@@ -166,8 +166,8 @@ def ran(cid: str, ok: bool) -> None:
 def no_corpus_reason(hermes: bool = True) -> str:
     rules = ("--corpus and EDI_CORPUS are unset and no readable Hermes config names a corpus" if hermes
              else "EDI_CORPUS is unset")
-    return (f"no E-DI corpus resolved ({rules}); set EDI_CORPUS to a checkout of smoitozo/e-di at the "
-            f"tools/pin.json commit to run it")
+    return (f"no E-DI corpus resolved ({rules}); set EDI_CORPUS to <a checkout of evaluatordriven/doctrine>/contracts "
+            f"at the tools/pin.json commit to run it")
 
 
 NO_CORPUS = no_corpus_reason(True)

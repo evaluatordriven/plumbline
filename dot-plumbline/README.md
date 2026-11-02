@@ -33,10 +33,9 @@ first job runs; an empty placeholder would be structure nothing asked for.
 
 ## What does not go here
 
-- **The doctrine.** The seven weight-bearing E-DI files live in the corpus (a private repository; the
-  public reading copy is `github.com/evaluatordriven/doctrine`), and this program's schemas are DERIVED from a pinned commit of it
-  — see Plumbline's `tools/build_schemas.py` and `tools/pin.json`. Do not copy doctrine in.
-  public doctrine: `github.com/evaluatordriven/doctrine` (DOCTRINE.md v0.1 @ `dc61854`) — for reading; the tools and schemas still pin the private corpus.
+- **The doctrine.** The seven weight-bearing E-DI files live in the corpus,
+  `github.com/evaluatordriven/doctrine` (load set `contracts/`), and this program's schemas are DERIVED from a
+  pinned commit of it — see Plumbline's `tools/build_schemas.py` and `tools/pin.json`. Do not copy doctrine in.
 - **Local state.** Caches, build output, scratch. Those are not evidence.
 
 ## Naming

@@ -1,0 +1,164 @@
+{
+  "job_id": "example-scored-job",
+  "job_name": "Example scored job: a stand-in packet for the scored-mode control in kit/cases/run_cases.py",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "artifact": {
+    "repo": "https://example.invalid/example-project.git",
+    "base": "main at 0000000 (example base)",
+    "paths": [
+      "src/example_module.py",
+      "tests/test_example_module.py",
+      "docs/example.md"
+    ],
+    "deliverable": "a work branch whose code, tests and docs meet bar checks C1-C3"
+  },
+  "buyer": "Owner",
+  "specialist": "Owner scope decision (example), recorded in approval.md",
+  "human_seat": "Owner",
+  "maker": {
+    "name": "Example Maker Model",
+    "who": "Example Maker Model",
+    "kind": "model",
+    "identifier": "example-vendor/example-maker-model",
+    "via": "example.invalid",
+    "provider": {
+      "order": [
+        "example-host/fp8"
+      ],
+      "allow_fallbacks": false,
+      "zdr": true
+    },
+    "header": "X-Example-Metadata: enabled",
+    "model": {
+      "family": "example-maker",
+      "identifier": "example-vendor/example-maker-model",
+      "readOnly": false,
+      "endpoint": "from harness log (expected api.example.invalid)"
+    },
+    "harness_log": "custody/evidence/harness-maker*.log (raw request, raw response, generation reply per call)",
+    "operator": "Maker operator: issues the logged calls through the frozen harness and writes the returned files verbatim; authors nothing"
+  },
+  "evaluator": {
+    "name": "Example Evaluator operator",
+    "who": "Example Evaluator operator",
+    "role": "operates the instruments and files their output; issues no score of its own",
+    "instruments": [
+      {
+        "id": "S1",
+        "kind": "script",
+        "name": "freeze/instrument/run_instrument.sh (C1-C3)",
+        "author": "Orchestrator drafter"
+      },
+      {
+        "id": "E-M",
+        "kind": "model",
+        "name": "Example Evaluator Model",
+        "identifier": "example-other-vendor/example-evaluator-model",
+        "via": "example.invalid",
+        "provider": {
+          "order": [
+            "example-other-host/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "header": "X-Example-Metadata: enabled",
+        "dimensions": [
+          "J1",
+          "J2"
+        ],
+        "readOnly": true
+      }
+    ]
+  },
+  "standard_ref": {
+    "doc": "Owner scope decision (example), recorded in approval.md",
+    "version": "draft-example",
+    "with": "bar.md; the corpus EDI-MACHINE-CONTRACTS.md at the tools/pin.json commit"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "the tools/pin.json commit"
+  },
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "cap_counts": "generations",
+    "budget": {
+      "amount": 5,
+      "unit": "USD",
+      "lt": true,
+      "time_hours_lt": 8,
+      "note": "strictly under US$5 of all model/API spend, enforced by the frozen harness's pre-call job guard; either breach -> needs_owner"
+    }
+  },
+  "k": 3,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "Owner scope decision (example)",
+      "ref": "approval.md",
+      "version": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "hardness": "DOCUMENT"
+    },
+    {
+      "source": "Example follow-ups list",
+      "ref": "follow-ups.md",
+      "version": "example-revision-1",
+      "hardness": "DOCUMENT"
+    }
+  ],
+  "escalation": {
+    "route": "Owner",
+    "classes": [
+      "cap_reached",
+      "budget_breach",
+      "time_breach",
+      "capability_gap",
+      "control_failed"
+    ],
+    "carries": "shortfalls"
+  },
+  "proposed": {
+    "status": "APPROVED by Owner (example)",
+    "drafted_by": "Orchestrator drafter (example)",
+    "level_claimed_for_own_record": "CL1",
+    "threshold_mapping": "Binary per check; pass = every check scores 1. Any 0 below the cap -> next iteration; at cap -> needs_owner.",
+    "k_x": "k = 3 iteration bound (= cap); x = 10 (% of budget) discovery window; not a spend allowance.",
+    "separation": "Maker and model evaluator are from different families and endpoints.",
+    "controls": "controls/ (sha256 manifest committed at freeze)"
+  },
+  "notes": "Neutral stand-in for the scored-mode control: shaped like a real scored packet (object maker and evaluator, bounds with a budget, ground truth, an escalation route), with placeholder names and example.invalid hosts.",
+  "close": {
+    "verdict": "CLOSEABLE",
+    "date": "2026-01-01T00:00:00Z",
+    "kit_revision": "0000000",
+    "counts": {
+      "OK": 5,
+      "FAILED": 0,
+      "NOT-CHECKABLE": 2
+    },
+    "skipped": {
+      "custody": 2,
+      "inputs": 1
+    },
+    "skipped_files": {
+      "custody": [
+        "custody/bar.md",
+        "custody/MANIFEST.sha256"
+      ],
+      "inputs": [
+        "inputs/brief.json"
+      ]
+    }
+  },
+  "disposition": "Accept the result with the disclosures listed (example).",
+  "disposition_state": "given",
+  "terminal_state": "accepted",
+  "outcome": "accepted"
+}

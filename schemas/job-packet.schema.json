@@ -68,7 +68,17 @@
           "minLength": 1
         },
         {
-          "type": "object"
+          "type": "object",
+          "properties": {
+            "kind": {
+              "enum": [
+                "person",
+                "model",
+                "script"
+              ],
+              "description": "Who holds the Evaluator seat (DOCTRINE D3.holder; Contracts \u00a74). Optional for now; a later version may require it."
+            }
+          }
         }
       ]
     },
@@ -216,12 +226,12 @@
     "k": {
       "type": "integer",
       "minimum": 0,
-      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (mandate B.1.2: \"found by iteration <= k or within x% of budget, with k and x declared per job\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
+      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (contracts/EDI-MANDATE.md \u00a77 B.1.2: the job declares its own bound before the run, \"material misalignment is found by iteration \u2264 k, or within x% of budget\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
     },
     "x": {
       "type": "number",
       "minimum": 0,
-      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (mandate B.1.2, verbatim). Both are terms, so both are written at open by the brief."
+      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (contracts/EDI-MANDATE.md \u00a77 B.1.2). Both are terms, so both are written at open by the brief."
     },
     "disposition_state": {
       "type": "string",
@@ -824,7 +834,7 @@
       }
     }
   ],
-  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/smoitozo/e-di@a48a4645aaa2 (Contracts v1.22.0). Field names are the corpus's; the instance layer is confined to the properties its own descriptions label INSTANCE-SPECIFIC (Contracts \u00a78 / C18). While ratified=false the must-ask values may live ONLY in the top-level `proposed` block and the loop's only possible terminal state is needs_owner \u2014 enforced structurally here, and in the corpus schema this file composes.",
+  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/evaluatordriven/doctrine@f8bfb7934dbb (Contracts v1.27.0). Field names are the corpus's; the instance layer is confined to the properties its own descriptions label INSTANCE-SPECIFIC (Contracts \u00a78 / C18). While ratified=false the must-ask values may live ONLY in the top-level `proposed` block and the loop's only possible terminal state is needs_owner \u2014 enforced structurally here, and in the corpus schema this file composes.",
   "$defs": {
     "plumblineBudget": {
       "type": "object",

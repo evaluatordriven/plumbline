@@ -1,0 +1,17 @@
+{
+  "entry": "B",
+  "instrument_profile": "mvi",
+  "job_name": "readings-census",
+  "artifact": "existing/SKILL.md",
+  "buyer": "Owner",
+  "maker": "unknown — recorded as unrecoverable",
+  "evaluator": "z-ai/glm-5.3-flash",
+  "standard_ref": "the artifact's own docs, version pinned before the freeze",
+  "human_seat": "Owner",
+  "mode": "readings",
+  "ratified": true,
+  "reads_before_freeze": "none — no defect-revealing read before the rubric was frozen",
+  "terminal_state": "accepted",
+  "outcome": "census",
+  "notes": "Every readable dimension conforms. A non-conformance would exit needs_owner, not census (0037)."
+}

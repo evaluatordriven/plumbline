@@ -28,12 +28,12 @@
     "k": {
       "type": "integer",
       "minimum": 0,
-      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (mandate B.1.2: \"found by iteration <= k or within x% of budget, with k and x declared per job\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
+      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (contracts/EDI-MANDATE.md §7 B.1.2: the job declares its own bound before the run, \"material misalignment is found by iteration ≤ k, or within x% of budget\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
     },
     "x": {
       "type": "number",
       "minimum": 0,
-      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (mandate B.1.2, verbatim). Both are terms, so both are written at open by the brief."
+      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (contracts/EDI-MANDATE.md §7 B.1.2). Both are terms, so both are written at open by the brief."
     },
     "disposition_state": {
       "type": "string",

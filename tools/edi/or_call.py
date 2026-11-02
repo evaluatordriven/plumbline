@@ -47,6 +47,13 @@ BASE = "https://openrouter.ai/api/v1"
 KEY_FILE = os.environ.get("OPENROUTER_KEY_FILE") or os.path.expanduser("~/.openrouter-key")
 META_HEADER = ("X-OpenRouter-Metadata", "enabled")
 REDACTED = "Bearer [REDACTED]"
+# Header names whose values are credentials or session state; matched case-insensitively.
+SECRET_HEADERS = frozenset({
+    "authorization", "proxy-authorization", "x-api-key", "api-key", "apikey",
+    "x-auth-token", "x-access-token", "x-refresh-token", "x-session-token",
+    "x-amz-security-token", "x-goog-api-key", "openai-api-key", "anthropic-api-key",
+    "cookie", "set-cookie", "set-cookie2", "cookie2",
+})
 HARNESS_NAME = "tools/edi/or_call.py"
 
 
@@ -65,6 +72,33 @@ def writer() -> str:
 def die(msg: str, code: int = 2) -> None:
     print(msg, file=sys.stderr)
     raise SystemExit(code)
+
+
+def _secret_header(name: str) -> bool:
+    n = str(name).strip().lower()
+    return (n in SECRET_HEADERS or "cookie" in n or "api-key" in n or "apikey" in n
+            or "secret" in n or "password" in n or n.endswith("authorization")
+            or n.endswith("-token"))
+
+
+def log_safe_headers(h: dict) -> dict:
+    """Copy of headers fit for a log: credential and cookie values masked.
+
+    Names are matched case-insensitively and kept as given. An Authorization
+    (or Proxy-Authorization) value that was Bearer becomes 'Bearer [REDACTED]';
+    every other masked value becomes '[REDACTED]'. Harmless headers (Date,
+    CF-Ray, Content-Type, X-OpenRouter-Metadata, ...) are kept unchanged.
+    """
+    out = {}
+    for k, v in (h or {}).items():
+        if not _secret_header(k):
+            out[k] = v
+        elif (str(k).strip().lower().endswith("authorization") and isinstance(v, str)
+              and v.strip().lower().startswith("bearer")):
+            out[k] = REDACTED
+        else:
+            out[k] = "[REDACTED]"
+    return out
 
 
 def norm(v) -> str:
@@ -515,7 +549,7 @@ def _send(a, t, sleep, key, tag, provider, messages, call_name, holder) -> int:
     url = f"{a.base_url}/chat/completions"
     send_headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json",
                     META_HEADER[0]: META_HEADER[1]}
-    log_headers = {**send_headers, "Authorization": REDACTED}
+    log_headers = log_safe_headers(send_headers)
     entry = {
         "call": call_name,
         "seat": a.seat,
@@ -541,7 +575,7 @@ def _send(a, t, sleep, key, tag, provider, messages, call_name, holder) -> int:
         print(f"or_call: transport error, logged: {type(exc).__name__}", file=sys.stderr)
         return 3
     entry["received_at"] = now()
-    entry["response_status"], entry["response_headers"] = status, hdrs
+    entry["response_status"], entry["response_headers"] = status, log_safe_headers(hdrs)
     holder["status"] = status
     try:
         resp = json.loads(raw.decode("utf-8"))

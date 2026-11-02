@@ -272,6 +272,30 @@ class LedgerTest(unittest.TestCase):
                                          "--key-reading", str(reading)), 0)
         self.assertEqual(self.events.read_bytes(), before)
 
+    def test_spend_paths_job_relative_even_outside_job(self):
+        now = datetime.now(timezone.utc)
+        outside = Path(self.tmp.name) / "shared"
+        outside.mkdir()
+        cases = [(outside / "spend.jsonl", outside / "reading.json", "../shared/"),
+                 (self.job / "spend" / "ledger.jsonl", self.job / "spend" / "reading.json", "spend/")]
+        for ledger, reading, prefix in cases:
+            ledger.parent.mkdir(parents=True, exist_ok=True)
+            ledger.write_text(json.dumps({"event": "settle", "at": iso(now - timedelta(minutes=10)),
+                                          "cost_usd": 0.01}) + "\n", encoding="utf-8")
+            reading.write_text(json.dumps({"read_at": iso(now - timedelta(minutes=6)),
+                                           "writer": "tools/edi/or_call.py@abc",
+                                           "key_delta_usd": 0.0}), encoding="utf-8")
+            self.assertEqual(self.run_cmd("spend", "--job-dir", str(self.job), "--spend-ledger", str(ledger),
+                                          "--key-reading", str(reading)), 0)
+            ev = self.read_events()[-1]
+            for field, target in (("spend_ledger", ledger), ("key_reading", reading)):
+                self.assertFalse(Path(ev[field]).is_absolute(), ev[field])
+                self.assertFalse(ev[field].startswith("/"), ev[field])
+                self.assertNotIn(self.tmp.name, ev[field])
+                self.assertTrue(ev[field].startswith(prefix), ev[field])
+                self.assertEqual((self.job / ev[field]).resolve(), target.resolve())
+        self.assertNotIn(self.tmp.name, self.events.read_text(encoding="utf-8"))
+
     def test_dispose_bounds(self):
         now = datetime.now(timezone.utc)
         last = now - timedelta(minutes=10)

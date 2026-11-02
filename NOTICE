@@ -18,11 +18,10 @@ Evaluator Driven — custody record specification
 (https://github.com/evaluatordriven/custody), Copyright 2026 Steve Moitozo II,
 licensed under the Apache License, Version 2.0.
 
-schemas/vendor/e-di@a48a4645/ (job-packet.schema.json, evaluator-record.schema.json
-and fixtures/*.json) is vendored byte-for-byte from
-E-DI — Evaluator Driven Iteration
-(a private repository; public reading copy: https://github.com/evaluatordriven/doctrine)
-at commit a48a4645aaa29947fdc17168d26c69c849941580,
+schemas/vendor/e-di@f8bfb793/ (job-packet.schema.json, evaluator-record.schema.json
+and fixtures/*.json) is vendored byte-for-byte from contracts/schemas/ in
+Evaluator Driven doctrine
+(https://github.com/evaluatordriven/doctrine) at commit f8bfb7934dbbefe3b32bc146b4481dba1744bc53,
 Copyright 2026 Steve Moitozo II,
 licensed under the Apache License, Version 2.0 (the E-DI text is licensed under CC BY 4.0).
-schemas/vendor/e-di@a48a4645/VENDOR.json lists each file's source path and sha256.
+schemas/vendor/e-di@f8bfb793/VENDOR.json lists each file's source path and sha256.

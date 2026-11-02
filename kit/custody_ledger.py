@@ -46,7 +46,7 @@ usage errors included, exits non-zero (2 = usage, 3 = refused), prints a line st
 changes neither the ledger nor `custody.json`. Stdlib only.
 """
 from __future__ import annotations
-import argparse, json, sys
+import argparse, json, os, sys
 from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
@@ -74,6 +74,15 @@ def relpath(job: Path, p: Path) -> str:
         return p.resolve().relative_to(job.resolve()).as_posix()
     except ValueError:
         return str(p.resolve())
+
+
+def job_relpath(job: Path, p: Path) -> str:
+    """A path relative to the job dir, always: '../' steps when p lies outside the job.
+
+    Spend lines name files that may live outside the job (a shared spend ledger), and
+    the custody record must not carry absolute paths, so this never returns one.
+    """
+    return Path(os.path.relpath(p.resolve(), job.resolve())).as_posix()
 
 
 def read_events(job: Path) -> list[dict]:
@@ -480,9 +489,9 @@ def main(argv=None) -> int:
                           f"{H.iso(last_settle)}; read the key again later", 3)
         key_delta = float(r.get("key_delta_usd") or 0)
         total = max(ledger_sum, key_delta)
-        ev = {"event": "spend", "spend_ledger": relpath(job, lp),
+        ev = {"event": "spend", "spend_ledger": job_relpath(job, lp),
               "spend_ledger_sha256": sha256(lp.read_bytes()).hexdigest(),
-              "key_reading": relpath(job, rp), "key_reading_sha256": sha256(rp.read_bytes()).hexdigest(),
+              "key_reading": job_relpath(job, rp), "key_reading_sha256": sha256(rp.read_bytes()).hexdigest(),
               "ledger_sum_usd": ledger_sum, "key_delta_usd": key_delta, "total_usd": total,
               "read_at": r["read_at"], "last_settle_at": H.iso(last_settle) if last_settle else None, "at": t}
 

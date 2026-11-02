@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/smoitozo/e-di/schemas/job-packet.schema.json",
+  "$id": "https://github.com/evaluatordriven/doctrine/contracts/schemas/job-packet.schema.json",
   "title": "E-DI job packet",
   "type": "object",
   "additionalProperties": true,
@@ -46,7 +46,9 @@
     "evaluator": {
       "oneOf": [
         {"type": "string", "minLength": 1},
-        {"type": "object"}
+        {"type": "object",
+         "properties": {"kind": {"enum": ["person", "model", "script"],
+                                 "description": "Who holds the Evaluator seat (DOCTRINE D3.holder; Contracts §4). Optional for now; a later version may require it."}}}
       ]
     },
     "ground_truth": {

@@ -1,13 +1,13 @@
 {
   "$schema": "plumbline/schemas/compliance-checklist.json",
-  "title": "E-DI Contracts \u00a79 compliance checklist \u2014 machine-readable (v1.22.0)",
+  "title": "E-DI Contracts \u00a79 compliance checklist \u2014 machine-readable (v1.27.0)",
   "description": "DERIVED from Contracts \u00a79 by tools/build_schemas.py, with the authored `why` annotations re-attached by clause id (they are authored, not generated \u2014 a wholesale regeneration loses them). Ids are stable and never renumbered (Contracts \u00a712); retired ids stay reserved.",
-  "contracts_version": "1.22.0",
-  "contracts_source": "github.com/smoitozo/e-di@a48a4645aaa2 (EDI-MACHINE-CONTRACTS.md)",
-  "contracts_sha256": "1016e871ff2d51776dc21009c1a668c24a3d508f5ec2d80a70ade12decd6dc86",
+  "contracts_version": "1.27.0",
+  "contracts_source": "github.com/evaluatordriven/doctrine@f8bfb7934dbb (EDI-MACHINE-CONTRACTS.md)",
+  "contracts_sha256": "70c40aca53f0c22eb22bc03513c2f4f30511177886135d611e8b596593ad82b9",
   "rule_index": {
-    "in_scope": 82,
-    "line": 70,
+    "in_scope": 86,
+    "line": 74,
     "schema": 2,
     "none": 10,
     "uncovered": 0,
@@ -24,7 +24,7 @@
     "rationale": "\u00a73 requires a mean threshold AND a per-dimension floor. For conformance both are 10: every clause must hold. A non-conformance scores above the reject floor deliberately \u2014 a divergence is remediable and opens a new job, it is not a discarded artifact."
   },
   "provenance": {
-    "clauses_parsed": 35,
+    "clauses_parsed": 39,
     "annotations_reattached": 12,
     "retired_ids_reserved": [
       "C17"
@@ -217,6 +217,26 @@
       "id": "C36",
       "clause": "a `regenerate` verdict carries at least one violation, because an iteration that names nothing it is tasked with is not an iteration; and a dimension scored below `T_dim` carries a violation whose class is rule 4's locator and whose `dimension` names it, while a violation whose shortfall is the pass rule's mean names no dimension and is complete without one; a `regenerate` with no violation, or a below-floor dimension with no violation naming it, fails the record",
       "section": "\u00a74, \u00a75"
+    },
+    {
+      "id": "C37",
+      "clause": "the job records who holds the Architect seat, and where the Orchestrator holds it the double-hat is declared; the Architect's decisions are recorded apart from the Evaluator's scores, and no score is attributed to the Architect; the artifact carried forward is the one rule 12's test selects from the scores, never the Architect's pick; readiness for the Maker is recorded as the pinned inputs, the specified fixes and the absence of any contradiction with the bar, never as a predicted pass; each iteration's input \u2014 the artifact handed over, by hash, and the defects and solutions sent with it \u2014 is recorded with the seat that decided it, and the Orchestrator verifies that what it delivered is what was decided",
+      "section": "\u00a74"
+    },
+    {
+      "id": "C38",
+      "clause": "the Maker and the Evaluator are dispatched only by the Orchestrator and return only to it; no message passes between them directly; no seat instructs the Evaluator on a score during a run, and a change to the instrument is recorded as a new instrument",
+      "section": "\u00a74.2"
+    },
+    {
+      "id": "C39",
+      "clause": "no Maker message contains held-out material, which is only material the Maker cannot see; findings reach the Maker and the Architect with every known defect and its measurement, an expected value on a fixture the Maker can see included; every built Maker message is checked against held-out material before dispatch, with the method, the result and who ran it recorded, and where the Orchestrator authored both the dimension set and the held-out material the Evaluator or the Architect also runs the check; every seat other than the Evaluator, the author and the custodian that has seen held-out material is recorded",
+      "section": "\u00a74.2"
+    },
+    {
+      "id": "C40",
+      "clause": "if the job requires approvals, each is recorded with approver, time and zone, channel, scope, words or labelled paraphrase, and whether it was direct or relayed; the form is the job's declaration (standing/kickoff grant, acting-channel yes, or allowed relay); jobs that declare no per-act approval need none beyond kickoff frame, budget and bounds; a form the job did not declare authorizes nothing",
+      "section": "\u00a74.2"
     }
   ]
 }
