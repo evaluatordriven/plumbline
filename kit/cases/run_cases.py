@@ -2,14 +2,14 @@
 """Every check this kit wraps must be shown FAILING before anyone trusts a pass.
 
 Two controls, because the law is mode-dependent: a READINGS packet (this kit job's own, no bar,
-no bounds) and a SCORED packet (the discoverability-gate job, which carries a specialist and
+no bounds) and a SCORED packet (a neutral stand-in fixture, which carries a specialist and
 bounds). A mutation is only a defect *for the mode it is applied to*, and the first draft of this
 file got that wrong twice — it mutated a readings packet in ways readings tolerate and called the
 result a miss. The control is what caught it, which is why the control is a case and not a
 formality.
 
     readings control     the kit job packet            -> must pass
-    scored control       the gate job packet            -> must pass
+    scored control       the scored stand-in packet     -> must pass
     readings + bounds    branch 0: no bar, so no bounds -> must fail
     scored + escalation ""                            -> must fail (the case recorded 2026-09-30:
                                                           the schema is loose, the gate is not)
@@ -405,7 +405,7 @@ def main() -> int:
     CORPUS = str(resolved.path)
     print(f"planted defects — two controls, six mutations, and the job-close gate (corpus: {CORPUS})")
     r = [case("CONTROL (readings): the kit job packet must pass", READINGS, lambda d: None, (0, "0 failed")),
-         case("CONTROL (scored): the gate job packet must pass", SCORED, lambda d: None, (0, "0 failed")),
+         case("CONTROL (scored): the scored stand-in packet must pass", SCORED, lambda d: None, (0, "0 failed")),
          case("readings packet + bounds (branch 0)", READINGS,
               lambda d: d.update({"bounds": {"T_accept": 9, "T_dim": 6, "T_reject": 2, "cap": 1}}),
               (1, "FAILED")),
