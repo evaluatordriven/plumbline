@@ -35,7 +35,7 @@ First public-facing cut: a custody/v1 emitter plus an E-DI kit.
   `doctrine_files`, the sha256 of `DOCTRINE.md` and `AUTHORITY.json`, whose drift `--check` reports.
   The four derived schemas are rebuilt; the checklist now runs C1–C40 with C17 retired.
 - `kit/cases/run_cases.py` reads two committed stand-ins, `tests/fixtures/cases/readings-control.json` (the
-  corpus's `readings-census.json`) and `scored-control.json` (the 2026-10-28 job's packet), instead of two
+  corpus's `readings-census.json`) and `scored-control.json` (a neutral stand-in scored packet), instead of two
   unpublished job packets, so it runs in a checkout with no `dot-plumbline/jobs/`. 37 cases.
 - `kit/emit_packet.py` prints a NOTE when the brief's evaluator has no `kind` (`person`, `model` or `script`;
   Contracts §4). It is optional, so it never refuses.
