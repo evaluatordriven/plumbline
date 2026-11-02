@@ -284,5 +284,5 @@
       }
     }
   },
-  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/smoitozo/e-di@a48a4645aaa2 (Contracts v1.22.0). Copied shape-for-shape: field names, requiredness and additionalProperties are the corpus's. Plumbline additions travel in instance_extensions[] (name + label:'instance-specific' + value), never as new top-level fields, so every record still validates against the corpus \u00a75 shape."
+  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/evaluatordriven/doctrine@f8bfb7934dbb (Contracts v1.27.0). Copied shape-for-shape: field names, requiredness and additionalProperties are the corpus's. Plumbline additions travel in instance_extensions[] (name + label:'instance-specific' + value), never as new top-level fields, so every record still validates against the corpus \u00a75 shape."
 }

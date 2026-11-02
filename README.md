@@ -57,14 +57,14 @@ python3 -m unittest discover -s tests -p 'test_*.py'   # emitter, ledger, verifi
 ```
 
 The corpus schemas and fixture battery those suites read are **vendored** at the pin, byte for byte, in
-`schemas/vendor/e-di@a48a4645/` (provenance and every file's sha256 in its `VENDOR.json`; licence in `NOTICE`).
+`schemas/vendor/e-di@f8bfb793/` (provenance and every file's sha256 in its `VENDOR.json`; licence in `NOTICE`).
 
-**Opting in to the corpus checks.** With the E-DI corpus checkout (private today; see Known limitations), set
+**Opting in to the corpus checks.** With a checkout of the public corpus ([`evaluatordriven/doctrine`](https://github.com/evaluatordriven/doctrine)), set
 `EDI_CORPUS` and the same commands also check the corpus itself: that it is still at the pin, that the derived
 schemas rebuild byte-identical from it, that the vendored copy is still its bytes, and the kit cases:
 
 ```sh
-export EDI_CORPUS=/path/to/e-di            # a checkout at a48a4645aaa29947fdc17168d26c69c849941580
+export EDI_CORPUS=/path/to/doctrine/contracts   # evaluatordriven/doctrine at f8bfb7934dbbefe3b32bc146b4481dba1744bc53
 python3 tests/run_all.py                   # each corpus id now prints RAN[corpus] <id>: pass
 export PLUMBLINE_REQUIRE_CORPUS=1          # make a missing corpus a failure, never a skip (for a gate)
 ```
@@ -107,10 +107,11 @@ checker (see Known limitations). How to emit and verify a record is in **`docs/c
 
 ## The doctrine this obeys
 
-Plumbline's schemas are **derived from a private corpus at `e-di@a48a4645aaa2` (Contracts v1.22.0); public
-reading copy: [`evaluatordriven/doctrine`](https://github.com/evaluatordriven/doctrine)** (DOCTRINE.md v0.1 @
-`dc61854`). Nothing here reads the public copy; the tools and schemas pin the private corpus, and
-`tools/pin.json` records its commit and every source file's sha256. The summary and the load order are in
+Plumbline's schemas are **derived from the public corpus
+[`evaluatordriven/doctrine`](https://github.com/evaluatordriven/doctrine) at `e-di@f8bfb7934dbb` (Contracts
+v1.27.0)**, read from its `contracts/` directory. `tools/pin.json` records the commit, that path, every source
+file's sha256, and the sha256 of `DOCTRINE.md` and `AUTHORITY.json` (pinned so `--check` reports their drift;
+nothing is derived from them). The summary and the load order are in
 **`AGENTS.md`** — read it before changing anything.
 
 Cite the commit, not just the version: a version number cannot be checked, a commit can. The build refuses to
@@ -166,7 +167,8 @@ with custody's public checker at `3e3ca58`; `examples/README.md` gives the comma
 of its files, so the files keep the paths, user names and machine names of the environment that produced them
 (for example home-directory paths, box paths and model-harness logs); editing them to tidy those would break
 the records. The subject files each record judges come from commits in a private repository, so their exact
-bytes are shipped beside the jobs in `examples/subjects/<job-id>/`. The two records predate the current
+bytes are shipped beside the jobs in `examples/subjects/<job-id>/`. `examples/subjects/` is those subject bytes only:
+it is not Plumbline's codebase, and nothing in Plumbline imports or runs it. The two records predate the current
 `x-plumbline` schema, so `kit/plumbline_verify.py` passes them at the custody layer and reports exit 4
 (Plumbline-layer schema) on them; that is expected and is not a custody failure.
 
@@ -194,8 +196,8 @@ tests/      the suites
 
 ## Known limitations
 
-- **The E-DI corpus is private.** The schemas and fixtures the suites read are vendored, so every suite runs
-  without it, and the five checks that need the corpus itself print `SKIP[corpus] <id>` by name (see
+- **The corpus checks need a doctrine checkout.** The schemas and fixtures the suites read are vendored, so
+  every suite runs without one, and the five checks that need the corpus itself print `SKIP[corpus] <id>` by name (see
   above). The emitters (`kit/emit_packet.py`, `kit/emit_record.py`), `kit/plumbline_job.py`,
   `kit/plumbline.py <paths>`, `kit/cases/run_cases.py` and the schema build still need a corpus checkout.
 - **Hand-entered times.** The emitter refuses a hand-entered time by default (exit 3, kind `hand-time`). Under
@@ -210,13 +212,15 @@ tests/      the suites
   `CUSTODY_DIR` that test skips.
 - **CI runs the stranger's run.** `.github/workflows/ci.yml` runs `tests/run_all.py` on Python 3.11, 3.12
   and 3.13 with no corpus and an empty `HOME`, then checks out custody's upstream at its pin, compares the
-  vendored custody schema with it, and runs the real-checker test against it with `CUSTODY_DIR` set. The corpus checks are not run in CI (the corpus is private); run them locally with
-  `EDI_CORPUS` set.
+  vendored custody schema with it, and runs the real-checker test against it with `CUSTODY_DIR` set. A separate CI job clones `evaluatordriven/doctrine` at the
+  `tools/pin.json` commit and runs `tests/run_all.py` with `PLUMBLINE_REQUIRE_CORPUS=1`.
 - **Instance tools.** Some tools under `tools/` measured Plumbline's own private records (for example
   `check_operating_loop.py`, `measure_operator_burden.py`, `run_conformance_read.py`, `probe_jev_evaluator*.py`)
-  and do not run on a plain clone. The opt-in corpus run of `kit/cases/run_cases.py` also reads two job packets
-  that are not published.
-- **Versions.** This is 0.1.0, unreleased (`CHANGELOG.md`).
+  and do not run on a plain clone.
+- **Rules not yet exercised.** Contracts v1.26.0 added C37–C40, the §4 roles table and Instrument A2/I2.
+  `schemas/compliance-checklist.json` lists C37–C40, but no Plumbline check, case or fixture exercises them,
+  and nothing here enforces the roles table or A2/I2. They are disclosed gaps, not covered rules.
+- **Versions.** This is 0.1.0, dated 2026-11-02 (`CHANGELOG.md`).
 
 ## Licenses
 

@@ -207,8 +207,7 @@ The record names the commit and tree of the checkout the emitter ran from. The e
 | Need | Detail |
 |---|---|
 | Python 3.10+ | The emitter, drift check and packer use only the standard library. The test suite needs `jsonschema`, which the venv has. |
-| E-DI corpus at the pin, **for `close` only** | The corpus is a private repository (its public reading copy is `github.com/evaluatordriven/doctrine`, which has no machine files). With access, clone it and check out `a48a4645aaa29947fdc17168d26c69c849941580`, then pass `--corpus <that checkout>` (or set `$EDI_CORPUS`). **A checkout at the corpus tip is NOT at the pin.** At tip (`f9c6f752…`) its `schemas/evaluator-record.schema.json` rejects the `passes` key that `kit/emit_record.py` writes, so a **scored** close against it stops at "the corpus rejected the emitted record" (observed 2026-10-27). A readings close against it did complete. |
-| public doctrine: `github.com/evaluatordriven/doctrine` (DOCTRINE.md v0.1 @ `dc61854`) | For reading alongside the private corpus. The tools and schemas still pin the private corpus; nothing here reads the public doctrine. |
+| E-DI corpus at the pin, **for `close` only** | Clone `github.com/evaluatordriven/doctrine` and check out `f8bfb7934dbbefe3b32bc146b4481dba1744bc53`, then pass `--corpus <that checkout>/contracts` (or set `$EDI_CORPUS`). **A checkout at another commit is NOT at the pin**: `tools/build_schemas.py --check` names the drift. |
 | custody checkout (optional) | `git clone https://github.com/evaluatordriven/custody && git -C custody checkout 3e3ca58de5631bdc58291564303a2e9d25a8653e`. You need it for `checker/check.py` (the standard layer), `kit/plumbline_verify.py` (the Plumbline layer) and the upstream half of the drift check. |
 | Hermes | **Not needed.** Nothing here reads `~/.hermes`. Every command runs with an empty `HOME`. |
 | Keys | **Only your model keys**, for the maker and the evaluator. Use whatever your harness reads, e.g. the provider API-key environment variable. Plumbline, the emitter and the packer read no key. |
@@ -451,7 +450,7 @@ writes a summary stamps `started_at`, `finished_at` (UTC Z, its own clock) and `
 
 For each job:
 
-1. **Open** the job: `python3 kit/plumbline_job.py open --brief brief.json --job-dir dot-plumbline/jobs/<id> --corpus <e-di@a48a4645>`.
+1. **Open** the job: `python3 kit/plumbline_job.py open --brief brief.json --job-dir dot-plumbline/jobs/<id> --corpus <doctrine@f8bfb793>/contracts`.
 2. **Freeze** the bar: write `custody/bar.md`, then `custody_ledger.py freeze` at that moment. The Buyer and the Specialist (each a person; never the orchestrator) each approve it, stamped with `custody_ledger.py approve` as they do, before any maker call.
 3. **Pin** (OpenRouter): the Orchestrator chooses one ZDR provider per model from `GET https://openrouter.ai/api/v1/endpoints/zdr` and declares each seat's pin with `custody_ledger.py pin` **before the Maker starts**. Use the exact model slugs (see "Provider pin and routing request"). Every request body carries `"provider": {"order": ["<pinned slug>"], "allow_fallbacks": false, "zdr": true}`. Log every call in full: the whole request body, the whole response, the `Date` header, and the `/api/v1/generation` reply under `generation`.
 4. **Make**: run the maker model and put the artifact in `custody/files/`. Its run file names the artifact the §5 record hashes. Save the maker's harness log (with its `Date` header and response) as `custody/evidence/harness-maker-<model>.log`. Record the maker block; do not type `startedAt`/`producedAt` (the log decides).
@@ -468,7 +467,7 @@ For each job:
 
    ```sh
    python3 kit/plumbline_job.py close --job-dir dot-plumbline/jobs/<id> --run run-1.json \
-     --corpus <e-di@a48a4645> --terminal-state <accepted|needs_owner|rejected> --outcome <same> \
+     --corpus <doctrine@f8bfb793>/contracts --terminal-state <accepted|needs_owner|rejected> --outcome <same> \
      [--disposition given|declined] [--allow-hand-times] [--custody <custody checkout>]
    ```
 

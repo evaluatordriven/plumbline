@@ -1,11 +1,11 @@
 {
-  "source_repo": "https://github.com/smoitozo/e-di",
-  "commit": "a48a4645aaa29947fdc17168d26c69c849941580",
-  "copied_by": "for rel in <the 45 paths below>; do git -C \"$CORPUS_GIT\" show \"a48a4645:schemas/$rel\" > \"schemas/vendor/e-di@a48a4645/$rel\"; done; (cd schemas/vendor/e-di@a48a4645 && sha256sum <the 45 paths>)  # CORPUS_GIT = a clean smoitozo/e-di checkout at a48a4645aaa29947fdc17168d26c69c849941580",
+  "source_repo": "github.com/evaluatordriven/doctrine",
+  "commit": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53",
+  "copied_by": "tools/vendor_corpus.py: the two schemas and every fixtures/*.json at f8bfb793, read with git show",
   "files": {
     "job-packet.schema.json": {
       "original_path": "schemas/job-packet.schema.json",
-      "sha256": "afde653b37eb19c7f890a12de22abde4940209c9580871a5aa7fbf504339397b"
+      "sha256": "5774604758ebcfeebceb0896acd5484878c2c84902d8b41e6216b0eb2764c953"
     },
     "evaluator-record.schema.json": {
       "original_path": "schemas/evaluator-record.schema.json",
@@ -18,6 +18,10 @@
     "fixtures/bad-entry-b-no-reads.json": {
       "original_path": "schemas/fixtures/bad-entry-b-no-reads.json",
       "sha256": "ee236e7b7f75a0ae490e77f1bd4ec7e21a9521f428c33acc3cff18b8f724ca88"
+    },
+    "fixtures/bad-evaluator-kind.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-kind.json",
+      "sha256": "de0f673fd6a516c9e1171a9e90512c5fad36889b9d3bf8b6db28ce919e989b5a"
     },
     "fixtures/bad-evaluator-record-below-floor-unnamed.json": {
       "original_path": "schemas/fixtures/bad-evaluator-record-below-floor-unnamed.json",
@@ -78,6 +82,10 @@
     "fixtures/bad-unratified-filled.json": {
       "original_path": "schemas/fixtures/bad-unratified-filled.json",
       "sha256": "4084932283470ebbe8e1cb20767f2271431b5ffe8a6aa9136f134d9fbf24b132"
+    },
+    "fixtures/evaluator-kind-script.json": {
+      "original_path": "schemas/fixtures/evaluator-kind-script.json",
+      "sha256": "a434b50f6a6799c566bef2c5918ff21e4bc5a9568b98c6bf9899a630845138eb"
     },
     "fixtures/evaluator-record-example.json": {
       "original_path": "schemas/fixtures/evaluator-record-example.json",
@@ -183,17 +191,5 @@
       "original_path": "schemas/fixtures/readings-census.json",
       "sha256": "ec50120ffc414b034fa5c31eeb1ca0495826300482d339de1faf94f6f6b129c3"
     }
-  },
-  "license": {
-    "code": "Apache-2.0",
-    "text": "CC-BY-4.0"
-  },
-  "copyright": "Copyright 2026 Steve Moitozo II",
-  "provenance": {
-    "commit_identities": [
-      "Steve Moitozo II <smoitozo@users.noreply.github.com>"
-    ],
-    "held_by": "Steve Moitozo II"
-  },
-  "note": "Vendored byte-for-byte; never hand-edited. tools/build_schemas.py --check verifies every file against its sha256 here, and the two schemas against tools/pin.json files. Re-vendor only together with a deliberate re-pin."
+  }
 }

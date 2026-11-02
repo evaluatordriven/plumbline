@@ -49,6 +49,20 @@ def seats(packet: dict) -> tuple[str, str]:
     return name(packet.get("maker")), name(packet.get("evaluator"))
 
 
+KINDS = ("person", "model", "script")
+
+
+def kind_note(p: dict) -> str:
+    """Contracts §4 (v1.26.0): who holds the Evaluator seat is recorded with the job, as `evaluator.kind`.
+    Optional in the schema today, so its absence is a NOTE, never a refusal. The emitter does not guess it: only
+    the brief knows whether a person, a model or a script holds the seat."""
+    ev = p.get("evaluator")
+    if isinstance(ev, dict) and ev.get("kind") in KINDS:
+        return ""
+    return ("NOTE evaluator.kind not recorded — Contracts §4 records who holds the Evaluator seat; give the "
+            "brief's evaluator as {\"name\": ..., \"kind\": \"person\" | \"model\" | \"script\"}")
+
+
 def refusals(p: dict, required: list[str]) -> list[str]:
     out = []
     for k in required:                                    # the law's own list, read from the corpus schema
@@ -121,7 +135,7 @@ def refusals(p: dict, required: list[str]) -> list[str]:
                     out.append(f"mandate_ref missing: {k}")
         if blank(p.get("escalation")):
             out.append("scored mode missing: escalation — who is raised to, and on what")
-        # Mandate B.1.2: "found by iteration <= k or within x% of budget, with k and x declared per job".
+        # contracts/EDI-MANDATE.md §7 B.1.2: "material misalignment is found by iteration ≤ k, or within x% of budget", declared before the run.
         # Declared AT OPEN, because a bound declared after the fact is not a bound — and O2's rate has no
         # numerator without it. The corpus declares neither field, so this is Plumbline's own requirement.
         for bound in ("k", "x"):
@@ -179,6 +193,9 @@ def main() -> int:
         return 1
 
     path = out / "packet.json"
+    note = kind_note(packet)
+    if note:
+        print(note)
     if a.print_only:
         print(f"would write {path} ({len(packet)} keys, all declared by the corpus schema)")
         print(json.dumps(packet, indent=2)[:800]); return 0

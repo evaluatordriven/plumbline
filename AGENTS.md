@@ -28,9 +28,10 @@ hook instead.
 
 ## The doctrine this obeys — seven weight-bearing files, authority by question
 
-Plumbline's schemas are **derived from a private corpus at `e-di@a48a4645aaa2` (Contracts v1.22.0); public
-reading copy: `evaluatordriven/doctrine`** (DOCTRINE.md v0.1 @ `dc61854`). The tools and schemas pin the
-private corpus (not public; read the doctrine at `github.com/evaluatordriven/doctrine`); point `--corpus` or `$EDI_CORPUS` at a checkout of it. Record the
+Plumbline's schemas are **derived from the public corpus `evaluatordriven/doctrine` at `e-di@f8bfb7934dbb`
+(Contracts v1.27.0)**, its `contracts/` directory. Point `--corpus` or `$EDI_CORPUS` at
+`<a checkout of it>/contracts`; `tools/pin.json` requires exactly that path. **When two files disagree,
+`AUTHORITY.json` at the doctrine's top level says which wins**; read it before acting on a conflict. Record the
 commit, not just a version: a version number cannot be checked, a commit can. Every derived schema names the pin.
 **Re-pinning is a deliberate act, and the build refuses until you do it.** `tools/build_schemas.py` will not
 run when the corpus has moved, because a silent stale build is the failure mode. Re-read the changed doctrine,
@@ -87,7 +88,7 @@ tools/build_schemas.py   corpus @ pin  +  schemas/instance-extensions.json
 - **The build refuses to run when the corpus has moved.** Re-read the changed doctrine, then `--repin`.
   `--check` verifies the pin without writing; run `tests/run_all.py` before every commit (CI runs it too,
   with no corpus).
-- **The corpus is vendored at the pin.** `schemas/vendor/e-di@a48a4645/` holds the corpus's two schemas and
+- **The corpus is vendored at the pin.** `schemas/vendor/e-di@f8bfb793/` holds the corpus's two schemas and
   its fixture battery, byte for byte, with `VENDOR.json` (provenance, every sha256). The battery runs on it, so
   the suites need no corpus; `tools/build_schemas.py --check` fails when the copy, `VENDOR.json` and
   `tools/pin.json` disagree. Never edit the copy; re-vendor it from the corpus when the pin moves.

@@ -284,7 +284,7 @@
       }
     }
   },
-  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/smoitozo/e-di@a48a4645aaa2. An audit IS a \u00a75 evaluator run whose subject is an instance rather than an artifact, so it must validate against the corpus \u00a75 schema unchanged \u2014 the audit-specific fields ride inside instance_extensions, and this schema requires the three that make a finding checkable: artifact_ref, method_note, verdict_derivation. If Plumbline's own output were prose, Plumbline would fail the doctrine it enforces.",
+  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/evaluatordriven/doctrine@f8bfb7934dbb. An audit IS a \u00a75 evaluator run whose subject is an instance rather than an artifact, so it must validate against the corpus \u00a75 schema unchanged \u2014 the audit-specific fields ride inside instance_extensions, and this schema requires the three that make a finding checkable: artifact_ref, method_note, verdict_derivation. If Plumbline's own output were prose, Plumbline would fail the doctrine it enforces.",
   "allOf": [
     {
       "properties": {

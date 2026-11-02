@@ -4,7 +4,7 @@ Versions follow Semantic Versioning 2.0.0. Before 1.0.0 any release may change w
 what the verifier accepts; every such change is listed under **Breaking**. Each release is a git tag and is
 cited by its commit.
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-11-02)
 
 First public-facing cut: a custody/v1 emitter plus an E-DI kit.
 
@@ -15,7 +15,7 @@ First public-facing cut: a custody/v1 emitter plus an E-DI kit.
   line, one line per requirement the checker reports `FAILED`, with the requirement id and detail.
 - `LICENSE` (CC BY 4.0, text), `LICENSE-CODE` (Apache-2.0, code) and `NOTICE`.
 - `requirements.txt`, `CONTRIBUTING.md`, `SECURITY.md`, this changelog, and `kit/plumbline.py --version`.
-- `schemas/vendor/e-di@a48a4645/`: the corpus's job-packet and evaluator-record schemas and its 43-fixture
+- `schemas/vendor/e-di@f8bfb793/`: the corpus's job-packet and evaluator-record schemas and its 45-fixture
   battery, vendored byte for byte at the pin, with `VENDOR.json` (source, commit, copy command, sha256 of each
   file, licence). `NOTICE` names it.
 - `tests/run_all.py`: runs every suite and `kit/cases/run_cases.py`; prints one `SKIP[corpus]`, `RAN[corpus]`
@@ -29,10 +29,21 @@ First public-facing cut: a custody/v1 emitter plus an E-DI kit.
   records stay in a private evidence archive.
 
 **Changed**
+- The corpus pin moves from the private development pin `e-di@a48a4645` (Contracts v1.22.0) to the public
+  `evaluatordriven/doctrine` at `f8bfb7934dbb` (Contracts v1.27.0), read from its `contracts/` directory.
+  `tools/pin.json` gains `path` (`--check` requires the corpus to be exactly `<checkout>/contracts`) and
+  `doctrine_files`, the sha256 of `DOCTRINE.md` and `AUTHORITY.json`, whose drift `--check` reports.
+  The four derived schemas are rebuilt; the checklist now runs C1–C40 with C17 retired.
+- `kit/cases/run_cases.py` reads two committed stand-ins, `tests/fixtures/cases/readings-control.json` (the
+  corpus's `readings-census.json`) and `scored-control.json` (the 2026-10-28 job's packet), instead of two
+  unpublished job packets, so it runs in a checkout with no `dot-plumbline/jobs/`. 37 cases.
+- `kit/emit_packet.py` prints a NOTE when the brief's evaluator has no `kind` (`person`, `model` or `script`;
+  Contracts §4). It is optional, so it never refuses.
+- CI gains a `corpus` job: doctrine checked out at the pin, `tests/run_all.py` with `PLUMBLINE_REQUIRE_CORPUS=1`.
 - `tests/validate_audit.py`: a checkout with no `dot-plumbline/audits/` of its own and no audit home in reach
   now reports that by name and passes on its schema checks. A checkout that has the directory but no records
   still fails.
-- `tools/pin.json` and the derived schemas name the corpus repository (`github.com/smoitozo/e-di`), not a
+- `tools/pin.json` and the derived schemas name the corpus repository (`github.com/evaluatordriven/doctrine`), not a
   local path; the checkout is resolved through `--corpus` or `$EDI_CORPUS`.
 - Scripts use `#!/usr/bin/env python3` and resolve their own repository; no machine-specific paths.
 - Probe and conformance-read tools take their keys from the environment; `tools/edi/or_call.py` reads its key
@@ -61,3 +72,15 @@ First public-facing cut: a custody/v1 emitter plus an E-DI kit.
   is not a corpus, or a bad `PLUMBLINE_REQUIRE_CORPUS`, exits 2 naming it (it exited 1). A resolved corpus prints
   `corpus source: <src>`. New test: `tests/test_emit_record.py`.
 - `.github/workflows/ci.yml` uses `actions/checkout@v7` and `actions/setup-python@v7` on `ubuntu-26.04`.
+
+**Fixed**
+- `tools/edi/or_call.py`: request and response headers pass through the new `log_safe_headers` before they
+  reach the harness log. Credential and cookie headers (`Authorization`, `Proxy-Authorization`, `X-API-Key`,
+  `api-key`, `Cookie`, `Set-Cookie` and similar, any case) are masked; a Bearer `Authorization` logs as
+  `Bearer [REDACTED]`. Other headers such as `Date` and `CF-Ray` are kept.
+- `kit/custody_ledger.py spend` writes `spend_ledger` and `key_reading` relative to the job directory, with
+  `../` steps when the file lives outside the job, never as an absolute path.
+
+**Known gaps**
+- C37–C40, the §4 roles table and Instrument A2/I2 are new in this corpus. No Plumbline check, case or fixture
+  exercises them yet.

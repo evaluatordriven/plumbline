@@ -29,9 +29,8 @@ import json, shutil, subprocess, sys, tempfile
 from pathlib import Path
 
 KIT = Path(__file__).resolve().parent.parent
-JOBS = KIT.parent / "dot-plumbline" / "jobs"
-READINGS = JOBS / "2026-10-02-deployment-conformance-kit" / "packet.json"
-SCORED = JOBS / "2026-10-01-discoverability-gate" / "packet.json"
+READINGS = KIT.parent / "tests" / "fixtures" / "cases" / "readings-control.json"
+SCORED = KIT.parent / "tests" / "fixtures" / "cases" / "scored-control.json"
 # The corpus: the first argument, else $EDI_CORPUS (tools/edi_corpus.py, the shared D-E resolver). A set value that is
 # not a corpus exits 2 naming it. With none, the cases do not run: corpus.run-cases prints SKIP[corpus] and exits 0,
 # or FAIL[corpus] and exits 1 under PLUMBLINE_REQUIRE_CORPUS=1.
@@ -139,6 +138,33 @@ def packet_control() -> bool:
         hit = r.returncode == 0 and "OK (schema-verified)" in (r.stdout + r.stderr) and (w / "packet.json").is_file()
     print(f"  {'PASS' if hit else 'MISS'}  CONTROL: a clean brief emits a packet the gate accepts")
     return hit
+
+
+def kind_cases() -> list[bool]:
+    """evaluator.kind (Contracts §4, v1.26.0): a string evaluator emits with a NOTE; an object with a kind passes
+    through unchanged and without the NOTE; a kind outside person/model/script is REFUSED by the corpus gate."""
+    import tempfile
+    out = []
+    for label, ev, want_rc, want_note, want_kind in (
+        ("a string evaluator emits, with the evaluator.kind NOTE", "eval-profile", 0, True, None),
+        ("an evaluator with kind script passes through, no NOTE", {"name": "eval-profile", "kind": "script"}, 0, False, "script"),
+        ("an evaluator with kind robot is refused by the corpus gate", {"name": "eval-profile", "kind": "robot"}, 1, None, None),
+    ):
+        with tempfile.TemporaryDirectory() as td:
+            w = Path(td); brief = json.loads(json.dumps(PACKET_BRIEF)); brief["evaluator"] = ev
+            (w / "brief.json").write_text(json.dumps(brief, indent=2))
+            r = subprocess.run([sys.executable, str(KIT / "emit_packet.py"), "--brief", str(w / "brief.json"),
+                                "--out-dir", str(w), "--corpus", CORPUS], capture_output=True, text=True)
+            text = r.stdout + r.stderr
+            hit = (r.returncode == 0) == (want_rc == 0)
+            if want_note is not None:
+                hit = hit and (("NOTE evaluator.kind" in text) == want_note)
+            if want_kind:
+                pk = w / "packet.json"
+                hit = hit and pk.is_file() and json.loads(pk.read_text()).get("evaluator", {}).get("kind") == want_kind
+        print(f"  {'PASS' if hit else 'MISS'}  {label}  -> exit {r.returncode}")
+        out.append(hit)
+    return out
 
 
 def population_case() -> bool:
@@ -462,6 +488,7 @@ def main() -> int:
          c36_case(),
          ask2_case(),
          population_case(),
+         *kind_cases(),
          missing_path_case()]
     print(f"\n  {sum(r)}/{len(r)} cases behaved as required")
     edi_corpus.ran(CHECK_ID, all(r))
