@@ -1,0 +1,1693 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "bar": {
+    "file": "custody/bar.md",
+    "frozenAt": "2026-10-28T20:47:58Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+        "at": "2026-10-28T21:41:23Z",
+        "adopted": null
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+        "at": "2026-10-28T21:41:23Z",
+        "adopted": {
+          "document": "Owner sheet items 1-30 (OWNER-APPROVAL.md) + Plumbline DOCTRINE.md v0.1 @ dc61854",
+          "version": "v0.1"
+        }
+      }
+    ],
+    "author": "Steve Moitozo II",
+    "dimensions": [
+      {
+        "id": "T1",
+        "plumbline_dimension": "T1",
+        "criterion": "Every line that any `custody_ledger.py` command appends (old and new commands) carries `writer: \"kit/custody_ledger.py@<first 12 hex of the sha256 of the file that ran>\"`. That value equals the file's sha256 at run time. Its `at` comes from the tool's clock, within ±5 s of the instrument's own clock around the call.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T2",
+        "plumbline_dimension": "T2",
+        "criterion": "On held-out planted fixtures P-T2a (ledger lines with no `writer`), P-T2b (`writer: \"hand\"`), P-T2c (a time in `custody.json` with no ledger line) and P-T2d (a tool line overridden by a later hand line), the emitter **with no switch** exits 3 with refusal kind `hand-time`, names every hand-time field and its file:line, and writes nothing.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T3",
+        "plumbline_dimension": "T3",
+        "criterion": "On the same fixtures **with `--allow-hand-times`**, the record is written and check.py reads OK at CL1. `x-plumbline.hand_times[]` lists exactly the hand-time fields, no more and no fewer, each with file:line, and the record carries the allowance `x-plumbline.allowances.hand_times` (`switch: \"--allow-hand-times\"`, the emitter's `writer`, and its tool-clock `at`). The listing is **not disclosure only**: `kit/plumbline_verify.py` fails a record whose flags lack the allowance or disagree with the ledger and logs (V3), and close refuses on that failure (V8). The switch silences nothing else: the repo overlay `failures/hand-times` (log contradicts the hand time) still exits 3 with the switch on.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T4",
+        "plumbline_dimension": "T4",
+        "criterion": "A job built at batch time only by the subject's own tools emits with **no switch**, exit 0, check.py OK at CL1, and an empty `hand_times`. The tools used: `custody_ledger.py` freeze/approve/pin/generation/evaluation/dispose, plus `tools/edi/or_call.py` with its mocked transport writing the harness logs.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T5",
+        "plumbline_dimension": "T5",
+        "criterion": "**Cross-checks no looser than at base.** (a) `custody_history.TOLERANCE_S` is still 60. (b) Every refusal case that exits 3 at base exits 3 on the subject, with a superset of base's refusal kinds, both without and with `--allow-hand-times`. The refusal cases are the repo overlays under `tests/fixtures/custody/failures/*` at base, plus the prior held-out refusal controls. (c) Every changed line in `cross_check`, `check_order`, `check_pin_order` and `check_approval` is listed for J1. Controls: C-T5c (the base rev itself, must PASS); C-T5p1 (subject with `TOLERANCE_S = 600`, must FAIL); C-T5p2 (subject with the \"after the close\" refusal in `check_order` turned into a gap, must FAIL).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T6",
+        "plumbline_dimension": "T6",
+        "criterion": "The prior job's N1–N8 procedure (frozen `ncheck.py`, held-out controls above) passes on the subject. It is run through the new subject runner with `--allow-hand-times`, because those synthetic fixtures are hand-typed by design. Every flagged field appears in `x-plumbline.hand_times`, and `kit/plumbline_verify.py` reads each emitted record OK.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "T7",
+        "plumbline_dimension": "T7",
+        "criterion": "**The emitter never writes its inputs, and a server time is not a logger time.** Found while drafting (about 13:43 EDT): at base, `custody_history.fill_logger_times` (called from `emit_custody.py` lines 798 and 849) rewrites harness logs in place, filling missing `sent_at`/`received_at` from the response's own `created` or `Date` header, and `tests/validate_schemas.py` line 469 runs the emitter on the committed fixture `job-rejected`, so a base test run dirties two tracked fixture logs. On the subject: (a) every file under the job dir except the record output is byte-identical before and after an emit (sha256 of the tree, on a copy of job-rejected and on the T4 job); (b) a call that has no logger `sent_at`/`received_at` is either refused as `hand-time` or, under `--allow-hand-times`, listed in `x-plumbline.hand_times[]` with source `server-header`/`response-created`, never written back to the log; (c) after the full test suite runs in a fresh clone, `git status --porcelain` is empty. Controls: C-T7c (subject, must PASS); C-T7p (subject with an in-place write of `sent_at` restored, must FAIL).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "T7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1a",
+        "plumbline_dimension": "F1a",
+        "criterion": "Each of `generation open`, `generation close`, `evaluation`, `amendment`, `relay`, `spend` and `dispose --decided-at` appends **exactly one** line when it succeeds. The bytes before the call equal the prefix of the bytes after it (the earlier lines are never rewritten). `custody.json` agrees with the new line. A refused call appends nothing and exits non-zero.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1b",
+        "plumbline_dimension": "F1b",
+        "criterion": "`dispose --decided-at T --decided-source S` refuses a T earlier than the last logged check and a T later than the tool's clock. The last logged check is the latest of: evaluator `received_at` in the harness logs, `evaluation` line times, and instrument-summary `finished_at`. It accepts T equal to the last check. The line carries `at` (tool clock), `decided_at` and `decided_source`, and the record's `disposition.at` = `decided_at`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1b does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1c",
+        "plumbline_dimension": "F1c",
+        "criterion": "`generation open/close`: n starts at 1 and goes up by 1. A second open while one is open is refused, and so is a close without a matching open (same n and seat). `prompt_sha256` is computed by the tool from the named file.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1c does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1d",
+        "plumbline_dimension": "F1d",
+        "criterion": "`evaluation --batch B --verdict FILE [--summary FILE]`: the tool computes the sha256 of FILE itself and refuses a missing file. With `--summary`, it takes `started_at`/`finished_at` and `writer` from the instrument's own stamp, and refuses a summary with no stamp.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1d does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1e",
+        "plumbline_dimension": "F1e",
+        "criterion": "`amendment --file F --quote Q --channel C --said-at T`: the tool computes the sha256 of F. It refuses F inside `custody/` (amendments go beside the frozen set), and T before the freeze or after its own clock. Q is stored verbatim.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1e does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1f",
+        "plumbline_dimension": "F1f",
+        "criterion": "`relay --quote Q --from BOT --source-chat C --source-at T`: stored verbatim, marked `relay`, with T bounded as in F1e. **The emitter never counts a relay as an approval.** Held-out fixture P-F1f, where a buyer approval exists only as a relay, is refused as a missing approval.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1f does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1g",
+        "plumbline_dimension": "F1g",
+        "criterion": "`spend --spend-ledger L --key-reading R`: it records the reconciled total from the spend ledger and a key-usage reading file that `tools/edi/or_call.py --spend-status` wrote and stamped (`read_at`, writer). It refuses when `read_at` is less than 3 min after the last `settle` line (F5), or when R has no stamp. Both files' sha256 go in the line.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1g does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F1h",
+        "plumbline_dimension": "F1h",
+        "criterion": "The emitter reads every F1 line into the record. `x-plumbline` carries `generations[]`, `evaluations[]`, `amendments[]`, `relays[]` and `spend`, each with its file:line source. check.py reads OK at CL1.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F1h does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "I1",
+        "plumbline_dimension": "I1",
+        "criterion": "Every instrument in `tools/edi/` that writes a summary writes `started_at` and `finished_at` (UTC, its own clock) and `writer: \"tools/edi/<file>@<sha12>\"`. The two times bracket the instrument's run as seen by S1's clock (±5 s).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "I1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F7a",
+        "plumbline_dimension": "F7a",
+        "criterion": "`tools/edi/` fixture runner: a run from a `chmod -R a-w` copy of the controls gives outputs byte-identical (once the I1 stamps are removed) to a run from a writable copy. Every file in the working copy is writable by its owner.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F7a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F8a",
+        "plumbline_dimension": "F8a",
+        "criterion": "With a mocked key whose usage is at the job limit, the call is refused with the named exit **before anything is sent**: the mock transport records zero chat POSTs, and there is no harness-log entry.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F8a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F8b",
+        "plumbline_dimension": "F8b",
+        "criterion": "`--max-cost X`: if the projected worst case is greater than X, the call is refused before sending. If the `/generation` `total_cost` is greater than X, the call ends with a named non-zero exit, the entry is logged and marked over-cap in the spend ledger, and no reply is written. (Mocked.)",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F8b does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F8c",
+        "plumbline_dimension": "F8c",
+        "criterion": "The job total is `max(spend-ledger sum, key-usage delta)`. It is checked against GET `/api/v1/key` before **each** call, and the call is refused when total + worst case + reserve ≥ bound. The job id, bound, reserve and price snapshot come from a job spend file, with no job hard-coded, and a missing file is refused. `max_tokens` is always the endpoint max (no throttling). (Mocked.)",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F8c does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "F8d",
+        "plumbline_dimension": "F8d",
+        "criterion": "**Live, at most US$0.07 per batch** (approval item 19). (i) One call through the subject's `or_call.py` with `--max-cost` below its worst case is refused: no harness-log entry, and key usage does not rise. (ii) One small call with a cap above its worst case is logged and settled, at or under the cap. Key usage is read ≥ 3 min later.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "F8d does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "P1",
+        "plumbline_dimension": "P1",
+        "criterion": "`tools/edi/` holds `or_call.py`, `judge_batch.py` (the model-judge batch, with rotating order and per-batch `order` written out), `fixture_run.py`, `extract_files.py` and `README.md`, with tests under `tests/test_edi_*.py`. A log entry from the subject's `or_call.py` (mocked) has every key that job 1's frozen harness writes, and `custody_history.read_log` reads it.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "P1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "X1",
+        "plumbline_dimension": "X1",
+        "criterion": "An `x-plumbline` object in `inputs/custody.json` comes out deep-equal under the record's `predicate[\"x-plumbline\"].inputs`, and check.py reads OK. Held-out planted fixture P-X1 has input keys that try to set the emitter's own keys (`verdict`, `gaps`, `times`, `hand_times`): the emitter refuses it, or keeps those keys only under `.inputs`, and its own values are unchanged.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "X1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V1",
+        "plumbline_dimension": "V1",
+        "criterion": "**Standard first.** The verifier checks that the checker's `checker/check.py` sha256 equals the pin (`aaeb7e05…bcd18`; otherwise exit 2), runs it on the record at the claimed level, and requires OK before anything else. Planted P-V1 (a record whose subject digest is altered) → exit 3, kind `standard`. A wrong-bytes checker copy → exit 2.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V2",
+        "plumbline_dimension": "V2",
+        "criterion": "**Well-formed, versioned block.** `schemas/x-plumbline/x-plumbline-v1.schema.json` exists (JSON Schema 2020-12, `$id` `plumbline/schemas/x-plumbline/x-plumbline-v1.schema.json`, top level `additionalProperties: false`, and it covers the predicate-level block plus the nested `x-plumbline` objects the emitter writes on attempts, maker and evaluators). The emitter writes `x-plumbline.schema: \"plumbline/x-plumbline/v1\"`. The verifier validates every block against it. Planted P-V2a (block missing), P-V2b (`hand_times` as a string), P-V2c (unknown top-level key), P-V2d (schema version absent or `v0`) → exit 4, kind `schema`. A record from base tooling (job 1's record, read from a copy) → exit 4, kind `schema`, no traceback (no grandfathering; item 29).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V3",
+        "plumbline_dimension": "V3",
+        "criterion": "**Hand times are enforced, both directions.** The verifier recomputes the hand-time set on its own from the ledger (`writer: \"hand\"` or no `writer`), from `inputs/custody.json` values with no ledger line, and from harness-log calls with no logger `sent_at`/`received_at` (server-time sources). It requires the set to equal `x-plumbline.hand_times[]` (same field, file:line, source), and `allowances.hand_times` to be present whenever the set is non-empty. Planted P-V3a (allowance removed) → `allowance`; P-V3b (a hand ledger line missing from the flags) → `hand-time-unflagged`; P-V3c (a flag with no hand line behind it) → `flag-without-source`; P-V3d (a server-time call not flagged) → `hand-time-unflagged`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V4",
+        "plumbline_dimension": "V4",
+        "criterion": "**Events match the ledger and the logs, both directions.** `x-plumbline.generations[]`, `evaluations[]`, `relays[]` and `amendments[]` match the ledger's lines one-to-one (n, seat, tool `at`, sha256s, verbatim quotes). Each generation has at least one Maker harness-log call between its open and close. Each evaluation's verdict file sha256 matches the evidence. No relay appears as an approval. Planted P-V4a (a generation in the ledger missing from the record) → `events`; P-V4b (an evaluation whose verdict sha differs from the file) → `events`; P-V4c (a relay listed among approvals) → `relay-as-approval`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V5",
+        "plumbline_dimension": "V5",
+        "criterion": "**Spend adds up.** `x-plumbline.spend` carries `calls_sum_usd`, `key_delta_usd`, `total_usd` and `tolerance_usd`. `calls_sum_usd` equals the sum of the per-call `total_cost` values in the harness logs within **US$0.0001** (rounding only; stated in the schema and docs). Each spend-ledger `settle` line matches one logged call. `total_usd` = max(`calls_sum_usd`, `key_delta_usd`) exactly. The key reading is stamped and read ≥ 3 min after the last settle (F1g). Planted P-V5a (`calls_sum_usd` off by US$0.01) → `spend`; P-V5b (`total_usd` below the calls sum) → `spend`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V6",
+        "plumbline_dimension": "V6",
+        "criterion": "**Inputs never shadow emitter-owned keys.** Input data appears only under `x-plumbline.inputs`. Every emitter-owned key (`verdict`, `gaps`, `times`, `time_tolerance_s`, `hand_times`, `allowances`, `generations`, `evaluations`, `relays`, `amendments`, `spend`, `schema`) holds the value the verifier re-derives from the §5 record, ledger and logs. Planted P-V6 (a record where `inputs.verdict`/`inputs.hand_times` values were copied over the owned keys) → `shadow`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V7",
+        "plumbline_dimension": "V7",
+        "criterion": "**Never writes its inputs, and stands alone.** The sha256 of every file under the record, files, evidence and ledger paths is identical before and after a run. A run from a `chmod -R a-w` copy gives the same result and output. `kit/plumbline_verify.py` does not import `kit/emit_custody.py` (static import check; it may use `custody_history.read_log` to parse logs), so the emitter's logic is checked by separate code. Planted C-V7p (a verifier copy that writes a `.verified` marker beside the record) → FAIL.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V8",
+        "plumbline_dimension": "V8",
+        "criterion": "**Close refuses on a verify failure.** `plumbline_job.py close` runs the emitter, then the verifier on the new record. If the verifier fails, close exits non-zero (the verifier's code), prints `NOT CLOSED: Plumbline verify failed (<kind>)`, writes a run-log row `close_refused` with the kind, and writes **no** `closed` row. (The packet's terminal state is still set by `plumbline.py --job-close` before custody, because the emitter needs it. \"Refuse\" means no `closed` row and a non-zero exit; re-running close after a fix retries.) Planted P-V8 (a scratch copy of the subject whose emitter drops `allowances`, closing a job with hand times) → exit 4, `close_refused`, no `closed` row. Clean: the T4 job closes with exit 0 and a `closed` row. `plumbline_job.py custody` (re-emit) also runs the verifier and returns its code.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V8 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "V9",
+        "plumbline_dimension": "V9",
+        "criterion": "**Tests and docs.** `tests/test_plumbline_verify*.py` covers every kind in V1–V8 with repo fixtures in new folders. `docs/custody-emission.md` documents the interface, the exit codes, the kinds, the US$0.0001 spend tolerance, and the two layers (G3).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "V9 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G1",
+        "plumbline_dimension": "G1",
+        "criterion": "`git diff --name-status 3df1ce5..<rev>` ⊆ the allow-list (edits only where edits are allowed; new files only where new files are allowed; no deletions). The protected bytes equal the pins. Every base file under `tests/fixtures/` and `dot-plumbline/jobs/` is byte-identical.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G2",
+        "plumbline_dimension": "G2",
+        "criterion": "Every test that exists at base passes on the subject with the frozen venv, and its result equals its result at 3df1ce5 when run the same way (base-test isolation). Every new test passes. Each part has at least one new test file (T, F1, I/F7, F8, P, X, V).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G3",
+        "plumbline_dimension": "G3",
+        "criterion": "`docs/custody-emission.md` names every new command, `--allow-hand-times`, the `writer` field, `x-plumbline.hand_times`, `x-plumbline.inputs` and `tools/edi/`. It also explains **the two layers**: the standard layer (custody check.py at CL1, which ignores every `x-` key per SPEC.md line 141) and the Plumbline layer (`kit/plumbline_verify.py`, which runs check.py first and then enforces `x-plumbline`). It says plainly that `x-` keys are enforced by Plumbline only, and it names the verifier's exit codes and failure kinds. `kit/README.md` names `tools/edi/` and `kit/plumbline_verify.py`.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G4",
+        "plumbline_dimension": "G4",
+        "criterion": "The guide exists at that exact path, is added in the diff (`A`), is non-empty UTF-8, and the whole diff passes G1's allow-list. Controls: C-G4c (a base clone with a held-out clean guide, must PASS); C-G4p (the same text at `docs/ORCHESTRATOR-FIELD-GUIDE.md`, must FAIL).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G5",
+        "plumbline_dimension": "G5",
+        "criterion": "**Status line.** One of the first 15 lines contains `status`, `non-normative` and `doctrine wins` (the doc is non-normative, and the doctrine wins on conflict). Controls: C-G5c (clean); C-G5p (status line removed).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G6",
+        "plumbline_dimension": "G6",
+        "criterion": "**Required rules present** (anchored phrases; each group needs one alternative from every list). B1 tripwire: `same failure class` + `3 times`/`three times`/`third time` + `change the request`. B2: `shared key` + `spend guard` + `upper bound`. B3: `pre-read` + `optional` + `approval sheet`. C1: `finish_reason` + `length` + `empty content` + `own failure class`. C2: `no throttling` + `endpoint max` + `reasoning limit`. C3: `size each task`/`sized task`/`size the task`/`size each request`/`sized request`/`size the request`. C4: `finish_reason` + `every call`. C5: `cap counts` + `iterations`. C6: `command that writes`. C7: `standing rules`. C8: `live test` + `freeze gate`. C9: `write-once`. C10: `relayed approval(s)` + `not an approval`/`not approvals`. C11: `/tmp`. F: `carried forward`, plus a heading containing it. Controls: C-G6c (clean); C-G6p (the tripwire count made vague).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "G7",
+        "plumbline_dimension": "G7",
+        "criterion": "**Leak scan.** None of: `Steve`, `Moitozo`, `S2` (case-sensitive), an email address, `/workspace`, `/Users/`, `/home/`, key material (`sk-or-`, `sk-` + 16 or more key characters) or a key fingerprint; and none of the denylisted verbatim phrases from the Owner's card answers and quoted messages (28 phrases in `fg_rules.json`, matched on letters and digits only). Model and organization names that the drafts cite (for example VizH, evaluatordriven) are allowed. Controls: C-G7c (clean); C-G7p (a planted Owner quote and a local path).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "G7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "J1",
+        "plumbline_dimension": "J1",
+        "criterion": "Reading the base→subject diff of `kit/emit_custody.py`, `kit/custody_history.py`, `kit/custody_ledger.py` and `kit/plumbline_job.py`, plus the new `kit/plumbline_verify.py` (numbered listing): no cross-check or refusal is loosened, removed or downgraded; `--allow-hand-times` affects only hand-time refusals; and no verifier failure is skipped when a field is absent or can be bypassed at close. Answer `CONFORMS` / `DOES_NOT_CONFORM` with cited lines. Controls: G-J1c (clean: a diff that only adds the writer field); G-J1p1 (tolerance widened to 600 s); G-J1p2 (a different failure type: an early `if allow_hand_times: return` that also skips the order checks).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "J1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "J2",
+        "plumbline_dimension": "J2",
+        "criterion": "Read as a person would, `docs/custody-emission.md` says the following. Hand times are refused by default. The switch **flags** hand times and never verifies them. A relay is a report, not an approval. Reported times are accepted only through the bounding commands. `x-plumbline` is enforced by Plumbline's verifier only; the standard check.py ignores it. Answer as in J1. Controls: G-J2c (clean); G-J2p1 (\"with `--allow-hand-times` the times are verified/trusted\"); G-J2p2 (a different failure type: \"a relayed approval counts as the Owner's approval\"); G-J2p3 (a third type, added with item 29: \"the standard custody check.py validates the `x-plumbline` block\").",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "J2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "J3",
+        "plumbline_dimension": "J3",
+        "criterion": "**G-faithful.** Reading the whole guide (numbered) against the Owner decisions of 2026-10-28 15:52 EDT (the tripwire at exactly 3 of the same failure class, then change the request; the shared key behind the harness pre-call spend guard, with reconciliation an upper bound and no per-job-key recommendation; the cross-family pre-read optional, decided per job on the approval sheet), the item-30 (c) rules, and DOCTRINE.md v0.1 @ `dc61854` (copied verbatim, CC BY 4.0, into the frozen instrument): nothing in the guide contradicts them, and it does not claim to override the doctrine. Controls: G-J3c (clean); G-J3p (the spend rule rewritten to require a per-job key; it must be cited within ±2 lines).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "J3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "J4",
+        "plumbline_dimension": "J4",
+        "criterion": "**G-story.** Every rule from item 30 (b) and (c) that the guide states is paired with its real story (a concrete incident from a real job or review, placed with the rule), in field-guide style. A bare reason or a hypothetical is not a story. Controls: G-J4c (clean); G-J4p (two rules' stories removed; one of those rule lines must be cited within ±2).",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "J4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      }
+    ]
+  },
+  "orchestrator": {
+    "name": "Chief of Staff (Orchestrator)",
+    "kind": "agent",
+    "aliases": []
+  },
+  "routing": {
+    "maker": {
+      "via": "openrouter.ai",
+      "provider": "DeepInfra",
+      "slug": "deepinfra/fp8",
+      "host": "api.deepinfra.com",
+      "declaredAt": "2026-10-28T20:47:58Z"
+    },
+    "E-GLM": {
+      "via": "openrouter.ai",
+      "provider": "Z.AI",
+      "slug": "z-ai/fp8",
+      "host": "api.z.ai",
+      "declaredAt": "2026-10-28T20:47:58Z"
+    },
+    "eval-glm": {
+      "via": "openrouter.ai",
+      "provider": "Z.AI",
+      "slug": "z-ai/fp8",
+      "host": "api.z.ai",
+      "declaredAt": "2026-10-28T20:47:58Z"
+    }
+  },
+  "levelClaimed": "CL1",
+  "files_dir": "../../..",
+  "subject": [
+    "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md",
+    "docs/custody-emission.md",
+    "kit/README.md",
+    "kit/custody_history.py",
+    "kit/custody_ledger.py",
+    "kit/emit_custody.py",
+    "kit/plumbline_job.py",
+    "kit/plumbline_verify.py",
+    "schemas/x-plumbline/x-plumbline-v1.schema.json",
+    "tests/fixtures/custody/verify/checkout/checker/check.py",
+    "tests/fixtures/custody/verify/clean/job/custody/evidence/notes.txt",
+    "tests/fixtures/custody/verify/clean/job/custody/files/artifact.txt",
+    "tests/fixtures/custody/verify/clean/job/inputs/custody-events.jsonl",
+    "tests/fixtures/custody/verify/clean/job/inputs/custody.json",
+    "tests/fixtures/custody/verify/clean/job/packet.json",
+    "tests/fixtures/custody/verify/clean/record-bad-subject.json",
+    "tests/fixtures/custody/verify/clean/record-flag-without-source.json",
+    "tests/fixtures/custody/verify/clean/record-hand-times-string.json",
+    "tests/fixtures/custody/verify/clean/record-no-block.json",
+    "tests/fixtures/custody/verify/clean/record-spend-off.json",
+    "tests/fixtures/custody/verify/clean/record-unknown-key.json",
+    "tests/fixtures/custody/verify/clean/record-v0.json",
+    "tests/fixtures/custody/verify/clean/record.custody.json",
+    "tests/fixtures/custody/verify/events/ledger.jsonl",
+    "tests/fixtures/custody/verify/events/record-missing-generation.json",
+    "tests/fixtures/custody/verify/hand/ledger.jsonl",
+    "tests/fixtures/custody/verify/hand/record-allowance.json",
+    "tests/fixtures/custody/verify/hand/record-no-allowance.json",
+    "tests/fixtures/custody/verify/hand/record-unflagged.json",
+    "tests/fixtures/custody/verify/relay/ledger.jsonl",
+    "tests/fixtures/custody/verify/relay/record.json",
+    "tests/fixtures/custody/verify/shadow/iteration-1-eval-record.json",
+    "tests/fixtures/custody/verify/shadow/record.json",
+    "tests/test_custody_ledger.py",
+    "tests/test_edi_extract_files.py",
+    "tests/test_edi_fixture_run.py",
+    "tests/test_edi_judge_batch.py",
+    "tests/test_edi_or_call.py",
+    "tests/test_plumbline_verify.py",
+    "tests/validate_schemas.py",
+    "tools/edi/README.md",
+    "tools/edi/extract_files.py",
+    "tools/edi/fixture_run.py",
+    "tools/edi/judge_batch.py",
+    "tools/edi/or_call.py"
+  ],
+  "maker": {
+    "name": "DeepSeek V4.1 Flash 1017",
+    "kind": "model",
+    "version": "v4.1-flash-1017",
+    "method_file": "custody/method.md",
+    "harness_log": "harness-maker-deepseek.log",
+    "calls": [
+      "maker_iter1_emitter_a1",
+      "maker_iter1_verifier_a2",
+      "maker_iter1_edi_a1",
+      "maker_iter1_edi_a2",
+      "maker_iter2_ledger_a1",
+      "maker_iter2_emitter_a1",
+      "maker_iter2_verifier_a1",
+      "maker_iter2_docs_a1",
+      "maker_iter3_fix_a3",
+      "maker_iter3_fix_a4"
+    ],
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek/deepseek-v4.1-flash-1017",
+      "readOnly": false
+    }
+  },
+  "instrument": {
+    "rubric_file": "custody/bar.md",
+    "runner_file": "handoffs/iter3/EVALUATOR.md"
+  },
+  "evaluators": [
+    {
+      "id": "S1",
+      "name": "S1 instrument script (T1-T7, F1a-F1h, I1, F7a, F8a-F8d, P1, X1, V1-V9, G1-G7)",
+      "kind": "script",
+      "script": {
+        "name": "run_instrument.sh",
+        "author": "Chief of Staff (Orchestrator) drafter",
+        "file": "custody/freeze/instrument/run_instrument.sh"
+      }
+    },
+    {
+      "id": "E-GLM",
+      "name": "GLM 5.3 Flash (J1-J4)",
+      "kind": "model",
+      "harness_log": "harness-eval-glm-b3.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "readOnly": true
+      }
+    }
+  ],
+  "passes": {
+    "s1-b3": {
+      "evaluator": "S1",
+      "run": 3,
+      "batch": "b3",
+      "at": "2026-10-29T15:56:38Z",
+      "dimensions": [
+        "T1",
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T7",
+        "F1a",
+        "F1b",
+        "F1c",
+        "F1d",
+        "F1e",
+        "F1f",
+        "F1g",
+        "F1h",
+        "I1",
+        "F7a",
+        "F8a",
+        "F8b",
+        "F8c",
+        "F8d",
+        "P1",
+        "X1",
+        "V1",
+        "V2",
+        "V3",
+        "V4",
+        "V5",
+        "V6",
+        "V7",
+        "V8",
+        "V9",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6",
+        "G7"
+      ],
+      "evidence": {
+        "T1": "T1.json",
+        "T2": "T2.json",
+        "T3": "T3.json",
+        "T4": "T4.json",
+        "T5": "T5.json",
+        "T7": "T7.json",
+        "F1a": "F1a.json",
+        "F1b": "F1b.json",
+        "F1c": "F1c.json",
+        "F1d": "F1d.json",
+        "F1e": "F1e.json",
+        "F1f": "F1f.json",
+        "F1g": "F1g.json",
+        "F1h": "F1h.json",
+        "I1": "I1.json",
+        "F7a": "F7a.json",
+        "F8a": "F8a.json",
+        "F8b": "F8b.json",
+        "F8c": "F8c.json",
+        "F8d": "F8d.json",
+        "P1": "P1.json",
+        "X1": "X1.json",
+        "V1": "V1.json",
+        "V2": "V2.json",
+        "V3": "V3.json",
+        "V4": "V4.json",
+        "V5": "V5.json",
+        "V6": "V6.json",
+        "V7": "V7.json",
+        "V8": "V8.json",
+        "V9": "V9.json",
+        "G1": "G1.json",
+        "G2": "G2.json",
+        "G3": "G3.json",
+        "G4": "G4.json",
+        "G5": "G5.json",
+        "G6": "G6.json",
+        "G7": "G7.json"
+      }
+    },
+    "s1-b3-t6-amend2": {
+      "evaluator": "S1",
+      "run": 3,
+      "batch": "b3",
+      "at": "2026-10-29T15:56:38Z",
+      "dimensions": [
+        "T6"
+      ],
+      "evidence": {
+        "T6": "T6-amend2.json"
+      }
+    },
+    "glm-b3-J1": {
+      "evaluator": "E-GLM",
+      "run": 3,
+      "batch": "b3",
+      "call": "J1-b3-1",
+      "dimensions": [
+        "J1"
+      ],
+      "evidence": {
+        "J1": "J1-J1-b3-1.json"
+      }
+    },
+    "glm-b3-J2": {
+      "evaluator": "E-GLM",
+      "run": 3,
+      "batch": "b3",
+      "call": "J2-b3-3",
+      "dimensions": [
+        "J2"
+      ],
+      "evidence": {
+        "J2": "J2-J2-b3-3.json"
+      }
+    },
+    "glm-b3-J3": {
+      "evaluator": "E-GLM",
+      "run": 3,
+      "batch": "b3",
+      "call": "J3-b3-3",
+      "dimensions": [
+        "J3"
+      ],
+      "evidence": {
+        "J3": "J3-J3-b3-3.json"
+      }
+    },
+    "glm-b3-J4": {
+      "evaluator": "E-GLM",
+      "run": 3,
+      "batch": "b3",
+      "call": "J4-b3-1",
+      "dimensions": [
+        "J4"
+      ],
+      "evidence": {
+        "J4": "J4-J4-b3-1.json"
+      }
+    }
+  },
+  "controls": [
+    {
+      "id": "C-G1p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/jobwt/dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/scheck.py",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G4c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/clean.md",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "G4",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G4p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/clean.md",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G4",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G5c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/clean.md",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "G5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G5p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/p-G5.md",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G6c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/clean.md",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "G6",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G6p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/p-G6.md",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G6",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G7c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/clean.md",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "G7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-G7p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/fg/p-G7.md",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-T5c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/expect.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "T5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-T5p1",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/jobwt/dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/scheck.py",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-T5p2",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/jobwt/dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/scheck.py",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-T7p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/wrappers/C-T7p.py.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-V7c",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/wrappers/C-V7s.py.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "V7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "C-V7p",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/wrappers/C-V7p.py.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1a.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1a.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1a",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1b.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1b.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1b",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1c.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1c.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F1c",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1c.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1c.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1c",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1d.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1d.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1d",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1e.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1e.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F1e",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1e.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1e.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1e",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1f.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1f.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1f",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1g.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1g.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F1g",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1g.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1g.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1g",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F1h.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F1h.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F1h",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F7a.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F7a.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F7a",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8a.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8a.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F8a",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8a.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8a.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F8a",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8b.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8b.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F8b",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8b.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8b.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F8b",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8c.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8c.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "F8c",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8c.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8c.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F8c",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-F8d.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/F8d.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "F8d",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-G1.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/G1.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "G1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-G2.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/G2.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G2",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-G3.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/G3.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "G3",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-I1.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/I1.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "I1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-P1.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/P1.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "P1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T1.clean",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T1.clean.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "T1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T1.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T1.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T2.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T2.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T2",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T3.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T3.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T3",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T4.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T4.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T4",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T5.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T5.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T6.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T6.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T6",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-T7.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/T7.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "T7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V1.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V1.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V2.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V2.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V2",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V3.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V3.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V3",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V4.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V4.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V4",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V5.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V5.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V5",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V6.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V6.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V6",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V7.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V7.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V7",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V8.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V8.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V8",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-V9.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/V9.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "V9",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "OBS-X1.planted",
+      "batch": "b3",
+      "evaluator": "S1",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/obs/X1.planted.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "X1",
+      "evidence_file": "custody/evidence/b3/s1-summary.json",
+      "at": "2026-10-29T15:56:38Z"
+    },
+    {
+      "id": "G-J1p2",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J1/G-J1p2/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J1",
+      "call": "J1-b3-2",
+      "evidence_file": "custody/evidence/b3/glm/J1-batch.json"
+    },
+    {
+      "id": "G-J1c",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J1/G-J1c/listing.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "J1",
+      "call": "J1-b3-3",
+      "evidence_file": "custody/evidence/b3/glm/J1-batch.json"
+    },
+    {
+      "id": "G-J1p1",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J1/G-J1p1/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J1",
+      "call": "J1-b3-4",
+      "evidence_file": "custody/evidence/b3/glm/J1-batch.json"
+    },
+    {
+      "id": "G-J2p1",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J2/G-J2p1/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J2",
+      "call": "J2-b3-1",
+      "evidence_file": "custody/evidence/b3/glm/J2-batch.json"
+    },
+    {
+      "id": "G-J2p3",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J2/G-J2p3/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J2",
+      "call": "J2-b3-2",
+      "evidence_file": "custody/evidence/b3/glm/J2-batch.json"
+    },
+    {
+      "id": "G-J2c",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J2/G-J2c/listing.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "J2",
+      "call": "J2-b3-4",
+      "evidence_file": "custody/evidence/b3/glm/J2-batch.json"
+    },
+    {
+      "id": "G-J2p2",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J2/G-J2p2/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J2",
+      "call": "J2-b3-5",
+      "evidence_file": "custody/evidence/b3/glm/J2-batch.json"
+    },
+    {
+      "id": "G-J3c",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J3/G-J3c/listing.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "J3",
+      "call": "J3-b3-1",
+      "evidence_file": "custody/evidence/b3/glm/J3-batch.json"
+    },
+    {
+      "id": "G-J3p",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J3/G-J3p/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J3",
+      "call": "J3-b3-2",
+      "evidence_file": "custody/evidence/b3/glm/J3-batch.json"
+    },
+    {
+      "id": "G-J4p",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J4/G-J4p/listing.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "J4",
+      "call": "J4-b3-2",
+      "evidence_file": "custody/evidence/b3/glm/J4-batch.json"
+    },
+    {
+      "id": "G-J4c",
+      "batch": "b3",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/job-controls/2026-10-28-custody-times-ledger-spend/glm/J4/G-J4c/listing.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "J4",
+      "call": "J4-b3-3",
+      "evidence_file": "custody/evidence/b3/glm/J4-batch.json"
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "E-GLM",
+      "evidence_file": "harness-eval-glm-b3.log",
+      "readBy": "Chief of Staff (Orchestrator)"
+    }
+  ],
+  "retention": {
+    "location": "github.com/smoitozo/plumbline (private), branch job/2026-10-28-custody-times-ledger-spend, dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend. The full E-GLM logs, the full S1 summaries, the Orchestrator's deviation log and the held-out controls stay on the Owner's box (/workspace/edi-work/2026-10-28-custody-times-ledger-spend, /workspace/job-controls/2026-10-28-custody-times-ledger-spend); the repo has their sha256 only (custody/evidence/HELD-ON-BOX.sha256, custody/evidence/harness-eval-glm-b*.log.full.sha256).",
+    "public": false
+  },
+  "separationGaps": [
+    "Grokbot's underlying model(s) are not disclosed by its operator; family and identifier recorded as undisclosed.",
+    "Every Maker call was issued by a harness operator, the E-DI Maker bot (a Grok Bot), which issued the logged calls through the frozen harness, extracted the returned files verbatim and committed them (custody/method.md). This was instructed, not enforced.",
+    "Controls and fixtures were held outside the Maker's and Evaluator's working trees with sha256 committed at freeze, but on a shared box both bots could technically read them; non-reading was instructed, not enforced.",
+    "Held-out control case files are digested from /workspace/job-controls/2026-10-28-custody-times-ledger-spend, outside the repo. The record carries their sha256 only, so a stranger cannot re-read the cases. The mutation controls C-T5p1, C-T5p2 and C-G1p have no case file of their own (scheck.py applies the mutation); their case_file is the frozen public instrument custody/freeze/instrument/scheck.py.",
+    "E-GLM ran as four checks (J1-J4) with one harness log each. The base emitter reads one log per evaluator, so the record's E-GLM log (custody/evidence/harness-eval-glm-b3.log) is the four batch-3 logs merged in sent_at order and redacted of held-out control text (handoffs/close/redact_glm_log.py); the full logs' sha256 are in custody/evidence/harness-eval-glm-b3.log.full.sha256 and the full logs stay on the box. Batches 1 and 2 are filed the same way (harness-eval-glm-b1.log, -b2.log) as evidence for runs 1 and 2.",
+    "Controls in the record are batch 3's only (57 S1 + 11 E-GLM, all right). Batches 1 and 2 ran their own controls, all right (custody/evidence/b1/, b2/ summaries and batch files).",
+    "S1 is a script with no call log. Its pass and control time (2026-10-29T15:56:38Z) is the batch-3 S1 run's own finished_at stamp (scheck.py@49d3a506f6f7). T6 is scored under Amendment 2 (AMENDMENT-2-t6-n1-refusal.md, ledger line 8) from that same run's output (custody/evidence/T6-amend2.json; frozen T6 verdict FAIL), so pass s1-b3-t6-amend2 carries the same time. The pass on all 43 checks rests on Amendment 2 (disclosure 20).",
+    "S1's batch-3 per-check evidence files that echoed held-out fixture values (F1a-F1h, F8a-F8d, I1, T2, T3, T6, T6-amend2, T7, V1-V4, V6) are filed redacted (handoffs/close/redact_s1_evidence.py: each such JSON value is replaced by a fixed marker; ids, verdicts and reasons are kept). The full files stay on the Owner's box; their sha256 are in custody/evidence/HELD-ON-BOX.sha256, so a stranger can check the verdicts but not re-read the fixture values.",
+    "The leak scan allows one reviewed hit (handoffs/close/leak-allow.json, by line sha256): a bare function signature that the Maker wrote in its own reasoning in call maker_iter1_edi_a1 equals one line of a held-out reference copy by naming coincidence. The Maker log's digest is pinned (882ee4e6...), so it is filed unredacted.",
+    "The record's Maker call list (maker.calls) leaves out maker_iter1_ledger_a1, maker_iter1_docs_a1, maker_iter3_fix_a1 and maker_iter3_fix_a2, whose /api/v1/generation fetch returned 404 (the base emitter refuses a call with no generation endpoint), and the guide calls, which are in separate logs (harness-maker-deepseek-guide-iter1.log, -iter2.log) because the base emitter reads one Maker log. All of them are in the evidence folder; startedAt is therefore maker_iter1_emitter_a1's sent_at, not the first call's.",
+    "After the approvals and amendments, the generation, evaluation, relay, spend and dispose lines in inputs/custody-events.jsonl were appended by hand by the Orchestrator at the close, not stamped by custody_ledger.py (which at 3df1ce5 has no command for them). They were recorded late: each carries writer \"hand\", recorded_late true, recorded_at and at_source (disclosure 23). The dispose line carries the Owner's decision time and channel as the Orchestrator received them.",
+    "Steve's run go-aheads for iteration 3 (09:55 EDT, card t21s1; 11:08 EDT, card t23s1) were given in the E-DI Maker's own chat and the batch-2 go-ahead (08:25 EDT, card t11s2) in the E-DI Evaluator's own chat; the Orchestrator checked them in those transcripts (ledger \"relay\": true). No source was found for the iteration-1 Maker and Evaluator go-aheads, the guide-a2 go-ahead or the batch-3 go-ahead; they are not in the ledger.",
+    "Spend (bar P6) is reconciled against a key-usage read at the close (custody/evidence/spend-status-close.json): settles US$0.584368826, key delta US$0.603089; the gap 0.01872 is the one reserve with no settle (iteration-1 verifier a1, ruled LOST), kept open at worst case on the Owner's decision; job total US$0.637685. Seven settles use response.usage.cost because the generation fetch failed. The Owner's dashboard figure (US$0.0472) is not reconciled: disclosure 24.",
+    "This record was emitted by base main @ 3df1ce5 (tree 230997f1), not by the branch under test (bar: base tooling only). That emitter cannot pass x-plumbline fields through, so spend, hand times, relays and the post-merge verifier note are in the sidecar custody/x-plumbline.json, sha256 3615556c4449caf88a78032f7f54c460c1544da5ea8fcb858d843df551f1fcf2.",
+    "Close disclosures 1-24 (1-23 accepted by the Owner 2026-10-29 13:15 EDT; first accepted 12:36 EDT (\"Accept the result with disclosures 1–22.\"; item 23 added on his instruction); item 24 added at the close): custody/DISCLOSURES.md, sha256 5d4ec727ccf1914afd49ed6969716bef47502ff946d4cf3fa8ddaba219ab8444."
+  ],
+  "disposition": {
+    "by": "Steve Moitozo II",
+    "at": "2026-10-29T16:36:00Z",
+    "acknowledgesUnobserved": []
+  }
+}

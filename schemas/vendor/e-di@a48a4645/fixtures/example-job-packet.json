@@ -1,0 +1,31 @@
+{
+  "entry": "A",
+  "instrument_profile": "full",
+  "job_name": "typesafe-jev-skill",
+  "artifact": "artifact/iter-2/SKILL.md",
+  "buyer": "Owner (agent must follow vendor docs without guessing)",
+  "specialist": "Vendor documentation",
+  "maker": "deepseek/deepseek-v4.1-flash",
+  "evaluator": "z-ai/glm-5.3-flash (3 readings/iteration)",
+  "standard_ref": "frozen rubric hash ebd7cfd13bd72bd2 + vendor docs pin",
+  "ground_truth": [
+    {"source": "Vendor docs snapshot", "version": "pinned for the job", "hardness": "DOCUMENT"}
+  ],
+  "mandate_ref": {"doc": "EDI-MANDATE.md", "version": "short form 2026-09-24"},
+  "escalation": "Owner on override",
+  "bounds": {
+    "T_accept": 8.5,
+    "T_dim": 7.0,
+    "T_reject": 6.0,
+    "cap": 3,
+    "budget": "$2"
+  },
+  "human_seat": "Owner on override",
+  "level": "L4",
+  "mode": "scored",
+  "ratified": true,
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "disposition": null,
+  "notes": "iter1 failed usability; iter2 fixed steps/checks; no fabricated remedies."
+}

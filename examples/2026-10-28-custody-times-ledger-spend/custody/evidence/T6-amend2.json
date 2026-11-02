@@ -1,0 +1,238 @@
+{
+ "check": "T6",
+ "amendment": 2,
+ "score": 1,
+ "frozen_verdict": "FAIL",
+ "why": [],
+ "obs": {
+  "rc": 0,
+  "stderr": "",
+  "summary": {
+   "controls": "as expected",
+   "mutants": "as expected",
+   "subject": {
+    "N1": "FAIL",
+    "N2": "PASS",
+    "N3": "PASS",
+    "N4": "PASS",
+    "N5": "PASS",
+    "N7": "PASS",
+    "N8": "PASS"
+   },
+   "scores": {
+    "N1": 0,
+    "N2": 1,
+    "N3": 1,
+    "N4": 1,
+    "N5": 1,
+    "N7": 1,
+    "N8": 1
+   }
+  },
+  "runs": [
+   {
+    "run": "F-genreply-full",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": [],
+    "emit_exit": 0,
+    "log_sha256": {
+     "harness-eval-glm.log": "47383151243419d3eb8d4e42b84c37ead30d4053565e4e33669f0dae64c2a35a",
+     "harness-maker-deepseek.log": "1f9ed634189faa20b396286164f1c759963a6182580022f032a436a82af7fe8e"
+    }
+   },
+   {
+    "run": "F-genreply-null",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": false,
+    "record_hand_fields": [],
+    "verify_rc": null,
+    "verify_kinds": null,
+    "emit_exit": 3,
+    "log_sha256": {
+     "harness-eval-glm.log": "2c88b163923ff49f806ad183a4639967e0d94ca654ce82fc47fdaea3d3244978",
+     "harness-maker-deepseek.log": "1f9ed634189faa20b396286164f1c759963a6182580022f032a436a82af7fe8e"
+    }
+   },
+   {
+    "run": "F-maker-10min",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": [],
+    "emit_exit": 0,
+    "log_sha256": {
+     "harness-eval-glm.log": "2cccd4c7fc1d3d591d7d28aed9db9ecc21c535a2859b2b1469e5772f0060d781",
+     "harness-maker-deepseek.log": "cb584c318034e486cf83975b086877fc70bfe4c97d390921a51882b70fb93e8f"
+    }
+   },
+   {
+    "run": "F-single-call",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": [],
+    "emit_exit": 0,
+    "log_sha256": {
+     "harness-eval-glm.log": "47383151243419d3eb8d4e42b84c37ead30d4053565e4e33669f0dae64c2a35a",
+     "harness-maker-deepseek.log": "9a6b37f6b53f3c6fd5bbabb24a88f1dcaee024227067761e29efc813e01c6975"
+    }
+   },
+   {
+    "run": "extra-1-job-rejected",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-a.log#eval_artifact.received_at",
+     "harness-eval-a.log#eval_artifact.sent_at",
+     "harness-eval-a.log#eval_k1.received_at",
+     "harness-eval-a.log#eval_k1.sent_at",
+     "harness-eval-a.log#eval_k2.received_at",
+     "harness-eval-a.log#eval_k2.sent_at",
+     "harness-maker-fixture.log#0.received_at",
+     "harness-maker-fixture.log#0.sent_at",
+     "passes.pass-a.at",
+     "producedAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "startedAt"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-a.log#eval_artifact.received_at",
+     "harness-eval-a.log#eval_artifact.sent_at",
+     "harness-eval-a.log#eval_k1.received_at",
+     "harness-eval-a.log#eval_k1.sent_at",
+     "harness-eval-a.log#eval_k2.received_at",
+     "harness-eval-a.log#eval_k2.sent_at",
+     "harness-maker-fixture.log#0.received_at",
+     "harness-maker-fixture.log#0.sent_at",
+     "passes.pass-a.at",
+     "producedAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "startedAt"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": [],
+    "emit_exit": 0,
+    "log_sha256": {
+     "harness-eval-a.log": "1190223bbf91a3be8e80a5b2b67ace443d31012f19527dcf89358f5133e22901",
+     "harness-maker-fixture.log": "59dba98a07c615e00792fa54c742ada79c8fdcc8caa0a1f9adf7883139cc2b6a"
+    }
+   }
+  ],
+  "min_runs": 5,
+  "n1_runs": {
+   "F-genreply-full": "PASS",
+   "F-maker-10min": "PASS",
+   "F-single-call": "PASS",
+   "extra-1-job-rejected": "FAIL"
+  },
+  "n4": {
+   "verdict": "PASS",
+   "mode": "a (refusal)",
+   "exit": 3
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (9 values)"
+}

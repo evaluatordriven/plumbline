@@ -1,0 +1,728 @@
+{
+  "$schema": "plumbline/schemas/instance-extensions.json",
+  "title": "Plumbline instance layer (AUTHORED \u2014 the only place instance law is written)",
+  "status": "instance-specific",
+  "contracts_basis": "E-DI Contracts \u00a78 (Extensions and instances): an implementation may add roles, dimensions, channels, or engines for its own domain provided it (1) labels them instance-specific in every artifact it emits, (2) does not weaken \u00a73, \u00a74 or \u00a77, and (3) records them with the job. C18 audits this file.",
+  "authority": {
+    "rank": "below the mandate, and it never displaces it",
+    "statement": "The mandate (Contracts \u00a71.7) is the doctrine's frame instrument, authored by the Owner. This file is Plumbline's encoding of that Owner's values, principles and escalation classes for one program. Where this file and the mandate disagree, ESCALATE TO THE OWNER \u2014 never auto-resolve, and never let a value here make a mandate must-ask optional.",
+    "why_the_split": "Values and principles change per program; jobs-to-be-done change per job. Re-specifying values on every job is the repeated burden the direction rules out, and a standard re-specified every job is one that drifts. The split is Plumbline's, not the doctrine's \u2014 the doctrine names the Owner as the setter of values (Mandate X1\u2013X3) and does not name a container for them."
+  },
+    "disposition_semantics": {
+    "declared": "2026-10-05, on the corpus maintainer's correction, before the O1 field lands",
+    "why": "Verdict and disposition are separate acts, so an accepted artifact with no disposition is a COMPLETE record, not a deficient one. The rate's numerator is an act by the Owner, so at any audit moment some accepted artifacts necessarily have none — and a reader that treats 'not yet given' as zero manufactures the non-conformance it reports, then pushes toward asking the Owner more, which cuts against operator friction.",
+    "states": ["given", "not_yet_given", "declined"],
+    "rule": "Every reader records the STATE, never the absence of one. 'Absent' and 'not yet given' are different facts.",
+    "honest_rate": "given / (given + declined) — the denominator is acts that exist, never all accepted artifacts"
+  },
+  "violation_locator_guidance": {
+    "declared": "2026-10-05, on C36's arrival; REFINED the same day on the corpus maintainer's correction",
+    "question": "C36 requires a below-floor dimension to carry a violation classified into one of rule 4's four locators. Which one, for a FRICTION/ATTENTION shortfall — the loop demanding more of the Owner than the bar allows?",
+    "determination": "It depends on whether the shortfall PERSISTS, not on which dimension it is.",
+    "rule": "(1) A shortfall at its FIRST occurrence, where the evidence supports a fix, is `artifact_missed_standard`: the loop as built cost more than the bar allows, which is a fixable property of the thing under judgement. (2) A shortfall that PERSISTS across runs of the cell is `frame_at_fault` — or the capability escalation §6 names — because §4's own test says a class that persists in every run is structural, not noise, and the response is the escalation rather than another regeneration.",
+    "why_not_keyed_on_the_dimension": "The first version of this guidance keyed on the dimension, which merges the two cases and turns every friction shortfall into `frame_at_fault` — a determination becoming a default, which is the failure this repo's own AGENTS.md names ('it promotes examples to defaults'). The corpus maintainer caught it and was right.",
+    "measured_input": "Plumbline's own three records. `attention_cost` scored 3, 4 and 3 (floors 6, 6, 5) and cleared the floor in NONE of them — structural, by §4's test. And the same job shows the contrast that makes the rule concrete: `operational_reliability` scored 5 against a floor of 6 in full-score iteration 1 and CLEARED it in iteration 2, while `attention_cost` went 3 -> 4 and stayed below. Two shortfalls in one cell, one fixed by an iteration and one not — which is exactly the distinction this guidance now keys on rather than the dimension's name. The measurement is stated so the seat can check it rather than inherit it.",
+    "status": "an instance determination, made by the Plumbline maintainer session where no measurement decides it, then refined where one did. Guidance for the Evaluator seat, not law: the locator must still be the one the evidence supports for the particular shortfall, and this field states its own uncertainty rather than settling it by assertion."
+  },
+"packet_properties": {
+    "k": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (mandate B.1.2: \"found by iteration <= k or within x% of budget, with k and x declared per job\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
+    },
+    "x": {
+      "type": "number",
+      "minimum": 0,
+      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (mandate B.1.2, verbatim). Both are terms, so both are written at open by the brief."
+    },
+    "disposition_state": {
+      "type": "string",
+      "enum": ["given", "not_yet_given", "declined"],
+      "description": "INSTANCE-SPECIFIC, and it exists because the corpus's own `disposition` is `string|null` and a null cannot distinguish 'not yet given' from 'declined'. Verdict and disposition are separate acts, so an accepted artifact with no disposition is a COMPLETE record; the state is recorded as one of three and never as the absence of one (corpus maintainer, 2026-10-05). The corpus field carries the Owner's act when there is one."
+    },
+    "run_log_exempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "declared_by"],
+      "description": "INSTANCE-SPECIFIC. A job the run-log does not name, declaring WHY it is not named, in the folder the exemption is about — §10.1's own split, and the corpus maintainer's correction (2026-10-05): a tolerance that lives in a checker is not counted, not in the check's output, and not in the folder it is about, so adding one is invisible. The guard fails any folder that is neither named in the log nor declares itself here.",
+      "properties": {"reason": {"type": "string", "minLength": 1}, "declared_by": {"type": "string", "minLength": 1}}
+    },
+    "close": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verdict", "date", "kit_revision", "counts", "skipped"],
+      "description": "INSTANCE-SPECIFIC. The close act's own record, written into the packet by the kit's --record-close. The corpus models a job's END on the packet (terminal_state and outcome); it does not model what the close itself did NOT read, and that is the fact that matters. Measured 2026-10-05: the kit learned to skip `superseded/` and `inputs/`, and the skip existed only on stdout, which disappears with the terminal. A close that read fewer files than the folder holds says so here.",
+      "properties": {
+        "verdict": {"enum": ["CLOSEABLE"]},
+        "date": {"type": "string", "minLength": 1},
+        "kit_revision": {"type": "string", "minLength": 1},
+                "billed_reroll": {"type": "boolean", "description": "INSTANCE-SPECIFIC. True when a regeneration was tasked with a violation the Maker could not act on — the Contracts' own definition: \"A regeneration tasked with a violation it cannot act on is not an iteration; it is a billed reroll.\" B.4.2 counts these. Written by the Orchestrator at close, using the doctrine's term rather than a parallel one."},
+        "escalation_kind": {"type": "string", "enum": ["capability_gap", "cap_reached", "below_floor", "other"], "description": "INSTANCE-SPECIFIC. Which escalation the job ended on, distinguishing a capability gap (§4, §6) from spending the cap."},
+        "misalignment": {"type": "object", "additionalProperties": false, "required": ["found_at_iteration"], "description": "INSTANCE-SPECIFIC. O2's fact: where the run diverged from the bound, and the spend at that point. A rate nobody can recompute is an assertion.", "properties": {"found_at_iteration": {"type": "integer", "minimum": 1}, "spend_usd": {"type": "number", "minimum": 0}, "note": {"type": "string"}}},
+"counts": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "skipped": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "skipped_files": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}}
+      }
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "elicitation",
+        "architecture",
+        "development",
+        "deployment",
+        "operations",
+        "revision"
+      ],
+      "description": "INSTANCE-SPECIFIC, OPTIONAL. The chain-of-loops stage this job belongs to. Deliberately NOT required: it is a label, and a label prevents no defect \u2014 the Instrument's Refusals say 'no clause without a job that needed it'. Doctrine is stage-agnostic: it knows one job, one artifact, one pass rule, one record, one terminal state. A stage is a job label, never a licence to score two artifacts in one job.",
+      "plumbline_note": "OPEN DEPENDENCY (not yet resolved). (1) The elicitation rule is NOT carried by this field \u2014 a job with no independent ground truth cannot be scored regardless of any label, because C33 requires non-empty ground_truth, mandate_ref and escalation on a scored job and an unratified job can never reach `accepted`. This field classifies; it does not gate. (2) constitution.schema.json declares principles[].applies_to_stages against the same enum, so making this field optional ORPHANED that scoping: a principle restricted to one stage can no longer be evaluated. Either this field returns (required where a stage-scoped principle is in force) or applies_to_stages is demoted. Do not leave both in the tree unresolved."
+    },
+    "constitution_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "INSTANCE-SPECIFIC. The standing constitution this job runs under (Plumbline schemas/constitution.schema.json): the Owner's values, principles and escalation classes for the program, each value carrying a decision_rule so it can arbitrate. Subordinate to mandate_ref \u2014 the mandate is the doctrine's frame instrument; this is the instance's encoding of it."
+    },
+    "constitution_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "INSTANCE-SPECIFIC. The constitution version in force when this packet was written, recorded so a later reader can tell which standard a decision was judged against after the standard has moved (Contracts \u00a710.3 makes a Buyer or standard change a revalidation trigger)."
+    },
+    "job_to_be_done": {
+      "type": "object",
+      "required": [
+        "statement"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC framing supplied by the Buyer for this job \u2014 the same material Contracts \u00a71.1 requires (whose problem is solved) in the Buyer's words rather than the record's. Per-job, never re-derived from the constitution.",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "pain_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The pains this job removes. Each should be traceable to a dimension or a principle, or it is wishlist."
+        },
+        "desired_future": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What is different once this works, described in the Buyer's environment or behaviour \u2014 never as a deliverable we ship. If it cannot be stated, the job has no evaluable target and belongs in elicitation."
+        },
+        "gains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The gains the Buyer expects (Playbook \u00a76: Buyer defines jobs-to-be-done, pains AND gains)."
+        }
+      }
+    },
+    "discoverability": {
+      "type": "object",
+      "required": [
+        "classification",
+        "question"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC gate in front of every escalation (Mandate M6, failure F5: the Owner is asked questions the system could have answered itself). Doctrine requires escalation to be without interrogation; this records the attempt that earns the right to ask.",
+      "properties": {
+        "classification": {
+          "enum": [
+            "discoverable",
+            "undecidable"
+          ],
+          "description": "discoverable = answerable by search, measurement, reading the repo, probing the record, or running the code \u2192 resolve it and never ask. undecidable = values, doctrine, Buyer intent, priority, risk appetite \u2192 escalate."
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What was tried. Instrument: an escalation carries the question, what was tried, why no observable answer exists, and the options with a recommendation."
+        },
+        "why_no_observable_answer": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Options with a recommendation. A question handed over without options is work pushed back, not escalated."
+        }
+      }
+    }
+  },
+  "packet_required": [],
+  "packet_defs": {
+    "plumblineBudget": {
+      "type": "object",
+      "required": [
+        "amount",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC shape for bounds.budget. Doctrine requires the budget as a must-ask and says the unit is stated (Instrument sheet: 'budget ___ (unit stated)'); this fixes the shape so the unit cannot go missing.",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "USD",
+            "wall_clock_s",
+            "tokens"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "makerWithTaskClasses": {
+      "type": "object",
+      "required": [
+        "engine",
+        "version",
+        "feedback_forms",
+        "task_classes"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC tightening of the corpus's maker (which accepts a string). Contracts \u00a74.1 and Instrument rule 10 require the engine, its version, the feedback forms it can consume, AND the task classes it has been shown to perform \u2014 generation and revision are different classes, each shown by a completed run, never by a claim about the engine. C33 does not structurally enforce task classes; Plumbline does, because a loop that will iterate needs the revision class and an unproven one is a billed reroll.",
+      "properties": {
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feedback_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Named forms this engine can actually consume (diff, failing test output, structured violations). An unnamed form is a feedback channel that does not exist (Contracts \u00a73: the loop is invalid without one)."
+        },
+        "task_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "class",
+              "shown_by"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "class": {
+                "enum": [
+                  "generation",
+                  "revision"
+                ]
+              },
+              "shown_by": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The completed run that shows this class. A claim about the engine is not evidence."
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "packet_all_of": [
+    {
+      "comment": "INSTANCE-SPECIFIC: a scored job must name its stage's standing constitution, and a ratified job must carry it. Weakening check: this adds a requirement; it removes none and contradicts none of the corpus's own if/then blocks.",
+      "if": {
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "const": "scored"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "constitution_ref",
+          "constitution_version"
+        ]
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: the Maker is an object carrying engine, version, feedback forms and task classes on a scored job (rule 10 / \u00a74.1). On a readings job the Maker is not scored, so the corpus's looser string form stands.",
+      "if": {
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "const": "scored"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "maker": {
+            "$ref": "#/$defs/makerWithTaskClasses"
+          }
+        }
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: bounds.budget takes the declared {amount, unit} shape so the unit cannot be omitted. Applies wherever bounds is present.",
+      "if": {
+        "required": [
+          "bounds"
+        ]
+      },
+      "then": {
+        "properties": {
+          "bounds": {
+            "properties": {
+              "budget": {
+                "$ref": "#/$defs/plumblineBudget"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: an undecidable escalation must carry what was tried and why no observable answer exists \u2014 the discoverability gate. A discoverable question may not be escalated at all; it is resolved.",
+      "if": {
+        "required": [
+          "discoverability"
+        ],
+        "properties": {
+          "discoverability": {
+            "properties": {
+              "classification": {
+                "const": "undecidable"
+              }
+            },
+            "required": [
+              "classification"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "discoverability": {
+            "required": [
+              "attempted",
+              "why_no_observable_answer",
+              "options"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "record_extension_conventions": {
+    "comment": "The corpus's \u00a75 record schema is additionalProperties:false and ships its own extension mechanism: instance_extensions[] of {name, label:'instance-specific', value}. Plumbline's record-level additions therefore travel as named extensions, NOT as new top-level fields, so every filed record still validates against the corpus \u00a75 shape.",
+    "names": {
+      "observation_ref": "Where the independent observation lives (path, artifact id, measurement), so the orchestrator can re-examine it without re-running the loop.",
+      "artifact_ref": "AUDIT ONLY. What was audited, pinned to an exact revision, carrying a value fresh on every run (commit SHA + date) \u2014 \u00a77.3 applied to the audit itself so a re-run is distinguishable from a stale entry.",
+      "method_note": "AUDIT ONLY. How the audit was performed and its limits: static vs executed, revision, what was not inspected.",
+      "verdict_derivation": "AUDIT ONLY. The arithmetic that produced the verdict, from the \u00a73 algebra, so the verdict is checkable rather than asserted.",
+      "channel_blind_note": "AUDIT ONLY. Where channel_blind is false, say why. A static audit did not observe the instance's runtime channels, so it may not claim \u00a77.2 on the instance's behalf.",
+      "next_order": "AUDIT ONLY. Remediation order, cheapest-decisive first.",
+      "supersedes": "AUDIT ONLY. The job_id this record supersedes. Corrections and re-audits are NEW records; the superseded record is retained unedited."
+    },
+    "audit_required_extensions": [
+      "artifact_ref",
+      "method_note",
+      "verdict_derivation"
+    ]
+  },
+  "instance_rule": {
+    "id": "extend-never-shrink",
+    "statement": "Plumbline may EXTEND the doctrine; it may never SHRINK it. S2's framing, 2026-09-29, and it is the general form of the one-directional invariant this repo already enforces mechanically (tests/validate_schemas.py asserts Plumbline accepts a strict SUBSET of what the corpus accepts).",
+    "doctrine_relationship": "THIS IS PLUMBLINE'S RULE, NOT THE DOCTRINE'S. The phrase 'extend-never-shrink' appears nowhere in the corpus. The doctrine's own and NARROWER version is \u00a78, audited by C18: instance extensions are labelled instance-specific, do not weaken \u00a73, \u00a74 or \u00a77, and are recorded with the job. Note what C18 does NOT say \u2014 its non-weakening clause is a closed set of three sections, so weakening something in \u00a71, \u00a72, \u00a75, \u00a76, \u00a79 or \u00a710 is not caught by it, and it is a condition on EXTENDING rather than a principle about shrinking. This rule is broader, and therefore stricter, than the doctrine's, which is permitted because an instance may constrain itself more. Do not read it back into the corpus and do not cite it TO the corpus as if the corpus said it. Proposal 0046's 'instance code does not shrink C1' is that proposal's argument, not a rule it cites.",
+    "extend_means": "Adding is permitted and encouraged where a real job needs it: dimensions (\u00a78/C18), channels, engines, labels. Every addition is labelled instance-specific, recorded with the job, and weakens nothing in \u00a73, \u00a74 or \u00a77.",
+    "shrink_means": "Dropping or failing to apply something the doctrine carries \u2014 a mechanism (M1\u2013M8), an exclusion (X1\u2013X4 or A.4's may-never-be-scored classes), a must-ask, a terminal state, an outcome. Missing an exclusion because it was not read IS a shrink.",
+    "consequence": "The exclusions and authorized dimensions must therefore be REACHED, not merely cited. The mandate's short front names its full text and says to open it for dimensions/outcomes; reading it for that purpose is not 'loading it as authority' \u2014 the ban is a weight ranking, not a prohibition. Adopt what is read at DOCUMENT hardness with its version recorded, so a later reader is sent to the right document."
+  },
+  "standing_authorization": {
+    "status": "INSTANCE-SPECIFIC, AUTHORIZED BY THE OWNER 2026-09-30. S2: 'I agree with the split.'",
+    "what_it_is": "An owner-declared risk appetite for ORDINARY OPERATING ACTIONS. It says which action shapes an agent stops asking about, and which it must keep asking about. It is not a job value, not a threshold, and not a licence to skip a must-ask.",
+    "measured_basis": "Not a preference \u2014 a measured defect. tools/measure_operator_burden.py read the session record: 236 repeated same-shape approval asks in 30 days across all 8 shapes, 25 in a single session. The other two signals the Owner named for operator burden sat at ZERO (re-explanation requests, and multiple options offered without a recommendation). So the burden is asking per INSTANCE about a shape already settled \u2014 an instruction where a constraint belongs.",
+    "authorized_no_longer_asks": [
+      "Commits and pushes in a repository the work lives in. Reversible by revert; the record is the repo.",
+      "In-place writes to a project's OWN docs, with read-back verification. Never recreate, never re-import over a reviewed document \u2014 editing the existing file id is the safe path that already exists.",
+      "Probes, experiments and bake-offs under a declared cost ceiling, reported with their cost."
+    ],
+    "still_asks_every_time": [
+      "Destructive deletes, purges and wipes \u2014 the blast radius is not recoverable from the repo.",
+      "Credentials, secrets, tokens and keys \u2014 never echoed, never moved, never committed.",
+      "External sends: email, posts, tweets, anything that leaves the machine or reaches a third party.",
+      "Writes to instruction files (AGENTS.md and the like) \u2014 these change how future agents behave, so the Owner's approval IS the act.",
+      "Anything irreversible or outward-facing that is not named above. The default stays: ask."
+    ],
+    "doctrine_relationship": "NO SHRINK. Contracts \u00a73's must-ask list is a list of JOB VALUES \u2014 Buyer, Specialist, ground truth and its hardness, the Maker's engine, the mandate, the dimension set, T_accept/T_dim/T_reject, the cap, the budget, the human seat, the escalation classes. None of them is git push, a project doc write, or a probe, so this authorization removes no must-ask. It is grounded in \u00a74, which gives the Owner 'the values, the priority and the risk appetite' \u2014 deciding which ordinary actions are pre-authorized IS setting risk appetite, so this is the Owner acting inside a seat the doctrine assigns, not an instance widening its own authority. C18's non-weakening clause (\u00a73, \u00a74, \u00a77) is untouched.",
+    "how_it_is_falsified": "The instrument that found the defect measures the remedy. tools/measure_operator_burden.py reports signal 2 (repeated same-shape approvals); its target is ZERO. If signal 2 does not fall, this block is prose that changed nothing and the honest remedy is a HOOK that catches an approval question for an authorized shape as it is emitted \u2014 built then, not before, because a check that cannot fail certifies nothing.",
+    "why_not_only_prose": "Written here because this file is the declared home of instance law, so the authorization is citable and versioned with the pin. AGENTS.md carries a POINTER, not a restatement \u2014 proposal 0001's argument: a restatement is a second place to go stale."
+  },
+  "standing_bars": {
+    "status": "INSTANCE-SPECIFIC, SET BY THE OWNER 2026-09-30. S2: 'Set the reading level bar at grade 10. That should help you write responses that are a bit less dense and jargon filled.'",
+    "reading_level": {
+      "measure": "Flesch-Kincaid grade level, computed by tools/measure_operator_burden.py over the agent's own replies",
+      "bar": 10.0,
+      "enforced": "PER MESSAGE, not on the aggregate. Measured when the bar was set: this session's aggregate was 9.5 \u2014 inside the bar \u2014 while 73 of 250 individual replies were OVER it, and the Owner's other work aggregated 11.1 with 779 of 2321 over. An average hides the one reply that was unreadable, which is the same defect as the pooled average that hid a measured regression in the corpus. The tool reports the densest replies by name so they can be rewritten.",
+      "companion_reading": "specialist-term density per 1,000 words, over a declared term list. Measured at the same time: 19.8 in this work against 8.6 across the Owner's other sessions \u2014 2.3x. The two readings disagree usefully: the vocabulary is far denser while the sentences are simpler than the agent's normal writing, so the remedy is WORD CHOICE, not shorter sentences.",
+      "why_it_is_law_here": "It is the Owner setting a bar for a standing dimension, which \u00a74 assigns to the Owner. It is recorded rather than remembered because a bar held only in an agent's memory is not a bar."
+    },
+    "not_a_bar": "Reading load (minutes of the agent's output) has NO bar. It is a reading and the Owner has not set a limit for it."
+  },
+  "standing_parties": {
+    "status": "INSTANCE-SPECIFIC. Seats stated by the Owner 2026-09-30: 'I am the buyer.' / 'Can the edi corpus be the specialist?' / 'It's me as Author.' / 'I am the Architect.'",
+    "seats_held": {
+      "one_person_four_seats": "S2 (the Owner) holds OWNER, BUYER, SPECIALIST and ARCHITECT. The remaining three seats are NOT his and cannot be: MAKER and EVALUATOR are machine seats and the doctrine forbids him holding the Evaluator on a job at all (\u00a74), and the ORCHESTRATOR is unbuilt.",
+      "why_the_doctrine_permits_it": "Contracts \u00a74, NORMATIVE, verbatim: 'one party may hold several, recorded as such... The Owner and the Architect are two seats, not one: the Architect authors the standard and the frame, the Owner ratifies them and sets the values. A party holding both authors and ratifies, which is recorded with the job, BECAUSE NOTHING ELSE DISTINGUISHES THAT ARRANGEMENT FROM A SINGLE SEAT.' The doctrine therefore anticipates this exact arrangement and names the record as the only thing that makes it a double-hat rather than a single seat.",
+      "the_role_question_makes_that_record_operational": {
+        "rule": "EVERY escalation to the Owner must ASK WHICH SEAT HE IS REPRESENTING when he answers, and the answer is recorded with the decision. The Owner's instruction, 2026-09-30: 'when something escalates to me ask me which role I am representing when I make the decision.'",
+        "why_it_matters": "It is the distinction \u00a74 says nothing else supplies. Without it, a decision made as BUYER (what the work must do) and a decision made as ARCHITECT (what good looks like for it) land in the record identically, and the double-hat collapses into a single seat in exactly the way \u00a74 warns about.",
+        "also_applies_to_ratification": "The Architect's own prohibition is 'ratify the frame it authored \u2014 the Owner ratifies' (Playbook \u00a76, Contracts \u00a74). When he ratifies, the act must be recorded as the OWNER's act, and the record must say plainly that the same person authored the frame in the Architect seat. Ratifying as Architect would be the one act the doctrine names as prohibited.",
+        "the_question_to_ask_in_these_words": "Which seat are you deciding in \u2014 Owner (values, priority, risk, ratification), Buyer (what the work must do), Specialist (what excellent looks like in the craft), or Architect (the standard and the thresholds)?"
+      },
+      "what_remains_independent": "Only the EVALUATOR. Everything else in the loop is now one person's judgement plus a machine's execution. The Evaluator is a different model family from the Maker and from him, and it is the sole remaining check on a standard he authors, holds the bar for, and ratifies. That is the whole of the residual independence, and it is stated here so a later reader does not over-estimate it.",
+      "the_trade_restated": "The bar is Buyer \u2229 Specialist and both halves are now one person, so a Buyer-versus-Specialist conflict cannot surface as a conflict and failure signal F3 cannot tell a needs-disagreement from a craft-disagreement. The Owner declares this trade knowingly."
+    },
+    "buyer": {
+      "name": "S2 (the Owner)",
+      "provenance": "Owner's own statement, 2026-09-30. Contracts \u00a71.1 requires the Buyer with provenance on EVERY job; C1 audits it. The Buyer supplies the jobs-to-be-done, the pains and the gains \u2014 the done-rule in his own words (Operating Instrument, Buyer's test)."
+    },
+    "specialist": {
+      "name": "The E-DI corpus \u2014 quoted and versioned at the pin \u2014 held by S2 as its AUTHOR",
+      "provenance": "Corpus proposed by the Owner 2026-09-30 ('Can the edi corpus be the specialist?'); the human holder named the same day: 'It's me as Author.' The doctrine permits this form, in the Operating Instrument's own words: 'Buyer: the done-rule in their words \u2014 a document may carry it if it is quoted and versioned, and the holder is still escalated. Specialist: the same.' So the corpus carries the craft standard and the version is the pin this repo already records; the AUTHOR holds the seat, and is who the Orchestrator escalates to when the checklist is silent or the work conflicts with it.",
+      "one_party_two_seats": "THE OWNER HOLDS BUYER AND SPECIALIST. Contracts \u00a74 permits this and requires it be RECORDED, which this is. The DEAL, stated rather than buried: the bar is Buyer \u2229 Specialist, so both halves of the bar now come from one person. A Buyer-versus-Specialist conflict therefore cannot surface as a conflict \u2014 it would just be one person's view \u2014 and failure signal F3 ('above the bar later rejected by named Buyer/Specialist') can no longer tell a needs-disagreement from a craft-disagreement. The Owner declares this trade knowingly: he is the person who both wants the thing and knows what excellent looks like in it.",
+      "what_keeps_it_honest": "Not the separation of Buyer and Specialist, which is deliberately given up here, but the two separations that remain: the EVALUATOR is independent of the Maker and of both (a different model family, Plumbline rule 2), and the ARCHITECT writes the standard that the Owner then ratifies \u2014 the Primer's split, 'Buyer + Specialist hold the bar; the Owner ratifies; the Architect writes it'. So the Owner does not grade his own work and does not author the rubric he is judged by. NOTE: the Architect seat has no holder named yet and the constitution schema carries no field for it \u2014 recorded as an open seat, not an omission.",
+      "scope_where_it_holds": "Jobs whose craft standard is E-DI itself: conformance audits of a program against the corpus, and the \u00a79 checklist work. There the corpus is the standard-holder the Evaluator's authority is on loan from.",
+      "scope_where_it_does_NOT_hold": "Jobs in any other field. For a translation, captioning or routing job, E-DI is the PROCESS the work runs through, not the craft the artifact is judged on. The Specialist there is the field's expert, named per job \u2014 e.g. for captioning, FCC 47 CFR \u00a779.1 with the BBC Subtitle Guidelines and the Netflix Timed Text Style Guide.",
+      "the_limit_that_comes_with_it": "A corpus cannot answer. The doctrine's own condition is that 'the holder is still escalated', so a question the checklist does not settle, or a conflict between the checklist and the work, still goes to a human. The document carries the standard; a person holds the seat.",
+      "consequence_worth_stating": "Naming a Specialist is what creates a bar and therefore what LICENSES SCORING (Contracts \u00a71.1, C29). Job one was readings-only because no Specialist was named at the outset. With this in place, a conformance job can in principle be SCORED rather than only read \u2014 which is a change in what jobs are possible, not only in bookkeeping.",
+      "the_one_job_it_cannot_hold": "An audit OF the corpus. E-DI cannot be both the artifact and the standard it is judged against; \u00a712's no-evaluator-above-the-corpus is the declaration that terminates that recursion. Self-audit of the corpus does not name it as its own Specialist."
+    },
+    "why_it_is_not_in_the_constitution_yet": "RESOLVED 2026-10-01 \u2014 THE CONSTITUTION IS RATIFIED. The Owner: 'Constitution Ratified.' This note is kept, rewritten, because the reason it existed is worth knowing. \u00a73 makes Buyer and Specialist must-ask values, so while a constitution sits in `ratified: false` those fields must be ABSENT; the schema enforces it, and `proposed` sets additionalProperties:false so they cannot live there either \u2014 only `values`, `principles`, `escalation_classes`, `human_seat` and `rationale` are permitted. \u00a71.1 says the same from the other side. So the two seat rows could not enter the frame as a placeholder; RATIFICATION was the act that admitted them, and it has now happened. dot-plumbline/constitution.json is at version 0.1.0, ratified=true, ratified_by S2, and carries Buyer and Specialist at the top level with the `proposed` block gone.",
+    "a_schema_gap_found_by_doing_it": "A RATIFIED CONSTITUTION HAS NOWHERE TO RECORD WHY. The schema sets additionalProperties:false at the root, so the only slots for a ratification are `ratified_by` and `ratified_at` \u2014 who and when, never WHAT WAS FLAGGED. The draft's `proposed.rationale` had to be dropped by the transform, and it is preserved in DECISIONS.log instead. This was found because the ratify tool VALIDATED BEFORE WRITING and refused, not by anyone reading the schema. Recorded as a gap rather than routed around: if a later ratification needs to carry a note, the schema is the thing that has to change, and that is a corpus-shaped question, not a local edit."
+  },
+  "known_doctrine_gaps": [
+    {
+      "id": "G1",
+      "status": "WITHDRAWN 2026-09-29 \u2014 it was not a corpus defect",
+      "was": "Claimed that C20 was unanswerable from the load set because the mandate's binding annexes live only in evidence/EDI-MANDATE-full.md, which EDI-FOR-MACHINES.md 'bans as authority'.",
+      "why_withdrawn": "Two errors of mine, both S2's correction. (1) The ban reads exactly 'Do not load as authority: evidence/** \u2026' \u2014 a RANKING, not a prohibition on reading or using. I collapsed 'not authority' into 'forbidden'. (2) The short mandate NAMES the full text twice: 'Full text (annexes, provenance, clause labels): evidence/EDI-MANDATE-full.md', and 'Auditing the corpus or dimensions/outcomes: open evidence/EDI-MANDATE-full.md (Annex A dimension set, Annex B outcome criteria O1\u2013O4)'. The load set points at the annexes and says when to open them.",
+      "residual": "A wording nit at most, not a proposal: 'not required to run a job' can read as 'never needed' when the next line says to open it precisely for dimensions/outcomes. A job that needs neither needs neither, which is correct. No corpus change is required and job one is not blocked."
+    },
+    {
+      "id": "G2",
+      "status": "RESOLVED 2026-09-29",
+      "finding": "Plumbline shipped a second job-packet schema that disagreed with the corpus's own (the corpus's fixtures give 18 errors against it). Two live schemas for one law means neither is authority.",
+      "action": "Resolved by composition: Plumbline's schemas are DERIVED from the corpus at a pinned commit (tools/build_schemas.py) and carry no independent field names."
+    }
+  ],
+  "operator_friction": {
+    "status": "INSTANCE-SPECIFIC, DEFINED 2026-10-05 at the Owner's instruction: 'I like the concept of operator friction as being the thing we focus on for the measure of burden.'",
+    "the_dimension": "Operator burden, defined as FRICTION ONLY: what the loop put in front of the Owner that it should not have had to. The second of the two dimensions the direction owes and the doctrine cannot supply.",
+    "what_counts": [
+      "a reading he had to ask about because we wrote it unclearly",
+      "a question we asked twice",
+      "a re-ratification caused by a defect we introduced"
+    ],
+    "what_counts_NOT": [
+      "his ratifications, selections and substantive amendments - the direction declares architecture a COLLABORATIVE stage, so his judgement there is designed-in. Counting it scored the design as a defect, and the Owner rejected that reading on 2026-10-05.",
+      "his depth of thinking on the specifications, which this channel cannot see and must not price",
+      "an escalation a declared route sends to him by design"
+    ],
+    "the_channel": "The clarification rows in a disposition ledger, plus the Owner's own signals in tools/measure_operator_burden.py (his requests to re-explain; approval asks by shape). That tool was built 2026-09-30 and already counts against zero; this dimension READS it rather than re-deriving a weaker version of it.",
+    "target": "ZERO, counted absolutely per job. No ratio and no denominator: friction is a defect count and engagement is a volume, and their ratio lets the program that imposed MORE unnecessary work read better. Jobs are the exposure measure, and running more of them cannot improve the score.",
+    "the_list_is_the_reading": "Which row cost him a question is actionable; how many rows he read is not.",
+    "design_rule": "The metric must never be improvable by showing the Owner LESS of the work. Measure what we took from him, never what he chose to give.",
+    "its_own_weakness_declared": "The ledger channel only exists where a program files a disposition ledger, so a program with none has no friction channel at all - a gap in the channel, not a clean bill of health. And an Owner act nobody recorded is invisible to every channel here.",
+    "first_reading": "2026-10-05, the Enterprise Analytics snapshot: 1 friction event across 5 jobs - the Response Contract heading, which he said he did not understand ('I am not sure I understand this one') and which was resolved the same day. Target 0.",
+    "not_yet": "No bar is set, and no job has run under this definition. The next job that reports this dimension runs under it; the earlier readings taken under weaker definitions are superseded and labelled."
+  },
+  "proportionality": {
+    "status": "INSTANCE-SPECIFIC, built 2026-10-01 at the Owner's instruction: 'First build proportionality.'",
+    "the_dimension": "One of the two the direction owes and the doctrine cannot supply. The direction's fourth falsification condition is 'the solutions are over-built and haven't earned the right to be so', and nothing in \u00a79 asks whether a thing NEEDED to exist \u2014 so a contract-derived evaluator is blind to it. Value 5 supplies the deciding rule: 'A mechanism earns its place by having been needed, not by being plausible... name the job that needs it, or defer it with a trigger.'",
+    "the_channel": "tools/check_proportionality.py enumerates the built surface MECHANICALLY \u2014 committed tools, instance-layer blocks, seat profiles \u2014 and requires each item to carry a need in the ledger below. Reading: the fraction earned, plus the LIST of what is not, which is the actionable part.",
+    "the_polarity_is_strict_on_purpose": "An item the ledger does not mention counts UNEARNED. A stale ledger therefore cannot pass: forgetting to declare something shows up as unearned surface rather than hiding behind silence. Shown failing in the tool's own selftest \u2014 delete one entry and exactly that item comes back unearned.",
+    "its_own_weakness_declared": "THE LEDGER IS WRITTEN BY THE AGENT BEING MEASURED, so this channel measures my honesty and not my restraint. That is the same failure that retired the recommendation-rate regex \u2014 three times the measure turned out to be the author rather than the behaviour. The mitigation is that every entry carries a `cite` naming a job id, a commit, or a recorded signal, so a reader can CHECK the claim instead of believing it. Entries whose cite is prose rather than an artifact are the ones to challenge. A 100% reading on a self-written ledger should be treated as suspicious by default.",
+    "not_a_size_measure": "Line counts measure effort, not need. A large mechanism with a named job is proportional; a tiny one built for no reason is not. This counts NEED.",
+    "bar": "NOT SET. The Owner sets it, as with the reading level. Until then the reading is reported and not scored.",
+    "ledger": {
+      "comment": "One entry per built thing. `needed_by` is what required it; `kind` classifies the need; `cite` is what a reader can CHECK it against. An item absent here is unearned by default.",
+      "items": {
+        "kit/skill/DEPLOYMENT-SKILL-TEMPLATE.md": {
+          "needed_by": "The kit README tells an adopter to generate its own skill rather than copy this instance's (which names this tree), and an instruction to write something is advice unless the shape is supplied. This is the shape: the two commands, the rules the kit enforces, and the four things not to do — each of which has a defect behind it. The proportionality channel caught this file undeclared before the commit, which is the channel doing its job on the person who wrote it.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-05: \"This seems like the sort of thing that should be in a README in the plumbline repo\" — the adoption guidance, extended from prose into a copyable shape"
+        },
+        "standards/website-standard.md": {
+          "needed_by": "A website job needed a standard its Specialist could adopt and declare, and the authority research behind one is PRIOR-heavy — every book is a person's judgement, which is not machine-checkable. The artifact was written so the classification IS the useful part: dimensions with a channel and a hardness each, DOCUMENT where a tool decides, READER where a person must (with a control so the judgement can fail), MEASURED once live. It also carries the AI-friendliness group, which is where the mechanical dimensions concentrate, and a stated falsifier: if the DOCUMENT dimensions pass while A1, A2, B1 and D2 fail, the standard is measuring the machine rather than the website.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-05: \"pull this research together in a coherent way so that it can provide ground truth for defining a plumbline specialist for a website project\" and \"features that make AI friendly so agents can really serve their users well\"; the hardness classification follows E-DI's own DOCUMENT/INVARIANT/PRIOR vocabulary"
+        },
+        "violation_locator_guidance": {
+          "needed_by": "C36 requires a below-floor dimension to carry a violation classified into rule 4's four locators. The attention/friction shortfall is the one case Plumbline's own records produce and the corpus has no instance of, so the determination had to be made here and written down where the Evaluator seat can find it.",
+          "kind": "owner_instruction",
+          "cite": "corpus maintainer to the Plumbline maintainer session, 2026-10-05, item 3 (\"which locator is right for a friction/attention shortfall is yours to determine\"); C36 (Contracts v1.22.0)"
+        },
+        "disposition_semantics": {
+          "needed_by": "Verdict and disposition are separate acts (the corpus's own words). The corpus maintainer showed (2026-10-05) that a reader treating an un-given disposition as the ABSENCE of one manufactures the non-conformance it reports, and then pushes toward asking the Owner more — which cuts against the operator-friction rule. So the three states are declared once, with the honest rate, before the O1 field lands.",
+          "kind": "owner_instruction",
+          "cite": "corpus maintainer to the Plumbline maintainer session, 2026-10-05, item 1; AGENTS.md's operator-friction rule (target zero, counted absolutely, never a ratio against engagement)"
+        },
+        "kit/plumbline_job.py": {
+          "needed_by": "The emitters fixed the PRODUCTION of readable terms and did nothing about running them being a thing someone must remember — the same failure one level up, and measured: four consecutive jobs shipped terms no checker could read, written by authors already told to produce machine-readable ones. A tool you must remember is advice. This is the join: a job folder comes into existence BY the packet emitter and ends BY the record emitter and the close, and it also encodes the folder conventions that individual tools cannot know (inputs/ is not terms, superseded/ is not current) — both of which were measured failures when they were left to a reader.",
+          "kind": "measured_defect",
+          "cite": "dot-plumbline/probes/eaaa-review-2026-10-02/REVIEW-2-2026-10-05.md (four jobs still shipping packet.md) and MIGRATION-DEMONSTRATION-2026-10-05.txt (the skip that lived only on stdout)"
+        },
+        "kit/emit_packet.py": {
+          "needed_by": "Four consecutive jobs closed with their terms in packet.md — prose, so the gate could not read a single field and every check that depends on those terms was reduced to reading English. Measured 2026-10-05 on the deployment's own folder: job-close returned exit 3 on all four, and the migration of one of them (packet + record + outcome, on a copy) took it to exit 0 CLOSEABLE. The emitter carries no copy of the law: it reads the corpus schema's own required list at runtime and runs the corpus gate BEFORE the file lands.",
+          "kind": "measured_defect",
+          "cite": "dot-plumbline/probes/eaaa-review-2026-10-02/MIGRATION-DEMONSTRATION-2026-10-05.txt"
+        },
+        "kit/emit_record.py": {
+          "needed_by": "Four jobs were opened after a review told the deployment to produce machine-readable records, and all four shipped hand-assembled ones that failed the checker: unlabelled extension keys, an instrument_in_force without the runner hash, a pass_rule written as a sentence, a violation filed in a class rule 4 does not have. Every one is a SHAPE failure, and a shape failure is what happens when a person types a record a machine should print. This tool prints it, refuses illegal input rather than warning about it, and runs the corpus validator on its own output.",
+          "kind": "measured_defect",
+          "cite": "dot-plumbline/probes/eaaa-review-2026-10-02/MIGRATION-DEMONSTRATION-2026-10-05.txt; the five failing job folders are named in REVIEW-2-2026-10-05.md"
+        },
+        "gate/plugin.yaml": {
+          "needed_by": "The discoverability gate's manifest. The gate is the direction's own design consequence: a classification step in front of every escalation, so the Owner is not asked questions the system could have answered itself (failure F5).",
+          "kind": "owner_instruction",
+          "cite": "Direction 2026-09-17, design consequence (3); job dot-plumbline/jobs/2026-10-01-gate-dispatch-shape-fix/"
+        },
+        "gate/__init__.py": {
+          "needed_by": "The gate itself: a pre_tool_call hook that blocks `clarify` while a job is armed, and records an accepted escalation as a ledger row so the denominator is the gate's own.",
+          "kind": "measured_defect",
+          "cite": "Plugin installed 2026-10-01 after two live failures (F1 positional dispatch, F2 turn_id vs session_id) recorded in that job's FINDINGS.md; first full cycle verified the same day"
+        },
+        "gate/rules.py": {
+          "needed_by": "The rules loader, split from the hook so the rules are data and the mechanism is code \u2014 the same split as the derived schemas: change the law without touching the runner.",
+          "kind": "doctrine_requirement",
+          "cite": "gate/discoverability-rules.json is the data; the split is what let the rules change without a plugin restart"
+        },
+        "gate/discoverability-rules.json": {
+          "needed_by": "The gate's rules as data: the question tool it governs, the satisfaction window, and the classes it will not ask about.",
+          "kind": "doctrine_requirement",
+          "cite": "dot-plumbline/probes/gate-coverage-retro-2026-10-02/ \u2014 the retro probe found `discoverable` in 0 of 14 escalations, which is why the second door exists"
+        },
+        "kit/plumbline.py": {
+          "needed_by": "The deployment-conformance reading. Five checkers existed in the corpus and none could reach a deployment: measured 2026-10-02, the Enterprise Analytics packet was prose so the gate exited on JSONDecodeError and four \u00a75 records failed validation with no way for their authors to know. It WRAPS the corpus's checkers rather than re-implementing them \u2014 a second ruler would outrank the first.",
+          "kind": "measured_defect",
+          "cite": "dot-plumbline/jobs/2026-10-02-deployment-conformance-kit/packet.json; first cross-machine reading recorded in its run-log row"
+        },
+        "kit/cases/run_cases.py": {
+          "needed_by": "The kit's own guard. A check that has never been shown failing is a check nobody knows works \u2014 and the first run of this case runner LIED (7/7 while a control failed: a substring assertion matched and the verdict was FAILED; the honest count was 4/7). Sixteen cases now, three of them running the corpus's own red fixtures.",
+          "kind": "measured_defect",
+          "cite": "run-log row 2026-10-02-deployment-conformance-kit-g1"
+        },
+        "kit/README.md": {
+          "needed_by": "What a deployment needs to run the kit without this repo: the three commands, the exit codes, and the rule that not-checkable is not a pass.",
+          "kind": "measured_defect",
+          "cite": "for-vizh-run-the-kit.md \u2014 the instruction the second machine actually ran, twice"
+        },
+        "kit/skill/plumbline/SKILL.md": {
+          "needed_by": "The skill a deployment's agent loads so the commands it runs ARE the kit's commands. Built INTO the kit job rather than separately, because two hand-written command sets are the drift trap this program keeps measuring.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-02: 'You can decide whether to bundle the skill build with the kit job' \u2014 bundled, and the reason is recorded in that job's packet"
+        },
+        "tools/build_schemas.py": {
+          "needed_by": "Plumbline shipped a second job-packet schema that disagreed with the corpus's own; the corpus fixtures gave it 18 errors. Two live schemas for one law means neither is authority.",
+          "kind": "measured_defect",
+          "cite": "schemas/instance-extensions.json known_doctrine_gaps G2 (RESOLVED 2026-09-29)"
+        },
+        "tools/check_proportionality.py": {
+          "needed_by": "This dimension itself. The Owner's instruction to build it, and the direction's fourth falsification condition, which no contract-derived evaluator can observe.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-01: 'First build proportionality.'"
+        },
+        "tools/measure_operator_burden.py": {
+          "needed_by": "The direction's first falsification condition. Measured 236 repeated same-shape approval asks in 30 days against 25 in one session.",
+          "kind": "measured_defect",
+          "cite": "dot-plumbline/probes/OPERATOR-BURDEN.md"
+        },
+        "tools/pin.json": {
+          "needed_by": "The pin discipline: every derived artifact names the corpus commit it was built from, because a version number cannot be checked and a commit can. The conformance runner resolves its `corpus:` surface entries through this file.",
+          "kind": "doctrine_requirement",
+          "cite": "AGENTS.md, 'a silent stale build is the failure mode'"
+        },
+        "tools/prepare_constitution_audio.py": {
+          "needed_by": "DEFERRED CAPABILITY \u2014 trigger: the Owner asks for another document read aloud, with a declared spoken normalisation. Its one use (the constitution) was requested, delivered and purged the same day, so no live job needs it.",
+          "kind": "deferred_capability",
+          "cite": "Owner 2026-10-01: 'Make an audio version\u2026' then 'Purge the audio artifact. No longer needed.' WEAKEST ENTRY IN THIS LEDGER \u2014 challenge it first."
+        },
+        "tools/probe_jev_evaluator.py": {
+          "needed_by": "DEFERRED \u2014 triggers: high evaluation volume, or the reasoning tier becoming an iteration bottleneck. Parked because no job has needed it.",
+          "kind": "deferred_probe",
+          "cite": "dot-plumbline/probes/jev-evaluator-probe/README.md"
+        },
+        "tools/probe_jev_evaluator_r2.py": {
+          "needed_by": "DEFERRED \u2014 same two triggers. Round 2 answered whether JEV could judge at all; it cannot read the surface, so it orders rather than decides.",
+          "kind": "deferred_probe",
+          "cite": "dot-plumbline/probes/jev-evaluator-probe/ROUND-2.md"
+        },
+        "tools/probe_jev_evaluator_r3.py": {
+          "needed_by": "DEFERRED \u2014 same two triggers. Round 3 measured that max share predicts reproduction, n=32x6.",
+          "kind": "deferred_probe",
+          "cite": "dot-plumbline/probes/jev-evaluator-probe/ROUND-3.md"
+        },
+        "tools/ratify_constitution.py": {
+          "needed_by": "The ratification act itself. Under the schema, ratification is a structural change \u2014 `proposed` must go and the seats must arrive \u2014 so it is performed by a validated transform, not a hand edit.",
+          "kind": "job",
+          "cite": "dot-plumbline/constitution.json ratified 2026-10-01"
+        },
+        "tools/render_constitution.py": {
+          "needed_by": "A measured split: the source file ran 14,123 characters, of which 37% was law and 42% was the case for each clause. An agent loading it needed the law alone.",
+          "kind": "measured_defect",
+          "cite": "commit aaa9d05"
+        },
+        "tools/run_conformance_read.py": {
+          "needed_by": "Job one. It produced the conformance census over \u00a79 C1\u2013C33 in three passes and archives itself content-addressed on every run so two instruments can coexist.",
+          "kind": "job",
+          "cite": "dot-plumbline/jobs/2026-09-29-plumbline-conformance-census/"
+        },
+        "packet_properties": {
+          "needed_by": "The instance layer's stated purpose: the labels and fields Plumbline adds beyond the corpus (\u00a78/C18), including constitution_ref and the discoverability block.",
+          "kind": "doctrine_requirement",
+          "cite": "schemas/instance-extensions.json title"
+        },
+        "packet_required": {
+          "needed_by": "Makes the instance layer's additions binding rather than advisory \u2014 the difference between a field that exists and a field that must.",
+          "kind": "doctrine_requirement",
+          "cite": "tools/build_schemas.py, required-merge step"
+        },
+        "packet_defs": {
+          "needed_by": "Shared shapes the instance adds. A definition used twice is one place to change rather than two to keep in step.",
+          "kind": "doctrine_requirement",
+          "cite": "tools/build_schemas.py, defs-merge step"
+        },
+        "packet_all_of": {
+          "needed_by": "Contracts \u00a73's must-ask rule as a schema if/then: while `ratified: false` the must-ask values may live only in a top-level `proposed` block. Structurally impossible to violate, which is the project's founding rule made real.",
+          "kind": "doctrine_requirement",
+          "cite": "AGENTS.md, 'a prompted model promises; a configured instance enforces'"
+        },
+        "record_extension_conventions": {
+          "needed_by": "Audit records needed three extensions the corpus's \u00a75 shape does not carry: artifact_ref, method_note and verdict_derivation.",
+          "kind": "measured_defect",
+          "cite": "tools/build_schemas.py, 'audit requires extensions'"
+        },
+        "instance_rule": {
+          "needed_by": "`extend-never-shrink` \u2014 the Owner's framing, and the general form of the invariant the repo already enforces mechanically: no fixture is accepted by Plumbline and rejected by the corpus.",
+          "kind": "owner_decision",
+          "cite": "tests/validate_schemas.py subset invariant; Owner 2026-09-29"
+        },
+        "standing_authorization": {
+          "needed_by": "A measured defect: 236 repeated same-shape approval asks in 30 days. Asking per instance about a settled shape is an instruction where a constraint belongs.",
+          "kind": "measured_defect",
+          "cite": "tools/measure_operator_burden.py; Owner 2026-10-01: 'I agree with the split'"
+        },
+        "standing_bars": {
+          "needed_by": "The Owner set a reading-level bar at grade 10 so replies are less dense and jargon-filled. A bar held only in an agent's memory is not a bar.",
+          "kind": "owner_decision",
+          "cite": "Owner 2026-10-01: 'Set the reading level bar at grade 10.'"
+        },
+        "standing_parties": {
+          "needed_by": "Contracts \u00a71.1 requires the Buyer and the Specialist with provenance, and \u00a74 requires a party holding several seats to be recorded 'because nothing else distinguishes that arrangement from a single seat'.",
+          "kind": "doctrine_requirement",
+          "cite": "EDI-MACHINE-CONTRACTS.md \u00a71.1, \u00a74; Owner 2026-10-01"
+        },
+        "known_doctrine_gaps": {
+          "needed_by": "A RECORD, kept so the corrections stay visible. Both entries are closed \u2014 G1 WITHDRAWN (it was not a corpus defect; the ban is a weight ranking, not a prohibition) and G2 RESOLVED (the second schema, above). A record that deletes its own withdrawals is worthless.",
+          "kind": "record",
+          "cite": "schemas/instance-extensions.json known_doctrine_gaps"
+        },
+        "plumbline-eval": {
+          "needed_by": "Job one. The Evaluator seat, pinned to a different model family from the Maker per rule 2, smoke-tested before anything was built on it.",
+          "kind": "job",
+          "cite": "AGENTS.md, Profile roster; dot-plumbline/jobs/2026-09-29-plumbline-conformance-census/"
+        },
+        "operator_friction": {
+          "needed_by": "The dimension itself, and this block is its declaration. Operator burden is one of the two the direction owes and no contract clause can observe: it is a count of what the loop put in front of the Owner that it should not have had to.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-05: 'I like the concept of operator friction as being the thing we focus on for the measure of burden.' Followed by his own correction of the first reading: 'penalizing Plumbline for the number of comments the Owner had on a deliverable' and 'friction should not be measured against engagement. That seems like a false dichotomy.'"
+        },
+        "proportionality": {
+          "needed_by": "The dimension itself, and this block is its declaration. The direction's fourth falsification condition \u2014 'the solutions are over-built and haven't earned the right to be so' \u2014 names no contract clause, so nothing in \u00a79 can observe it; this is the only channel that can.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-01: 'First build proportionality.'"
+        },
+        "tools/check_operating_loop.py": {
+          "needed_by": "The reliability channel for the full-score job. A PROXY accepted by the Owner ('proxy accepted (record it as such in the report)') \u2014 declared at DOCUMENT hardness in the rubric and every record.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-01; job 2026-10-01-plumbline-full-score ADR-002 \u00a71"
+        },
+        "tools/check_foreclosure.py": {
+          "needed_by": "The non-foreclosure channel, the same declaration-channel device as proportionality itself.",
+          "kind": "owner_instruction",
+          "cite": "Owner 2026-10-01; job 2026-10-01-plumbline-full-score ADR-002 \u00a72"
+        },
+        "attention_cost_test": {
+          "needed_by": "The Owner's redefinition of his own dimension \u2014 'Is the content I'm asked to read really essential for achieving the goal at hand? If not, it's noise.' This block IS that law, declared in the only place instance law is written.",
+          "kind": "owner_decision",
+          "cite": "Owner 2026-10-01, in the fairness exchange; fact 1402; rubric move declared per C30"
+        }
+      }
+    }
+  },
+  "attention_cost_test": {
+    "status": "INSTANCE-SPECIFIC, redefined by the Owner 2026-10-01 (fact 1402).",
+    "the_test": "Is the content I'm asked to read really essential for achieving the goal at hand? If not, it's noise.",
+    "why_the_old_one_was_biased": "The reading-load channel measured VOLUME (minutes read), which is an input count. It cannot distinguish reading the Owner demanded \u2014 an audit record exists because verification was required \u2014 from reading imposed on him, like walls of prose or asks that shouldn't exist. So it double-counts rigor as burden and is biased against verification-heavy jobs.",
+    "what_the_amended_measure_is": "NOISE \u2014 content the Owner was asked to read that was not essential for the goal at hand. The mechanical half already exists: the repeated-asks channel (an ask that shouldn't exist is noise) and the discoverability gate (the tool that prevents asks that shouldn't exist). The prose half (essential-vs-noise classification) needs an instrument; build it to the Owner's test, not to a proxy like length.",
+    "rubric_move_declared": "Per C30 the instrument that produced the two filed attention scores (both 3) STANDS \u2014 those records are fair under the volume definition and are not re-read. The next job runs under the moved instrument, declared as such."
+  },
+  "custody_record": {
+    "status": "instance-specific",
+    "purpose": "How Plumbline writes a custody/v1 record (in-toto Statement, predicateType https://evaluatordriven.com/custody/v1) for a job that reaches a terminal state. tools/build_schemas.py --custody DERIVES schemas/custody-record.schema.json from the pinned custody schema plus the rules below; the derived file is never hand-edited.",
+    "authority": "custody SPEC.md v0.9.6 section 4 is the record's shape. Plumbline adds nothing outside `x-` keys (SPEC section 4: producer fields only under `x-`), and weakens nothing: the derived schema is allOf(pinned custody schema, these constraints).",
+    "x_key": "x-plumbline",
+    "predicate_x_required": [
+      "job_id",
+      "verdict",
+      "terminal_state",
+      "disposition_source"
+    ],
+    "verdicts": [
+      "accept",
+      "regenerate",
+      "needs_owner",
+      "reject"
+    ],
+    "terminal_states": [
+      "accepted",
+      "needs_owner",
+      "rejected"
+    ],
+    "violation_locators": [
+      "artifact_missed_standard",
+      "standard_moved",
+      "dimension_unauthorized",
+      "frame_at_fault"
+    ],
+    "rules": [
+      "Plumbline's verdict is carried only as x-plumbline.verdict; custody/v1 has no verdict field and a bare `verdict` key is refused.",
+      "disposition.state is copied from the packet's disposition_state (written by `plumbline_job.py close --disposition`), never inferred from the verdict.",
+      "Every violation carries exactly one rule-4 locator at x-plumbline.locator.",
+      "Every predicate key is a custody section-4 field (read from the pinned schema's own property list) or begins with `x-`.",
+      "A remedy appears only under x-plumbline.remedy, with the evidence file it was read from, and only when that file contains it verbatim; the emitter never writes one."
+    ]
+  }
+}

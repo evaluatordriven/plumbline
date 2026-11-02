@@ -1,0 +1,151 @@
+# Handoff: iter2 Evaluator (batch 3) · job 2026-10-27-custody-emitter-gaps
+
+> Filled from `iter2-evaluator-b3.TEMPLATE.md` by the Orchestrator on 2026-10-28 after verifying gen 4 (ledger
+> generation n=4 close line). Dispatch only after the commit that adds this file is on origin (E1).
+> **No job work in `/tmp`** (Steve's standing rule, 2026-10-28): every scratch, venv, temp and rebuild path is under
+> `/workspace/edi-work/2026-10-27-custody-emitter-gaps/`.
+
+To: **E-DI Evaluator bot** (Evaluator seat operator). From: Chief of Staff (Orchestrator). Authority: Steve Moitozo II,
+2026-10-27 18:06 EDT, "Proceed. Run the job"; 18:31 EDT, "Go with all four recommendations and start iteration 1";
+AMENDMENT-5 (Buyer, 2026-10-28 07:52 EDT, cap 4 generations). AMENDMENT-4 (E-GLM output cap) also applies.
+Bar: `custody/bar.md` sha256 `3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b` (frozen, unchanged).
+Subject: gen-4 Maker commit `73863fb00c72239de0f0c2def4f68d1c6dfd902b`. This is iteration 2, batch 3: the same procedure as batch 2
+(handoffs/iter1-evaluator-b2.md), with a new batch dir, `--batch 3`, and the new subject. Do not reuse or modify
+`/workspace/edi-batches/2026-10-27-custody-emitter-gaps/iter1` or `.../iter1-b2`; they are evidence.
+Time bound: AMENDMENT-3 (ends **2026-10-28 13:15 EDT (17:15Z)**). See section 7.
+
+You operate two instruments and file their output. **You score nothing**: every verdict comes from S1
+(`run_instrument.sh`, `p5check.py`) or E-GLM (`n6_batch.py`) output, copied as written. You write no code, fix
+nothing, and never edit an instrument, a control or the subject. Anything not covered here: stop and report.
+
+## 0. Preconditions (any NO → stop and report)
+- E0 Seat `eval-glm` is pinned: `grep '"seat": "eval-glm"' $JOB/inputs/custody-events.jsonl` prints the pin line.
+- E1 Maker commit `73863fb00c72239de0f0c2def4f68d1c6dfd902b` is on `origin/job/2026-10-27-custody-emitter-gaps`.
+  Check: `git -C /workspace/plumbline-pr branch -r --contains 73863fb00c72239de0f0c2def4f68d1c6dfd902b`. Its author is `E-DI Maker` and its
+  subject starts `iter2 gen4: Maker files from maker_iter2_gen4_call`
+  (`git -C /workspace/plumbline-pr log -1 --format='%an | %s' 73863fb00c72239de0f0c2def4f68d1c6dfd902b`).
+- E2 Frozen set as amended: `cd $JOB/custody && sha256sum -c MANIFEST.sha256` shows every file OK, and
+  `sha256sum $JOB/custody/MANIFEST.sha256` = `f0ed1caf047e12eaa232df235343fae3b07603ac2fe5f8de0e293c93e8f680e7`,
+  `sha256sum $JOB/custody/freeze/instrument/n6_batch.py` = `616760242939ae5da88310909a84ce9e6bd464f0e55ae7005f2714d7d749ee81`,
+  `grep -c -- '"--max-tokens", "131072"' $JOB/custody/freeze/instrument/n6_batch.py` = 1, and
+  `sha256sum $JOB/custody/bar.md` = `3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b`.
+- E3 Key file `/workspace/.openrouter-key` exists. Never print, copy or commit it.
+- E4 Ledger: `sha256sum $JOB/inputs/custody-events.jsonl` = `1a2f19d3f498f24585e3a4f254b401db69623b8ba52d6b3d4c33148e7bb73331`.
+  Its last line is `"event": "generation", "n": 4, "boundary": "close"` (the Orchestrator's gen-4 close line naming
+  `73863fb00c72239de0f0c2def4f68d1c6dfd902b`, outcome `accepted`).
+- E5 Clock: it is before **12:10 EDT (16:10Z)** 2026-10-28 when you start step 2. Otherwise stop and report (section 7).
+- E6 The batch-3 dir `$B` (below) does not exist yet.
+- E7 Environment outside the repo (a reboot at ~08:36 EDT wiped it once): `readlink -f /Users/jarbis/Jarbis-PARAD/5_Devspace/edi`
+  prints `/workspace/plumbline-job/src/e-di-a48a464`, and every file hash in `/workspace/plumbline-pr/tools/pin.json` `"files"`
+  matches under that path:
+  `python3 -c 'import json,hashlib;p=json.load(open("/workspace/plumbline-pr/tools/pin.json"));b=[f for f,h in p["files"].items() if hashlib.sha256(open(p["corpus"]+"/"+f,"rb").read()).hexdigest()!=h];print("pin-ok" if not b else b)'`
+  prints `pin-ok`. If the link is missing or wrong, stop and report; do not recreate it yourself.
+- E8 `/workspace/edi-work/2026-10-27-custody-emitter-gaps/` exists and is writable (`mkdir -p` it; it holds `$TMPDIR`).
+
+## 1. Fixed names
+```bash
+JOB=/workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps   # read-only for you
+I=$JOB/custody/freeze/instrument
+B=/workspace/edi-batches/2026-10-27-custody-emitter-gaps/iter2-b3   # NEW batch dir, OUTSIDE every repo
+REV=$B/rev
+SRC=/workspace/next-job-controls/controls                           # held-out controls: READ-ONLY source
+CM=$JOB/custody/controls/MANIFEST.sha256                            # frozen controls manifest (551 files)
+W=/workspace/edi-work/2026-10-27-custody-emitter-gaps                # job scratch root (never /tmp)
+export TMPDIR=$W/tmp-eval-b3                                         # mktemp/tempfile in the instruments land here, not /tmp
+mkdir -p "$B/s1" "$B/p5" "$B/n6" "$TMPDIR"
+```
+Never write into `$SRC`, `/workspace/next-job-controls` or `/workspace/plumbline-pr`. Never copy a control,
+fixture or batch output into any repo. Control bytes leave `$B` only as sha256 digests.
+
+## 2. Subject and batch controls (copy stays WRITABLE)
+```bash
+git clone -q /workspace/plumbline-pr "$REV" && git -C "$REV" -c advice.detachedHead=false checkout -q --detach 73863fb00c72239de0f0c2def4f68d1c6dfd902b
+git -C "$REV" rev-parse HEAD > "$B/rev.txt"
+cp -a "$SRC" "$B/controls" && chmod -R u+w "$B/controls"      # NO chmod a-w: subject.py copies fixtures with their modes
+sha256sum "$CM"     # expect 9764d8e4d5a0bad067f44379f08035e0e41de6df6acc00a2c9e31641139760bf
+( cd "$B/controls" && sha256sum --quiet -c "$CM" ) && echo controls-before-ok
+( cd "$B/controls" && find . -type f -print0 | sort -z | xargs -0 sha256sum ) > "$B/controls-before.sha256"
+wc -l < "$B/controls-before.sha256"   # expect 551 (no file beyond the manifest)
+```
+If the manifest check fails or the count is not 551 → stop and report.
+
+## 3. S1 batch (N1-N5, N7, N8; N9 control; all controls in the same batch — P1)
+```bash
+bash "$I/run_instrument.sh" batch "$REV" "$B/controls" "$B/s1" > "$B/s1/run.log" 2>&1; echo $? > "$B/s1/exit"
+grep -l PermissionError -r "$B/s1" > "$B/s1/permission-errors.txt"; wc -l < "$B/s1/permission-errors.txt"   # expect 0
+```
+Exit codes: `0` controls as expected (subject verdicts in `$B/s1/summary.json`) · `1` a control missed → batch **void**
+(report it; re-run only on the Orchestrator's word; a re-run counts against the budget, not the cap) · `2` usage ·
+`3` pin mismatch → stop. If any PermissionError appears, report it as an environment anomaly. No real job is passed
+(REAL_JOB list empty) unless the dispatch names one.
+
+## 4. P5(e)
+```bash
+python3 "$I/p5check.py" --job "$JOB" > "$B/p5/P5-check.json" 2> "$B/p5/P5-check.stderr"; echo $? > "$B/p5/exit"
+```
+
+## 5. E-GLM batch 3 (N6, with clean G-c1 and planted G-p1 in the same batch)
+```bash
+python3 "$JOB/custody/freeze/harness/or_call.py" --check-key > "$B/n6/key-usage-before.json"
+python3 "$I/n6_batch.py" --rev "$REV" --controls "$B/controls" --batch 3 --out "$B/n6" \
+  --ledger "$JOB/inputs/custody-events.jsonl" > "$B/n6/stdout.json" 2> "$B/n6/stderr.txt"; echo $? > "$B/n6/exit"
+python3 "$JOB/custody/freeze/harness/or_call.py" --check-key > "$B/n6/key-usage-after.json"
+```
+This makes 3 sequential logged calls into `$B/n6/harness-eval-glm-b3.log`: `z-ai/glm-5.3-flash`, pin `z-ai/fp8`,
+temperature 0, max tokens 131072 (the endpoint maximum), no reasoning parameters. The shuffle uses seed `n6-batch-3`, so
+the order differs from batches 1 and 2. The result goes to `$B/n6/N6-batch.json` (`controls_ok`, `subject_verdict`, `N6` = PASS /
+FAIL / void). For each call, report `finish_reason` and the token counts from the log (`choices[0].finish_reason`,
+generation `native_tokens_reasoning` / `native_tokens_completion` / `total_cost`). If any `or_call_exit` ≠ 0 or any
+finish_reason is not `stop`, report it and do not retry.
+**Log policy (DECISIONS D4):** the full log stays in `$B`. Never copy it into a repo. Report `sha256sum $B/n6/harness-eval-glm-b3.log`.
+
+## 5b. Controls integrity after the run
+```bash
+( cd "$B/controls" && sha256sum --quiet -c "$CM" ) && echo controls-after-ok
+( cd "$B/controls" && find . -type f -print0 | sort -z | xargs -0 sha256sum ) > "$B/controls-after.sha256"
+cmp "$B/controls-before.sha256" "$B/controls-after.sha256" && echo controls-unchanged
+```
+Any mismatch, or any added or removed file, makes the batch **void**. Report it.
+
+## 6. Seal and report
+```bash
+grep -rlF -f /workspace/.openrouter-key "$B"; echo "key-scan rc=$? (must be 1)"
+( cd "$B" && find . \( -path ./rev -o -path ./controls \) -prune -o -type f ! -name 'BATCH-MANIFEST.*' -print0 \
+    | sort -z | xargs -0 sha256sum ) > "$B/BATCH-MANIFEST.sha256"
+grep -c BATCH-MANIFEST "$B/BATCH-MANIFEST.sha256"   # must print 0 (the seal does not list itself)
+sha256sum "$B/BATCH-MANIFEST.sha256"
+```
+Report to the Orchestrator in plain text. Copy verdicts from the instrument files; never give your own:
+```
+JOB 2026-10-27-custody-emitter-gaps · iter2 · batch 3 · subject 73863fb00c72239de0f0c2def4f68d1c6dfd902b (rev.txt: …)
+preconditions E0–E8: …   controls copy: before OK|FAIL (551) · after OK|FAIL · unchanged yes|no
+S1 exit: …   permission-errors: …   summary.json: <verbatim>
+  N1 … N2 … N3 … N4 … N5 … N7 … N8 …   (from summary.json)   N9 control: … (C-N9p)
+  controls: every line of run.log containing "MISMATCH" (or "none")
+  N1/N3 on extra-1-job-rejected: <the "why" lines verbatim from s1/subject/N1-*.json, N3-*.json, if present>
+P5(e): p5check exit …, verdict …  (P5-check.json)
+E-GLM (N6): exit … · controls_ok … · subject_verdict … · N6 … ; per call: call id, item id, or_call_exit, finish_reason,
+  reasoning/completion tokens, verdict, lines
+  spend: Σ total_cost from the generation replies in harness-eval-glm-b3.log; key usage before → after
+  full log sha256: …
+batch dir: $B · BATCH-MANIFEST.sha256 sha256 … (self-listing count 0)
+key-scan rc=1
+stops/anomalies: … (verbatim)
+```
+The Orchestrator applies the pass rule, not you: every N1-N8 must read PASS; N9 is a control and is not scored.
+
+## 7. Time and budget (AMENDMENT-3 bound; AMENDMENT-4 E-GLM cap; AMENDMENT-5 cap 4)
+The bound ends **2026-10-28 13:15 EDT (17:15Z)**. Leave the Orchestrator at least 45 min to close (pass rule, redacted
+log, commit, record), so the evaluation must end by **12:30 EDT (16:30Z)**. The S1 batch makes no model calls and
+takes minutes.
+- Do not start step 2 after **12:10 EDT (16:10Z)**. Start steps 2-5 as soon as you are dispatched; do not wait for the cutoff.
+- **Do not start step 5 (`n6_batch.py`) after 12:20 EDT (16:20Z).** If step 5 has not started by then, stop and report
+  what you have.
+- Step 5 duration: batch 2's three calls took about 6 min in all (11:39:53–11:45:21Z: 16 s, 4 min 22 s, 27 s). The
+  worst case is a full 131072 tokens, about 40 min per call. Do not kill a running call. If step 5 is still running at
+  **12:30 EDT (16:30Z)**, report that it is still running and how many calls have finished (entries in the log).
+- Money: E-GLM worst case is **$0.20** (3 × 131072 completion tokens × $0.50/M, plus prompts). Batch 2 cost
+  $0.00919725. The ceiling stays **$0.25**. Report job key usage before this batch (key-usage-before.json). The cap is
+  unchanged: < US$10.
+- Generation 4 is the last generation (cap 4). Whatever the verdict, there is no further Maker generation; the
+  Orchestrator applies the pass rule.

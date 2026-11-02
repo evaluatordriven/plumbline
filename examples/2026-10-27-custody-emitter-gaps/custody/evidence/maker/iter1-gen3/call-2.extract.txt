@@ -1,0 +1,3 @@
+extract_files: wrote kit/custody_history.py (24863 bytes, sha256 c9d8b15df608a74de1322e5960f8309aee99666803d321ffe0ae5eeb4828adfd)
+extract_files: wrote kit/emit_custody.py (54688 bytes, sha256 bc98c3d5819e20a548c827bde4790f0f843ab256e83caa8cdd72d43421c658ce)
+extract_files: wrote tools/pack_stranger_bundle.py (7458 bytes, sha256 6530a9261ff524aefea321f0d644a9477292aafd97918fba3e822df8cae518ac)

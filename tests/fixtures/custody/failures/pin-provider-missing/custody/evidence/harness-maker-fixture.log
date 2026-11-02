@@ -1,0 +1,46 @@
+{
+  "note": "SYNTHETIC FAILURE FIXTURE (pin-provider-missing): routed through the aggregator; nothing in the log says which provider served it",
+  "request": {
+    "url": "https://openrouter.ai/api/v1/chat/completions",
+    "model": "fixture/maker-1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "SYNTHETIC FIXTURE PROMPT"
+      }
+    ],
+    "temperature": 0,
+    "provider": {
+      "order": [
+        "deepinfra/fp8"
+      ],
+      "allow_fallbacks": false,
+      "zdr": true
+    }
+  },
+  "response": {
+    "id": "gen-synthetic-None",
+    "object": "chat.completion",
+    "created": 1792494000,
+    "model": "fixture/maker-1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "SYNTHETIC artifact text"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    }
+  },
+  "response_headers": {
+    "Date": "Tue, 20 Oct 2026 11:00:07 GMT",
+    "Content-Type": "application/json"
+  }
+}

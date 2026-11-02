@@ -1,0 +1,35 @@
+{
+ "batch": "1",
+ "calls_ok": true,
+ "check": "J3",
+ "controls_ok": true,
+ "dry_run": false,
+ "items": [
+  {
+   "call": "J3-b1-1",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J3p",
+   "messages_sha256": "1f50f6a6e262d0dbc24bd210bbf868387b1c0d7b43e02ac640a6151675228921",
+   "or_call_exit": 0,
+   "reply_sha256": "d3e4929407bbe0e94dacc517c8fe9cdf7889be9c99f73d4e7afc56a9a67d8afc",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J3-b1-2",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J3c",
+   "messages_sha256": "53c66d2a333c525eeecc625d8ce430e1c68f3c27716974d1fa1b74171c270526",
+   "or_call_exit": 0,
+   "reply_sha256": "dfc9dd497959c87b1db395166a461d6ec89aaf0d72b8f6faba374e75ff2cc2d3",
+   "verdict": "CONFORMS"
+  }
+ ],
+ "log": "harness-E-GLM-J3-b1.log",
+ "order": [
+  "G-J3p",
+  "G-J3c"
+ ],
+ "window": 2
+}

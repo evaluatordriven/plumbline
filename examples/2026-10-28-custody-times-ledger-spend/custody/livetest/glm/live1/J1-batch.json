@@ -1,0 +1,46 @@
+{
+ "batch": "1",
+ "calls_ok": true,
+ "check": "J1",
+ "controls_ok": true,
+ "dry_run": false,
+ "items": [
+  {
+   "call": "J1-b1-1",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J1p1",
+   "messages_sha256": "9fafb47ba2de25a81b67372a92661fec503350d5453be9deced7e8c045f25d03",
+   "or_call_exit": 0,
+   "reply_sha256": "408134518d0d8a9288434c6eb729b2799b1bb9680396368fb31ffb4ce7ab9162",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J1-b1-2",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J1p2",
+   "messages_sha256": "2d814e65dcf8d850e0b56b8d94518b8887150a975e6f849a4f2c1dd0432292ed",
+   "or_call_exit": 0,
+   "reply_sha256": "f284ffe9f5060cd1b655479c71b08ed49480de869eaf9c9c55ef0f22816f41b4",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J1-b1-3",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J1c",
+   "messages_sha256": "3eb58b4066fcfbf9fe929c4c1fb27e0c8a0f59f6af12e5504051f35645d9a65f",
+   "or_call_exit": 0,
+   "reply_sha256": "ede9ea65e64af1564a89fa4b3aca1c9f34b1765be2dc37522d99fdde4b39e30e",
+   "verdict": "CONFORMS"
+  }
+ ],
+ "log": "harness-E-GLM-J1-b1.log",
+ "order": [
+  "G-J1p1",
+  "G-J1p2",
+  "G-J1c"
+ ],
+ "window": 2
+}

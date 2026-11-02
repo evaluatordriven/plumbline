@@ -1,0 +1,53 @@
+{
+ "id": "P1",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "files": {
+   "or_call.py": true,
+   "fixture_run.py": true,
+   "judge_batch.py": true
+  },
+  "tests": [
+   "test_edi_extract_files.py",
+   "test_edi_fixture_run.py",
+   "test_edi_judge_batch.py",
+   "test_edi_or_call.py"
+  ],
+  "entry_keys": [
+   "call",
+   "generation",
+   "generation_fetched_at",
+   "generation_status",
+   "harness",
+   "received_at",
+   "request",
+   "response",
+   "response_headers",
+   "response_status",
+   "seat",
+   "sent_at",
+   "verdict"
+  ],
+  "job1_keys": [
+   "call",
+   "generation",
+   "generation_fetched_at",
+   "generation_status",
+   "harness",
+   "received_at",
+   "request",
+   "response",
+   "response_headers",
+   "response_status",
+   "seat",
+   "sent_at",
+   "verdict"
+  ],
+  "read_log": {
+   "rc": 0,
+   "out": "{\"n\": 1}\n",
+   "err": ""
+  }
+ }
+}

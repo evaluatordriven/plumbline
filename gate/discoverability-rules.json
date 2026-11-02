@@ -1,0 +1,72 @@
+{
+  "version": "1.0.0",
+  "what_this_is": "THE RULES AS DATA, not code. The direction's non-foreclosure resolution requires evaluator DEFINITIONS to be portable \u2014 'they can be pointed at a different system without being rewritten' \u2014 so the classes and thresholds live here and the code is a thin reader. This is the single thing that keeps the gate from foreclosing a non-Hermes runtime. ADR-001 \u00a76-\u00a77.",
+  "why_the_agent_must_route_through_this": "The gate cannot intercept a reply \u2014 there is no pre-send hook, and the send is deliberately not a tool call. So it refuses at the points the agent chooses to route through, and measures coverage rather than claiming to catch everything. ADR-001 \u00a71 and \u00a74.",
+  "declared_methods": {
+    "search": [
+      "search",
+      "grep",
+      "looked up",
+      "lookup",
+      "googled",
+      "web_search"
+    ],
+    "measurement": [
+      "measur",
+      "counted",
+      "count",
+      "timing",
+      "benchmark",
+      "computed"
+    ],
+    "reading": [
+      "read",
+      "consulted",
+      "opened",
+      "re-read"
+    ],
+    "probing": [
+      "probe",
+      "quer",
+      "fact_store",
+      "hindsight",
+      "session_search",
+      "dug into"
+    ],
+    "running": [
+      "ran ",
+      "run ",
+      "executed",
+      "test",
+      "invoked"
+    ]
+  },
+  "methods_note": "Straight from the direction's own definition of a discoverable question: 'search, measurement, reading the repo, probing the record, running the code'. An attempt that names none of these is not an attempt.",
+  "minimum_attempts": 1,
+  "minimum_why_chars": 40,
+  "restatement_token_overlap": 0.8,
+  "minimum_options": 2,
+  "require_recommendation_names_an_option": true,
+  "require_seat": true,
+  "seats": [
+    "Owner",
+    "Architect",
+    "Buyer",
+    "Specialist",
+    "Maker",
+    "Evaluator",
+    "Orchestrator"
+  ],
+  "seat_note": "The Owner's own rule: on every escalation, ask which seat is answering. An escalation that does not name one cannot be answered in the right capacity.",
+  "refusal_style": {
+    "rule": "A refusal must name what is missing and what would satisfy it. 'Invalid' teaches nothing, so a refusal that only says invalid is itself a defect \u2014 the same principle as the corpus gate naming the field it rejected."
+  },
+  "gateable_paths": {
+    "escalation_tool": "plumbline_escalate",
+    "question_tools": [
+      "clarify"
+    ],
+    "note": "Three paths reach the Owner and two are gateable. `clarify` is blocked by a pre_tool_call hook unless an escalation was accepted this turn. The third \u2014 a question typed into an ordinary reply \u2014 is not gateable in this host, and that is the declared gap (ADR-001 \u00a74)."
+  },
+  "satisfaction_window_seconds": 900
+}

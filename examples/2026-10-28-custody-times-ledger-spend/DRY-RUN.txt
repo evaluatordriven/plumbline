@@ -1,0 +1,23 @@
+Dry runs and tests before the real actions (2026-10-28, EDT, UTC-4).
+1. 16:34 EDT  kit/plumbline_job.py open on scratch (--job-dir /workspace/edi-work/2026-10-28-custody-times-ledger-spend/dryrun/jobs/..., --run-log scratch):
+   wrote packet.json, OK (schema-verified), exit 0 (about 20:34:09Z). Then the real open on branch job/2026-10-28-custody-times-ledger-spend
+   from main 3df1ce5 at 16:34:22 EDT (20:34:22Z), schema-verified, exit 0.
+2. 16:36:28 EDT  freeze set built and stamped FROZEN-BUILD 2026-10-28T20:36:28Z. Checked on the frozen copy: jbatch.py --dry-run message
+   bytes for J1-J4 EQUAL to the live-tested ones (equiv.sh, sha compare); harness unit tests 25/25 OK (PLUMBLINE=base checkout);
+   handoffs/test_extract_files.py OK; offline S1 with the frozen instrument and the held-out controls (manifest fe03346b...5ccf verified):
+   base 1/39 (only G1 PASS), ref tree 8/39, field-guide reference 5/5 on G1,G4-G7; none void; all 57 controls right in each run.
+3. 16:37:39 EDT  first ledger freeze + 3 pins, run WITHOUT --orchestrator (my omission; job 1 used it). The approve path tested on a
+   scratch clone was REFUSED by custody_ledger.py at 3df1ce5 ("the custody inputs do not name the orchestrating agent").
+   Nothing had been committed or pushed. The two uncommitted files (inputs/custody.json sha a405c6a7...ce82, inputs/custody-events.jsonl
+   sha 7dd2f304...3875) were set aside on the box (/workspace/edi-work/2026-10-28-custody-times-ledger-spend/snap/discarded-freeze-2026-10-28T203739Z/)
+   and the freeze re-run at 16:47:58 EDT (20:47:58Z) with --orchestrator "Chief of Staff (Orchestrator)", then the same 3 pins.
+   Bar bytes unchanged (72e92dc7...61c6). This ledger is the first committed one.
+4. 16:48 EDT  approve path on a scratch clone (no remote) of the job: APPROVE-apply.sh --apply with placeholder words -> buyer + specialist
+   "logged"; handoffs/iter1/fill_handoffs.py then wrote MAKER.md/EVALUATOR.md with no placeholder left; with no approve events it refuses
+   (exit 3). Clone deleted. The real ledger has NO approve events.
+5. APPROVE-apply.sh --dry-run: prints the two commands; bar 72e92dc7...61c6, manifest acdf764b...5d98: unchanged.
+6. or_call.py guard tests (test mode, nothing sent; key usage unchanged 0.317534503): empty scratch ledger -> exit 7 (would allow,
+   headroom 4.9); near-bound prefill (4.87 spent) -> exit 6; no baseline -> exit 6. Item-19 live spend-guard test (S1 F8d, 16:27:54 EDT):
+   --max-cost 0.001 -> exit 8, nothing sent, key delta 0; cap 0.05 -> exit 0, one call on deepinfra/fp8 (US$0.0000074). PASS.
+7. P5 (freeze/instrument/p5check.py): PASS (P5-CHECK.json).
+8. git push: `git push --dry-run origin job/2026-10-28-custody-times-ledger-spend` before the real push (see the final report).

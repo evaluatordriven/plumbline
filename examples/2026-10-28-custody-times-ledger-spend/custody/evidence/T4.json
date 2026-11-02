@@ -1,0 +1,167 @@
+{
+ "id": "T4",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "build": {
+   "ok": true,
+   "error": null
+  },
+  "steps": [
+   {
+    "name": "open",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:21.900354Z",
+    "t1": "2026-10-29T15:45:22.044941Z",
+    "stderr": ""
+   },
+   {
+    "name": "freeze",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:23.246187Z",
+    "t1": "2026-10-29T15:45:23.289246Z",
+    "stderr": ""
+   },
+   {
+    "name": "approve-buyer",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:24.489433Z",
+    "t1": "2026-10-29T15:45:24.536710Z",
+    "stderr": ""
+   },
+   {
+    "name": "approve-specialist",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:25.736884Z",
+    "t1": "2026-10-29T15:45:25.783879Z",
+    "stderr": ""
+   },
+   {
+    "name": "pin-maker",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:26.984072Z",
+    "t1": "2026-10-29T15:45:27.029927Z",
+    "stderr": ""
+   },
+   {
+    "name": "pin-eval-m",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:28.230311Z",
+    "t1": "2026-10-29T15:45:28.274905Z",
+    "stderr": ""
+   },
+   {
+    "name": "init-spend",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:29.476001Z",
+    "t1": "2026-10-29T15:45:29.526392Z",
+    "stderr": ""
+   },
+   {
+    "name": "relay",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:30.726910Z",
+    "t1": "2026-10-29T15:45:30.776591Z",
+    "stderr": ""
+   },
+   {
+    "name": "amendment",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:31.977293Z",
+    "t1": "2026-10-29T15:45:32.023200Z",
+    "stderr": ""
+   },
+   {
+    "name": "generation-open",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:33.223619Z",
+    "t1": "2026-10-29T15:45:33.269071Z",
+    "stderr": ""
+   },
+   {
+    "name": "maker-call",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:34.470158Z",
+    "t1": "2026-10-29T15:45:34.529075Z",
+    "stderr": ""
+   },
+   {
+    "name": "generation-close",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:35.729525Z",
+    "t1": "2026-10-29T15:45:35.778389Z",
+    "stderr": ""
+   },
+   {
+    "name": "eval-eval_artifact",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:36.979341Z",
+    "t1": "2026-10-29T15:45:37.111496Z",
+    "stderr": ""
+   },
+   {
+    "name": "eval-eval_k1",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:38.312459Z",
+    "t1": "2026-10-29T15:45:38.382395Z",
+    "stderr": ""
+   },
+   {
+    "name": "eval-eval_k2",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:39.583372Z",
+    "t1": "2026-10-29T15:45:39.641426Z",
+    "stderr": ""
+   },
+   {
+    "name": "evaluation",
+    "rc": 0,
+    "t0": "2026-10-29T15:45:40.841690Z",
+    "t1": "2026-10-29T15:45:40.887821Z",
+    "stderr": ""
+   },
+   {
+    "name": "spend-status",
+    "rc": 0,
+    "t0": "2026-10-29T15:48:40.634817Z",
+    "t1": "2026-10-29T15:48:40.705958Z",
+    "stderr": ""
+   },
+   {
+    "name": "spend",
+    "rc": 0,
+    "t0": "2026-10-29T15:48:41.906134Z",
+    "t1": "2026-10-29T15:48:41.960356Z",
+    "stderr": ""
+   },
+   {
+    "name": "dispose",
+    "rc": 0,
+    "t0": "2026-10-29T15:48:43.160556Z",
+    "t1": "2026-10-29T15:48:43.205526Z",
+    "stderr": ""
+   },
+   {
+    "name": "close",
+    "rc": 0,
+    "t0": "2026-10-29T15:48:44.406219Z",
+    "t1": "2026-10-29T15:48:45.180160Z",
+    "stderr": ""
+   }
+  ],
+  "emit": {
+   "rc": 0,
+   "record_written": true,
+   "kinds": [],
+   "hand": [],
+   "stdout": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/j4/custody/record.custody.json  sha256 f6857b4493c2ca160668ceb3040b2cb0a2e643b8c701307055a3cdc5d1e3b0c5\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n"
+  },
+  "check": {
+   "verdict": "OK",
+   "levelAchieved": "CL1",
+   "failed": []
+  },
+  "packet_terminal": "accepted",
+  "hand_times": []
+ }
+}

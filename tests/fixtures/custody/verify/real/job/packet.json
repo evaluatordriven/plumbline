@@ -1,0 +1,17 @@
+{
+  "job_id": "fixture-rejected",
+  "note": "SYNTHETIC FIXTURE for tests/validate_schemas.py \u2014 not a real job",
+  "mode": "scored",
+  "terminal_state": "rejected",
+  "outcome": "rejected",
+  "disposition_state": "not_yet_given",
+  "maker": {
+    "engine": "fixture-maker",
+    "version": "0.0.1"
+  },
+  "buyer": "Fixture Buyer",
+  "specialist": "Fixture Specialist",
+  "close": {
+    "date": "2026-10-20T12:10:00Z"
+  }
+}

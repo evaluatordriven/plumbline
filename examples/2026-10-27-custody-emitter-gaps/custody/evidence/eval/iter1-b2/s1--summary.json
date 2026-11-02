@@ -1,0 +1,22 @@
+{
+ "controls": "as expected",
+ "mutants": "as expected",
+ "subject": {
+  "N1": "FAIL",
+  "N2": "PASS",
+  "N3": "FAIL",
+  "N4": "PASS",
+  "N5": "PASS",
+  "N7": "PASS",
+  "N8": "PASS"
+ },
+ "scores": {
+  "N1": 0,
+  "N2": 1,
+  "N3": 0,
+  "N4": 1,
+  "N5": 1,
+  "N7": 1,
+  "N8": 1
+ }
+}

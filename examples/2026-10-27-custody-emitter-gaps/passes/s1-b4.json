@@ -1,0 +1,39 @@
+{
+  "pass_id": "s1-b4",
+  "kind": "scored",
+  "status": "filed",
+  "channel": "S1 script, batch 4",
+  "rubric_sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+  "code_sha256": "1a07b6b2fa9d7c00b40038a04b12d2699ee91cdf54954d4e21273c9e2756a422",
+  "run_ref": "custody/evidence/eval/iter3-b4/s1--summary.json",
+  "scores": [
+    {
+      "dimension": "N1",
+      "score": 1
+    },
+    {
+      "dimension": "N2",
+      "score": 1
+    },
+    {
+      "dimension": "N3",
+      "score": 1
+    },
+    {
+      "dimension": "N4",
+      "score": 1
+    },
+    {
+      "dimension": "N5",
+      "score": 1
+    },
+    {
+      "dimension": "N7",
+      "score": 1
+    },
+    {
+      "dimension": "N8",
+      "score": 1
+    }
+  ]
+}

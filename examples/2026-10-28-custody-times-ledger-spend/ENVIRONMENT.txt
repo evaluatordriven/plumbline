@@ -1,0 +1,17 @@
+# Environment record, job 2026-10-28-custody-times-ledger-spend, 2026-10-28T20:48:25Z
+jsv python (open, schema checks, S1 PY): /workspace/edi-work/2026-10-27-custody-emitter-gaps/jsv/bin/python -> Python 3.13.5
+python3 (harness/instrument): /usr/bin/python3 Python 3.13.5
+git: git version 2.47.3
+curl: curl 8.14.1 (x86_64-pc-linux-gnu) libcurl/8.14.1 OpenSSL/3.5.7 zlib/1.3.1 brotli/1.1.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.2 libssh2/1.11.1 nghttp2/1.64.0 nghttp3/1.8.0 librtmp/2.3 OpenLDAP/2.6.10
+sha256sum: sha256sum (GNU coreutils) 9.7
+base checkout (S1_BASE): /workspace/edi-work/2026-10-28-custody-times-ledger-spend/base at 3df1ce52eddfe18705e380c4b6e99cf617cfa24b
+corpus: /workspace/plumbline-job/src/e-di-a48a464 (exported tree, inside /workspace/plumbline-job at HEAD 4a26e78d3255a7ad21e5b2e017005b2e69b2a035); corpus MANIFEST.sha256 sha256 c4fd52df5649c7bc8426c0c4f7b010ef09f7e805ef285946741f9f2502e0b1b4
+custody source: /workspace/plumbline-job/src/custody at 3e3ca58de5631bdc58291564303a2e9d25a8653e; checker/check.py sha256 aaeb7e0532c950ee1736207b0a91ff9d810533fccecdb2c7708312408e5bcd18
+TMPDIR for all steps: /workspace/edi-work/2026-10-28-custody-times-ledger-spend/tmp (never /tmp); PYTHONDONTWRITEBYTECODE=1
+OpenRouter key: /workspace/.openrouter-key (read by path by the harness only; never printed or committed)
+== jsv site-packages (dist-info; venv has no pip)
+attrs-26.1.0.dist-info
+jsonschema-4.26.0.dist-info
+jsonschema_specifications-2025.9.1.dist-info
+referencing-0.37.0.dist-info
+rpds_py-2026.9.1.dist-info

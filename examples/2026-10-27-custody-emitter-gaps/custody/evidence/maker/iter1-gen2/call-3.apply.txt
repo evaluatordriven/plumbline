@@ -1,0 +1,1 @@
+error: patch fragment without header at line 106: @@ -177,5 +205,6 @@ def events_log(job: Path, ref: H.Refusals) -> dict:

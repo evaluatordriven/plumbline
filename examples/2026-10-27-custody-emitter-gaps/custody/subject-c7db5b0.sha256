@@ -1,0 +1,5 @@
+# artifact under evaluation: job/2026-10-27-custody-emitter-gaps @ c7db5b0 (files changed from base ff350e3)
+4eeb2dc452236b4408d838db82fbe3ef53608366b59b66487937fd72f3a1e424  kit/emit_custody.py
+004cc4f9e90dc8700af23ff5318f72d1f81492b5229a2f851ff06f81c23ec762  kit/custody_history.py
+6530a9261ff524aefea321f0d644a9477292aafd97918fba3e822df8cae518ac  tools/pack_stranger_bundle.py
+0a50f89dcd4c1fdcd1dc660a707063e7a1a6f35dde6815577a01ad69b2b572db  tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl

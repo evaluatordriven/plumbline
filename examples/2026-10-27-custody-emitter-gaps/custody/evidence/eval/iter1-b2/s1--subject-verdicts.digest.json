@@ -1,0 +1,122 @@
+{
+ "_note": "Per-check S1 verdicts on subject 7cc38f83 over held-out fixtures. Record time values quoted from held-out fixtures redacted; each full file by sha256 (also in BATCH-MANIFEST.sha256).",
+ "verdicts": [
+  {
+   "file": "s1/subject/N1-F-genreply-full.json",
+   "sha256": "e82cc63254df0e9032fdee11f2c4202373db571e74d534f0898c53e7d311aa83",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-F-maker-10min.json",
+   "sha256": "e73b170b3f9acf7ecdd05a2ce0ff740ae18edf2b542993ad918e071a9244ee0f",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-F-single-call.json",
+   "sha256": "d8189caae46e727a100327e0dd69df57a58d1dc9f87527efa77a97c6f8376f18",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-extra-1-job-rejected.json",
+   "sha256": "317638f26e1e1c7981b5e5b7ff8c740fa57aca81d4c1563b5e20ada0b514147b",
+   "check": "N1",
+   "verdict": "FAIL",
+   "why": [
+    "maker call(s) without the logger's sent_at/received_at: ['0']",
+    "startedAt: record '<held-out fixture value>' != sent_at of the first maker call None",
+    "producedAt: record '<held-out fixture value>' != received_at of the last maker call None"
+   ]
+  },
+  {
+   "file": "s1/subject/N2.json",
+   "sha256": "c4169c7fd38234e1815447eb130dc11cca302ee83390cbf695b72b8e838254c9",
+   "check": "N2",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N3-F-genreply-full.json",
+   "sha256": "872d5c5161f6d1d75f42088d37365e74aab52954583f8a1bcdb98774f8d533a6",
+   "check": "N3",
+   "verdict": "FAIL",
+   "why": [
+    "no time field names a {file, line} source in x-plumbline (timeSources | time_sources | times)"
+   ]
+  },
+  {
+   "file": "s1/subject/N3-F-maker-10min.json",
+   "sha256": "872d5c5161f6d1d75f42088d37365e74aab52954583f8a1bcdb98774f8d533a6",
+   "check": "N3",
+   "verdict": "FAIL",
+   "why": [
+    "no time field names a {file, line} source in x-plumbline (timeSources | time_sources | times)"
+   ]
+  },
+  {
+   "file": "s1/subject/N3-F-single-call.json",
+   "sha256": "872d5c5161f6d1d75f42088d37365e74aab52954583f8a1bcdb98774f8d533a6",
+   "check": "N3",
+   "verdict": "FAIL",
+   "why": [
+    "no time field names a {file, line} source in x-plumbline (timeSources | time_sources | times)"
+   ]
+  },
+  {
+   "file": "s1/subject/N3-extra-1-job-rejected.json",
+   "sha256": "872d5c5161f6d1d75f42088d37365e74aab52954583f8a1bcdb98774f8d533a6",
+   "check": "N3",
+   "verdict": "FAIL",
+   "why": [
+    "no time field names a {file, line} source in x-plumbline (timeSources | time_sources | times)"
+   ]
+  },
+  {
+   "file": "s1/subject/N4.json",
+   "sha256": "a5fecae3211f0167ac9baa02435c755a3ebab84ecb1e76db2628225920e1d7e7",
+   "check": "N4",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N5.json",
+   "sha256": "236b20bb9a320c6f0d5c2a4939f974c76c9059c1a4b877b05953a061f9d7e302",
+   "check": "N5",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N7-F-genreply-full.json",
+   "sha256": "5cc9cd4d533430254935953fd18afdc64da9b1710d82c25ebd9c76bf6c838f4f",
+   "check": "N7",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N7-F-maker-10min.json",
+   "sha256": "03334f2b6e25eb2ad9cd77a7148d7e3f9aff9cd8df02d0b62189ce2d105c1095",
+   "check": "N7",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N8-F-genreply-full.json",
+   "sha256": "ad3cb03be9d5dbfaa4fd820e779af87af2c7e6bce7581dc98ddd75032d49d07c",
+   "check": "N8",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N8-F-maker-10min.json",
+   "sha256": "fdd3baf6eb28496adca3e0edb9d6e23130ac8ae3d330f3ceb5d1134e601ec2fe",
+   "check": "N8",
+   "verdict": "PASS",
+   "why": []
+  }
+ ]
+}

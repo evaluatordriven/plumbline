@@ -1,0 +1,12 @@
+{
+  "entry": "A",
+  "instrument_profile": "mvi",
+  "job_name": "readings-empty-bounds",
+  "artifact": "x.md",
+  "buyer": "Owner",
+  "maker": "m",
+  "evaluator": "e",
+  "mode": "readings",
+  "ratified": true,
+  "bounds": {}
+}

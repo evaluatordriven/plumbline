@@ -1,0 +1,208 @@
+{
+ "id": "F1h",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "record_xp": {
+   "generations": [
+    {
+     "event": "generation",
+     "action": "open",
+     "seat": "maker",
+     "n": 1,
+     "prompt_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "prompt_sha256": "afc77ede2aa893ace59eead6ddd176cf8167515bd3a2c79f2058c84ef6415fef",
+     "at": "2026-10-29T15:45:33Z",
+     "writer": "kit/custody_ledger.py@c70062b4f696",
+     "source": "inputs/custody-events.jsonl:8"
+    },
+    {
+     "event": "generation",
+     "action": "close",
+     "seat": "maker",
+     "n": 1,
+     "outcome": "artifact written",
+     "fix_kind": "artifact",
+     "at": "2026-10-29T15:45:35Z",
+     "writer": "kit/custody_ledger.py@c70062b4f696",
+     "source": "inputs/custody-events.jsonl:9"
+    }
+   ],
+   "evaluations": [
+    {
+     "event": "evaluation",
+     "batch": "b1",
+     "evaluator": "eval-m",
+     "verdict_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "verdict_sha256": "76d61c0368218cf5fe276b9f7970e65d9c26e5c70440978be84d09bba03f6f89",
+     "at": "2026-10-29T15:45:40Z",
+     "iteration": "1",
+     "writer": "kit/custody_ledger.py@c70062b4f696",
+     "source": "inputs/custody-events.jsonl:10"
+    }
+   ],
+   "relays": [
+    {
+     "event": "relay",
+     "kind": "relay",
+     "quote": "Steve: “Ratified proceed” — go ✓",
+     "from": "S1 T4 relay bot",
+     "source_chat": "t4-chat msg r1",
+     "source_at": "2026-10-29T15:45:23Z",
+     "at": "2026-10-29T15:45:30Z",
+     "writer": "kit/custody_ledger.py@c70062b4f696",
+     "source": "inputs/custody-events.jsonl:6"
+    }
+   ],
+   "amendments": [
+    {
+     "event": "amendment",
+     "file": "amendments/amendment-1.md",
+     "file_sha256": "69cd843526b7d5707f393aff74a3e4ee35aede27c580bbb5b7b618f207a8020e",
+     "quote": "T4 Buyer: “D2 means every named section”",
+     "channel": "t4-chat msg a1",
+     "said_at": "2026-10-29T15:45:23Z",
+     "at": "2026-10-29T15:45:32Z",
+     "writer": "kit/custody_ledger.py@c70062b4f696",
+     "source": "inputs/custody-events.jsonl:7"
+    }
+   ],
+   "spend": {
+    "calls_sum_usd": 4e-05,
+    "key_delta_usd": 0.0,
+    "total_usd": 4e-05,
+    "tolerance_usd": 0.0001,
+    "source": "inputs/custody-events.jsonl:11"
+   }
+  },
+  "ledger": [
+   {
+    "event": "freeze",
+    "at": "2026-10-29T15:45:23Z",
+    "bar_file": "custody/bar.md",
+    "bar_sha256": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "approve",
+    "role": "buyer",
+    "by": "T4 Buyer",
+    "kind": "person",
+    "at": "2026-10-29T15:45:24Z",
+    "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+    "adopted": null,
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "approve",
+    "role": "specialist",
+    "by": "T4 Specialist",
+    "kind": "person",
+    "at": "2026-10-29T15:45:25Z",
+    "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+    "adopted": null,
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "pin",
+    "seat": "maker",
+    "via": "openrouter.ai",
+    "provider": "DeepInfra",
+    "slug": "deepinfra/fp8",
+    "host": "api.deepinfra.com",
+    "at": "2026-10-29T15:45:27Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "pin",
+    "seat": "eval-m",
+    "via": "openrouter.ai",
+    "provider": "Z.AI",
+    "slug": "z-ai/fp8",
+    "host": "api.z.ai",
+    "at": "2026-10-29T15:45:28Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "relay",
+    "kind": "relay",
+    "quote": "Steve: “Ratified proceed” — go ✓",
+    "from": "S1 T4 relay bot",
+    "source_chat": "t4-chat msg r1",
+    "source_at": "2026-10-29T15:45:23Z",
+    "at": "2026-10-29T15:45:30Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "amendment",
+    "file": "amendments/amendment-1.md",
+    "file_sha256": "69cd843526b7d5707f393aff74a3e4ee35aede27c580bbb5b7b618f207a8020e",
+    "quote": "T4 Buyer: “D2 means every named section”",
+    "channel": "t4-chat msg a1",
+    "said_at": "2026-10-29T15:45:23Z",
+    "at": "2026-10-29T15:45:32Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "generation",
+    "action": "open",
+    "seat": "maker",
+    "n": 1,
+    "prompt_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+    "prompt_sha256": "afc77ede2aa893ace59eead6ddd176cf8167515bd3a2c79f2058c84ef6415fef",
+    "at": "2026-10-29T15:45:33Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "generation",
+    "action": "close",
+    "seat": "maker",
+    "n": 1,
+    "outcome": "artifact written",
+    "fix_kind": "artifact",
+    "at": "2026-10-29T15:45:35Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "evaluation",
+    "batch": "b1",
+    "evaluator": "eval-m",
+    "verdict_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+    "verdict_sha256": "76d61c0368218cf5fe276b9f7970e65d9c26e5c70440978be84d09bba03f6f89",
+    "at": "2026-10-29T15:45:40Z",
+    "iteration": "1",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "spend",
+    "spend_ledger": "spend/spend-ledger.jsonl",
+    "spend_ledger_sha256": "d00954b95d03d0a4bda9a289b43cf986ba02c401abc14cf6a2491ea20b9e08e7",
+    "key_reading": "spend/key-reading.json",
+    "key_reading_sha256": "5ddd9da65d77a2833af99be15ce76e25f8f2dc07a93588c6e24f12a38cad73cf",
+    "ledger_sum_usd": 4e-05,
+    "key_delta_usd": 0.0,
+    "total_usd": 4e-05,
+    "read_at": "2026-10-29T15:48:40.696374Z",
+    "last_settle_at": "2026-10-29T15:45:39Z",
+    "at": "2026-10-29T15:48:41Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   },
+   {
+    "event": "dispose",
+    "by": "T4 Buyer",
+    "at": "2026-10-29T15:48:43Z",
+    "decided_at": "2026-10-29T15:45:40Z",
+    "decided_source": "harness-eval-m.log#eval_k2 received_at",
+    "state": "given",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   }
+  ],
+  "check": {
+   "verdict": "OK",
+   "levelAchieved": "CL1",
+   "failed": []
+  },
+  "emit_rc": 0
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (4 values)"
+}

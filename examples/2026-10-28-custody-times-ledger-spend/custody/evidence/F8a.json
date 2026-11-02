@@ -1,0 +1,490 @@
+{
+ "id": "F8a",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "a_init": 0,
+  "a": {
+   "rc": 6,
+   "posts": [],
+   "log": [],
+   "err": "{\"ledger\": \"/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f8/a/spend/spend-ledger.jsonl\", \"ledger_spent_usd\": 0, \"bound_usd\": 5.0, \"reserve_usd\": 0.1, \"key_usage_baseline\": 1.0, \"key_usage_now\": 6.0, \"key_usage_delta_usd\": 5.0, \"spent_usd\": 5.0, \"headroom_usd\": -0.1, \"call\": \"f8_1\", \"seat\": \"maker\", \"model\": \"deepseek/deepseek-v4.1-flash-1017\", \"tag\": \"deepinfra/fp8\", \"worst_usd\": 0.039327, \"decision\": \"REFUSED\"}\nor_call: REFUSED by the job spend guard (spent + worst case + reserve >= bound); nothing sent, nothing logged\n"
+  },
+  "b1": {
+   "rc": 8,
+   "posts": [],
+   "log": []
+  },
+  "b2": {
+   "rc": 9,
+   "log": [
+    {
+     "call": "f8_1",
+     "seat": "maker",
+     "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+       "Authorization": "Bearer [REDACTED]",
+       "Content-Type": "application/json",
+       "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+       "model": "deepseek/deepseek-v4.1-flash-1017",
+       "messages": [
+        {
+         "role": "user",
+         "content": "S1 F8 guard test"
+        }
+       ],
+       "provider": {
+        "order": [
+         "deepinfra/fp8"
+        ],
+        "allow_fallbacks": false,
+        "zdr": true
+       },
+       "max_tokens": 131072
+      }
+     },
+     "harness": {
+      "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "sha256": "f740e95437654d842ca83e0180dfabbedc018783902f3bff7301fa08d73066ff"
+     },
+     "sent_at": "2026-10-29T15:52:28.777232Z",
+     "received_at": "2026-10-29T15:52:28.777388Z",
+     "response_status": 200,
+     "response_headers": {
+      "Date": "NOW",
+      "Content-Type": "application/json"
+     },
+     "response": {
+      "id": "gen-1793289148-s1t4maker",
+      "object": "chat.completion",
+      "created": 1793289148,
+      "model": "deepseek/deepseek-v4.1-flash-1017",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": "default",
+      "choices": [
+       {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "message": {
+         "role": "assistant",
+         "content": "S1 F8",
+         "refusal": null
+        }
+       }
+      ],
+      "usage": {
+       "prompt_tokens": 117,
+       "completion_tokens": 163,
+       "total_tokens": 280,
+       "cost": 5.9388e-05,
+       "is_byok": false,
+       "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+       },
+       "cost_details": {
+        "upstream_inference_cost": 5.9388e-05,
+        "upstream_inference_prompt_cost": 1.1466e-05,
+        "upstream_inference_completions_cost": 4.7922e-05
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 66,
+        "image_tokens": 0,
+        "audio_tokens": 0
+       }
+      },
+      "openrouter_metadata": {
+       "requested": "deepseek/deepseek-v4.1-flash-1017",
+       "strategy": "direct",
+       "region": "MIA",
+       "summary": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "attempt": 1,
+       "is_byok": false,
+       "endpoints": {
+        "total": 36,
+        "available": [
+         {
+          "provider": "DeepInfra",
+          "model": "deepseek/deepseek-v4.1-flash-1017",
+          "selected": true
+         }
+        ]
+       },
+       "generation_time": 3353
+      }
+     },
+     "generation": {
+      "data": {
+       "created_at": "2026-10-29T15:52:28.000Z",
+       "model": "deepseek/deepseek-v4.1-flash-1017",
+       "app_id": null,
+       "external_user": null,
+       "streamed": true,
+       "cancelled": false,
+       "latency": 191,
+       "moderation_latency": null,
+       "generation_time": 3353,
+       "tokens_prompt": 108,
+       "tokens_completion": 218,
+       "native_tokens_prompt": 117,
+       "native_tokens_completion": 163,
+       "native_tokens_completion_images": null,
+       "native_tokens_reasoning": 66,
+       "native_tokens_cached": 0,
+       "num_media_prompt": null,
+       "num_input_audio_prompt": null,
+       "num_media_completion": 0,
+       "num_search_results": null,
+       "num_fetches": null,
+       "web_search_engine": null,
+       "origin": "",
+       "is_byok": false,
+       "finish_reason": "stop",
+       "native_finish_reason": "stop",
+       "service_tier": "default",
+       "usage": 5.9388e-05,
+       "router": null,
+       "user_agent": "Python-urllib/3.9",
+       "http_referer": null,
+       "request_id": "req-1793125412-BeUju6CZsHTMflLAkeJO",
+       "session_id": null,
+       "preset_id": null,
+       "api_type": "completions",
+       "id": "gen-1793289148-s1t4maker",
+       "upstream_id": "chatcmpl-RmBwuaRITXOGNnaVGb58oGPs",
+       "provider_responses": [
+        {
+         "endpoint_id": "a34868e3-d8e3-46c4-acf2-19c86ae3365a",
+         "id": "chatcmpl-RmBwuaRITXOGNnaVGb58oGPs",
+         "is_byok": false,
+         "latency": 77,
+         "model_permaslug": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+         "provider_name": "DeepInfra",
+         "status": 200
+        }
+       ],
+       "total_cost": 1e-05,
+       "cache_discount": null,
+       "upstream_inference_cost": 0,
+       "provider_name": "DeepInfra",
+       "response_cache_source_id": null,
+       "data_region": "global",
+       "workspace_id": "00000000-0000-0000-0000-000000000000"
+      }
+     },
+     "generation_status": 200,
+     "generation_fetched_at": "2026-10-29T15:52:28.777504Z",
+     "verdict": {
+      "pin": {
+       "tag": "deepinfra/fp8",
+       "provider": "DeepInfra"
+      },
+      "served_by": {
+       "response.provider": "DeepInfra",
+       "openrouter_metadata.endpoints.selected": "DeepInfra",
+       "generation.provider_name": "DeepInfra"
+      },
+      "tried": [
+       "DeepInfra"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+     }
+    }
+   ],
+   "reply_exists": false,
+   "spend_rows": [
+    {
+     "at": "2026-10-29T15:52:28.774601Z",
+     "call": "f8_1",
+     "event": "reserve",
+     "id": "2927750ca5aa47cab39d549292fedf66",
+     "job": "s1-d4783c45a766",
+     "max_tokens": 131072,
+     "model": "deepseek/deepseek-v4.1-flash-1017",
+     "seat": "maker",
+     "spent_before_usd": 0,
+     "tag": "deepinfra/fp8",
+     "worst_usd": 0.0
+    },
+    {
+     "at": "2026-10-29T15:52:28.777827Z",
+     "call": "f8_1",
+     "cost_usd": 1e-05,
+     "event": "settle",
+     "id": "2927750ca5aa47cab39d549292fedf66",
+     "job": "s1-d4783c45a766",
+     "over_cap": true,
+     "source": "generation.total_cost"
+    }
+   ]
+  },
+  "c1": {
+   "rc": 6,
+   "posts": []
+  },
+  "c2": {
+   "rc1": 0,
+   "rc2": 6,
+   "requests": [
+    {
+     "at": "2026-10-29T15:52:28.988327Z",
+     "method": "GET",
+     "url": "https://openrouter.ai/api/v1/key"
+    },
+    {
+     "at": "2026-10-29T15:52:28.989870Z",
+     "method": "POST",
+     "url": "https://openrouter.ai/api/v1/chat/completions"
+    },
+    {
+     "at": "2026-10-29T15:52:28.990035Z",
+     "method": "GET",
+     "url": "https://openrouter.ai/api/v1/generation?id=gen-1793289148-s1t4maker"
+    },
+    {
+     "at": "2026-10-29T15:52:29.065765Z",
+     "method": "GET",
+     "url": "https://openrouter.ai/api/v1/key"
+    }
+   ],
+   "log": [
+    {
+     "call": "f8_1",
+     "seat": "maker",
+     "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+       "Authorization": "Bearer [REDACTED]",
+       "Content-Type": "application/json",
+       "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+       "model": "deepseek/deepseek-v4.1-flash-1017",
+       "messages": [
+        {
+         "role": "user",
+         "content": "S1 F8 guard test"
+        }
+       ],
+       "provider": {
+        "order": [
+         "deepinfra/fp8"
+        ],
+        "allow_fallbacks": false,
+        "zdr": true
+       },
+       "max_tokens": 131072
+      }
+     },
+     "harness": {
+      "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "sha256": "f740e95437654d842ca83e0180dfabbedc018783902f3bff7301fa08d73066ff"
+     },
+     "sent_at": "2026-10-29T15:52:28.989818Z",
+     "received_at": "2026-10-29T15:52:28.989997Z",
+     "response_status": 200,
+     "response_headers": {
+      "Date": "NOW",
+      "Content-Type": "application/json"
+     },
+     "response": {
+      "id": "gen-1793289148-s1t4maker",
+      "object": "chat.completion",
+      "created": 1793289148,
+      "model": "deepseek/deepseek-v4.1-flash-1017",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": "default",
+      "choices": [
+       {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "message": {
+         "role": "assistant",
+         "content": "S1 F8",
+         "refusal": null
+        }
+       }
+      ],
+      "usage": {
+       "prompt_tokens": 117,
+       "completion_tokens": 163,
+       "total_tokens": 280,
+       "cost": 5.9388e-05,
+       "is_byok": false,
+       "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+       },
+       "cost_details": {
+        "upstream_inference_cost": 5.9388e-05,
+        "upstream_inference_prompt_cost": 1.1466e-05,
+        "upstream_inference_completions_cost": 4.7922e-05
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 66,
+        "image_tokens": 0,
+        "audio_tokens": 0
+       }
+      },
+      "openrouter_metadata": {
+       "requested": "deepseek/deepseek-v4.1-flash-1017",
+       "strategy": "direct",
+       "region": "MIA",
+       "summary": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "attempt": 1,
+       "is_byok": false,
+       "endpoints": {
+        "total": 36,
+        "available": [
+         {
+          "provider": "DeepInfra",
+          "model": "deepseek/deepseek-v4.1-flash-1017",
+          "selected": true
+         }
+        ]
+       },
+       "generation_time": 3353
+      }
+     },
+     "generation": {
+      "data": {
+       "created_at": "2026-10-29T15:52:28.000Z",
+       "model": "deepseek/deepseek-v4.1-flash-1017",
+       "app_id": null,
+       "external_user": null,
+       "streamed": true,
+       "cancelled": false,
+       "latency": 191,
+       "moderation_latency": null,
+       "generation_time": 3353,
+       "tokens_prompt": 108,
+       "tokens_completion": 218,
+       "native_tokens_prompt": 117,
+       "native_tokens_completion": 163,
+       "native_tokens_completion_images": null,
+       "native_tokens_reasoning": 66,
+       "native_tokens_cached": 0,
+       "num_media_prompt": null,
+       "num_input_audio_prompt": null,
+       "num_media_completion": 0,
+       "num_search_results": null,
+       "num_fetches": null,
+       "web_search_engine": null,
+       "origin": "",
+       "is_byok": false,
+       "finish_reason": "stop",
+       "native_finish_reason": "stop",
+       "service_tier": "default",
+       "usage": 5.9388e-05,
+       "router": null,
+       "user_agent": "Python-urllib/3.9",
+       "http_referer": null,
+       "request_id": "req-1793125412-BeUju6CZsHTMflLAkeJO",
+       "session_id": null,
+       "preset_id": null,
+       "api_type": "completions",
+       "id": "gen-1793289148-s1t4maker",
+       "upstream_id": "chatcmpl-RmBwuaRITXOGNnaVGb58oGPs",
+       "provider_responses": [
+        {
+         "endpoint_id": "a34868e3-d8e3-46c4-acf2-19c86ae3365a",
+         "id": "chatcmpl-RmBwuaRITXOGNnaVGb58oGPs",
+         "is_byok": false,
+         "latency": 77,
+         "model_permaslug": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+         "provider_name": "DeepInfra",
+         "status": 200
+        }
+       ],
+       "total_cost": 3e-05,
+       "cache_discount": null,
+       "upstream_inference_cost": 0,
+       "provider_name": "DeepInfra",
+       "response_cache_source_id": null,
+       "data_region": "global",
+       "workspace_id": "00000000-0000-0000-0000-000000000000"
+      }
+     },
+     "generation_status": 200,
+     "generation_fetched_at": "2026-10-29T15:52:28.990135Z",
+     "verdict": {
+      "pin": {
+       "tag": "deepinfra/fp8",
+       "provider": "DeepInfra"
+      },
+      "served_by": {
+       "response.provider": "DeepInfra",
+       "openrouter_metadata.endpoints.selected": "DeepInfra",
+       "generation.provider_name": "DeepInfra"
+      },
+      "tried": [
+       "DeepInfra"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+     }
+    }
+   ]
+  },
+  "c3": {
+   "rc": 2,
+   "requests": []
+  },
+  "c_literal": [],
+  "c_max_tokens": [
+   131072
+  ],
+  "c_jobid": "s1-83a2c2449416",
+  "c_rows": [
+   {
+    "at": "2026-10-29T15:52:28.988557Z",
+    "call": "f8_1",
+    "event": "reserve",
+    "id": "7b6cabbfb2694d7ebbfd2053b345d029",
+    "job": "s1-83a2c2449416",
+    "max_tokens": 131072,
+    "model": "deepseek/deepseek-v4.1-flash-1017",
+    "seat": "maker",
+    "spent_before_usd": 0,
+    "tag": "deepinfra/fp8",
+    "worst_usd": 0.0
+   },
+   {
+    "at": "2026-10-29T15:52:28.990511Z",
+    "call": "f8_1",
+    "cost_usd": 3e-05,
+    "event": "settle",
+    "id": "7b6cabbfb2694d7ebbfd2053b345d029",
+    "job": "s1-83a2c2449416",
+    "source": "generation.total_cost"
+   }
+  ],
+  "c_baseline": [
+   {
+    "job": "s1-83a2c2449416",
+    "usage": 1.0,
+    "at": "2026-10-29T15:52:28.936159Z",
+    "writer": "tools/edi/or_call.py@f740e9543765"
+   }
+  ]
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (6 values)"
+}

@@ -1,0 +1,20 @@
+--- a/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/n6_batch.py
++++ b/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/n6_batch.py
+@@ -9,7 +9,7 @@
+ controls = CONTROLS/glm/G-*.txt (same listing format) with CONTROLS/glm/expected.json.
+ Order: random.Random("n6-batch-<N>").shuffle over [subject, G-c1, G-p1] (sorted ids first).
+ Each call: or_call.py --seat eval-glm --model z-ai/glm-5.3-flash --ledger LEDGER (pin z-ai/fp8)
+---log OUT/harness-eval-glm-b<N>.log --call n6-b<N>-<k> --temperature 0 --max-tokens 800.
++--log OUT/harness-eval-glm-b<N>.log --call n6-b<N>-<k> --temperature 0 --max-tokens 131072.
+ Writes OUT/N6-batch.json: order, per item {call, id (subject|G-*), messages sha256, reply verdict, LINES,
+ or_call exit}, control outcomes, and the subject verdict: score 1 iff the subject reads CONFORMS and every
+ control reads its expected verdict (a planted control must also cite a line in its marked span).
+@@ -66,7 +66,7 @@
+             rf = out / f"{call}.reply.txt"
+             p = subprocess.run([sys.executable, str(HERE.parent / "harness/or_call.py"), "--seat", "eval-glm",
+                                 "--model", MODEL, "--ledger", a.ledger, "--log", str(log), "--call", call,
+-                                "--messages", str(mf), "--out", str(rf), "--temperature", "0", "--max-tokens", "800"],
++                                "--messages", str(mf), "--out", str(rf), "--temperature", "0", "--max-tokens", "131072"],
+                                capture_output=True, text=True)
+             row["or_call_exit"] = p.returncode
+             row.update(parse(rf.read_text(encoding="utf-8") if rf.is_file() else ""))

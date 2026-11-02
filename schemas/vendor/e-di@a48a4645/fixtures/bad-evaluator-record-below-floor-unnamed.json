@@ -1,0 +1,54 @@
+{
+ "dimensions": [
+  {
+   "name": "clarity",
+   "score": 5.0,
+   "observation": "The sentence says what the job asked.",
+   "observation_channel": "blind back-read",
+   "ground_truth_access": "blind_to_gt"
+  }
+ ],
+ "pass_rule": {
+  "accept": 9,
+  "dimension_floor": 7,
+  "reject": 4,
+  "cap": 3
+ },
+ "violations": [
+  {
+   "id": "V1",
+   "class": "artifact_missed_standard",
+   "observation": "something else entirely, and it names no dimension"
+  }
+ ],
+ "verdict": "needs_owner",
+ "ground_truth_ref": "Vendor docs snapshot",
+ "ground_truth_version": "pinned for the job",
+ "ground_truth_hardness": "DOCUMENT",
+ "mandate_ref": {
+  "doc": "EDI-MANDATE.md",
+  "version": "short form 2026-09-24"
+ },
+ "instrument_in_force": {
+  "version": "fixture-stamp",
+  "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "code_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+ },
+ "evaluator_identity": "fixture-evaluator",
+ "channel_blind": true,
+ "ratified": true,
+ "passes": [
+  {
+   "pass_id": "bad-evaluator-record-below-floor-unnamed-A",
+   "kind": "scored",
+   "status": "filed",
+   "artifact": "pass-bad-evaluator-record-below-floor-unnamed-A.json"
+  },
+  {
+   "pass_id": "bad-evaluator-record-below-floor-unnamed-B",
+   "kind": "scored",
+   "status": "filed",
+   "artifact": "pass-bad-evaluator-record-below-floor-unnamed-B.json"
+  }
+ ]
+}

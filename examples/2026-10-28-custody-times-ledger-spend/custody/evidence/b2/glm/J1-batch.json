@@ -1,0 +1,74 @@
+{
+  "check": "J1",
+  "batch": "2",
+  "order": [
+    "G-J1c",
+    "G-J1p1",
+    "G-J1p2",
+    "subject"
+  ],
+  "items": [
+    {
+      "call": "J1-b2-1",
+      "id": "G-J1c",
+      "messages_sha256": "3eb58b4066fcfbf9fe929c4c1fb27e0c8a0f59f6af12e5504051f35645d9a65f",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "1b91a3129900fc2f26e582efa18222c9bb09d2e94f0c82aeef81ed003f8ec717",
+      "verdict": "CONFORMS",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J1-b2-2",
+      "id": "G-J1p1",
+      "messages_sha256": "9fafb47ba2de25a81b67372a92661fec503350d5453be9deced7e8c045f25d03",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "9a2aac7c3d2c64f7b399484b096a3595d118c634a6e0bd44a067297dad939349",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J1-b2-3",
+      "id": "G-J1p2",
+      "messages_sha256": "2d814e65dcf8d850e0b56b8d94518b8887150a975e6f849a4f2c1dd0432292ed",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "06a079d64f2038cbad89e6383cd0ff431ac81bc0b45f44e7ae1d007465924b54",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J1-b2-4",
+      "id": "subject",
+      "messages_sha256": "6fcf1db8ef4e0d41abf0f7d70f79484e8d187007449b1d761d0d14bc4352124c",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "c7f22fb11c6cb9c9133b6d7096fd5d895ed0478dd385955495d071016da83b06",
+      "verdict": "CONFORMS",
+      "lines": [
+        "kit/emit_custody.py:844",
+        "kit/emit_custody.py:986",
+        "kit/emit_custody.py:839",
+        "kit/emit_custody.py:334",
+        "kit/plumbline_job.py:256",
+        "kit/plumbline_verify.py:366",
+        "kit/custody_history.py:249"
+      ]
+    }
+  ],
+  "log": "harness-E-GLM-J1-b2.log",
+  "dry_run": false,
+  "window": 2,
+  "controls_ok": true,
+  "calls_ok": true,
+  "subject_verdict": "CONFORMS",
+  "J1": "PASS"
+}

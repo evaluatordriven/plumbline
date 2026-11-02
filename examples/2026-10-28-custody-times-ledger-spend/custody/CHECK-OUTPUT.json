@@ -1,0 +1,84 @@
+{
+  "verdict": "OK",
+  "levelClaimed": "CL1",
+  "levelAchieved": "CL1",
+  "routing": "none",
+  "requirements": {
+    "CR-1": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CR-2": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-1": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-2": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-3": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-4": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-5": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-6": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-7": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-8": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-9": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-10": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-11": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-12": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-13": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-14": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-15": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-16": {
+      "status": "OK",
+      "detail": ""
+    },
+    "CL1-17": {
+      "status": "OK",
+      "detail": ""
+    }
+  }
+}

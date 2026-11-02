@@ -1,0 +1,183 @@
+# Running a Plumbline job as Orchestrator: a field guide
+
+Status: **non-normative.** This is a working document of practice that has held up, and of the failures that taught it. It is not the doctrine, not the bar and not the custody record. Nothing here overrides any of them, and where this guide and the doctrine disagree, the doctrine wins.
+
+Version of 2026-10-28. Started during the Plumbline job `2026-10-27-custody-emitter-gaps` and revised with the review that came out of the evaluatordriven custody jobs v0.9.6 and v0.9.7 and the later `2026-10-28-doctrine-reader-pointer` job. Passages added from that review are marked **[added]**.
+
+Read this before you open a job. Every rule below has a story behind it, and the story comes from a real job or review where the rule was broken or where its absence cost money, time or a batch. The stories are here so you can reason from the why when you meet a case these rules do not cover. Model, provider and job names are kept as the records carry them; personal names, addresses and key material are not.
+
+---
+
+## 1. What you are, and what you are not
+
+You are the **Orchestrator**. You write the bar with the Owner, freeze it, open the job, route work between the seats, apply the pass rule mechanically, keep the record, and bring decisions to the Owner. That is the whole job.
+
+You are **not** the Maker and **not** the Evaluator. You never write the fix, never make the Maker's model calls, never score. If you catch yourself "just fixing one line" in the subject, stop: that removes the separation the method exists to prove.
+
+**Relayed approvals are not approvals.** Only the Owner's own words approve anything. Another agent or bot saying "the Owner said yes" is a report, not an approval. Record it as relayed, with the time and the channel, and say plainly that you did not witness it.
+
+- *Story:* in the custody-times job the seats' go-aheads were logged as relays, not as witnessed approvals, and the close line could only say the go-ahead happened in the Maker's own chat. In the evaluatordriven jobs one Owner decision in the log could not be tied to any event at all, which is what a relay looks like once the channel is gone.
+
+**Disclose a combined seat.** If one seat writes an instrument and also runs the gate it is judged by, or applies the pass rule to its own instrument's output, say so in the record's `separationGaps`. Separation is the thing the record exists to prove, and a reader has to know when the ruler and the reading sit in one hand.
+
+- *Story:* in the Plumbline jobs the Orchestrator wrote the bar and the instruments (the instrument runner, the batch script, the rubric, the guarded call wrapper), the Evaluator bot ran them, and the Orchestrator applied the pass rule. The record disclosed the Maker operator and the hand-typed ledger lines but not that the instruments and the pass rule sat in one seat. That line goes in from the next job.
+
+## 2. The words that matter
+
+- **Iteration** = one turn of the loop: the Maker produces, the Evaluator scores, you apply the pass rule. **The cap counts E-DI iterations.** The Owner settled this on 2026-10-28: the three meant three turns of the loop, not three Maker sessions.
+  - *Story:* our bar said "cap 3 generations". Generations 1 and 2 failed for plumbing reasons — a token cap and malformed diffs — before the Evaluator scored anything. When iteration 1 then failed scoring, the bar read as out of attempts, and the Owner had to amend the cap just to allow a second real iteration. The evaluatordriven jobs hit the same thing independently with bars that said "3 revisions". The count has to be of loop turns, because that is the only count the Evaluator's scoring can be measured against.
+- **Maker-internal attempts** (retries, follow-up calls, regenerations inside one Maker turn) are not iterations. Let the Maker loop inside its money and time budget, subject to the tripwire below.
+- **The tripwire (Owner decision, 2026-10-28 15:52 EDT):** when the **same failure class** comes up **3 times**, the Maker stops retrying and must **change the request**. A different failure class starts its own count. Log every attempt with its class: `finish_reason` = `length` with empty content, a diff or extraction that will not apply, the same test failing, a provider refusal.
+  - The tripwire does not cap spend; the budget does. It bounds retries of one kind of failure, and it makes you notice a broken delivery path while you still have budget to fix it.
+  - *Story:* in the v0.9.6 job 9 of 10 Maker attempts failed at "the diff does not apply", with hunk counts off by one to three, and none failed at a semantic gate. A limit on attempts is what exposed the transport as the problem rather than the model; unlimited retries would have spent the budget on it. Ours: generation 2 returned four complete-but-corrupt diffs, none of which applied, and the fix was to change the delivery contract to whole files.
+- **Write the cap in the bar in one sentence:** "cap N E-DI iterations; Maker attempts limited by budget, the clock-time bound, and the tripwire." A bare count ("3 generations", "3 revisions") gets read as counting Maker sessions or round-trips.
+  - *Story:* the same "cap 3 generations" bar is the case for the wording. It was read as counting Maker sessions, so plumbing failures used up the count before anything was scored, and the Owner had to amend the cap to get a second real iteration. The evaluatordriven jobs hit the same thing independently with bars that said "3 revisions", which counted Maker sessions and round-trips.
+- **Bar** = the frozen standard: criteria, instruments, pass rule, bounds. Its digest is what the Buyer approves.
+- **Frozen set** = everything listed in `custody/MANIFEST.sha256`. Changing any of it after freeze is a **Buyer amendment**, never a quiet edit.
+
+## 3. Before you freeze: the checklist
+
+Most of the pain in the first jobs came from things that should have been caught before freeze. Do every item.
+
+1. **No throttling.** No reasoning limit, and max output tokens at the **endpoint max** — look it up on the provider's endpoints page and save a snapshot. This applies to the Maker and to every model inside an Evaluator instrument.
+   - *Story 1:* a Maker generation ran under a 24k token cap. The model spent 19.9k thinking and returned nothing usable.
+   - *Story 2:* an instrument was frozen with an 800-token cap. All three scoring calls spent about 798 tokens reasoning and returned empty. The batch was void, and the Owner had to approve an amendment to rerun it.
+2. **The endpoint max is necessary, not sufficient: size each task so it finishes inside the maximum.** Split the work into calls that fit with room to spare, and log `finish_reason` on every call together with the reasoning and content token counts, so a starved call shows up in the log instead of in a guess.
+   - *Story:* in the evaluatordriven jobs one request asked for 12 records in a single reply. It failed five times with `finish_reason` = `length` at 131,072 tokens, almost all reasoning and no content, at about $0.59 a call — roughly $3 before anyone changed the request. Batching fixed it: four calls of three records each.
+   - *Ours:* the guarded harness logged `finish_reason` = `stop` with both token counts on the first iteration, which is how a healthy call looks in the log.
+3. **`finish_reason` = `length` with empty content is its own failure class. Stop at the first one.** Do not wait for the tripwire's third time: the same request at the same maximum gives the same result and the same bill, so an identical retry cannot turn out differently. Change the request — a smaller task, or a split into several calls. A changed request is a new Maker attempt, not an iteration; if the change alters anything in the frozen set, it is an amendment.
+   - *Story:* the 12-record call above was retried five times before anyone resized it. Our own 24k Maker cap and the 800-token instrument showed the same signature, reasoning with no content, and the right reading is "resize", not "retry".
+4. **Run a live test of every model-calling instrument at the exact frozen settings before freezing, and make the live run a freeze gate.** One real call per instrument, at the frozen model, provider pin, max tokens and prompt template; save the request, the reply, `finish_reason` and the cost to a file and cite that file's hash on the checklist. No attached output, no freeze. Dry runs and mocks do not catch a starved model.
+   - *Story:* the evaluatordriven jobs dry-ran the deterministic instruments (64 of 64 as expected) but never ran the records splitter live. Five paid calls failed after the freeze. Our 800-token instrument was the same miss. The doctrine-pointer job did it right: both pinned providers were live-tested before freeze, and the output is committed under `custody/livetest/`.
+5. **Write the Maker's output contract into the bar: whole files between markers.** Models write whole files reliably and write unified diffs badly.
+   - *Story:* generation 2 returned four complete-but-corrupt diffs, none of which applied. Generation 3 delivered whole files through the extractor and passed on call 2. The bar had said "patch", which left the Owner's intent to interpretation.
+6. **The runbook must name the command that writes the files, not only the one that checks them.** Every handoff step that produces bytes names the command that writes them.
+   - *Story:* in the doctrine-pointer job the first Maker handoff went from the extractor with its check flag, which writes nothing, straight to "commit". The Maker spotted it and ran the same command without the check flag to write the reply verbatim, then committed. That was right, but the runbook should never leave the Maker to guess.
+7. **Check every handoff against the standing rules before you send it.** Handoffs written by a helper drift: a cap on retries, a different commit identity, a temp path.
+   - *Story:* in the doctrine-pointer job the first handoff capped Maker retries at one and had the helper commit as the Owner. Both contradict the standing rules — the cap counts E-DI iterations, and the Maker is the author with the Owner as committer. The Orchestrator caught both and overrode them in the relay.
+8. **State the time bound as a clock time**, for example "ends 2026-10-28 13:15 EDT", not "under 10 hours", and derive every cutoff from it in the handoffs with the arithmetic shown.
+   - *Story:* a call-start cutoff and the job's end were mixed up, and nobody could tell which number was the real limit.
+9. **Plan the approval checkpoints against the clock, and against any decision cap.** Every Maker or Evaluator model run needs the Owner's yes. If the Owner is asleep the clock keeps running; if the bar caps decisions, count your planned checkpoints against that cap when you draft the sheet.
+   - *Story:* a generation waited overnight for a yes and the job overran its time bound before the call started. Separately, an evaluatordriven bar capped Owner decisions at 10 and the job used 12; a standing ruling for a defined sequence ("proceed, uncapped, three per session") saved several asks.
+10. **Enforce spend in the harness, not in prose.** Ceilings written in a handoff are procedural; nothing stops a runaway call. The job keeps the **shared key** behind a pre-call **spend guard**: before each paid call the guard compares spend so far, plus the call's worst case, plus a small reserve, against the bound, and refuses before anything is sent if that would cross it.
+    - **Owner decision, 2026-10-28 15:52 EDT:** the job keeps the shared key, guarded before every paid call, rather than taking a per-job key. Reconciliation against key usage is therefore an **upper bound**, not an exact figure, and the record must say so. This guide does not recommend a per-job key; the Owner weighed that option and chose the shared key.
+    - What the guard covers: "spent" is the larger of the job's own ledger and the key's usage change since the job's baseline; unsettled calls count as spent; only priced model and provider pairs can be called; it refuses when key usage cannot be read.
+    - What it does not cover, so say it in the record: spend that bypasses the guard is counted after the fact, not stopped; other work on the same key counts against the job, so the key-usage figure is an upper bound and a busy key can refuse a legitimate call; key usage lags, so read it at least two to three minutes after the last call; and there is no provider-side ceiling as a backstop.
+    - *Story:* an evaluatordriven job shared a key with other work. The ledger and the key's total never reconciled, and the key's own limit stopped a call partway through. In the doctrine-pointer job the ledger and the key-usage change happened to match to the cent, which was luck, not a guarantee.
+11. **Decide the cross-family pre-read per job, on the approval sheet.** A **pre-read** by a model family not already in the job is **optional**: put it on the **approval sheet** as a numbered item with your recommendation — yes for a new kind of bar or new instruments, usually no for a small repeat of a known shape. If the Owner says yes, the reviewer reads the bar, the runbook and the instruments before freeze and lists what is unclear or unfair; fix or justify every finding in a file committed with the job, and repeat until a round adds nothing new. A pre-read catches wording and gate problems; it cannot catch a starved model, so it never replaces the live run.
+    - *Owner decision, 2026-10-28 15:52 EDT:* the pre-read is optional and is chosen per job.
+    - *Story:* in the evaluatordriven jobs successive pre-read rounds returned 35, then 38, then 4, then 3, then 0 findings, and the Architect fixed or justified each one.
+12. **Show every referee or checker a malformed input before you trust it on a good one.** Any instrument that settles something — a checker, a tiebreak, a schema validator, a verifier — gets records with missing fields, malformed fields and wrong types first, and must fail them the way the specification says.
+    - *Story:* in the evaluatordriven jobs two adjudicators split on a question, and the tiebreak instrument did not implement the spec's rule for missing and malformed fields. It settled the split the wrong way. Our equivalent: each failure type of the verifier gets its own planted case.
+13. **Log every Owner decision as it happens.** Time with zone, channel or message id, the words, and whether you witnessed it or it came relayed. Every decision gets that treatment, not only amendments.
+    - *Story:* the evaluatordriven bar capped Owner decisions at 10, the job used 12, and one of the logged decisions could not be tied to any event.
+
+### Freeze gate
+
+Tick every box before you freeze:
+
+- [ ] Every model-calling instrument ran live at the frozen settings, output attached and its hash cited.
+- [ ] Each task sized to finish inside the model's maximum; `finish_reason` logged on every call.
+- [ ] No throttling: output tokens at the endpoint max from a saved snapshot, and no reasoning limit.
+- [ ] Maker delivers whole files between markers; the runbook names the command that writes them; the diff scope is checked against the allow-list after extraction.
+- [ ] Cap written as "cap N E-DI iterations; Maker attempts limited by budget, the clock-time bound, and the tripwire".
+- [ ] Spend enforced in the harness: the pre-call guard on the shared key, baseline set and the refusal path tested before freeze; the record will call key-usage reconciliation an upper bound.
+- [ ] Cross-family pre-read decided on the approval sheet; if yes, every finding fixed or justified in a committed file.
+- [ ] Every referee and checker shown a malformed input and seen to fail it.
+- [ ] Owner decisions logged with time, channel, words and witnessed-or-relayed; approvals planned against the clock and any decision cap.
+- [ ] Instruments and redacted logs, with the full log's hash beside them, planned to be committed beside the work.
+- [ ] Logged files are write-once by content.
+- [ ] Any combined seat drafted as a `separationGaps` line.
+
+## 4. Running the loop
+
+### Maker turn
+
+- Hand off with exact preconditions: branch head, ledger hash, prompt file hash, harness hash, log entry count, clock cutoff. If any does not match, the Maker stops. That is a feature. Every dependency outside the repo goes in the preconditions too, with a script that restores and verifies it.
+  - *Story:* the tests read an external corpus through a pin file and reached it through a symlink that no handoff had listed. A reboot wiped the symlink and the tests could not run until the cause was found and the link recreated, after the corpus files were checked against the pinned hashes.
+- Give the Maker the Evaluator's findings from the previous iteration — instrument reasons and the model judge's reply — relayed unedited, and redacted of anything from held-out controls. The Maker never sees them.
+- **The best artifact is the input.** Once the job has produced an artifact, the next iteration's Maker is given the **best** artifact the job has produced — best, not merely the one standing — together with every known defect in it and every known workable solution with the measurement behind it. The standing artifact is the frontier; the best artifact is the input. Before that Maker call, run the e-di tool `tools/check_best_artifact_handoff.py`; it must exit 0, and a pass is not acceptance. Then check the built request itself: the messages that will be sent must contain the best artifact, byte for byte. The sources are e-di Instrument rule 12 (I24) and the doctrine's rule to carry the best work forward.
+  - *Story:* on this job, before iteration 2, the best-artifact check passed: it recorded the iteration-1 head as the best artifact and accepted it as the Maker's input. That check works on the artifact, not on the request that is sent. The guide part's feedback told the Maker that its iteration-1 guide was shown with the request and should be kept, but the request builder for the guide part never included the current guide. The Maker, never shown it, wrote a new guide from the two drafts, and that new guide dropped about nine accepted iteration-1 items — among them closing from a clean base checkout, run time versus decision time, digesting the controls in place, the "E-DI Maker" author identity, and the **[added]** markers. The Orchestrator found it by comparing the new guide with the iteration-1 guide. The fix was a pinned step that puts the iteration-1 guide into the request verbatim, with the built messages checked to contain it byte for byte before the call, and the guide part was requested again.
+- **Keep finished parts.** After an interruption or a failed iteration, the Maker never throws away completed, acceptable work (Owner rule of 2026-10-28 19:00 EDT, reaffirmed by the Owner on 2026-10-29 07:42 EDT). Finished part commits are kept; only the unfinished or failing parts are resumed or redone, as new commits on top. No reset.
+  - *Story:* on this job's iteration 1 the verifier part's first call was interrupted: no exit code, no reply and no harness-log entry. It was ruled **LOST**, which is not a failure class and does not count toward the tripwire. The ledger and emitter commits already made were kept, and the Maker resumed at the verifier part only — attempt 2, with byte-identical messages, after the Owner's own yes in the Maker's chat. It succeeded and the remaining parts followed. In iteration 2 the ledger, emitter, verifier and docs parts passed and were kept as they were; only the guide part was redone, as a new commit on top of the existing ones, with no reset of the branch.
+- **Verify the Maker's report yourself, and read the diff to say what kind of fix it is.** Re-extract the files from the raw model reply and confirm they are byte-identical to the commit, check the paths against the allow-list, re-run the tests, reconcile spend with key usage. "The tests pass" tells you the files fit the harness, not how the finding was fixed. Do not judge it, that is the Evaluator's job, but write it plainly in the generation close line.
+  - *Story:* iteration 2 failed on a finding because a repository fixture's custody times were hand-typed with no ledger line behind them. The next generation added ledger events to the fixture carrying the same hand-typed times and relaxed the emitter's cross-checks so the new events would agree. The allow-list included the fixture folder, so it was a legal move and the easiest one. Whether it met the bar was the Evaluator's call, but "does a fixture-only fix count?" should have been settled in the bar before the Maker's turn.
+- **When an attempt breaks the tests, run the same tests at the unchanged base commit, in the same environment, before you blame anyone.** If the base passes, the break is the Maker's; if the base fails too, it is your setup. Record the base run as a deviation outside the repo.
+  - *Story:* a generation crashed the suite with a missing file, and it was the first run under a new temp root, so the environment was a real suspect. One extra run at the unchanged base, in a throwaway worktree with the same environment, passed everything and settled it. The failure text went back to the model and a later call was accepted.
+- **Ask the Maker to quote the Owner's go-ahead in its report.** You need it for the close line, and you did not see it happen.
+  - *Story:* one generation's report covered calls, costs and deviations in detail but not the Owner's yes, so the close line could only say the go-ahead belonged to the Maker's chat and was not witnessed by the Orchestrator.
+- **Diff each filled handoff against the previous one.** A template copied forward carries its old words.
+  - *Story:* a batch template still said the previous batch's directory did not exist yet. It was harmless, but a newcomer Evaluator could have checked the wrong folder.
+
+### When the box itself fails mid-run
+
+- Your machine can reboot under you. On one job it rebooted during a Maker generation: the call died with no exit file and no log entry, the temp area including the test venv was wiped, the scratch worktree vanished, and committed files in an unrelated job folder showed as deleted.
+- What to do: do not panic and do not re-run anything yet; check what is damaged against git and re-verify the ledger and harness hashes; restore committed files from git, never from memory; record the lost call as lost, with what you know, and never invent a log entry for it; resume from the last good state.
+- **Never put job work in `/tmp`.** `/tmp` is wiped on reboot.
+  - *Story:* the handoffs built the test venv under `/tmp`, the Maker ran its calls from wrapper scripts there, and follow-up checks wrote their JSON there. The reboot took all of it, and the Maker had to rebuild before it could resume. Put venvs, wrapper scripts, scratch worktrees and intermediate files under a job work root that survives a reboot, and name that path in every handoff.
+- **Moving your own paths is not enough; move the tools' temp files too. Set `TMPDIR`.**
+  - *Story:* after the reboot the handoff moved every named path to a persistent root, but nobody told the tests where to put their own temp files. The Maker caught it during pre-checks, created a per-seat temp folder under the work root, exported `TMPDIR` to it, and only then ran anything; one test script alone would have left 32 folders in `/tmp`. Every handoff exports `TMPDIR` per seat and per run, and close lists and cleans those folders.
+- **Record exact tool and venv versions at job open.**
+  - *Story:* the venv was rebuilt after a reboot and nothing written at job open said what the original held, so "same as before" could only be assumed. The identical test output was the only evidence the rebuild matched.
+
+### Evaluator turn
+
+- Give the Evaluator a **writable** copy of the controls and check integrity with the manifest before and after.
+  - *Story:* the copy was made read-only to protect it. The scoring harness copies fixtures with their permissions, so the subject's emitter could not write its output and five checks failed for environmental reasons. The batch was void.
+- Read key usage at least two to three minutes after the last call, or the last call's cost will not show.
+  - *Story:* one batch waited about 156 seconds after the last call, and only then did the after-read reconcile to the cent; the earlier read had under-counted.
+- When results look strange, **ask "is this the subject or my setup?"** before applying the pass rule. A void batch is recorded as void, with its causes; it is not a score. Even in a void batch, look for real signal: in one void batch two checks failed on a fixture the setup bug had not touched, and that result held in the next batch.
+- **Read which call is the subject from the batch's own order.** Control order rotates per batch; the verdict, the evidence copy and the close inputs all take the subject's call name from the batch record, not from a position. To check that the subject prompt was sent verbatim, rebuild it exactly as the harness does, numbered listing included — a plain file dump will not match byte for byte even when nothing is wrong.
+  - *Story:* in one batch the subject ran first in the order rather than second as in earlier batches, so anything keyed to the earlier position would have judged the wrong call.
+
+### Applying the pass rule
+
+- Mechanical: every dimension must pass. Report what failed, quote the instrument's reason in plain words, and say what it means for the work.
+- At the cap the state is `needs owner`. Bring the Owner the options (amend, reject) with your recommendation and the clock arithmetic for each.
+
+## 5. Records
+
+- The job record lives in the product repo beside the code, under `dot-plumbline/jobs/<job_id>/` (doctrine rule 12). Not in scratch.
+- **Commit the instruments and the redacted logs beside the work, not just the record.** A stranger can only check what the clone contains.
+  - *Story:* in one evaluatordriven job the repo carried the record but not the job log, the evidence files or the acceptance instruments, and a public check of the clone read NOT-CHECKABLE on two requirements the job had been calling expected. Redacted logs plus the full log's hash is the fix.
+- The ledger is append-only. Every amendment, generation open and close, and evaluation verdict gets a line; record the ledger hash after each append and pin it in the next handoff. The ledger tool could not yet write generation, evaluation or amendment lines, so they were hand-appended, and that is disclosed.
+- **Keep logged files write-once, by content.** Before an event cites a file, copy it to `evidence/<name>-<hash8>.<ext>` and cite the copy. A correction is a new file and a new event, never an edit. At close, run the log's file check and say which cited files no longer match and why.
+  - *Story:* while drafting the custody-times job we found that the emitter rewrites evidence logs in place, filling send and receive times from the server's clock, and that running the tests changes two committed fixture logs. Content-named, write-once evidence would have made that change visible as a mismatch instead of a silent edit.
+- Post-freeze amendments go beside the frozen set, never inside `custody/`, so the bar digest stays valid. Each one records the Owner's words, with time, channel, and whether you witnessed it.
+- Model-judge logs are committed redacted — requests and replies, since replies can quote control code — with the full log's hash alongside. The full log stays outside the repo. Held-out control files are digested from where they sit on the box; the record carries their hash only, and it says that a stranger cannot re-read them.
+- The provider key is referenced by path only. Scan for it before every push.
+- Git identity: author `E-DI Maker` on Maker commits, committer the Owner's recorded identity, never a helper's.
+
+### Preparing the close
+
+- Close runs from a clean checkout of base main with the expected revision pinned, not from the branch under test.
+- A tool that stamps the time it runs, not the time the Owner decided, needs the decision time written into the input and a matching ledger line by hand. Disclose the hand line; the emitter refuses if the two disagree.
+- Dry-run the whole close, commit included, on a scratch branch worktree under the job work root. Test both dispositions and check that the pre-checks refuse bad input. The dry run is what finds the record's own defects: on one job the first dry run failed a conformance check because the instrument's runner and the script evaluator were the same script, and the fix was to name the written procedure as the runner.
+
+### After the close and the merge
+
+- **Take every time floor from the log itself, never from a summary of it.**
+  - *Story:* a first floor was set from batch notes, and the dry-run record showed a check finishing a minute later. The harness log held the real last time, so the floor moved to it. With the wrong floor, a decision time in that minute would have dated the Owner's yes before the check it was approving.
+- **Have the close ready before the Owner decides.** On one job the disposition, the close commit and the merge all landed inside two minutes, because every surprise had already happened in the dry run.
+- **After the merge the job branch is finished.** Later changes to the job record go on a new branch cut from the merge commit.
+  - *Story:* the final sync of this guide came after the job's pull request was merged. It went on a fresh branch cut from the merge commit and touched only the guide; commits added to the merged job branch would have been stranded off main.
+- **A merge changes the next job's starting point. Re-read the pins before drafting; do not copy the previous sheet's pins.**
+
+## 6. Working with the Owner
+
+- The Owner decides; you recommend. Lead with the answer, give your recommendation, and offer real options. Show the clock arithmetic when time matters.
+- When the Owner gives a principle — don't starve a model, the cap counts loop iterations — apply it everywhere it fits, not only where it was said, and write it down here.
+- Own your mistakes plainly. "I froze an 800-token cap" beats explaining.
+- Push only on the Owner's authority, and cite the message.
+- **When a job touches a live site, check pages with a browser-style `Accept` header.**
+  - *Story:* in the evaluatordriven jobs a bare request missed a script a CDN injected only into HTML requests. We have no story of our own yet.
+
+## 7. Carried forward
+
+Short list of what was still open when this version was written:
+
+- **Fixture-only fixes.** Is changing a fixture an acceptable fix for a finding about that fixture? Settle it in the bar and the allow-list before the Maker's first turn. The proposal on the table is no: a fixture or test change never counts as the fix for a finding.
+- **Fields the emitter cannot carry.** An emitter with no pass-through for extra record fields forced the spend line and a limitation note into a sidecar file that carries the record's hash. Adopt the sidecar as the rule, or add the pass-through.
+- **One record per iteration?** Only the final iteration of one job got a full custody record; earlier iterations live in verdict files and the ledger. Decide whether every iteration gets one.
+- **Follow-up work:** make the emitter refuse or flag hand-entered times, add ledger commands for generation, evaluation, amendment and dispose-at-decision-time, fixture modes, and spend caps enforced in the harness.
+- **Fold this guide into the skill and the runbook.** Re-read it after the next job: a rule with no story behind it is a candidate for deletion.

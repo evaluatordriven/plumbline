@@ -1,0 +1,3 @@
+VERDICT: CONFORMS
+LINES: kit/custody_history.py:376, kit/custody_history.py:381, kit/custody_history.py:292, kit/custody_history.py:402, kit/emit_custody.py:355, kit/emit_custody.py:393
+REASON: `endpoint_of` returns None and adds a refusal (which makes `main` exit 3 with nothing written, naming the call) whenever an aggregator call's `/api/v1/generation` reply is absent or names no provider, and returns the pinned host only after a non-null generation reply names the pinned provider (response `provider`/metadata only confirm, never substitute); the emitter strips hand-entered endpoints from maker/evaluator model blocks and writes endpoints only from the log-derived call endpoint, so no routing-config, pin, hand-entry, or response-metadata fallback exists.

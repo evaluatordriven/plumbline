@@ -1,0 +1,2 @@
+# run from the job folder; checker = custody check.py @ 3e3ca58 (sha256 aaeb7e0532c950ee1736207b0a91ff9d810533fccecdb2c7708312408e5bcd18)
+python3 <custody@3e3ca58>/checker/check.py custody/record.custody.json --files ../../.. --evidence custody/evidence --bar custody/bar.md

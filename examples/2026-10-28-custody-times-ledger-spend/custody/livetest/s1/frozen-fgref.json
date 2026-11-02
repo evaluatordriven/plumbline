@@ -1,0 +1,308 @@
+{
+ "base_rev": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+ "controls": {
+  "C-G1p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-G4c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-G4p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-G5c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-G5p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-G6c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-G6p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-G7c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-G7p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T5c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-T5p1": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T5p2": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T7p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-V7c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-V7p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1a.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1b.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1c.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F1c.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1d.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1e.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F1e.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1f.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1g.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F1g.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F1h.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F7a.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F8a.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F8a.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F8b.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F8b.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F8c.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-F8c.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-F8d.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-G1.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-G2.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-G3.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-I1.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-P1.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T1.clean": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "OBS-T1.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T2.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T3.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T4.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T5.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T6.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-T7.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V1.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V2.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V3.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V4.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V5.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V6.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V7.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V8.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-V9.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "OBS-X1.planted": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  }
+ },
+ "controls_manifest_sha256": "fe03346b4b62240ec461f3feedc89ae28b6d96fc177e967852566cec1a655ccf",
+ "finished_at": "2026-10-28T20:36:55.520620Z",
+ "job": "2026-10-28-custody-times-ledger-spend",
+ "live_f8d": false,
+ "passed": 5,
+ "results": {
+  "G1": "PASS",
+  "G4": "PASS",
+  "G5": "PASS",
+  "G6": "PASS",
+  "G7": "PASS"
+ },
+ "started_at": "2026-10-28T20:36:41.047653Z",
+ "subject_rev": "07f768d1ffb2cb7e2a1962e0a845cc4685fc45cb",
+ "summary_sha256_on_box": "6fee5c24cbc0543c3d38f082514020d4e577f6d2e55663d7f0a93170c44588e3",
+ "total": 5,
+ "void": false,
+ "void_because": []
+}

@@ -1,0 +1,356 @@
+{
+  "job": "2026-10-28-custody-times-ledger-spend",
+  "instrument": "S1",
+  "writer": "scheck.py@49d3a506f6f7",
+  "started_at": "2026-10-29T00:36:06.823563Z",
+  "subject": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev",
+  "subject_rev": "1cb410badbff504ca480b199ae4fe4f37caed893",
+  "base_rev": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+  "controls_manifest_sha256": "fe03346b4b62240ec461f3feedc89ae28b6d96fc177e967852566cec1a655ccf",
+  "live_f8d": true,
+  "results": {
+    "T1": "PASS",
+    "T2": "FAIL",
+    "T3": "FAIL",
+    "T4": "FAIL",
+    "T5": "PASS",
+    "T6": "FAIL",
+    "T7": "FAIL",
+    "F1a": "FAIL",
+    "F1b": "FAIL",
+    "F1c": "PASS",
+    "F1d": "FAIL",
+    "F1e": "PASS",
+    "F1f": "FAIL",
+    "F1g": "PASS",
+    "F1h": "FAIL",
+    "I1": "PASS",
+    "F7a": "PASS",
+    "F8a": "PASS",
+    "F8b": "PASS",
+    "F8c": "PASS",
+    "F8d": "PASS",
+    "P1": "FAIL",
+    "X1": "FAIL",
+    "V1": "FAIL",
+    "V2": "FAIL",
+    "V3": "FAIL",
+    "V4": "FAIL",
+    "V5": "FAIL",
+    "V6": "FAIL",
+    "V7": "FAIL",
+    "V8": "FAIL",
+    "V9": "FAIL",
+    "G1": "PASS",
+    "G2": "FAIL",
+    "G3": "PASS",
+    "G4": "PASS",
+    "G5": "PASS",
+    "G6": "PASS",
+    "G7": "PASS"
+  },
+  "passed": 17,
+  "total": 39,
+  "controls_run": true,
+  "void": false,
+  "void_because": [],
+  "finished_at": "2026-10-29T00:47:28.111813Z",
+  "controls": {
+    "C-T5c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true,
+      "cases": 11
+    },
+    "C-T5p1": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-T5p2": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-T7p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-V7c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "C-V7p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-G1p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-G4c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "C-G5c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "C-G6c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "C-G7c": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "C-G4p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-G5p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-G6p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "C-G7p": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true,
+      "signature_seen": true
+    },
+    "OBS-F1a.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1b.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1c.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F1c.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1d.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1e.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F1e.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1f.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1g.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F1g.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F1h.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F7a.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F8a.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F8a.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F8b.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F8b.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F8c.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-F8c.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-F8d.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-G1.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-G2.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-G3.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-I1.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-P1.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T1.clean": {
+      "want": "PASS",
+      "got": "PASS",
+      "right": true
+    },
+    "OBS-T1.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T2.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T3.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T4.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T5.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T6.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-T7.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V1.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V2.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V3.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V4.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V5.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V6.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V7.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V8.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-V9.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    },
+    "OBS-X1.planted": {
+      "want": "FAIL",
+      "got": "FAIL",
+      "right": true
+    }
+  },
+  "redaction": "controls[].why, .signature and .mutation_applied removed (they can describe the held-out plant); the full summary is held on the Owner's box, digest in HELD-ON-BOX.sha256"
+}

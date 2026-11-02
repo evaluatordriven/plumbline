@@ -1,0 +1,8 @@
+precheck for maker_iter3_gen5_call3
+clock: 2026-10-28T09:52:05-04:00 / 2026-10-28T13:52:05+00:00
+  prior: maker_iter3_gen5_call1 total_cost 0.011010888 counted 0.011010888
+  prior: maker_iter3_gen5_call2 total_cost 0.001399283 counted 0.001399283
+sum_total_cost_so_far: 0.012410171  (rule 1: <= 0.85 -> OK)
+max_single_call_cost: 0.011010888  (rule 2: none > 0.25 -> OK)
+messages_bytes (wc -c): 183946  (rule 3: <= 2400000 -> OK)
+rule 4 clock: OK (before 11:05 EDT)

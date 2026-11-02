@@ -1,0 +1,804 @@
+{
+  "job_id": "2026-10-28-custody-times-ledger-spend",
+  "iteration": 1,
+  "artifact": "custody/subject-1cb410b.sha256",
+  "ratified": true,
+  "channel_blind": true,
+  "evaluator_identity": "S1 script run_instrument.sh (39 checks) + z-ai/glm-5.3-flash via openrouter.ai (J1-J4)",
+  "instrument": {
+    "version": "rubric custody/bar.md, runner handoffs/iter1/EVALUATOR.md",
+    "rubric_sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+    "code_sha256": "89a721e823a487f2147d33fde94a9702cf4b49c55425c07d6c21ed8ce1ecb4e6"
+  },
+  "pass_rule": {
+    "accept": 1,
+    "dimension_floor": 1,
+    "reject": 0,
+    "cap": 3
+  },
+  "ground_truth": {
+    "ref": "dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend/OWNER-APPROVAL.md",
+    "version": "sha256:20d5ff994e946eb938c859e928b80d116bd34f232e2b119a62d92fa9f8307c1c (ratified e41aae44...fe1a + item 30)",
+    "hardness": "DOCUMENT"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "a48a4645"
+  },
+  "dimensions": [
+    {
+      "name": "T1",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T1 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T2",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T2 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T3",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T3 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T4",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T4 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T5",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T5 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T6",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T6 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "T7",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "T7 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1a",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1a FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1b",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1b FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1c",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1c PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1d",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1d FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1e",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1e PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1f",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1f FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1g",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1g PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F1h",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F1h FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "I1",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "I1 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F7a",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F7a PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F8a",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F8a PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F8b",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F8b PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F8c",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F8c PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "F8d",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "F8d PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "P1",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "P1 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "X1",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "X1 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V1",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V1 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V2",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V2 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V3",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V3 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V4",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V4 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V5",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V5 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V6",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V6 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V7",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V7 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V8",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V8 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "V9",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "V9 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G1",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G1 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G2",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G2 FAIL (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G3",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G3 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G4",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G4 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G5",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G5 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G6",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G6 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "G7",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "G7 PASS (custody/evidence/b1/s1-summary.json)",
+      "observation_channel": "S1 run_instrument.sh, batch 1",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "J1",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "J1 PASS, controls_ok true (custody/evidence/b1/glm/J1-batch.json)",
+      "observation_channel": "E-GLM z-ai/glm-5.3-flash, call J1-b1-2",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "J2",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "J2 FAIL, controls_ok true (custody/evidence/b1/glm/J2-batch.json)",
+      "observation_channel": "E-GLM z-ai/glm-5.3-flash, call J2-b1-2",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "J3",
+      "score": 1,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "J3 PASS, controls_ok true (custody/evidence/b1/glm/J3-batch.json)",
+      "observation_channel": "E-GLM z-ai/glm-5.3-flash, call J3-b1-3",
+      "ground_truth_access": "blind_to_gt"
+    },
+    {
+      "name": "J4",
+      "score": 0,
+      "scale": "0-1",
+      "anchor_note": "binary; threshold 1 (bar.md)",
+      "observation": "J4 FAIL, controls_ok true (custody/evidence/b1/glm/J4-batch.json)",
+      "observation_channel": "E-GLM z-ai/glm-5.3-flash, call J4-b1-3",
+      "ground_truth_access": "blind_to_gt"
+    }
+  ],
+  "violations": [
+    {
+      "id": "I1-T2",
+      "class": "artifact_missed_standard",
+      "dimension": "T2",
+      "observation": "T2 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-T3",
+      "class": "artifact_missed_standard",
+      "dimension": "T3",
+      "observation": "T3 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-T4",
+      "class": "artifact_missed_standard",
+      "dimension": "T4",
+      "observation": "T4 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-T6",
+      "class": "artifact_missed_standard",
+      "dimension": "T6",
+      "observation": "T6 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-T7",
+      "class": "artifact_missed_standard",
+      "dimension": "T7",
+      "observation": "T7 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-F1a",
+      "class": "artifact_missed_standard",
+      "dimension": "F1a",
+      "observation": "F1a FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-F1b",
+      "class": "artifact_missed_standard",
+      "dimension": "F1b",
+      "observation": "F1b FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-F1d",
+      "class": "artifact_missed_standard",
+      "dimension": "F1d",
+      "observation": "F1d FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-F1f",
+      "class": "artifact_missed_standard",
+      "dimension": "F1f",
+      "observation": "F1f FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-F1h",
+      "class": "artifact_missed_standard",
+      "dimension": "F1h",
+      "observation": "F1h FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-P1",
+      "class": "artifact_missed_standard",
+      "dimension": "P1",
+      "observation": "P1 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-X1",
+      "class": "artifact_missed_standard",
+      "dimension": "X1",
+      "observation": "X1 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V1",
+      "class": "artifact_missed_standard",
+      "dimension": "V1",
+      "observation": "V1 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V2",
+      "class": "artifact_missed_standard",
+      "dimension": "V2",
+      "observation": "V2 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V3",
+      "class": "artifact_missed_standard",
+      "dimension": "V3",
+      "observation": "V3 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V4",
+      "class": "artifact_missed_standard",
+      "dimension": "V4",
+      "observation": "V4 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V5",
+      "class": "artifact_missed_standard",
+      "dimension": "V5",
+      "observation": "V5 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V6",
+      "class": "artifact_missed_standard",
+      "dimension": "V6",
+      "observation": "V6 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V7",
+      "class": "artifact_missed_standard",
+      "dimension": "V7",
+      "observation": "V7 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V8",
+      "class": "artifact_missed_standard",
+      "dimension": "V8",
+      "observation": "V8 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-V9",
+      "class": "artifact_missed_standard",
+      "dimension": "V9",
+      "observation": "V9 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-G2",
+      "class": "artifact_missed_standard",
+      "dimension": "G2",
+      "observation": "G2 FAIL on 1cb410b, batch 1 (custody/evidence/b1/s1-summary.json)"
+    },
+    {
+      "id": "I1-J2",
+      "class": "artifact_missed_standard",
+      "dimension": "J2",
+      "observation": "J2 DOES_NOT_CONFORM on 1cb410b, batch 1 (custody/evidence/b1/glm/J2-batch.json)"
+    },
+    {
+      "id": "I1-J4",
+      "class": "artifact_missed_standard",
+      "dimension": "J4",
+      "observation": "J4 DOES_NOT_CONFORM on 1cb410b, batch 1 (custody/evidence/b1/glm/J4-batch.json)"
+    }
+  ],
+  "verdict": "regenerate",
+  "passes": [
+    {
+      "pass_id": "s1-b1",
+      "kind": "scored",
+      "status": "filed",
+      "channel": "S1 script, batch 1",
+      "run_ref": "custody/evidence/b1/s1-summary.json",
+      "code_sha256": "c40c640cdb0ec9ba383acb6cb4e46c54d5012bc9bf78445cd1689197058953af",
+      "scores": [
+        {
+          "dimension": "T1",
+          "score": 1
+        },
+        {
+          "dimension": "T2",
+          "score": 0
+        },
+        {
+          "dimension": "T3",
+          "score": 0
+        },
+        {
+          "dimension": "T4",
+          "score": 0
+        },
+        {
+          "dimension": "T5",
+          "score": 1
+        },
+        {
+          "dimension": "T6",
+          "score": 0
+        },
+        {
+          "dimension": "T7",
+          "score": 0
+        },
+        {
+          "dimension": "F1a",
+          "score": 0
+        },
+        {
+          "dimension": "F1b",
+          "score": 0
+        },
+        {
+          "dimension": "F1c",
+          "score": 1
+        },
+        {
+          "dimension": "F1d",
+          "score": 0
+        },
+        {
+          "dimension": "F1e",
+          "score": 1
+        },
+        {
+          "dimension": "F1f",
+          "score": 0
+        },
+        {
+          "dimension": "F1g",
+          "score": 1
+        },
+        {
+          "dimension": "F1h",
+          "score": 0
+        },
+        {
+          "dimension": "I1",
+          "score": 1
+        },
+        {
+          "dimension": "F7a",
+          "score": 1
+        },
+        {
+          "dimension": "F8a",
+          "score": 1
+        },
+        {
+          "dimension": "F8b",
+          "score": 1
+        },
+        {
+          "dimension": "F8c",
+          "score": 1
+        },
+        {
+          "dimension": "F8d",
+          "score": 1
+        },
+        {
+          "dimension": "P1",
+          "score": 0
+        },
+        {
+          "dimension": "X1",
+          "score": 0
+        },
+        {
+          "dimension": "V1",
+          "score": 0
+        },
+        {
+          "dimension": "V2",
+          "score": 0
+        },
+        {
+          "dimension": "V3",
+          "score": 0
+        },
+        {
+          "dimension": "V4",
+          "score": 0
+        },
+        {
+          "dimension": "V5",
+          "score": 0
+        },
+        {
+          "dimension": "V6",
+          "score": 0
+        },
+        {
+          "dimension": "V7",
+          "score": 0
+        },
+        {
+          "dimension": "V8",
+          "score": 0
+        },
+        {
+          "dimension": "V9",
+          "score": 0
+        },
+        {
+          "dimension": "G1",
+          "score": 1
+        },
+        {
+          "dimension": "G2",
+          "score": 0
+        },
+        {
+          "dimension": "G3",
+          "score": 1
+        },
+        {
+          "dimension": "G4",
+          "score": 1
+        },
+        {
+          "dimension": "G5",
+          "score": 1
+        },
+        {
+          "dimension": "G6",
+          "score": 1
+        },
+        {
+          "dimension": "G7",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "pass_id": "glm-b1-J1",
+      "kind": "scored",
+      "status": "filed",
+      "channel": "openrouter.ai -> Z.AI",
+      "provider": "Z.AI",
+      "model": "z-ai/glm-5.3-flash",
+      "family": "glm",
+      "run_ref": "custody/evidence/harness-eval-glm-b1.log#J1-b1-2",
+      "rubric_sha256": "bed8e9b8ce98e81554e8f411ed30a0e153ebd984441043586781bffc92a380c0",
+      "code_sha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+      "scores": [
+        {
+          "dimension": "J1",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "pass_id": "glm-b1-J2",
+      "kind": "scored",
+      "status": "filed",
+      "channel": "openrouter.ai -> Z.AI",
+      "provider": "Z.AI",
+      "model": "z-ai/glm-5.3-flash",
+      "family": "glm",
+      "run_ref": "custody/evidence/harness-eval-glm-b1.log#J2-b1-2",
+      "rubric_sha256": "8f63bd340e1c669eb7a5f25194bcbe39530d2787eb91a92377715b8c0283aa0e",
+      "code_sha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+      "scores": [
+        {
+          "dimension": "J2",
+          "score": 0
+        }
+      ]
+    },
+    {
+      "pass_id": "glm-b1-J3",
+      "kind": "scored",
+      "status": "filed",
+      "channel": "openrouter.ai -> Z.AI",
+      "provider": "Z.AI",
+      "model": "z-ai/glm-5.3-flash",
+      "family": "glm",
+      "run_ref": "custody/evidence/harness-eval-glm-b1.log#J3-b1-3",
+      "rubric_sha256": "ab00c7b701427bde2c5797847cbeed668fce899bc49087b2594ada5d98ebbc20",
+      "code_sha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+      "scores": [
+        {
+          "dimension": "J3",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "pass_id": "glm-b1-J4",
+      "kind": "scored",
+      "status": "filed",
+      "channel": "openrouter.ai -> Z.AI",
+      "provider": "Z.AI",
+      "model": "z-ai/glm-5.3-flash",
+      "family": "glm",
+      "run_ref": "custody/evidence/harness-eval-glm-b1.log#J4-b1-3",
+      "rubric_sha256": "08d06e407844ee1e15bc4319d19aacba02cf59be4e3181fddc61e29942d441d6",
+      "code_sha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+      "scores": [
+        {
+          "dimension": "J4",
+          "score": 0
+        }
+      ]
+    }
+  ]
+}

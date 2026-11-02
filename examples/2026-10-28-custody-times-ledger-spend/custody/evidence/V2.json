@@ -1,0 +1,1145 @@
+{
+ "id": "V2",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "clean": {
+   "clean": {
+    "rc": 0,
+    "kinds": [],
+    "failures": [],
+    "traceback": false,
+    "error": null,
+    "out": "",
+    "json": {
+     "exit": 0,
+     "failures": []
+    }
+   },
+   "x1": {
+    "rc": 0,
+    "kinds": [],
+    "failures": [],
+    "traceback": false,
+    "error": null,
+    "out": "",
+    "json": {
+     "exit": 0,
+     "failures": []
+    }
+   },
+   "t4": {
+    "rc": 0,
+    "kinds": [],
+    "failures": [],
+    "traceback": false,
+    "error": null,
+    "out": "",
+    "json": {
+     "exit": 0,
+     "failures": []
+    }
+   },
+   "jr-sw": {
+    "rc": 0,
+    "kinds": [],
+    "failures": [],
+    "traceback": false,
+    "error": null,
+    "out": "",
+    "json": {
+     "exit": 0,
+     "failures": []
+    }
+   }
+  },
+  "plants": {
+   "P-V1": {
+    "rc": 3,
+    "kinds": [
+     "standard"
+    ],
+    "failures": [
+     {
+      "kind": "standard",
+      "field": "record",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1/custody/record.custody.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL standard record /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1/custody/record.custody.json:0\n",
+    "json": {
+     "exit": 3,
+     "failures": [
+      {
+       "kind": "standard",
+       "field": "record",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1/custody/record.custody.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "standard",
+    "expect_rc": 3
+   },
+   "P-V1w": {
+    "rc": 2,
+    "kinds": [],
+    "failures": [],
+    "traceback": false,
+    "error": null,
+    "out": "NOT CHECKABLE: pinned checker /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1w-custody/checker/check.py bytes are not the pin (/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1w-custody:0)\n",
+    "json": {
+     "exit": 2,
+     "failures": [
+      {
+       "kind": "standard",
+       "field": "pinned checker",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1w-custody",
+       "line": 0,
+       "message": "pinned checker /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V1w-custody/checker/check.py bytes are not the pin"
+      }
+     ]
+    },
+    "expect": null,
+    "expect_rc": 2
+   },
+   "P-V2a": {
+    "rc": 4,
+    "kinds": [
+     "schema"
+    ],
+    "failures": [
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "predicate.x-plumbline",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2a/custody/record.custody.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL schema $.predicate.x-plumbline /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema predicate.x-plumbline /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2a/custody/record.custody.json:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "schema",
+       "field": "$.predicate.x-plumbline",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      },
+      {
+       "kind": "schema",
+       "field": "predicate.x-plumbline",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2a/custody/record.custody.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "schema",
+    "expect_rc": 4
+   },
+   "P-V2b": {
+    "rc": 4,
+    "kinds": [
+     "schema"
+    ],
+    "failures": [
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline.hand_times",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL schema $.predicate.x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "schema",
+       "field": "$.predicate.x-plumbline.hand_times",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      },
+      {
+       "kind": "schema",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "schema",
+    "expect_rc": 4
+   },
+   "P-V2c": {
+    "rc": 4,
+    "kinds": [
+     "schema"
+    ],
+    "failures": [
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline.s1_unknown",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "x-plumbline.s1_unknown",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL schema $.predicate.x-plumbline.s1_unknown /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.s1_unknown /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "schema",
+       "field": "$.predicate.x-plumbline.s1_unknown",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      },
+      {
+       "kind": "schema",
+       "field": "x-plumbline.s1_unknown",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "schema",
+    "expect_rc": 4
+   },
+   "P-V2d": {
+    "rc": 4,
+    "kinds": [
+     "schema"
+    ],
+    "failures": [
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2d/custody/record.custody.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL schema $.predicate.x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2d/custody/record.custody.json:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "schema",
+       "field": "$.predicate.x-plumbline.schema",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      },
+      {
+       "kind": "schema",
+       "field": "x-plumbline.schema",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+       "line": 0
+      },
+      {
+       "kind": "schema",
+       "field": "x-plumbline.schema",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V2d/custody/record.custody.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "schema",
+    "expect_rc": 4
+   },
+   "P-V3a": {
+    "rc": 4,
+    "kinds": [
+     "allowance"
+    ],
+    "failures": [
+     {
+      "kind": "allowance",
+      "field": "x-plumbline.allowances.hand_times",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3a/custody/record.custody.json",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL allowance x-plumbline.allowances.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3a/custody/record.custody.json:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "allowance",
+       "field": "x-plumbline.allowances.hand_times",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3a/custody/record.custody.json",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "allowance",
+    "expect_rc": 4
+   },
+   "P-V3b": {
+    "rc": 4,
+    "kinds": [
+     "allowance",
+     "hand-time-unflagged",
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "hand-time-unflagged",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "inputs/custody-events.jsonl",
+      "line": 4
+     },
+     {
+      "kind": "allowance",
+      "field": "x-plumbline.allowances.hand_times",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/custody/record.custody.json",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL hand-time-unflagged routing.maker.declaredAt inputs/custody-events.jsonl:4\nFAIL allowance x-plumbline.allowances.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/custody/record.custody.json:0\nFAIL shadow x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "hand-time-unflagged",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "inputs/custody-events.jsonl",
+       "line": 4
+      },
+      {
+       "kind": "allowance",
+       "field": "x-plumbline.allowances.hand_times",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/custody/record.custody.json",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3b/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "hand-time-unflagged",
+    "expect_rc": 4
+   },
+   "P-V3c": {
+    "rc": 4,
+    "kinds": [
+     "flag-without-source",
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "flag-without-source",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "inputs/custody-events.jsonl",
+      "line": 4
+     },
+     {
+      "kind": "shadow",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3c/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL flag-without-source routing.maker.declaredAt inputs/custody-events.jsonl:4\nFAIL shadow x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3c/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "flag-without-source",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "inputs/custody-events.jsonl",
+       "line": 4
+      },
+      {
+       "kind": "shadow",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3c/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "flag-without-source",
+    "expect_rc": 4
+   },
+   "P-V3d": {
+    "rc": 4,
+    "kinds": [
+     "allowance",
+     "hand-time-unflagged",
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "hand-time-unflagged",
+      "field": "harness-maker-t4.log#maker_1.sent_at",
+      "file": "harness-maker-t4.log",
+      "line": 44
+     },
+     {
+      "kind": "allowance",
+      "field": "x-plumbline.allowances.hand_times",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/custody/record.custody.json",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL hand-time-unflagged harness-maker-t4.log#maker_1.sent_at harness-maker-t4.log:44\nFAIL allowance x-plumbline.allowances.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/custody/record.custody.json:0\nFAIL shadow x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "hand-time-unflagged",
+       "field": "harness-maker-t4.log#maker_1.sent_at",
+       "file": "harness-maker-t4.log",
+       "line": 44
+      },
+      {
+       "kind": "allowance",
+       "field": "x-plumbline.allowances.hand_times",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/custody/record.custody.json",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V3d/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "hand-time-unflagged",
+    "expect_rc": 4
+   },
+   "P-V4a": {
+    "rc": 4,
+    "kinds": [
+     "events",
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "events",
+      "field": "x-plumbline.generations",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "x-plumbline.generations",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL events x-plumbline.generations /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl:0\nFAIL shadow x-plumbline.generations /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "events",
+       "field": "x-plumbline.generations",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "x-plumbline.generations",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4a/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "events",
+    "expect_rc": 4
+   },
+   "P-V4b": {
+    "rc": 4,
+    "kinds": [
+     "events",
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "events",
+      "field": "x-plumbline.evaluations",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "x-plumbline.evaluations",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL events x-plumbline.evaluations /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl:0\nFAIL shadow x-plumbline.evaluations /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "events",
+       "field": "x-plumbline.evaluations",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "x-plumbline.evaluations",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4b/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "events",
+    "expect_rc": 4
+   },
+   "P-V4c": {
+    "rc": 4,
+    "kinds": [
+     "relay-as-approval"
+    ],
+    "failures": [
+     {
+      "kind": "relay-as-approval",
+      "field": "predicate.bar.approvals",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4c/inputs/custody-events.jsonl",
+      "line": 6
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL relay-as-approval predicate.bar.approvals /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4c/inputs/custody-events.jsonl:6\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "relay-as-approval",
+       "field": "predicate.bar.approvals",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V4c/inputs/custody-events.jsonl",
+       "line": 6
+      }
+     ]
+    },
+    "expect": "relay-as-approval",
+    "expect_rc": 4
+   },
+   "P-V5a": {
+    "rc": 4,
+    "kinds": [
+     "shadow",
+     "spend"
+    ],
+    "failures": [
+     {
+      "kind": "spend",
+      "field": "x-plumbline.spend.calls_sum_usd",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+      "line": 0
+     },
+     {
+      "kind": "spend",
+      "field": "x-plumbline.spend.total_usd",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "x-plumbline.spend",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL spend x-plumbline.spend.calls_sum_usd /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl:0\nFAIL spend x-plumbline.spend.total_usd /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl:0\nFAIL shadow x-plumbline.spend /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "spend",
+       "field": "x-plumbline.spend.calls_sum_usd",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+       "line": 0
+      },
+      {
+       "kind": "spend",
+       "field": "x-plumbline.spend.total_usd",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "x-plumbline.spend",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5a/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "spend",
+    "expect_rc": 4
+   },
+   "P-V5b": {
+    "rc": 4,
+    "kinds": [
+     "shadow",
+     "spend"
+    ],
+    "failures": [
+     {
+      "kind": "spend",
+      "field": "x-plumbline.spend.total_usd",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl",
+      "line": 0
+     },
+     {
+      "kind": "shadow",
+      "field": "x-plumbline.spend",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL spend x-plumbline.spend.total_usd /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl:0\nFAIL shadow x-plumbline.spend /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "spend",
+       "field": "x-plumbline.spend.total_usd",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl",
+       "line": 0
+      },
+      {
+       "kind": "shadow",
+       "field": "x-plumbline.spend",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V5b/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "spend",
+    "expect_rc": 4
+   },
+   "P-V6": {
+    "rc": 4,
+    "kinds": [
+     "shadow"
+    ],
+    "failures": [
+     {
+      "kind": "shadow",
+      "field": "x-plumbline.verdict",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V6/inputs/custody-events.jsonl",
+      "line": 0
+     }
+    ],
+    "traceback": false,
+    "error": null,
+    "out": "FAIL shadow x-plumbline.verdict /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V6/inputs/custody-events.jsonl:0\n",
+    "json": {
+     "exit": 4,
+     "failures": [
+      {
+       "kind": "shadow",
+       "field": "x-plumbline.verdict",
+       "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/plant/P-V6/inputs/custody-events.jsonl",
+       "line": 0
+      }
+     ]
+    },
+    "expect": "shadow",
+    "expect_rc": 4
+   }
+  },
+  "legacy": {
+   "rc": 4,
+   "kinds": [
+    "schema"
+   ],
+   "failures": [
+    {
+     "kind": "schema",
+     "field": "$.predicate.x-plumbline.schema",
+     "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+     "line": 0
+    },
+    {
+     "kind": "schema",
+     "field": "$.predicate.x-plumbline.hand_times",
+     "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+     "line": 0
+    },
+    {
+     "kind": "schema",
+     "field": "x-plumbline.schema",
+     "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+     "line": 0
+    },
+    {
+     "kind": "schema",
+     "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+     "line": 0
+    },
+    {
+     "kind": "schema",
+     "field": "x-plumbline.schema",
+     "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/legacy-tree/dot-plumbline/jobs/2026-10-28-doctrine-reader-pointer/custody/record.custody.json",
+     "line": 0
+    }
+   ],
+   "traceback": false,
+   "error": null,
+   "out": "FAIL schema $.predicate.x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema $.predicate.x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json:0\nFAIL schema x-plumbline.schema /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/legacy-tree/dot-plumbline/jobs/2026-10-28-doctrine-reader-pointer/custody/record.custody.json:0\n",
+   "json": {
+    "exit": 4,
+    "failures": [
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "$.predicate.x-plumbline.hand_times",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/rev3/schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "line": 0
+     },
+     {
+      "kind": "schema",
+      "field": "x-plumbline.schema",
+      "file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v/legacy-tree/dot-plumbline/jobs/2026-10-28-doctrine-reader-pointer/custody/record.custody.json",
+      "line": 0
+     }
+    ]
+   }
+  },
+  "schema": {
+   "$schema": "https://json-schema.org/draft/2020-12/schema",
+   "$id": "plumbline/schemas/x-plumbline/x-plumbline-v1.schema.json",
+   "title": "Plumbline custody record with x-plumbline v1",
+   "type": "object",
+   "additionalProperties": false,
+   "required": [
+    "_type",
+    "subject",
+    "predicateType",
+    "predicate"
+   ],
+   "properties": {
+    "_type": {
+     "const": "https://in-toto.io/Statement/v1"
+    },
+    "subject": {
+     "type": "array",
+     "items": {
+      "$ref": "#/$defs/subjectItem"
+     }
+    },
+    "predicateType": {
+     "const": "https://evaluatordriven.com/custody/v1"
+    },
+    "predicate": {
+     "$ref": "#/$defs/predicate"
+    }
+   },
+   "$defs": {
+    "subjectItem": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "name",
+      "digest"
+     ],
+     "properties": {
+      "name": {
+       "type": "string"
+      },
+      "digest": {
+       "type": "object",
+       "additionalProperties": false,
+       "required": [
+        "sha256"
+       ],
+       "properties": {
+        "sha256": {
+         "type": "string",
+         "pattern": "^[0-9a-f]{64}$"
+        }
+       }
+      }
+     }
+    },
+    "predicate": {
+     "type": "object",
+     "additionalProperties": true,
+     "required": [
+      "x-plumbline"
+     ],
+     "properties": {
+      "x-plumbline": {
+       "$ref": "#/$defs/xPlumbline"
+      }
+     }
+    },
+    "xPlumbline": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "schema",
+      "hand_times"
+     ],
+     "properties": {
+      "job_id": {
+       "type": "string"
+      },
+      "sources": {
+       "type": "object",
+       "additionalProperties": {
+        "type": "string"
+       }
+      },
+      "events_log": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "terminal_state": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "outcome": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "verdict": {
+       "type": [
+        "string",
+        "null"
+       ]
+      },
+      "iteration": {
+       "type": [
+        "integer",
+        "null"
+       ]
+      },
+      "s5_record": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "earlier_iterations": {
+       "type": "array",
+       "items": {
+        "type": "string"
+       }
+      },
+      "pass_rule": {},
+      "disposition_source": {
+       "type": "string"
+      },
+      "packet": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "emitter": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "time_tolerance_s": {
+       "type": "integer"
+      },
+      "times": {
+       "type": "object",
+       "additionalProperties": {
+        "type": "string"
+       }
+      },
+      "timeSources": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "time_sources": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "emittedAt": {
+       "type": "string"
+      },
+      "schema": {
+       "const": "plumbline/x-plumbline/v1"
+      },
+      "hand_times": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/handTime"
+       }
+      },
+      "allowances": {
+       "type": "object",
+       "additionalProperties": true,
+       "properties": {
+        "hand_times": {
+         "$ref": "#/$defs/allowance"
+        }
+       }
+      },
+      "generations": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/ledgerLine"
+       }
+      },
+      "evaluations": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/ledgerLine"
+       }
+      },
+      "relays": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/ledgerLine"
+       }
+      },
+      "amendments": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/ledgerLine"
+       }
+      },
+      "spend": {
+       "$ref": "#/$defs/spend"
+      },
+      "inputs": {
+       "type": "object",
+       "additionalProperties": true
+      },
+      "gaps": {
+       "type": "array",
+       "items": {
+        "$ref": "#/$defs/gap"
+       }
+      },
+      "disposition_at_source": {
+       "type": "string"
+      }
+     }
+    },
+    "handTime": {
+     "type": "object",
+     "additionalProperties": false,
+     "required": [
+      "field",
+      "file",
+      "line",
+      "source"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "file": {
+       "type": "string"
+      },
+      "line": {
+       "type": [
+        "integer",
+        "null"
+       ]
+      },
+      "source": {
+       "type": "string"
+      }
+     }
+    },
+    "ledgerLine": {
+     "type": "object",
+     "additionalProperties": true,
+     "required": [
+      "event",
+      "at",
+      "writer",
+      "source"
+     ],
+     "properties": {
+      "event": {
+       "type": "string"
+      },
+      "at": {
+       "type": "string"
+      },
+      "writer": {
+       "type": "string"
+      },
+      "source": {
+       "type": "string"
+      }
+     }
+    },
+    "spend": {
+     "type": "object",
+     "additionalProperties": true,
+     "required": [
+      "calls_sum_usd",
+      "key_delta_usd",
+      "total_usd",
+      "tolerance_usd"
+     ],
+     "properties": {
+      "calls_sum_usd": {
+       "type": "number"
+      },
+      "key_delta_usd": {
+       "type": "number"
+      },
+      "total_usd": {
+       "type": "number"
+      },
+      "tolerance_usd": {
+       "const": 0.0001
+      },
+      "source": {
+       "type": [
+        "string",
+        "null"
+       ]
+      }
+     }
+    },
+    "gap": {
+     "type": "object",
+     "additionalProperties": true,
+     "required": [
+      "field",
+      "reason",
+      "hard"
+     ],
+     "properties": {
+      "field": {
+       "type": "string"
+      },
+      "reason": {
+       "type": "string"
+      },
+      "hard": {
+       "type": "boolean"
+      }
+     }
+    },
+    "allowance": {
+     "type": "object",
+     "additionalProperties": true,
+     "required": [
+      "switch",
+      "writer",
+      "at"
+     ],
+     "properties": {
+      "switch": {
+       "const": "--allow-hand-times"
+      },
+      "writer": {
+       "type": "string"
+      },
+      "at": {
+       "type": "string"
+      }
+     }
+    },
+    "xNested": {
+     "type": "object",
+     "additionalProperties": true
+    }
+   }
+  },
+  "schema_ref_in_records": {
+   "clean": "plumbline/x-plumbline/v1",
+   "x1": "plumbline/x-plumbline/v1",
+   "t4": "plumbline/x-plumbline/v1",
+   "jr-sw": "plumbline/x-plumbline/v1"
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (14 values)"
+}

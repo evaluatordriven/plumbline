@@ -1,0 +1,78 @@
+{
+ "what": "close spend read (bar P6), job 2026-10-28-custody-times-ledger-spend; no model call",
+ "read_at": "2026-10-29T17:17:39Z",
+ "harness": {
+  "file": "custody/freeze/harness/or_call.py",
+  "sha256": "d2b320398a8de7a240de30cf9ea3ee54aa5fed8a2d1bc2a616b75fba9713d574"
+ },
+ "key_file": "by path only (harness KEY_FILE); not recorded",
+ "spend_status": {
+  "ledger": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/spend/spend-ledger.jsonl",
+  "ledger_spent_usd": 0.637685,
+  "bound_usd": 5.0,
+  "reserve_usd": 0.1,
+  "key_usage_baseline": 0.317534503,
+  "key_usage_now": 0.920623777,
+  "key_usage_delta_usd": 0.603089,
+  "spent_usd": 0.637685,
+  "headroom_usd": 4.262315
+ },
+ "key_get": {
+  "http_status": 200,
+  "figures": {
+   "usage": 0.920623777,
+   "usage_daily": 0.447278793,
+   "usage_weekly": 0.920623777,
+   "usage_monthly": 0.920623777,
+   "byok_usage": 0,
+   "byok_usage_daily": 0,
+   "byok_usage_weekly": 0,
+   "byok_usage_monthly": 0,
+   "limit": 20,
+   "limit_remaining": 19.079376223,
+   "limit_reset": "weekly",
+   "is_free_tier": false,
+   "is_provisioning_key": false,
+   "include_byok_in_limit": false
+  },
+  "fields_dropped": [
+   "allowed_data_regions",
+   "budgets",
+   "creator_user_id",
+   "effective_budget",
+   "expires_at",
+   "free_model_daily_requests",
+   "is_management_key",
+   "label",
+   "organization_id",
+   "rate_limit",
+   "workspace_id"
+  ],
+  "note": "usage_daily/weekly/monthly are OpenRouter's own windows for this key (UTC days)"
+ },
+ "spend_ledger": {
+  "sha256_before": "cc60d88bccaba3a0a1206900d29c72244f57d6a2d38897ceebb15489c6274ddf",
+  "sha256_after": "cc60d88bccaba3a0a1206900d29c72244f57d6a2d38897ceebb15489c6274ddf",
+  "lines": 149,
+  "reserves": 75,
+  "settles": 74,
+  "settled_usd": 0.584368826,
+  "open_reserves": [
+   {
+    "id": "19701ada497e40abac36ff4b9130eb76",
+    "call": "maker_iter1_verifier_a1",
+    "at": "2026-10-28T22:46:37.575725Z",
+    "worst_usd": 0.05331592
+   }
+  ],
+  "settled_by_utc_day": {
+   "2026-10-28": 0.125393387,
+   "2026-10-29": 0.458975439
+  },
+  "settled_by_edt_day": {
+   "2026-10-28": 0.241752889,
+   "2026-10-29": 0.342615937
+  },
+  "last_line_at": "2026-10-29T16:23:54.926127Z"
+ }
+}

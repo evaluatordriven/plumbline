@@ -1,0 +1,22 @@
+{
+ "check": "J1",
+ "batch": "3",
+ "call": "J1-b3-1",
+ "id": "subject",
+ "messages_sha256": "0fcfc07a7865613dadc589fc75e626ccf6cf882a840c96421903931d53ad1038",
+ "or_call_exit": 0,
+ "or_call_stderr": "",
+ "finish_reason": "stop",
+ "reply_sha256": "d0179510e26493501b895e3f9c3e0debaad656de3a24e35d9b93f7b7aacd3b27",
+ "verdict": "CONFORMS",
+ "lines": [
+  "kit/emit_custody.py:881",
+  "kit/emit_custody.py:1020",
+  "kit/emit_custody.py:1203",
+  "kit/plumbline_job.py:256",
+  "kit/plumbline_job.py:259",
+  "kit/plumbline_job.py:99",
+  "kit/plumbline_verify.py:393",
+  "kit/plumbline_verify.py:919"
+ ]
+}

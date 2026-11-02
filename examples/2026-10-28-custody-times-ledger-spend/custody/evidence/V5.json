@@ -1,0 +1,37 @@
+{
+ "id": "V5",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "spend": {
+   "calls_sum_usd": 4e-05,
+   "key_delta_usd": 0.0,
+   "total_usd": 4e-05,
+   "tolerance_usd": 0.0001,
+   "source": "inputs/custody-events.jsonl:11"
+  },
+  "log_costs": [
+   1e-05,
+   1e-05,
+   1e-05,
+   1e-05
+  ],
+  "ledger_spend": [
+   {
+    "event": "spend",
+    "spend_ledger": "spend/spend-ledger.jsonl",
+    "spend_ledger_sha256": "d00954b95d03d0a4bda9a289b43cf986ba02c401abc14cf6a2491ea20b9e08e7",
+    "key_reading": "spend/key-reading.json",
+    "key_reading_sha256": "5ddd9da65d77a2833af99be15ce76e25f8f2dc07a93588c6e24f12a38cad73cf",
+    "ledger_sum_usd": 4e-05,
+    "key_delta_usd": 0.0,
+    "total_usd": 4e-05,
+    "read_at": "2026-10-29T15:48:40.696374Z",
+    "last_settle_at": "2026-10-29T15:45:39Z",
+    "at": "2026-10-29T15:48:41Z",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   }
+  ],
+  "tol": 0.0001
+ }
+}

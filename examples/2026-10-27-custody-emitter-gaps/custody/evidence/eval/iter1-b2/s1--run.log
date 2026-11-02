@@ -1,0 +1,64 @@
+== controls verified against MANIFEST.sha256 (sha256 9764d8e4d5a0bad067f44379f08035e0e41de6df6acc00a2c9e31641139760bf)
+== C1 checker controls (custody's own fixtures @ pin): check.py must return each expected verdict
+  C1 cl1-fail-approval-bound-to-other-bar         expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-file-differs                    expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-frozen-after-start              expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-frozen-at-start                 expect FAILED        got FAILED        ok
+  C1 cl1-fail-evidence-file-differs               expect FAILED        got FAILED        ok
+  C1 cl1-fail-maker-wrote-bar-undisclosed         expect FAILED        got FAILED        ok
+  C1 cl1-fail-no-clean-control                    expect FAILED        got FAILED        ok
+  C1 cl1-fail-same-model-session-undeclared       expect FAILED        got FAILED        ok
+  C1 cl1-fail-tampered-artifact                   expect FAILED        got FAILED        ok
+  C1 cl1-fail-unobserved-not-acknowledged         expect FAILED        got FAILED        ok
+  C1 cl1-pass-adopted-specialist                  expect OK            got OK            ok
+  C1 cl1-pass-basic                               expect OK            got OK            ok
+  C1 cl1-pass-extension-fields                    expect OK            got OK            ok
+  C1 cl1-pass-not-yet-given-with-violation        expect OK            got OK            ok
+  C1 cl1-pass-same-model-session-declared         expect OK            got OK            ok
+  C1 cl1-unchecked-evidence-file-not-supplied     expect NOT-CHECKABLE got NOT-CHECKABLE ok
+  C1 cl1-unchecked-model-evaluator-settings-only  expect NOT-CHECKABLE got NOT-CHECKABLE ok
+== record-level controls: each clean control PASSes, each planted control FAILs, its named check(s)
+  C-N1c    N1  expect PASS got PASS  ok
+  C-N1p    N1  expect FAIL got FAIL  ok
+  C-N1p2   N1  expect FAIL got FAIL  ok
+  C-N2c    N1  expect PASS got PASS  ok
+  C-N2c    N2  expect PASS got PASS  ok
+  C-N2p    N1  expect FAIL got FAIL  ok
+  C-N2p    N2  expect FAIL got FAIL  ok
+  C-N3c    N3  expect PASS got PASS  ok
+  C-N3p    N3  expect FAIL got FAIL  ok
+  C-N3p0   N3  expect FAIL got FAIL  ok
+  C-N4c-b  N4  expect PASS got PASS  ok
+  C-N4c    N4  expect PASS got PASS  ok
+  C-N4p    N4  expect FAIL got FAIL  ok
+  C-N5c    N5  expect PASS got PASS  ok
+  C-N5p    N5  expect FAIL got FAIL  ok
+  C-N9c    N7  expect PASS got PASS  ok
+  C-N9c    N8  expect PASS got PASS  ok
+  C-N9p    N7  expect FAIL got FAIL  ok
+  C-N9p    N8  expect FAIL got FAIL  ok
+  C-N9p0   N7  expect FAIL got FAIL  ok
+  C-N9p0   N8  expect FAIL got FAIL  ok
+== P5(e) controls (amendment 2): p5check.py on each synthetic job folder
+  C-P5c    P5e expect PASS got PASS  ok
+  C-P5p    P5e expect FAIL got FAIL  ok
+  C-P5p2   P5e expect FAIL got FAIL  ok
+== subject: 7cc38f833f8f5eeceffcb405885adb05141f8c65 on the held-out fixtures
+  N1 on F-genreply-full                    PASS
+  N1 on F-maker-10min                      PASS
+  N1 on F-single-call                      PASS
+  N1 on extra-1-job-rejected               FAIL
+  N1 FAIL
+  N2 PASS
+  N3 FAIL
+  N4 PASS
+  N5 PASS
+  N7 PASS
+  N8 PASS
+== mutants of the subject's own outputs (planted; must FAIL)
+  M-N2p  n1 expect FAIL got FAIL
+  M-N2p  n2 expect FAIL got FAIL
+  M-N1p  n1 expect FAIL got FAIL
+  M-N5p  n4 expect FAIL got FAIL
+  M-N9p  n7 expect FAIL got FAIL · n8 expect FAIL got FAIL · check.py OK (N9: expect OK)
+{"controls": "as expected", "mutants": "as expected", "subject": {"N1": "FAIL", "N2": "PASS", "N3": "FAIL", "N4": "PASS", "N5": "PASS", "N7": "PASS", "N8": "PASS"}, "scores": {"N1": 0, "N2": 1, "N3": 0, "N4": 1, "N5": 1, "N7": 1, "N8": 1}}

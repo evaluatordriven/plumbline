@@ -1,0 +1,1 @@
+DOCTRINE.md copied verbatim from evaluatordriven/doctrine @ dc61854ba7d763aa2ae12db30fddbb51265ede85 (sha256 c9b45567f27738ca33662162e44fec121b1e840f34522fd9eb64e8fd3d49d6ed), licensed CC BY 4.0 (LICENSE beside it), for the J3 rubric.

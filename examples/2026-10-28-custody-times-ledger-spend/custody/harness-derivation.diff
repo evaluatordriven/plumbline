@@ -1,0 +1,87 @@
+--- job-1 custody/freeze/harness/or_call.py (d345c151...7880)
++++ custody/freeze/harness/or_call.py
+@@ -1,6 +1,7 @@
+ #!/usr/bin/env python3
+-# STATUS: FROZEN-BUILD 2026-10-28T16:18:50Z — part of the freeze set of job 2026-10-28-doctrine-reader-pointer; sha256 in ../../MANIFEST.sha256.
+-# Derived from job 2026-10-27-custody-emitter-gaps or_call.py (sha256 55e8981c...) + the job-wide SPEND GUARD (approval item 6, Owner 2026-10-28 11:58 EDT).
++# STATUS: FROZEN-BUILD 2026-10-28T20:36:28Z — part of the freeze set of job 2026-10-28-custody-times-ledger-spend; sha256 in ../../MANIFEST.sha256.
++# Derived from job 2026-10-28-doctrine-reader-pointer or_call.py (frozen, sha256 d345c151...7880): JOB_ID, BOUND_USD,
++# RESERVE_USD and the snapshot time changed; PRICES re-read from the 2026-10-28T18:55:55Z snapshot (values unchanged).
+ """or_call.py: one logged OpenRouter chat call for a seat of an E-DI job (Maker or model evaluator).
+ 
+     or_call.py --seat maker --log custody/evidence/harness-maker-deepseek.log \
+@@ -32,8 +33,8 @@
+ The log never contains the key: the Authorization header is replaced before logging, and the serialized entry
+ is scanned for the key string before it is written (exit 2, nothing written, if it would appear).
+ 
+-SPEND GUARD (job 2026-10-28-doctrine-reader-pointer, approval item 6: the shared key, bound < US$2):
+-  * Only the (model, tag) pairs in PRICES may be called (prices = the saved ZDR snapshot 2026-10-28T15:59:42Z).
++SPEND GUARD (job 2026-10-28-custody-times-ledger-spend, approval sheet: the shared key, bound < US$5.00, reserve US$0.10):
++  * Only the (model, tag) pairs in PRICES may be called (prices = the saved ZDR snapshot 2026-10-28T18:55:55Z).
+   * NO THROTTLING: max_tokens is always the endpoint maximum from PRICES (omitted = set to it; any other value
+     = exit 2). No reasoning/effort parameter is ever sent.
+   * Before anything is sent, under an exclusive lock on the job spend ledger (JSON lines, outside the repo):
+@@ -49,7 +50,9 @@
+     exit 7 (would send), and NOTHING is sent (with the real transport).
+   * --init-spend: write key-usage-baseline.json beside the ledger (refuses if a ledger or baseline exists).
+   * --spend-status: print ledger total, key-usage delta, remaining headroom; sends nothing paid.
+-Exit 6 = REFUSED by the spend guard (nothing sent) · 7 = test mode, guard would allow (nothing sent).
++Exit 6 = REFUSED by the spend guard (nothing sent) · 7 = test mode, guard would allow (nothing sent) ·
++10 = finish_reason "length" with empty content: logged, no reply written; a failure class of its own (stop, do not retry).
++Every log entry carries "finish_reason" (null when no reply came back) and, when a reply came back, "content_empty".
+ """
+ from __future__ import annotations
+ 
+@@ -72,12 +75,12 @@
+ KEY_FILE = "/workspace/.openrouter-key"
+ META_HEADER = ("X-OpenRouter-Metadata", "enabled")
+ REDACTED = "Bearer [REDACTED]"
+-JOB_ID = "2026-10-28-doctrine-reader-pointer"
++JOB_ID = "2026-10-28-custody-times-ledger-spend"
+ SPEND_LEDGER = f"/workspace/edi-work/{JOB_ID}/spend/spend-ledger.jsonl"
+-BOUND_USD = 2.00        # strict: total job spend must stay < BOUND_USD
+-RESERVE_USD = 0.05      # margin kept free under the bound (pricing/estimate error)
++BOUND_USD = 5.00        # strict: total job spend must stay < BOUND_USD
++RESERVE_USD = 0.10      # margin kept free under the bound (pricing/estimate error)
+ # (model, tag) -> USD per prompt token, USD per completion token, endpoint max_completion_tokens.
+-# Source: /api/v1/models/<model>/endpoints snapshot 2026-10-28T15:59:42Z (custody/zdr-endpoints-*.json + models-*.json).
++# Source: /api/v1/models/<model>/endpoints snapshot 2026-10-28T18:55:55Z (custody/zdr-endpoints-*.json + models-*.json).
+ PRICES = {
+     ("deepseek/deepseek-v4.1-flash-1017", "deepinfra/fp8"): (0.000000098, 0.000000294, 131072),
+     ("z-ai/glm-5.3-flash", "z-ai/fp8"): (0.00000015, 0.0000005, 131072),
+@@ -345,7 +348,7 @@
+         status, hdrs, raw = t.request("POST", url, send_headers, json.dumps(body).encode())
+     except Exception as exc:  # transport failure: nothing came back
+         entry.update({"received_at": now(), "response_status": None, "response_headers": {}, "response": None,
+-                      "transport_error": f"{type(exc).__name__}: {exc}", "generation": None,
++                      "finish_reason": None, "transport_error": f"{type(exc).__name__}: {exc}", "generation": None,
+                       "verdict": {"ok": False, "refusal": "transport error"}})
+         append_entry(Path(a.log), entry, key)
+         print(f"or_call: transport error, logged: {type(exc).__name__}", file=sys.stderr); return 3
+@@ -358,6 +361,9 @@
+         resp = {"_raw_text": raw.decode("utf-8", "replace")}
+     entry["response"] = resp
+     holder["resp"] = resp
++    ch0 = ((resp.get("choices") or [{}])[0] if isinstance(resp, dict) else {}) or {}
++    entry["finish_reason"] = ch0.get("finish_reason")          # logged on every call that got a reply (None otherwise)
++    entry["content_empty"] = not ((ch0.get("message") or {}).get("content") or "").strip()
+     if status != 200 or not isinstance(resp, dict) or not resp.get("id"):
+         entry.update({"generation": None, "verdict": {"ok": False, "refusal": f"HTTP {status}"}})
+         append_entry(Path(a.log), entry, key)
+@@ -392,12 +398,16 @@
+     if refusal:
+         print(f"or_call: REFUSED ({refusal}); logged to {a.log}; no reply written", file=sys.stderr); return 4
+     content = ((resp.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
++    if entry.get("finish_reason") == "length" and not content.strip():
++        print("or_call: finish_reason=length with empty content (its own failure class: stop, do not retry); "
++              f"logged to {a.log}; no reply written", file=sys.stderr); return 10
+     if a.out:
+         Path(a.out).write_text(content, encoding="utf-8")
+     if gen is None:
+         print(f"or_call: served by the pin, but no /api/v1/generation reply after {a.gen_tries} tries "
+               f"(last status {gstatus}); logged with generation null", file=sys.stderr); return 5
+     print(json.dumps({"logged": a.log, "call": entry["call"], "id": resp["id"], "served_by": served,
++                      "finish_reason": entry.get("finish_reason"),
+                       "date": next((v for k, v in hdrs.items() if k.lower() == "date"), None)}))
+     return 0
+ 

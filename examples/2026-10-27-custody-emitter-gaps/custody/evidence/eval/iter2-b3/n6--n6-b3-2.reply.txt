@@ -1,0 +1,3 @@
+VERDICT: CONFORMS
+LINES: kit/custody_history.py:376, kit/custody_history.py:381, kit/custody_history.py:399, kit/emit_custody.py:347, kit/emit_custody.py:385, kit/emit_custody.py:455
+REASON: For every aggregator call, `endpoint_of` returns the pinned host only when a non-null `/api/v1/generation` reply names the pinned provider, and adds a refusal (exit 3, nothing written) when the reply is missing, null, or names no provider — the chat response's `provider`/`openrouter_metadata` can never stand in for it — while hand-entered endpoints are stripped from every model block and only the generation-gated log-derived endpoint is substituted. Direct (non-router) calls take the request URL host itself, which is the host that actually answered, not an inferred source.

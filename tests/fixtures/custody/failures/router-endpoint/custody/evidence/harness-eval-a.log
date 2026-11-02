@@ -1,0 +1,95 @@
+[
+  {
+    "call": "eval_artifact",
+    "request": {
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "model": "vendor/example-1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "SYNTHETIC FIXTURE PROMPT"
+        }
+      ]
+    },
+    "response": {
+      "id": "gen-synthetic-eval_artifact",
+      "created": 1792497602,
+      "model": "vendor/example-1",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "SYNTHETIC"
+          },
+          "finish_reason": "stop"
+        }
+      ]
+    },
+    "response_headers": {
+      "Date": "Tue, 20 Oct 2026 12:00:03 GMT"
+    }
+  },
+  {
+    "call": "eval_k1",
+    "request": {
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "model": "vendor/example-1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "SYNTHETIC FIXTURE PROMPT"
+        }
+      ]
+    },
+    "response": {
+      "id": "gen-synthetic-eval_k1",
+      "created": 1792497661,
+      "model": "vendor/example-1",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "SYNTHETIC"
+          },
+          "finish_reason": "stop"
+        }
+      ]
+    },
+    "response_headers": {
+      "Date": "Tue, 20 Oct 2026 12:01:02 GMT"
+    }
+  },
+  {
+    "call": "eval_k2",
+    "request": {
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "model": "vendor/example-1",
+      "messages": [
+        {
+          "role": "user",
+          "content": "SYNTHETIC FIXTURE PROMPT"
+        }
+      ]
+    },
+    "response": {
+      "id": "gen-synthetic-eval_k2",
+      "created": 1792497724,
+      "model": "vendor/example-1",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "SYNTHETIC"
+          },
+          "finish_reason": "stop"
+        }
+      ]
+    },
+    "response_headers": {
+      "Date": "Tue, 20 Oct 2026 12:02:05 GMT"
+    }
+  }
+]

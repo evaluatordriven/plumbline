@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/evaluator-record.schema.json",
+  "title": "Evaluator output record",
+  "description": "Structured evaluator output (E-DI Contracts v1.8 s5). Structured data, never prose alone; prose may accompany it but may not replace it. Every score carries an observation: a dimension with no observation is discarded, not averaged — it forces needs_owner (s5, C27). A record with ratified=false can never be part of an `accepted` terminal state.",
+  "type": "object",
+  "required": ["job_id", "iteration", "dimensions", "pass_rule", "violations", "verdict", "ground_truth_ref", "ground_truth_version", "ground_truth_hardness", "mandate_ref", "evaluator_identity", "channel_blind", "ratified"],
+  "additionalProperties": false,
+  "properties": {
+    "job_id": { "type": "string", "minLength": 1 },
+    "iteration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Counted from 0 before the first generation, incremented once per generation. Written to the record at generation time (the worked trace in s3: generation 1 => iteration 1)."
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "score", "scale", "anchor_note", "observation", "observation_channel", "ground_truth_access"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "score": { "type": ["integer", "number"] },
+          "scale": { "type": "string" },
+          "anchor_note": { "type": "string", "description": "What this score means here." },
+          "observation": {
+            "type": "string",
+            "minLength": 1,
+            "description": "What the dimension was scored on, produced by the channel named below (s5; Contracts v1.8 s5, C27). Required: an empty value leaves the dimension with no observation, which forces needs_owner rather than a synthesised score."
+          },
+          "observation_channel": { "type": "string", "minLength": 1, "description": "Which channel produced this dimension's observation (s7.2)." },
+          "ground_truth_access": {
+            "enum": ["none", "blind_to_gt", "saw_gt"],
+            "description": "Closed enum (s5). saw_gt invalidates this dimension's observation — the channel had access to the answer it was checking — and the dimension then fails."
+          },
+          "observation_ref": {
+            "type": "string",
+            "description": "Where the independent observation lives (path, artifact id, measurement). Optional but strongly preferred: the orchestrator must be able to re-examine it without re-running the loop."
+          }
+        }
+      }
+    },
+    "pass_rule": {
+      "type": "object",
+      "required": ["accept", "dimension_floor", "reject", "cap"],
+      "additionalProperties": false,
+      "description": "Echoed from the job packet, fixed before the run. The evaluator reports it; it does not choose it.",
+      "properties": {
+        "accept": { "type": "number" },
+        "dimension_floor": { "type": "number" },
+        "reject": { "type": "number" },
+        "cap": { "type": "integer" }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "severity", "observation"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "type": "string", "description": "Violation class, so cheap defects route to automatic regeneration and consequential ones route to a person." },
+          "severity": { "enum": ["P0", "P1", "P2"] },
+          "observation": { "type": "string", "description": "The quoted text or observed behaviour that constitutes the violation." },
+          "remedy": { "type": "string", "description": "The judge's insight into what would rectify the condition, where it has one — omitted otherwise (Contracts v1.5, proposal 0004). A prescriptive judge anchors the maker on the judge's own solution, so this is not required." }
+        }
+      }
+    },
+    "verdict": {
+      "enum": ["accept", "regenerate", "needs_owner", "reject"],
+      "description": "RECOMMENDED verdict only. s4: the evaluator emits scores, violations and a recommended verdict; it does not own the loop. The orchestrator is the sole applier of the pass rule, the cap, and escalation. s5: exactly these four values — implementations must not invent synonyms (no 'minor-revision' alongside 'regenerate')."
+    },
+    "ground_truth_ref": { "type": "string", "minLength": 1, "description": "The artifact or invariant this scoring used." },
+    "ground_truth_version": { "type": "string", "minLength": 1, "description": "The version of the ground truth in force for this scoring (s1.6, C19). Echoed from the job packet; never chosen here." },
+    "ground_truth_hardness": { "enum": ["INVARIANT", "DOCUMENT", "PRIOR"], "description": "How far this judge may lean on the ground truth (s1.6, C19), echoed from the job packet. Supplied per job, never defaulted." },
+    "mandate_ref": { "type": "string", "minLength": 1, "description": "The mandate in force for the frame this scoring sits inside (s1.7, C20) — named with its revision, so a reader can tell which frame judged this." },
+    "evaluator_identity": { "type": "string", "minLength": 1, "description": "model + version. If generator and evaluator are the same model, s4 requires that fact to be recorded with the job." },
+    "channel_blind": { "type": "boolean", "description": "s5: asserts every observation channel met s7.2." },
+    "ratified": { "type": "boolean", "description": "s5: asserts no must-ask value is proposed/unratified. ratified=false can never be part of an `accepted` terminal state." },
+    "unjudged_dimensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dimensions that could not be judged. s5: a dimension with no observation FAILS, and a job containing one can never reach `accepted` — its exit is a forced `needs_owner`, not `rejected`. Do not synthesise a below-floor score for it: that puts an invented number into min() and misreports why the job stopped."
+    },
+    "notes": { "type": "string", "description": "Prose. May accompany the structured record; may not replace it." }
+  }
+}

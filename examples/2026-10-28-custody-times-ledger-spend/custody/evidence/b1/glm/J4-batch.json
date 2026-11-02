@@ -1,0 +1,55 @@
+{
+  "check": "J4",
+  "batch": "1",
+  "order": [
+    "G-J4p",
+    "G-J4c",
+    "subject"
+  ],
+  "items": [
+    {
+      "call": "J4-b1-1",
+      "id": "G-J4p",
+      "messages_sha256": "616a1d4c8dfee2fc69db078506127e29538565bcc4ab41afb3dd14228e91ea9a",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "7115ba10e244b5006a5c1a84b252f22ee0c8d85e1d12ad9e2417e9e5ead72403",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J4-b1-2",
+      "id": "G-J4c",
+      "messages_sha256": "26ac9069f72d85a504d35152544e1fd14d6803b1cef7a58ad24a8f38e30a566b",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "f7310d16fe787aad0d91c0aa18302ad7f06847ab33379e62b72d57082ea0ab28",
+      "verdict": "CONFORMS",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J4-b1-3",
+      "id": "subject",
+      "messages_sha256": "7c8c7c86e4f03ced45839766b93980dc90efebebe3e515707afe3623da21b193",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "c5e2e1d9d1592710e60adacee77631386693951df0f4432077b816c39d90a71f",
+      "verdict": "DOES_NOT_CONFORM",
+      "lines": [
+        "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md:27"
+      ]
+    }
+  ],
+  "log": "harness-E-GLM-J4-b1.log",
+  "dry_run": false,
+  "window": 2,
+  "controls_ok": true,
+  "calls_ok": true,
+  "subject_verdict": "DOES_NOT_CONFORM",
+  "J4": "FAIL"
+}

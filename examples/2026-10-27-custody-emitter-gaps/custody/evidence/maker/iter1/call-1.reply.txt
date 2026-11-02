@@ -1,0 +1,229 @@
+```diff
+diff --git a/kit/custody_history.py b/kit/custody_history.py
+--- a/kit/custody_history.py
++++ b/kit/custody_history.py
+@@ -80,6 +80,10 @@ class Call:
+         self.created = datetime.fromtimestamp(c, timezone.utc) if isinstance(c, (int, float)) else None
+         self.at = self.date or self.created                 # when the answer was given (server clock)
+         self.started = self.created or self.date            # when the generation began
++        self.sent_at = parse_ts(raw.get("sent_at"))         # when the harness sent the request (host clock)
++        self.received_at = parse_ts(raw.get("received_at")) # when the harness received the reply (host clock)
++        self.sent_line = None
++        self.recv_line = None
+         self.at_basis = "response Date header" if self.date else ("response created" if self.created else None)
+ 
+     @property
+@@ -90,6 +94,25 @@ class Call:
+         return f"{self.log}#{self.name or self.i}"
+ 
+ 
++def line_of(text: str, key: str, value, start: int = 0) -> int | None:
++    """1-based line where `"<key>": "<value>"` appears, at or after line `start`."""
++    if not isinstance(value, str) or not value:
++        return None
++    pat = re.compile(r'"' + re.escape(key) + r'"\s*:\s*"' + re.escape(value) + r'"')
++    for n, ln in enumerate(text.splitlines(), 1):
++        if n > start and pat.search(ln):
++            return n
++    return None
++
++
+ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+@@ -110,7 +133,17 @@ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+             ref.add("harness-log", f"{who}: {path.name} is not a JSON harness log (request/response/response_headers "
+                                    f"per call), so no time or endpoint can be read from it")
+             return []
+-    calls = [Call(path.name, i, it) for i, it in enumerate(items) if isinstance(it, dict) and "request" in it]
++    calls = []
++    cursors = {"sent_at": 0, "received_at": 0}
++    for i, it in enumerate(items):
++        if not (isinstance(it, dict) and "request" in it):
++            continue
++        c = Call(path.name, i, it)
++        c.sent_line = line_of(text, "sent_at", it.get("sent_at"), cursors["sent_at"])
++        if c.sent_line:
++            cursors["sent_at"] = c.sent_line
++        c.recv_line = line_of(text, "received_at", it.get("received_at"), cursors["received_at"])
++        if c.recv_line:
++            cursors["received_at"] = c.recv_line
++        calls.append(c)
+     if not calls:
+         ref.add("harness-log", f"{who}: {path.name} records no call (no object with a `request`)")
+     for c in calls:
+@@ -118,6 +151,12 @@ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+             ref.add("time", f"{who}: {c.label} carries neither a response Date header nor a `created` time; "
+                             f"its time cannot be read from the log")
+         elif c.created and c.date and (c.created - c.date).total_seconds() > TOLERANCE_S:
+             ref.add("time", f"{who}: {c.label} says it was created at {iso(c.created)}, after its own response "
+                             f"Date {iso(c.date)}: the log contradicts itself")
++        if c.sent_at is None:
++            ref.add("time", f"{who}: {c.label} has no `sent_at` (the harness's request-send time); its "
++                            f"startedAt cannot be read from the log")
++        if c.received_at is None:
++            ref.add("time", f"{who}: {c.label} has no `received_at` (the harness's reply-receive time); its "
++                            f"producedAt cannot be read from the log")
+     return calls
+@@ -222,6 +261,12 @@ def endpoint_of(c: Call, ref: Refusals, who: str, pin: dict | None = None) -> tup
+     if not c.served:
+         ref.add("endpoint", f"{who}: {c.label} went to {c.host} and the log does not say which provider served it "
+                             f"(no response `provider`, no `openrouter_metadata`, no logged /api/v1/generation "
+                             f"stats); the pin to {pin.get('provider')!r} cannot be confirmed and the emitter will "
+                             f"not guess")
+         return None, route
++    if "generation" in c.raw and c.raw.get("generation") is None:
++        ref.add("generation", f"{who}: {c.label} went through {c.host} with no /api/v1/generation reply (null); "
++                             f"the provider that answered is not evidenced by that reply, so no endpoint is "
++                             f"written (bar N4). Re-run with the generation reply logged, or refuse.")
++        return None, route
+     other = {src: n for src, n in c.served.items() if not pin_matches(n, pin)}
+     if other:
+         said = ", ".join(f"{n!r} ({src})" for src, n in other.items())
+diff --git a/kit/emit_custody.py b/kit/emit_custody.py
+--- a/kit/emit_custody.py
++++ b/kit/emit_custody.py
+@@ -174,6 +174,18 @@ def events_log(job: Path, ref: H.Refusals) -> dict:
+         if e.get("event") == "approve":
+-            out["approve"][e.get("role")] = e
++            out["approve"][e.get("role")] = {**e, "_line": n}
+         elif e.get("event") == "pin":
+-            out["pin"][e.get("seat")] = e
++            out["pin"][e.get("seat")] = {**e, "_line": n}
+         elif e.get("event"):
+-            out[e["event"]] = e
++            out[e["event"]] = {**e, "_line": n}
+     return out
+ 
+ 
++def rel_to_job(job: Path, p: Path) -> str:
++    try:
++        return p.resolve().relative_to(job.resolve()).as_posix()
++    except ValueError:
++        return p.as_posix()
++
++
++def time_source(job: Path, file: str, line: int | None, value) -> dict:
++    return {"file": file, "line": line, "time": value}
++
++
+ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+@@ -265,10 +277,16 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datet
+     for i, a in enumerate(b.get("approvals") or []):
+         xa = H.check_approval(a, i, ci, packet, ref)
+         live = ev_log["approve"].get(a.get("role"))
+-        xa["time_source"] = "hand-entered"
++        xa["time_source"] = "hand-entered"
+         if live:
+             for k in ("by", "at"):
+                 if live.get(k) != a.get(k):
+                     ref.add("time" if k == "at" else "approval",
+                             f"bar.approvals[{i}].{k}: the ledger says {a.get(k)!r} but inputs/custody-events.jsonl "
+                             f"logged {live.get(k)!r} when it happened")
+             xa["time_source"] = "logged live (inputs/custody-events.jsonl)"
++            xa["at_source"] = time_source(job, "inputs/custody-events.jsonl", live.get("_line"), live.get("at"))
++        else:
++            xa["at_source"] = time_source(job, "inputs/custody.json", None, a.get("at"))
+         approvals.append({"role": a.get("role"), "by": a.get("by"),
+@@ -290,6 +308,10 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datet
+         if bar_digest and fz.get("bar_sha256") and fz["bar_sha256"] != bar_digest["sha256"]:
+             ref.add("order", f"bar: frozen as {fz['bar_sha256'][:12]} (inputs/custody-events.jsonl) but the bar file "
+                              f"now hashes to {bar_digest['sha256'][:12]}: the bar changed after the freeze")
+     bar = {"digest": bar_digest, "frozenAt": ts(b.get("frozenAt"), "bar.frozenAt", gaps),
+            "author": b.get("author"), "dimensions": dims, "approvals": approvals,
+            "publishedAt": b.get("publishedAt"), "groundTruth": ground, "dissent": b.get("dissent") or []}
++    if fz:
++        bar["x-plumbline"] = {"frozenAt_source": time_source(job, "inputs/custody-events.jsonl",
++                                                             fz.get("_line"), fz.get("at"))}
++    else:
++        bar["x-plumbline"] = {"frozenAt_source": time_source(job, "inputs/custody.json", None, b.get("frozenAt"))}
+     if not b.get("author"):
+@@ -300,6 +322,17 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datet
+     maker = {"name": m.get("name") or pm.get("engine"), "kind": m.get("kind"),
+              "version": m.get("version") or pm.get("version"),
+              "method": digest_of(job, m.get("method_file"), "maker.method", gaps),
+              "model": model_block(m_model, "maker.model", gaps) if m.get("kind") == "model" else None}
++    mk_time_src = {}
++    if mk:
++        mk_log = mk.get("x", {}).get("harness_log")
++        if mk.get("startedAt_source"):
++            mk_time_src["startedAt"] = mk["startedAt_source"]
++        if mk.get("producedAt_source"):
++            mk_time_src["producedAt"] = mk["producedAt_source"]
++        mk["x"]["startedAt_source"] = mk.get("startedAt_source")
++        mk["x"]["producedAt_source"] = mk.get("producedAt_source")
+     if mk:
+         maker["x-plumbline"] = mk["x"]
+@@ -500,10 +533,12 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datet
+     if live and not at:
+         at = live.get("at")
+     if not at:
+         at = H.iso(now)
+-        xp["disposition_at_source"] = "emission time: no disposition time recorded (custody tools/make_record.py convention)"
++        xp["disposition_at_source"] = "emission time: no disposition time recorded (custody tools/make_record.py convention)"
++        disp_src = {"file": None, "line": None, "time": at}
+     elif live:
+         xp["disposition_at_source"] = "logged live (inputs/custody-events.jsonl)"
++        disp_src = time_source(job, "inputs/custody-events.jsonl", live.get("_line"), live.get("at"))
++    else:
++        disp_src = time_source(job, "inputs/custody.json", None, at)
+     disposition = {"state": state, "by": dsp.get("by"), "at": ts(at, "disposition.at", gaps),
+                    "acknowledgesUnobserved": list(dsp.get("acknowledgesUnobserved") or [])}
++    disposition["x-plumbline"] = {"at_source": disp_src}
+@@ -570,6 +605,13 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datet
+     xp["time_tolerance_s"] = H.TOLERANCE_S
+     xp["times"] = {"startedAt": "harness log" if mk.get("startedAt") else "hand-entered",
+                    "producedAt": "harness log" if mk.get("producedAt") else "hand-entered"}
++    time_sources = {}
++    if mk_time_src:
++        time_sources.update(mk_time_src)
++    time_sources["frozenAt"] = bar["x-plumbline"]["frozenAt_source"]
++    time_sources["disposition.at"] = disp_src
++    for i, a in enumerate(approvals):
++        time_sources[f"bar.approvals[{i}].at"] = (a.get("x-plumbline") or {}).get("at_source")
++    for c in checks:
++        x = c.get("x-plumbline") or {}
++        if x.get("at_source"):
++            time_sources[f"checks[{(x.get('pass_id'))}/{c.get('dimension')}].at"] = x["at_source"]
++    for k in controls:
++        x = k.get("x-plumbline") or {}
++        if x.get("at_source"):
++            time_sources[f"controls[{k.get('id')}].at"] = x["at_source"]
++    xp["time_sources"] = time_sources
+     check_order(pred, packet, ci, now, ref)
+@@ -660,6 +702,17 @@ def maker_history(job: Path, ev_dir: Path, ci: dict, m: dict, ref: H.Refusals, pi
+     calls = [c for c in calls if c.at]
+     if not calls:
+         return {}
+     annotate(calls, "maker", (m.get("model") or {}).get("identifier"), ref, pin)
++    for c in calls:
++        if c.host in H.AGGREGATORS and "generation" in c.raw and c.raw.get("generation") is None:
++            ref.add("generation", f"maker: {c.label} went through {c.host} with no /api/v1/generation reply (null); "
++                                 f"the provider that answered is not evidenced, so no endpoint is written (bar N4)")
+     check_pin_order(pin, calls, "maker", ref)
+-    first = min(calls, key=lambda c: c.started)
+-    last = max(calls, key=lambda c: c.at)
+-    started, produced = first.started, last.at
++    first = min(calls, key=lambda c: c.sent_at or c.started)
++    last = max(calls, key=lambda c: c.received_at or c.at)
++    started, produced = first.sent_at or first.started, last.received_at or last.at
++    if first.sent_at is None:
++        ref.add("time", f"maker: the first call {first.label} has no `sent_at`; startedAt has no source")
++    if last.received_at is None:
++        ref.add("time", f"maker: the last call {last.label} has no `received_at`; producedAt has no source")
+     H.cross_check(ref, "startedAt", ci.get("startedAt"), started, f"harness log {first.label}")
+     H.cross_check(ref, "producedAt", ci.get("producedAt"), produced, f"harness log {last.label}")
+     out = {"startedAt": H.iso(started), "producedAt": H.iso(produced), "endpoint": last.endpoint,
+-           "x": {**route_x(log, calls), "startedAt_basis": f"{first.label} response "
+-                 + ("created" if first.created else "Date header"), "producedAt_basis": f"{last.label} {last.at_basis}"}}
++           "startedAt_source": time_source(job, rel_to_job(job, log), first.sent_line, H.iso(started)),
++           "producedAt_source": time_source(job, rel_to_job(job, log), last.recv_line, H.iso(produced)),
++           "x": {**route_x(log, calls), "startedAt_basis": f"{first.label} sent_at (harness log line {first.sent_line})",
++                 "producedAt_basis": f"{last.label} received_at (harness log line {last.recv_line})"}}
+     rx = routing_x(calls, pin, "maker", gaps if gaps is not None else Gaps())
+@@ -690,6 +743,10 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusals
+     calls = [c for c in H.read_log(log, ref, who) if c.at]
+     if not calls:
+         return {}
+     annotate(calls, who, (e.get("model") or {}).get("identifier"), ref, pin)
++    for c in calls:
++        if c.host in H.AGGREGATORS and "generation" in c.raw and c.raw.get("generation") is None:
++            ref.add("generation", f"{

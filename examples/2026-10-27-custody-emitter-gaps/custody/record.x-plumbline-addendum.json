@@ -1,0 +1,18 @@
+{
+  "record": "custody/record.custody.json",
+  "record_sha256": "749b825bd745d44361391eaa809c845e0f79f0931cb7a77d05cd410e2e466bc8",
+  "why": "The ff350e3 emitter that the bar requires has no pass-through for x-plumbline fields, so the bar's P6 spend and the Emitter limitation are written here, beside the record, and are not in it.",
+  "x-plumbline": {
+    "spend": {
+      "model_calls_usd": 0.303493375,
+      "basis": "OpenRouter key usage after batch 4 (custody/evidence/eval/iter3-b4/n6--key-usage-after.json), the job's only key; EVAL-ITER3-VERDICT.md",
+      "grokbot_usd": null,
+      "grokbot_note": "Grok Bot spend (Orchestrator, Maker operator, Evaluator bot) is not visible to the job and is declared unverifiable."
+    },
+    "emitter": {
+      "revision": "ff350e3",
+      "tree": "4abcfa08f84d3b34849ad64bcfc281415772ffc1",
+      "limitation": "Known limitation: that emitter has gap 1 (producedAt), which this job repairs."
+    }
+  }
+}

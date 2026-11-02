@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/evaluator-record.schema.json",
+  "title": "Evaluator output record",
+  "description": "Structured evaluator output (E-DI Contracts v1.1 s5). Structured data, never prose alone; prose may accompany it but may not replace it. Every score carries evidence: a score without evidence is discarded, not averaged. A record with ratified=false can never be part of an `accepted` terminal state.",
+  "type": "object",
+  "required": ["job_id", "iteration", "dimensions", "pass_rule", "violations", "verdict", "ground_truth_ref", "evaluator_identity", "channel_blind", "ratified"],
+  "additionalProperties": false,
+  "properties": {
+    "job_id": { "type": "string", "minLength": 1 },
+    "iteration": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Counted from 0 before the first generation, incremented once per generation. Written to the record at generation time (the worked trace in s3: generation 1 => iteration 1)."
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "score", "scale", "anchor_note", "evidence_channel", "ground_truth_access"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "score": { "type": ["integer", "number"] },
+          "scale": { "type": "string" },
+          "anchor_note": { "type": "string", "description": "What this score means here. The evidence accompanying the score." },
+          "evidence_channel": { "type": "string", "description": "Which channel produced the evidence for this dimension (s7.2)." },
+          "ground_truth_access": {
+            "enum": ["none", "blind_to_gt", "saw_gt"],
+            "description": "Closed enum (s5). saw_gt invalidates this dimension's evidence — the channel had access to the answer it was checking — and the dimension then fails."
+          },
+          "evidence_ref": {
+            "type": "string",
+            "description": "Where the independent evidence lives (path, artifact id, measurement). Optional but strongly preferred: the orchestrator must be able to re-examine it without re-running the loop."
+          }
+        }
+      }
+    },
+    "pass_rule": {
+      "type": "object",
+      "required": ["accept", "dimension_floor", "reject", "cap"],
+      "additionalProperties": false,
+      "description": "Echoed from the job packet, fixed before the run. The evaluator reports it; it does not choose it.",
+      "properties": {
+        "accept": { "type": "number" },
+        "dimension_floor": { "type": "number" },
+        "reject": { "type": "number" },
+        "cap": { "type": "integer" }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "severity", "evidence", "fix"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "type": "string", "description": "Violation class, so cheap defects route to automatic regeneration and consequential ones route to a person." },
+          "severity": { "enum": ["P0", "P1", "P2"] },
+          "evidence": { "type": "string", "description": "The quoted text or observed behaviour that constitutes the violation." },
+          "fix": { "type": "string", "description": "The change that resolves it. Sent back to the generator as a constraint on the next iteration." }
+        }
+      }
+    },
+    "verdict": {
+      "enum": ["accept", "regenerate", "needs_human", "reject"],
+      "description": "RECOMMENDED verdict only. s4: the evaluator emits scores, violations and a recommended verdict; it does not own the loop. The orchestrator is the sole applier of the pass rule, the cap, and escalation. s5: exactly these four values — implementations must not invent synonyms (no 'minor-revision' alongside 'regenerate')."
+    },
+    "ground_truth_ref": { "type": "string", "minLength": 1, "description": "The artifact or invariant this scoring used." },
+    "evaluator_identity": { "type": "string", "minLength": 1, "description": "model + version. If generator and evaluator are the same model, s4 requires that fact to be recorded with the job." },
+    "channel_blind": { "type": "boolean", "description": "s5: asserts every evidence channel met s7.2." },
+    "ratified": { "type": "boolean", "description": "s5: asserts no must-ask value is proposed/unratified. ratified=false can never be part of an `accepted` terminal state." },
+    "unevidenced_dimensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Dimensions that could not be judged. s5: a dimension with no evidence FAILS, and a job containing one can never reach `accepted` — its exit is a forced `needs_human`, not `rejected`. Do not synthesise a below-floor score for it: that puts an invented number into min() and misreports why the job stopped."
+    },
+    "notes": { "type": "string", "description": "Prose. May accompany the structured record; may not replace it." }
+  }
+}

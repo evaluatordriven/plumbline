@@ -1,0 +1,68 @@
+{
+ "id": "V8",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "planted": {
+   "planted": {
+    "close_rc": 4,
+    "close_out": "nce\n  OK (schema-verified)\n  SKIPPED        custody/ — 14 file(s): history and inputs, not current terms (skipped by name, and counted)\n  SKIPPED        inputs/ — 5 file(s): history and inputs, not current terms (skipped by name, and counted)\n  POPULATION     7 file(s) present · 4 judged · 19 skipped by name · 3 not judged by shape (no checker applies to .jsonl, .lock, .md)\n  OK             ...026-10-28-s1-t4-tool-built/iteration-1-eval-record.json  OK (schema-verified)\n  OK             ...s1/work/v8/jobs/2026-10-28-s1-t4-tool-built/packet.json  OK (schema-verified)\n  OK             packet.json [role separation]                               OK\n  NOT-CHECKABLE  .../v8/jobs/2026-10-28-s1-t4-tool-built/passes/pass-a.json  channel output: a channel artifact, not a §5 record — the corpus declares no shape for it, so there \n  NOT-CHECKABLE  ...26-10-28-s1-t4-tool-built/spend/key-usage-baseline.json  no checker applies to this shape (reported, not skipped)\n\n  3 ok · 0 failed · 2 not-checkable\n  not-checkable is not a pass: a record no checker can read is a finding.\n\n  job-close: CLOSEABLE — the packet is readable and every record a checker can read passed.\n  close recorded in packet.json — verdict, date, revision, counts, and 19 skipped file(s) named\ncustody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v8/jobs/2026-10-28-s1-t4-tool-built/custody/record.custody.json  sha256 8a2a691137fb2c6532c0a453626d4bcfc3f01aa1fab2fa194f2629a49248652e\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n\nclose:\n  packet: disposition_state=given\n\ncustody:\nFAIL allowance x-plumbline.allowances.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v8/jobs/2026-10-28-s1-t4-tool-built/custody/record.custody.json:0\nNOT CLOSED: Plumbline verify failed (allowance)\n  run-log: appended the close_refused row for 2026-10-28-s1-t4-tool-built (2 rows)\n",
+    "rows": [
+     {
+      "event": "opened",
+      "kind": null,
+      "job_id": "2026-10-28-s1-t4-tool-built"
+     },
+     {
+      "event": "close_refused",
+      "kind": "allowance",
+      "job_id": "2026-10-28-s1-t4-tool-built"
+     }
+    ],
+    "build_error": "step close rc 4",
+    "steps": [
+     "open",
+     "freeze",
+     "approve-buyer",
+     "approve-specialist",
+     "pin-maker",
+     "pin-eval-m",
+     "init-spend",
+     "relay",
+     "amendment",
+     "generation-open",
+     "maker-call",
+     "generation-close",
+     "eval-eval_artifact",
+     "eval-eval_k1",
+     "eval-eval_k2",
+     "evaluation",
+     "dispose",
+     "close"
+    ],
+    "reemit": {
+     "rc": 4,
+     "out": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v8/jobs/2026-10-28-s1-t4-tool-built/custody/record.custody.json  sha256 e0a708db647d84756e145a72dfa2ebf9513962f7fe1b6ed68b2dc07efbe74654\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\nFAIL allowance x-plumbline.allowances.hand_times /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/v8/jobs/2026-10-28-s1-t4-tool-built/custody/record.custody.json:0\nNOT CLOSED: Plumbline verify failed (allowance)\n"
+    }
+   }
+  },
+  "clean": {
+   "clean": {
+    "close_rc": 0,
+    "close_out": "26-10-28-s1-t4-tool-built/packet.json  OK (schema-verified)\n  OK             packet.json [role separation]                               OK\n  NOT-CHECKABLE  .../t4/jobs/2026-10-28-s1-t4-tool-built/passes/pass-a.json  channel output: a channel artifact, not a §5 record — the corpus declares no shape for it, so there \n  NOT-CHECKABLE  ...jobs/2026-10-28-s1-t4-tool-built/spend/key-reading.json  no checker applies to this shape (reported, not skipped)\n  NOT-CHECKABLE  ...26-10-28-s1-t4-tool-built/spend/key-usage-baseline.json  no checker applies to this shape (reported, not skipped)\n\n  3 ok · 0 failed · 3 not-checkable\n  not-checkable is not a pass: a record no checker can read is a finding.\n\n  job-close: CLOSEABLE — the packet is readable and every record a checker can read passed.\n  close recorded in packet.json — verdict, date, revision, counts, and 19 skipped file(s) named\ncustody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t4/jobs/2026-10-28-s1-t4-tool-built/custody/record.custody.json  sha256 b45149b4f1c2fcb59ce75bf555e7533283f5df879d69457012f7d208c1e9be03\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n\nclose:\n  packet: disposition_state=given\n\ncustody:\n  run-log: appended the closed row for 2026-10-28-s1-t4-tool-built (2 rows)\n\njob closed: /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t4/jobs/2026-10-28-s1-t4-tool-built\n",
+    "rows": [
+     {
+      "event": "opened",
+      "kind": null,
+      "job_id": "2026-10-28-s1-t4-tool-built"
+     },
+     {
+      "event": "closed",
+      "kind": null,
+      "job_id": "2026-10-28-s1-t4-tool-built"
+     }
+    ]
+   }
+  }
+ }
+}

@@ -1,0 +1,71 @@
+{
+ "check": "N3",
+ "verdict": "FAIL",
+ "why": [
+  "/bar/frozenAt: source file 'inputs/custody.json' is not a ledger or harness log in the job",
+  "/bar/approvals/0/at: source file 'inputs/custody.json' is not a ledger or harness log in the job",
+  "/bar/approvals/1/at: source file 'inputs/custody.json' is not a ledger or harness log in the job",
+  "/disposition/at: source file 'inputs/custody.json' is not a ledger or harness log in the job"
+ ],
+ "source_keys": [
+  "timeSources"
+ ],
+ "fields": [
+  {
+   "field": "/bar/frozenAt",
+   "value": "2026-10-20T10:00:00Z"
+  },
+  {
+   "field": "/bar/approvals/0/at",
+   "value": "2026-10-20T10:05:00Z"
+  },
+  {
+   "field": "/bar/approvals/1/at",
+   "value": "2026-10-20T10:10:00Z"
+  },
+  {
+   "field": "/startedAt",
+   "value": "2026-10-20T11:00:00Z",
+   "source": {
+    "file": "harness-maker-fixture.log",
+    "line": 54
+   },
+   "line_text": "\"sent_at\": \"2026-10-20T11:00:00Z\",",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/producedAt",
+   "value": "2026-10-20T11:00:07Z",
+   "source": {
+    "file": "harness-maker-fixture.log",
+    "line": 55
+   },
+   "line_text": "\"received_at\": \"2026-10-20T11:00:07Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/checks/0/at",
+   "value": "2026-10-20T12:00:03Z",
+   "source": {
+    "file": "harness-eval-a.log",
+    "line": 41
+   },
+   "line_text": "\"received_at\": \"2026-10-20T12:00:03Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/checks/1/at",
+   "value": "2026-10-20T12:00:03Z",
+   "source": {
+    "file": "harness-eval-a.log",
+    "line": 41
+   },
+   "line_text": "\"received_at\": \"2026-10-20T12:00:03Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/disposition/at",
+   "value": "2026-10-20T13:00:00Z"
+  }
+ ]
+}

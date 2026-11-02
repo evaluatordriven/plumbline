@@ -1,0 +1,90 @@
+{
+ "check": "N3",
+ "verdict": "PASS",
+ "why": [],
+ "source_keys": [
+  "timeSources"
+ ],
+ "fields": [
+  {
+   "field": "/bar/frozenAt",
+   "value": "2026-10-20T10:00:00Z",
+   "source": {
+    "file": "inputs/custody-events.jsonl",
+    "line": 1
+   },
+   "line_text": "{\"event\": \"freeze\", \"at\": \"2026-10-20T10:00:00Z\", \"bar_file\": \"custody/bar.md\"}",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/bar/approvals/0/at",
+   "value": "2026-10-20T10:05:00Z",
+   "source": {
+    "file": "inputs/custody-events.jsonl",
+    "line": 2
+   },
+   "line_text": "{\"event\": \"approve\", \"role\": \"buyer\", \"at\": \"2026-10-20T10:05:00Z\", \"barDigest\": \"e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24\"}",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/bar/approvals/1/at",
+   "value": "2026-10-20T10:10:00Z",
+   "source": {
+    "file": "inputs/custody-events.jsonl",
+    "line": 3
+   },
+   "line_text": "{\"event\": \"approve\", \"role\": \"specialist\", \"at\": \"2026-10-20T10:10:00Z\", \"barDigest\": \"e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24\"}",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/startedAt",
+   "value": "2026-10-20T11:00:00Z",
+   "source": {
+    "file": "harness-maker-fixture.log",
+    "line": 54
+   },
+   "line_text": "\"sent_at\": \"2026-10-20T11:00:00Z\",",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/producedAt",
+   "value": "2026-10-20T11:00:07Z",
+   "source": {
+    "file": "harness-maker-fixture.log",
+    "line": 55
+   },
+   "line_text": "\"received_at\": \"2026-10-20T11:00:07Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/checks/0/at",
+   "value": "2026-10-20T12:00:03Z",
+   "source": {
+    "file": "harness-eval-a.log",
+    "line": 41
+   },
+   "line_text": "\"received_at\": \"2026-10-20T12:00:03Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/checks/1/at",
+   "value": "2026-10-20T12:00:03Z",
+   "source": {
+    "file": "harness-eval-a.log",
+    "line": 41
+   },
+   "line_text": "\"received_at\": \"2026-10-20T12:00:03Z\"",
+   "verdict": "PASS"
+  },
+  {
+   "field": "/disposition/at",
+   "value": "2026-10-20T13:00:00Z",
+   "source": {
+    "file": "inputs/custody-events.jsonl",
+    "line": 5
+   },
+   "line_text": "{\"event\": \"dispose\", \"at\": \"2026-10-20T13:00:00Z\"}",
+   "verdict": "PASS"
+  }
+ ]
+}

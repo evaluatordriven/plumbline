@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/x-plumbline/x-plumbline-v1.schema.json",
+  "title": "Plumbline custody record with x-plumbline v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["_type", "subject", "predicateType", "predicate"],
+  "properties": {
+    "_type": {"const": "https://in-toto.io/Statement/v1"},
+    "subject": {"type": "array", "items": {"$ref": "#/$defs/subjectItem"}},
+    "predicateType": {"const": "https://evaluatordriven.com/custody/v1"},
+    "predicate": {"$ref": "#/$defs/predicate"}
+  },
+  "$defs": {
+    "subjectItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "digest"],
+      "properties": {
+        "name": {"type": "string"},
+        "digest": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sha256"],
+          "properties": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+        }
+      }
+    },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["x-plumbline"],
+      "properties": {
+        "x-plumbline": {"$ref": "#/$defs/xPlumbline"}
+      }
+    },
+    "xPlumbline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "hand_times"],
+      "properties": {
+        "job_id": {"type": "string"},
+        "sources": {"type": "object", "additionalProperties": {"type": "string"}},
+        "events_log": {"type": "object", "additionalProperties": true},
+        "terminal_state": {"type": ["string", "null"]},
+        "outcome": {"type": ["string", "null"]},
+        "verdict": {"type": ["string", "null"]},
+        "iteration": {"type": ["integer", "null"]},
+        "s5_record": {"type": "object", "additionalProperties": true},
+        "earlier_iterations": {"type": "array", "items": {"type": "string"}},
+        "pass_rule": {},
+        "disposition_source": {"type": "string"},
+        "packet": {"type": "object", "additionalProperties": true},
+        "emitter": {"type": "object", "additionalProperties": true},
+        "time_tolerance_s": {"type": "integer"},
+        "times": {"type": "object", "additionalProperties": {"type": "string"}},
+        "timeSources": {"type": "object", "additionalProperties": true},
+        "time_sources": {"type": "object", "additionalProperties": true},
+        "emittedAt": {"type": "string"},
+        "schema": {"const": "plumbline/x-plumbline/v1"},
+        "hand_times": {"type": "array", "items": {"$ref": "#/$defs/handTime"}},
+        "allowances": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "hand_times": {"$ref": "#/$defs/allowance"}
+          }
+        },
+        "generations": {"type": "array", "items": {"$ref": "#/$defs/ledgerLine"}},
+        "evaluations": {"type": "array", "items": {"$ref": "#/$defs/ledgerLine"}},
+        "relays": {"type": "array", "items": {"$ref": "#/$defs/ledgerLine"}},
+        "amendments": {"type": "array", "items": {"$ref": "#/$defs/ledgerLine"}},
+        "spend": {"$ref": "#/$defs/spend"},
+        "inputs": {"type": "object", "additionalProperties": true},
+        "gaps": {"type": "array", "items": {"$ref": "#/$defs/gap"}},
+        "disposition_at_source": {"type": "string"}
+      }
+    },
+    "handTime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "file", "line", "source"],
+      "properties": {
+        "field": {"type": "string"},
+        "file": {"type": "string"},
+        "line": {"type": ["integer", "null"]},
+        "source": {"type": "string"}
+      }
+    },
+    "ledgerLine": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["event", "at", "writer", "source"],
+      "properties": {
+        "event": {"type": "string"},
+        "at": {"type": "string"},
+        "writer": {"type": "string"},
+        "source": {"type": "string"}
+      }
+    },
+    "spend": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["calls_sum_usd", "key_delta_usd", "total_usd", "tolerance_usd"],
+      "properties": {
+        "calls_sum_usd": {"type": "number"},
+        "key_delta_usd": {"type": "number"},
+        "total_usd": {"type": "number"},
+        "tolerance_usd": {"const": 0.0001},
+        "source": {"type": ["string", "null"]}
+      }
+    },
+    "gap": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["field", "reason", "hard"],
+      "properties": {
+        "field": {"type": "string"},
+        "reason": {"type": "string"},
+        "hard": {"type": "boolean"}
+      }
+    },
+    "allowance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["switch", "writer", "at"],
+      "properties": {
+        "switch": {"const": "--allow-hand-times"},
+        "writer": {"type": "string"},
+        "at": {"type": "string"}
+      }
+    },
+    "xNested": {
+      "type": "object",
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,9 @@
+call: maker_iter2_gen4_call3
+status: LOST
+started: 2026-10-28 08:27:48 EDT (12:27:48Z), messages call-3.messages.json (sha256 8ac905ce194cbe3019172b26daf7bfb85725cc807a95151d16d2f7f2c161ddf1)
+ended: killed by the box reboot at about 08:36 EDT (12:36Z); not operator action (the operator did not kill it)
+exit file: none (call-3.or_call.exit was never written)
+harness log entry: none (log holds 12 entries; no entry was added or fabricated)
+stdout/stderr: call-3.or_call.stdout and call-3.or_call.stderr are empty
+billing: probably billed by OpenRouter; key usage at 08:42:27 EDT read 0.221109746 vs gen-4 before-read 0.1612795, delta 0.059830246, minus calls 1+2 total_cost 0.044478891 = about $0.0154 unaccounted, attributed to this call
+disposition: CoS ruling (option A), Steve approved 08:44 EDT; call-3.messages.json re-sent unchanged as maker_iter2_gen4_call4

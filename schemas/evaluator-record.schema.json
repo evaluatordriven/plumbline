@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/evaluator-record.schema.json",
+  "title": "Plumbline \u00a75 evaluator record (derived verbatim from the corpus)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "passes",
+    "dimensions",
+    "pass_rule",
+    "violations",
+    "verdict",
+    "ground_truth_ref",
+    "ground_truth_version",
+    "ground_truth_hardness",
+    "mandate_ref",
+    "instrument_in_force",
+    "evaluator_identity",
+    "channel_blind",
+    "ratified"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string"
+    },
+    "iteration": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "passes": {
+      "description": "One entry per run that produced a reading, or was attempted and produced none (\u00a75). The pass itself is a filed artifact with its own shape (pass.schema.json); this entry names it. A record's scores are attributable only to the passes it names, and a named pass that is not filed fails the check (C34).",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "pass_id",
+          "kind",
+          "status",
+          "artifact"
+        ],
+        "properties": {
+          "pass_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "kind": {
+            "enum": [
+              "scored",
+              "confirmation"
+            ]
+          },
+          "status": {
+            "enum": [
+              "filed",
+              "void"
+            ]
+          },
+          "artifact": {
+            "description": "The pass's own filed file, resolved relative to this record (@see \u00a710.1).",
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "score",
+          "observation",
+          "observation_channel",
+          "ground_truth_access"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "score": {
+            "type": "number"
+          },
+          "scale": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "anchor_note": {
+            "type": "string"
+          },
+          "observation": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "observation_channel": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "ground_truth_access": {
+            "enum": [
+              "none",
+              "blind_to_gt",
+              "saw_gt"
+            ]
+          }
+        }
+      }
+    },
+    "pass_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accept",
+        "dimension_floor",
+        "reject",
+        "cap"
+      ],
+      "properties": {
+        "accept": {
+          "type": "number"
+        },
+        "dimension_floor": {
+          "type": "number"
+        },
+        "reject": {
+          "type": "number"
+        },
+        "cap": {
+          "type": "number"
+        }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "class",
+          "observation"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "class": {
+            "enum": [
+              "artifact_missed_standard",
+              "standard_moved",
+              "dimension_unauthorized",
+              "frame_at_fault"
+            ]
+          },
+          "observation": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "remedy": {
+            "type": "string"
+          },
+          "dimension": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "verdict": {
+      "enum": [
+        "accept",
+        "regenerate",
+        "needs_owner",
+        "reject"
+      ]
+    },
+    "ground_truth_ref": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "ground_truth_version": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "ground_truth_hardness": {
+      "enum": [
+        "INVARIANT",
+        "DOCUMENT",
+        "PRIOR"
+      ]
+    },
+    "mandate_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "doc",
+        "version"
+      ],
+      "properties": {
+        "doc": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "instrument_in_force": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "rubric_sha256",
+        "code_sha256"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "rubric_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "code_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "evaluator_identity": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "channel_blind": {
+      "type": "boolean"
+    },
+    "ratified": {
+      "type": "boolean"
+    },
+    "instance_extensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "label"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "label": {
+            "const": "instance-specific"
+          },
+          "value": true
+        }
+      }
+    }
+  },
+  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/smoitozo/e-di@a48a4645aaa2 (Contracts v1.22.0). Copied shape-for-shape: field names, requiredness and additionalProperties are the corpus's. Plumbline additions travel in instance_extensions[] (name + label:'instance-specific' + value), never as new top-level fields, so every record still validates against the corpus \u00a75 shape."
+}

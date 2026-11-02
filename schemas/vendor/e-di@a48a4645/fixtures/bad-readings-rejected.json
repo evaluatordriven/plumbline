@@ -1,0 +1,14 @@
+{
+  "entry": "B",
+  "instrument_profile": "mvi",
+  "job_name": "readings-reject",
+  "artifact": "x.md",
+  "buyer": "Owner",
+  "maker": "m",
+  "evaluator": "e",
+  "mode": "readings",
+  "ratified": true,
+  "terminal_state": "rejected",
+  "outcome": "rejected",
+  "reads_before_freeze": "none — synthetic negative fixture"
+}

@@ -1,0 +1,14 @@
+Text in this repository (README.md, AGENTS.md, CHANGELOG.md, CONTRIBUTING.md, SECURITY.md, docs/,
+standards/, the Markdown files under kit/, and job records) is licensed under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0).
+
+Copyright 2026 Steve Moitozo II.
+
+You may share and adapt it for any purpose, including commercially, if you give
+appropriate credit to Steve Moitozo II, link the license, and indicate changes.
+
+License text: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Code in this repository (kit/, tools/, tests/, gate/, schemas/, and their fixtures,
+except the Markdown files under kit/) is licensed under the Apache License, Version 2.0;
+see LICENSE-CODE.

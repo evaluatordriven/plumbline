@@ -1,0 +1,15 @@
+{
+  "pass_id": "s1-b3-t6-amend2",
+  "kind": "scored",
+  "status": "filed",
+  "channel": "S1 script, batch 3, T6 scored under Amendment 2",
+  "rubric_sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+  "code_sha256": "c40c640cdb0ec9ba383acb6cb4e46c54d5012bc9bf78445cd1689197058953af",
+  "run_ref": "custody/evidence/T6-amend2.json",
+  "scores": [
+    {
+      "dimension": "T6",
+      "score": 1
+    }
+  ]
+}

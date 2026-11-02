@@ -1,0 +1,12 @@
+== brief.json  (temp out-dir /tmp/tmp.f9aN8k77br)
+wrote packet.json
+  OK (schema-verified)
+emit exit 0
+OK (schema-verified)
+gate exit 0
+== brief.entry-B.json  (temp out-dir /tmp/tmp.73gkZZYzsz)
+wrote packet.json
+  OK (schema-verified)
+emit exit 0
+OK (schema-verified)
+gate exit 0

@@ -1,0 +1,48 @@
+{
+ "dimensions": [
+  {
+   "name": "clarity",
+   "score": 8.0,
+   "observation": "",
+   "observation_channel": "blind back-read",
+   "ground_truth_access": "blind_to_gt"
+  }
+ ],
+ "pass_rule": {
+  "accept": 8.5,
+  "dimension_floor": 7.0,
+  "reject": 6.0,
+  "cap": 3
+ },
+ "violations": [],
+ "verdict": "accept",
+ "ground_truth_ref": "Vendor docs snapshot",
+ "ground_truth_version": "pinned for the job",
+ "ground_truth_hardness": "DOCUMENT",
+ "mandate_ref": {
+  "doc": "EDI-MANDATE.md",
+  "version": "short form 2026-09-24"
+ },
+ "instrument_in_force": {
+  "version": "fixture-stamp",
+  "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "code_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+ },
+ "evaluator_identity": "fixture-evaluator",
+ "channel_blind": true,
+ "ratified": true,
+ "passes": [
+  {
+   "pass_id": "bad-evaluator-record-empty-observation-A",
+   "kind": "scored",
+   "status": "filed",
+   "artifact": "pass-bad-evaluator-record-empty-observation-A.json"
+  },
+  {
+   "pass_id": "bad-evaluator-record-empty-observation-B",
+   "kind": "scored",
+   "status": "filed",
+   "artifact": "pass-bad-evaluator-record-empty-observation-B.json"
+  }
+ ]
+}

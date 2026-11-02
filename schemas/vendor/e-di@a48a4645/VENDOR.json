@@ -1,0 +1,199 @@
+{
+  "source_repo": "https://github.com/smoitozo/e-di",
+  "commit": "a48a4645aaa29947fdc17168d26c69c849941580",
+  "copied_by": "for rel in <the 45 paths below>; do git -C \"$CORPUS_GIT\" show \"a48a4645:schemas/$rel\" > \"schemas/vendor/e-di@a48a4645/$rel\"; done; (cd schemas/vendor/e-di@a48a4645 && sha256sum <the 45 paths>)  # CORPUS_GIT = a clean smoitozo/e-di checkout at a48a4645aaa29947fdc17168d26c69c849941580",
+  "files": {
+    "job-packet.schema.json": {
+      "original_path": "schemas/job-packet.schema.json",
+      "sha256": "afde653b37eb19c7f890a12de22abde4940209c9580871a5aa7fbf504339397b"
+    },
+    "evaluator-record.schema.json": {
+      "original_path": "schemas/evaluator-record.schema.json",
+      "sha256": "008f399fb3ed5c4ed57baaa65efa1e64cadaa0deda8c76264a9d073858838de5"
+    },
+    "fixtures/bad-census-on-scored.json": {
+      "original_path": "schemas/fixtures/bad-census-on-scored.json",
+      "sha256": "7d994b12007516cd08b713f29805f2af8a815ae4251f65616cf4855730eba8eb"
+    },
+    "fixtures/bad-entry-b-no-reads.json": {
+      "original_path": "schemas/fixtures/bad-entry-b-no-reads.json",
+      "sha256": "ee236e7b7f75a0ae490e77f1bd4ec7e21a9521f428c33acc3cff18b8f724ca88"
+    },
+    "fixtures/bad-evaluator-record-below-floor-unnamed.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-below-floor-unnamed.json",
+      "sha256": "f2e34f74bef5cd20a1904bc72edc96390d97fe82c9d32f40e4e18d15bd65b038"
+    },
+    "fixtures/bad-evaluator-record-empty-observation.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-empty-observation.json",
+      "sha256": "cead3328d68d7f459671d90a662ad1874cf39ed1f892d156fc0adc303eb04e09"
+    },
+    "fixtures/bad-evaluator-record-extra-key.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-extra-key.json",
+      "sha256": "cc86b5b16b899b95782770c36823920975b6d3162bcd4ba20f50920151c38af8"
+    },
+    "fixtures/bad-evaluator-record-instrument-string.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-instrument-string.json",
+      "sha256": "7915f50b3a1c35d0853fb6ff38cd61a5c27def001317bd84f8507b1d75f766a7"
+    },
+    "fixtures/bad-evaluator-record-pass-disagreement.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-pass-disagreement.json",
+      "sha256": "ebddd469fee0bce7556b4adbd86a5e67de97cf75855f68f54887e9ddcff2e4fa"
+    },
+    "fixtures/bad-evaluator-record-regenerate-without-violation.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-regenerate-without-violation.json",
+      "sha256": "a0273b90fece11d5565f877833f79a5be9032eebd70a2c556d0eb4c3ee8971c8"
+    },
+    "fixtures/bad-evaluator-record-unattributable-pass.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-unattributable-pass.json",
+      "sha256": "8b87052685746f55442a8efc07931d16e07454b543ae0bc8826d90b55f91ae5c"
+    },
+    "fixtures/bad-evaluator-record-unfiled-pass.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-unfiled-pass.json",
+      "sha256": "1ef9b8439946d6fa8fc17c332645f4d03c701e96c0379472485e7a19169b0fa0"
+    },
+    "fixtures/bad-evaluator-record-unlabelled-extension.json": {
+      "original_path": "schemas/fixtures/bad-evaluator-record-unlabelled-extension.json",
+      "sha256": "3a6650ccd587a920410832243b55d540a510511ac9f67dd1d5e7409640127fbe"
+    },
+    "fixtures/bad-mode-absent.json": {
+      "original_path": "schemas/fixtures/bad-mode-absent.json",
+      "sha256": "d9686a20725a424b93459ce34dea5227a1c32a3670cb47fd4a3b72da9bda900e"
+    },
+    "fixtures/bad-owner-evaluator-object.json": {
+      "original_path": "schemas/fixtures/bad-owner-evaluator-object.json",
+      "sha256": "c47948aab46146760840c5c1d777da754866628fcfd8c31777f61e7694aac4fc"
+    },
+    "fixtures/bad-readings-empty-bounds.json": {
+      "original_path": "schemas/fixtures/bad-readings-empty-bounds.json",
+      "sha256": "1803506b1ddf8eef6fee6d1cc54892011b343e3a1d41356560492d2fb1d1478f"
+    },
+    "fixtures/bad-readings-rejected.json": {
+      "original_path": "schemas/fixtures/bad-readings-rejected.json",
+      "sha256": "ea6b8ca521603552239a20404fef9f929a1f6cac753fd790fc5aedf0b023de73"
+    },
+    "fixtures/bad-unratified-accept.json": {
+      "original_path": "schemas/fixtures/bad-unratified-accept.json",
+      "sha256": "3569f15ad50e901165e70aff2dfb270d36f4901f72067ef9acbefaf5bff0702e"
+    },
+    "fixtures/bad-unratified-filled.json": {
+      "original_path": "schemas/fixtures/bad-unratified-filled.json",
+      "sha256": "4084932283470ebbe8e1cb20767f2271431b5ffe8a6aa9136f134d9fbf24b132"
+    },
+    "fixtures/evaluator-record-example.json": {
+      "original_path": "schemas/fixtures/evaluator-record-example.json",
+      "sha256": "c925b835d2e33c638412c28db9853f85184f22bfe9f75a048aa1501a0e50e2f9"
+    },
+    "fixtures/evaluator-record-saw-gt.json": {
+      "original_path": "schemas/fixtures/evaluator-record-saw-gt.json",
+      "sha256": "c8d5931577d6adf904cdd04996345ccf9128e63843d6e67482999b609c56a3c0"
+    },
+    "fixtures/example-job-packet.json": {
+      "original_path": "schemas/fixtures/example-job-packet.json",
+      "sha256": "e58950ef6916bf37d163ec86f412438aa8390c565edfd2195a1ac39d344eab9e"
+    },
+    "fixtures/mvi-job-packet.json": {
+      "original_path": "schemas/fixtures/mvi-job-packet.json",
+      "sha256": "f1e25b7cb2f0f3205c89fc6387da2d209d39f0241733e947c9b9c6bcc1270d48"
+    },
+    "fixtures/pass-bad-evaluator-record-below-floor-unnamed-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-below-floor-unnamed-A.json",
+      "sha256": "44581b461e4fb1c454483478aba727b370d51bb86992983d2516d1cf5ce727c9"
+    },
+    "fixtures/pass-bad-evaluator-record-below-floor-unnamed-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-below-floor-unnamed-B.json",
+      "sha256": "803733ce6344a3ac9ddd52a7fdc1ab6c565d877fcb8dba969e6eb2cc95f7d1b3"
+    },
+    "fixtures/pass-bad-evaluator-record-empty-observation-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-empty-observation-A.json",
+      "sha256": "e928ee2e346abfce217d40be303fef60d201d61ca86b202388becf0e84d2c4df"
+    },
+    "fixtures/pass-bad-evaluator-record-empty-observation-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-empty-observation-B.json",
+      "sha256": "925f75e2eb213d3422ebcf9a28c7c72e88d6c1db001d926ca50037d21b9223a9"
+    },
+    "fixtures/pass-bad-evaluator-record-extra-key-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-extra-key-A.json",
+      "sha256": "02a88ddbdf5726df4244482305a6f4558e41ef2027a128414c9ecccb4d41a84a"
+    },
+    "fixtures/pass-bad-evaluator-record-extra-key-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-extra-key-B.json",
+      "sha256": "4f5f8e671aad93eaced62201f5c6083f61f6a07fd63647e85729ed608b2b35ba"
+    },
+    "fixtures/pass-bad-evaluator-record-instrument-string-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-instrument-string-A.json",
+      "sha256": "c6b4cbb8e162cb093d1a1216feaa2f2844685a4f01d72da9f1c120bcb1833bdb"
+    },
+    "fixtures/pass-bad-evaluator-record-instrument-string-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-instrument-string-B.json",
+      "sha256": "be74271fba4bc87f284a60b4569fb9d046310e2f6f8b323ecd25d69b89d17e5b"
+    },
+    "fixtures/pass-bad-evaluator-record-pass-disagreement-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-pass-disagreement-A.json",
+      "sha256": "2043a388973afbdb96d3b75a1b699978ee781333ed691f9904ade899561b7ea5"
+    },
+    "fixtures/pass-bad-evaluator-record-pass-disagreement-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-pass-disagreement-B.json",
+      "sha256": "8791020372dedbc69147069c96efb63fcee72dfb399a54ca52882129705648f7"
+    },
+    "fixtures/pass-bad-evaluator-record-regenerate-without-violation-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-regenerate-without-violation-A.json",
+      "sha256": "7ec159fa052b734e796efb4e94bdfce5c8d9865a05cff866f314729e58cf39ce"
+    },
+    "fixtures/pass-bad-evaluator-record-regenerate-without-violation-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-regenerate-without-violation-B.json",
+      "sha256": "c63cf8ef0c65b623f9ec81bd6d8be036a3a2497838db624c720c56c3c2bb7676"
+    },
+    "fixtures/pass-bad-evaluator-record-unattributable-pass-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-unattributable-pass-A.json",
+      "sha256": "a4c34374835179f2cae900e20bd1503d0b783a6edb6e753eb18364eca0133559"
+    },
+    "fixtures/pass-bad-evaluator-record-unattributable-pass-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-unattributable-pass-B.json",
+      "sha256": "992f86c652d03deb4971e25a76730af91592923b246d26c835ebd1d7638ec878"
+    },
+    "fixtures/pass-bad-evaluator-record-unfiled-pass-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-unfiled-pass-A.json",
+      "sha256": "f34e314d9114426bfe7913a1d12d284d2e7e184571141fb937bf6f52aa1f9a19"
+    },
+    "fixtures/pass-bad-evaluator-record-unlabelled-extension-A.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-unlabelled-extension-A.json",
+      "sha256": "8e53a1301eecb102ac416bcf991852058b427d62801b5ef38f66057a09bd5269"
+    },
+    "fixtures/pass-bad-evaluator-record-unlabelled-extension-B.json": {
+      "original_path": "schemas/fixtures/pass-bad-evaluator-record-unlabelled-extension-B.json",
+      "sha256": "40b2d894d5a1899a2d76184fa4060ee5f03d1cc537f9f626476830a1573fb7e1"
+    },
+    "fixtures/pass-evaluator-record-example-A.json": {
+      "original_path": "schemas/fixtures/pass-evaluator-record-example-A.json",
+      "sha256": "73274b634b1ef86253bf4db1b8bb22732670dac19a5d9687b8a3c6e90347c4a9"
+    },
+    "fixtures/pass-evaluator-record-example-B.json": {
+      "original_path": "schemas/fixtures/pass-evaluator-record-example-B.json",
+      "sha256": "1c74c16dc4baa197b3bfcb1143e4600289f8ddfd4bd6061ee40584c8438f9601"
+    },
+    "fixtures/pass-evaluator-record-saw-gt-A.json": {
+      "original_path": "schemas/fixtures/pass-evaluator-record-saw-gt-A.json",
+      "sha256": "705b984f46b717ee763d11058c25e2f882f48aaf0a30e91fd14d767a41154638"
+    },
+    "fixtures/pass-evaluator-record-saw-gt-B.json": {
+      "original_path": "schemas/fixtures/pass-evaluator-record-saw-gt-B.json",
+      "sha256": "2c4a62ee3c7bafe8ead8afcad335d70cf4a2822dbb8287724b4eba40d18cf233"
+    },
+    "fixtures/readings-census.json": {
+      "original_path": "schemas/fixtures/readings-census.json",
+      "sha256": "ec50120ffc414b034fa5c31eeb1ca0495826300482d339de1faf94f6f6b129c3"
+    }
+  },
+  "license": {
+    "code": "Apache-2.0",
+    "text": "CC-BY-4.0"
+  },
+  "copyright": "Copyright 2026 Steve Moitozo II",
+  "provenance": {
+    "commit_identities": [
+      "Steve Moitozo II <smoitozo@users.noreply.github.com>"
+    ],
+    "held_by": "Steve Moitozo II"
+  },
+  "note": "Vendored byte-for-byte; never hand-edited. tools/build_schemas.py --check verifies every file against its sha256 here, and the two schemas against tools/pin.json files. Re-vendor only together with a deliberate re-pin."
+}

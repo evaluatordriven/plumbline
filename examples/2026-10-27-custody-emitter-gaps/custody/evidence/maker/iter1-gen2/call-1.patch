@@ -1,0 +1,308 @@
+diff --git a/kit/custody_history.py b/kit/custody_history.py
+--- a/kit/custody_history.py
++++ b/kit/custody_history.py
+@@ -114,5 +114,12 @@ class Call:
+         self.at = self.date or self.created                 # when the answer was given (server clock)
+         self.started = self.created or self.date            # when the generation began
+         self.at_basis = "response Date header" if self.date else ("response created" if self.created else None)
++        self.sent = parse_ts(raw.get("sent_at"))
++        self.received = parse_ts(raw.get("received_at"))
++        self.has_generation_key = "generation" in raw
++        self.generation = raw.get("generation")
++        self.path = None
++        self.sent_line = self.received_line = self.date_line = self.created_line = None
+ 
+     @property
+@@ -118,6 +118,44 @@ class Call:
+     @property
+     def label(self) -> str:
+         return f"{self.log}#{self.name or self.i}"
+ 
+ 
++def _line_of(text: str, needle: str, start: int = 0) -> tuple[int | None, int]:
++    i = text.find(needle, start)
++    if i < 0:
++        return None, start
++    return text.count("\n", 0, i) + 1, i + len(needle)
++
++
++def _annotate_lines(text: str, calls: list[Call]) -> None:
++    cursors: dict[str, int] = {}
++    for c in calls:
++        raw = c.raw
++        for key, attr in (("sent_at", "sent_line"), ("received_at", "received_line")):
++            val = raw.get(key)
++            if isinstance(val, str):
++                needle = f'"{key}": {json.dumps(val)}'
++                line, pos = _line_of(text, needle, cursors.get(key, 0))
++                if line:
++                    setattr(c, attr, line)
++                    cursors[key] = pos
++        hdrs = raw.get("response_headers") or raw.get("headers") or {}
++        d = _hdr(hdrs, "Date")
++        if isinstance(d, str):
++            for key in ("Date", "date"):
++                needle = f'"{key}": {json.dumps(d)}'
++                line, pos = _line_of(text, needle, cursors.get("Date", 0))
++                if line:
++                    c.date_line = line
++                    cursors["Date"] = pos
++                    break
++        created = (raw.get("response") or {}).get("created")
++        if isinstance(created, (int, float)) and not isinstance(created, bool):
++            needle = f'"created": {json.dumps(created)}'
++            line, pos = _line_of(text, needle, cursors.get("created", 0))
++            if line:
++                c.created_line = line
++                cursors["created"] = pos
++
++
+ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+@@ -139,4 +177,7 @@ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+     calls = [Call(path.name, i, it) for i, it in enumerate(items) if isinstance(it, dict) and "request" in it]
+     if not calls:
+         ref.add("harness-log", f"{who}: {path.name} records no call (no object with a `request`)")
++    for c in calls:
++        c.path = path
++    _annotate_lines(text, calls)
+     for c in calls:
+@@ -218,2 +259,5 @@ def endpoint_of(c: Call, ref: Refusals, who: str, pin: dict | None = None) -> tuple[str | None, dict]:
+     route = {"aggregator": c.host, "upstream_provider": c.provider}
++    if c.host in AGGREGATORS and getattr(c, "has_generation_key", False) and not (isinstance(c.generation, dict) and c.generation):
++        ref.add("endpoint", f"{who}: {c.label} has no /api/v1/generation reply (null); the emitter will not derive an endpoint from the provider pin or routing config. Log the /api/v1/generation reply, or re-run the call with it.")
++        return None, route
+     if not pin:
+diff --git a/kit/emit_custody.py b/kit/emit_custody.py
+--- a/kit/emit_custody.py
++++ b/kit/emit_custody.py
+@@ -95,4 +95,32 @@ def rel_file(job: Path, rel: str | None, field: str, gaps: Gaps, hard: bool = True) -> Path | None:
+     return p
+ 
+ 
++def src(job: Path, p: Path | None, line: int | None) -> dict | None:
++    if p is None or not line:
++        return None
++    try:
++        rel = p.resolve().relative_to(job.resolve()).as_posix()
++    except ValueError:
++        rel = p.name
++    return {"file": rel, "line": int(line)}
++
++
++def json_src(job: Path, p: Path, key: str, value) -> dict | None:
++    if not p.is_file() or value in (None, ""):
++        return None
++    text = p.read_text(encoding="utf-8")
++    needle = f'"{key}": {json.dumps(value)}'
++    i = text.find(needle)
++    if i < 0:
++        needle = f'"{key}":{json.dumps(value)}'
++        i = text.find(needle)
++    if i < 0:
++        return None
++    try:
++        rel = p.resolve().relative_to(job.resolve()).as_posix()
++    except ValueError:
++        rel = p.name
++    return {"file": rel, "line": text.count("\n", 0, i) + 1}
++
++
+ def digest_of(job: Path, rel: str | None, field: str, gaps: Gaps, hard: bool = True) -> dict | None:
+@@ -170,3 +198,4 @@ def events_log(job: Path, ref: H.Refusals) -> dict:
+         except ValueError:
+             ref.add("time", f"inputs/custody-events.jsonl line {n} is not JSON"); continue
++        e["_line"] = n
+         if e.get("event") == "approve":
+@@ -200,4 +229,5 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+     ev_log = events_log(job, ref)
+     if ev_log["_file"]:
+         xp["events_log"] = ev_log["_file"]
++    ev_path = job / ev_log["_file"]["name"] if ev_log["_file"] else None
+ 
+     # ---- the emitter's own revision (refused when dirty or not the stated revision) ----
+@@ -240,11 +270,13 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+         xa = H.check_approval(a, i, ci, packet, ref)
+         live = ev_log["approve"].get(a.get("role"))
+         xa["time_source"] = "hand-entered"
++        xa["at_source"] = json_src(job, inputs_path, "at", a.get("at"))
+         if live:
+             for k in ("by", "at"):
+                 if live.get(k) != a.get(k):
+                     ref.add("time" if k == "at" else "approval",
+                             f"bar.approvals[{i}].{k}: the ledger says {a.get(k)!r} but inputs/custody-events.jsonl "
+                             f"logged {live.get(k)!r} when it happened")
+             xa["time_source"] = "logged live (inputs/custody-events.jsonl)"
++            xa["at_source"] = src(job, ev_path, live.get("_line"))
+         approvals.append({"role": a.get("role"), "by": a.get("by"),
+@@ -260,12 +292,15 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+     fz = ev_log.get("freeze")
+     if fz:
+         if fz.get("at") != b.get("frozenAt"):
+             ref.add("time", f"bar.frozenAt: the ledger says {b.get('frozenAt')!r} but inputs/custody-events.jsonl "
+                             f"logged the freeze at {fz.get('at')!r}")
+         if bar_digest and fz.get("bar_sha256") and fz["bar_sha256"] != bar_digest["sha256"]:
+             ref.add("order", f"bar: frozen as {fz['bar_sha256'][:12]} (inputs/custody-events.jsonl) but the bar file "
+                              f"now hashes to {bar_digest['sha256'][:12]}: the bar changed after the freeze")
++    fz_source = src(job, ev_path, fz.get("_line")) if fz else json_src(job, inputs_path, "frozenAt", b.get("frozenAt"))
+     bar = {"digest": bar_digest, "frozenAt": ts(b.get("frozenAt"), "bar.frozenAt", gaps),
+            "author": b.get("author"), "dimensions": dims, "approvals": approvals,
+            "publishedAt": b.get("publishedAt"), "groundTruth": ground, "dissent": b.get("dissent") or []}
++    if fz_source:
++        bar["x-plumbline"] = {"frozenAt_source": fz_source}
+     if not b.get("author"):
+@@ -290,3 +325,5 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+     if mk:
+         maker["x-plumbline"] = mk["x"]
++        xp["startedAt_source"] = (mk.get("x") or {}).get("startedAt_source")
++        xp["producedAt_source"] = (mk.get("x") or {}).get("producedAt_source")
+     for k in ("name", "kind", "version"):
+@@ -340,4 +377,5 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+         if call is not None:
+             H.cross_check(ref, f"passes.{pid}.at", f.get("at"), call.at, f"harness log {call.label}")
+-            at_v, xc = H.iso(call.at), {"call": call.label, "at_basis": call.at_basis}
++            at_v, xc = H.iso(call.at), {"call": call.label, "at_basis": call.at_basis,
++                                        "at_source": src(job, call.path, call.date_line if call.date else call.created_line)}
+             if f.get("endpoint") and call.endpoint and f["endpoint"] != call.endpoint:
+@@ -380,4 +418,5 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+         if call is not None:
+             H.cross_check(ref, f"controls[{k.get('id')}].at", k.get("at"), call.at, f"harness log {call.label}")
+-            xk.update({"call": call.label, "at": H.iso(call.at), "at_basis": call.at_basis})
++            xk.update({"call": call.label, "at": H.iso(call.at), "at_basis": call.at_basis,
++                       "at_source": src(job, call.path, call.date_line if call.date else call.created_line)})
+             if call.endpoint and call.endpoint != ev_ep.get(k.get("evaluator")):
+@@ -420,8 +459,11 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+         xp["disposition_at_source"] = "emission time: no disposition time recorded (custody tools/make_record.py convention)"
+     elif live:
+         xp["disposition_at_source"] = "logged live (inputs/custody-events.jsonl)"
++    at_source = src(job, ev_path, live.get("_line")) if live else (json_src(job, inputs_path, "at", dsp.get("at")) if dsp.get("at") else None)
+     disposition = {"state": state, "by": dsp.get("by"), "at": ts(at, "disposition.at", gaps),
+                    "acknowledgesUnobserved": list(dsp.get("acknowledgesUnobserved") or [])}
++    if at_source:
++        disposition["x-plumbline"] = {"at_source": at_source}
+     if not dsp.get("by"):
+@@ -460,4 +502,7 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+     xp["time_tolerance_s"] = H.TOLERANCE_S
++    mkx = mk.get("x") or {}
+     xp["times"] = {"startedAt": "harness log" if mk.get("startedAt") else "hand-entered",
+-                   "producedAt": "harness log" if mk.get("producedAt") else "hand-entered"}
++                   "producedAt": "harness log" if mk.get("producedAt") else "hand-entered",
++                   "startedAt_source": mkx.get("startedAt_source"),
++                   "producedAt_source": mkx.get("producedAt_source")}
+     check_order(pred, packet, ci, now, ref)
+@@ -500,17 +545,40 @@ def maker_history(job: Path, ev_dir: Path, ci: dict, m: dict, ref: H.Refusals, pin: dict | None = None,
+     calls = H.read_log(log, ref, "maker")
+     if m.get("calls"):
+         calls = [c for c in calls if c.name in m["calls"]]
+-    calls = [c for c in calls if c.at]
+     if not calls:
+         return {}
++    has_send_recv = any(c.sent is not None or c.received is not None for c in calls)
++    if has_send_recv:
++        for c in calls:
++            if c.sent is None or c.received is None:
++                ref.add("time", f"maker: {c.label} carries no sent_at/received_at; startedAt and producedAt must be read from the harness log's send and receive times")
++        calls = [c for c in calls if c.sent and c.received]
++        if not calls:
++            return {}
++        first = min(calls, key=lambda c: c.sent)
++        last = max(calls, key=lambda c: c.received)
++        started, produced = first.sent, last.received
++        start_basis, prod_basis = f"{first.label} sent_at", f"{last.label} received_at"
++        start_line, prod_line = first.sent_line, last.received_line
++        start_where, prod_where = f"harness log {first.label} sent_at", f"harness log {last.label} received_at"
++    else:
++        calls = [c for c in calls if c.at]
++        if not calls:
++            return {}
++        first = min(calls, key=lambda c: c.started or c.at)
++        last = max(calls, key=lambda c: c.at)
++        started, produced = first.started, last.at
++        start_basis = f"{first.label} response " + ("created" if first.created else "Date header")
++        prod_basis = f"{last.label} {last.at_basis}"
++        start_line = first.created_line or first.date_line
++        prod_line = last.date_line or last.created_line
++        start_where, prod_where = f"harness log {first.label}", f"harness log {last.label}"
+     annotate(calls, "maker", (m.get("model") or {}).get("identifier"), ref, pin)
+     check_pin_order(pin, calls, "maker", ref)
+-    first = min(calls, key=lambda c: c.started)
+-    last = max(calls, key=lambda c: c.at)
+-    started, produced = first.started, last.at
+-    H.cross_check(ref, "startedAt", ci.get("startedAt"), started, f"harness log {first.label}")
+-    H.cross_check(ref, "producedAt", ci.get("producedAt"), produced, f"harness log {last.label}")
+-    out = {"startedAt": H.iso(started), "producedAt": H.iso(produced), "endpoint": last.endpoint,
+-           "x": {**route_x(log, calls), "startedAt_basis": f"{first.label} response "
+-                 + ("created" if first.created else "Date header"), "producedAt_basis": f"{last.label} {last.at_basis}"}}
++    H.cross_check(ref, "startedAt", ci.get("startedAt"), started, start_where)
++    H.cross_check(ref, "producedAt", ci.get("producedAt"), produced, prod_where)
++    out = {"startedAt": H.iso(started), "producedAt": H.iso(produced), "endpoint": last.endpoint,
++           "x": {**route_x(log, calls), "startedAt_basis": start_basis, "producedAt_basis": prod_basis,
++                 "startedAt_source": src(job, log, start_line),
++                 "producedAt_source": src(job, log, prod_line)}}
+     rx = routing_x(calls, pin, "maker", gaps if gaps is not None else Gaps())
+diff --git a/tools/pack_stranger_bundle.py b/tools/pack_stranger_bundle.py
+--- a/tools/pack_stranger_bundle.py
++++ b/tools/pack_stranger_bundle.py
+@@ -48,2 +48,3 @@ def main() -> int:
+     pred = record["predicate"]
++    xp = pred.get("x-plumbline") or {}
+     files_dir = job / ci.get("files_dir", "custody/files")
+@@ -76,5 +77,21 @@ def main() -> int:
+     for v in pred.get("violations") or []:
+         r = (v.get("x-plumbline") or {}).get("remedy")
+         if r:
+             ev_names.add(r["evidence"]["name"])
++    ev_log = (xp.get("events_log") or {}).get("name")
++    if ev_log:
++        add(ev_log, job / ev_log)
++    elif (job / "inputs" / "custody-events.jsonl").is_file():
++        add("inputs/custody-events.jsonl", job / "inputs" / "custody-events.jsonl")
++    harness = set()
++    for holder in [pred.get("maker") or {}, *(pred.get("evaluators") or [])]:
++        hx = holder.get("x-plumbline") or {}
++        if hx.get("harness_log"):
++            harness.add(hx["harness_log"])
++    for name in sorted(harness):
++        src = next((b / name for b in (ev_dir, job) if (b / name).is_file()), None)
++        if src:
++            add(f"evidence/{name}", src)
++        else:
++            missing.append(f"evidence/{name} <- harness log {name}")
+     for n in sorted(ev_names):
+         add(f"evidence/{n}", ev_dir / n)
+@@ -87,4 +104,3 @@ def main() -> int:
+     for g in (ci.get("bar") or {}).get("groundTruth") or []:
+         ctx.append(g.get("file"))
+-    xp = pred.get("x-plumbline") or {}
+     ctx += [(xp.get("s5_record") or {}).get("name"), "packet.json"]
+diff --git a/docs/custody-emission.md b/docs/custody-emission.md
+--- a/docs/custody-emission.md
++++ b/docs/custody-emission.md
+@@ -29,8 +29,8 @@ The emitter no longer trusts a typed time, a typed host or a typed approver when
+ | Fact | Source | A hand-entered value is… |
+ |---|---|---|
+-| `startedAt` | the maker harness log: the earliest call's response `created` (else its `Date` header) | a cross-check: refused if more than **60 s** off |
+-| `producedAt` | the maker harness log: the last call's response `Date` header (else `created`) | a cross-check, 60 s |
++| `startedAt` | the maker harness log: the first call's `sent_at` (the harness's request-send time), with an `x-plumbline` source naming the log and line | a cross-check: refused if more than **60 s** off |
++| `producedAt` | the maker harness log: the last call's `received_at` (the harness's reply-receive time), with an `x-plumbline` source naming the log and line | a cross-check, 60 s |
+ | `checks[].at` | the evaluator harness call linked to the pass (`passes.<id>.call`): its `Date` header | a cross-check, 60 s |
+@@ -54,7 +54,7 @@ The emitter no longer trusts a typed time, a typed host or a typed approver when
+ **Harness log format.** One JSON object per model call, a JSON list of them, or JSON Lines. Each call:
+-`{"call": "<name>", "request": {"url", "model", "messages", "provider": {…}, …}, "response": {"id", "created",
++`{"call": "<name>", "sent_at": "<RFC 3339 Z>", "received_at": "<RFC 3339 Z>", "request": {"url", "model", "messages", "provider": {…}, …}, "response": {"id", "created",
+ "model", "provider"?, "openrouter_metadata"?, …}, "response_headers": {"Date": "<RFC 7231>", …},
+ "generation"?: <the GET /api/v1/generation?id=<response id> reply>}`.
+@@ -95,6 +95,8 @@ Response headers are not read. OpenRouter documents no provider header. A name m
+ **Refuse or gap: a request that did not ask for this is a HARD GAP (exit 1), not a refusal.** The record is
+ written, with `x-plumbline.gaps[]` field `routing.<seat>.request` naming what was missing, and
+ `x-plumbline.routing.request_ok: false` next to exactly what was asked. Why a gap:
++
++**No generation reply.** If a call's log carries `generation: null`, the emitter refuses (exit 3) with an
++`endpoint` line naming the call; it never falls back to the pin or routing config for an endpoint.
+@@ -150,6 +152,8 @@ The zip contains:
+ | `files/` | The subject files. |
+ | `evidence/` | Every evidence file and harness log. |
++| `inputs/custody-events.jsonl` | The live event ledger (freeze, approvals, pins, disposition). |
++| `evidence/<harness log>` | Every maker/evaluator harness log the record's times or endpoints came from. |
+ | `context/` | The method, instrument and control files, the §5 record and the packet. |
+ | `MANIFEST.sha256` | sha256 manifest, `sha256sum -c` compatible. |
+ | `README.txt` | The one check command. |

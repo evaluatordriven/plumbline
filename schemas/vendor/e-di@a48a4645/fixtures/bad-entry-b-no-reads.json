@@ -1,0 +1,11 @@
+{
+  "entry": "B",
+  "instrument_profile": "mvi",
+  "job_name": "entry-b-no-reads",
+  "artifact": "x.md",
+  "buyer": "Owner",
+  "maker": "m",
+  "evaluator": "e",
+  "mode": "readings",
+  "ratified": true
+}

@@ -1,0 +1,1 @@
+error: can't open patch '/workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/custody/evidence/maker/iter1/call-4.patch': No such file or directory

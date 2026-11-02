@@ -1,0 +1,17 @@
+{
+ "id": "V7",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "rw": {
+   "rc": 0,
+   "failures": []
+  },
+  "ro": {
+   "rc": 0,
+   "failures": []
+  },
+  "changed": [],
+  "emit_imports": []
+ }
+}

@@ -1,0 +1,304 @@
+{
+ "id": "F8d",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "bound_usd": 0.07,
+  "delta_tol": 0.002,
+  "init_rc": 0,
+  "i": {
+   "rc": 8,
+   "cap": 0.001,
+   "log": [],
+   "reply_exists": false,
+   "reading_rc": 0,
+   "status": {
+    "read_at": "2026-10-29T15:52:36.546916Z",
+    "writer": "tools/edi/or_call.py@f740e9543765",
+    "job_id": "s1-becf0d90ce26",
+    "key_usage_usd": 0.845538789,
+    "baseline_usd": 0.845538789,
+    "key_delta_usd": 0.0,
+    "ledger_sum_usd": 0,
+    "total_usd": 0,
+    "last_settle_at": null
+   },
+   "key_delta": 0.0,
+   "inst_before": 0.845538789,
+   "inst_after": 0.845538789,
+   "inst_delta": 0.0,
+   "err": "or_call: REFUSED by --max-cost before sending (worst case 0.03854134 > 0.001)\n"
+  },
+  "ii": {
+   "rc": 0,
+   "cap": 0.05,
+   "log": [
+    {
+     "call": "f8d_2",
+     "seat": "maker",
+     "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+       "Authorization": "Bearer [REDACTED]",
+       "Content-Type": "application/json",
+       "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+       "model": "deepseek/deepseek-v4.1-flash-1017",
+       "messages": [
+        {
+         "role": "user",
+         "content": "Reply with the single word ok."
+        }
+       ],
+       "provider": {
+        "order": [
+         "deepinfra/fp8"
+        ],
+        "allow_fallbacks": false,
+        "zdr": true
+       },
+       "max_tokens": 131072
+      }
+     },
+     "harness": {
+      "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "sha256": "f740e95437654d842ca83e0180dfabbedc018783902f3bff7301fa08d73066ff"
+     },
+     "sent_at": "2026-10-29T15:52:36.772047Z",
+     "received_at": "2026-10-29T15:52:37.297813Z",
+     "response_status": 200,
+     "response_headers": {
+      "Date": "Thu, 29 Oct 2026 15:52:37 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=44,cfOrigin;dur=0,cfWorker;dur=222",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1793289156-y0hkkWWnbLCWrhX4YW5h",
+      "access-control-expose-headers": "X-Generation-Id,X-Provider-Name,request-id,cf-ray",
+      "set-cookie": "__cf_bm=5Jq1oB8RBHsXRi8.JNuufjbaiTHTj9p.vK1XGm2kJQk-1793289156.805203-1.0.1.1-pYEqviJfNtpZMMaovd1wcTuFOsv7sUaD5xC0o93VdUvs4vJilWmc5oGq4rYjspy_mw6fhMjJhaMrGCkChkXQrKydCjhnn4Dd.qPAcrw6xozaFTPBRD.34r9Os.13OTFJ; HttpOnly; SameSite=None; Secure; Path=/; Domain=openrouter.ai; Expires=Thu, 29 Oct 2026 16:22:37 GMT",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a523592e0c09962a-PDX"
+     },
+     "response": {
+      "id": "gen-1793289156-y0hkkWWnbLCWrhX4YW5h",
+      "object": "chat.completion",
+      "created": 1793289156,
+      "model": "deepseek/deepseek-v4.1-flash-1017",
+      "provider": "DeepInfra",
+      "system_fingerprint": null,
+      "service_tier": "default",
+      "choices": [
+       {
+        "index": 0,
+        "logprobs": null,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "message": {
+         "role": "assistant",
+         "content": "ok",
+         "refusal": null,
+         "reasoning": "We need answer single word ok. Must comply.",
+         "reasoning_details": [
+          {
+           "type": "reasoning.text",
+           "text": "We need answer single word ok. Must comply.",
+           "format": "unknown",
+           "index": 0
+          }
+         ]
+        }
+       }
+      ],
+      "usage": {
+       "prompt_tokens": 37,
+       "completion_tokens": 13,
+       "total_tokens": 50,
+       "cost": 7.448e-06,
+       "is_byok": false,
+       "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+       },
+       "cost_details": {
+        "upstream_inference_cost": 7.448e-06,
+        "upstream_inference_prompt_cost": 3.626e-06,
+        "upstream_inference_completions_cost": 3.822e-06
+       },
+       "completion_tokens_details": {
+        "reasoning_tokens": 10,
+        "image_tokens": 0,
+        "audio_tokens": 0
+       }
+      },
+      "openrouter_metadata": {
+       "requested": "deepseek/deepseek-v4.1-flash-1017",
+       "strategy": "direct",
+       "region": "PDX",
+       "summary": "available=2, selected=DeepInfra",
+       "attempt": 1,
+       "is_byok": false,
+       "endpoints": {
+        "total": 42,
+        "available": [
+         {
+          "provider": "DeepInfra",
+          "model": "deepseek/deepseek-v4.1-flash-20261017",
+          "selected": true
+         },
+         {
+          "provider": "DeepInfra",
+          "model": "deepseek/deepseek-v4.1-flash-20261017",
+          "selected": false
+         }
+        ]
+       },
+       "generation_time": 283,
+       "pipeline": [
+        {
+         "type": "guardrail",
+         "name": "content-filter",
+         "summary": "No PII detected (regex)",
+         "data": {
+          "flagged": false,
+          "action": "no_match",
+          "filter_mode": "regex",
+          "engines": [],
+          "matched_entity_types": []
+         }
+        }
+       ]
+      }
+     },
+     "generation": {
+      "data": {
+       "created_at": "2026-10-29T15:52:36.848Z",
+       "model": "deepseek/deepseek-v4.1-flash-20261017",
+       "app_id": null,
+       "external_user": null,
+       "streamed": true,
+       "cancelled": false,
+       "latency": 283,
+       "moderation_latency": null,
+       "generation_time": 283,
+       "tokens_prompt": 8,
+       "tokens_completion": 12,
+       "native_tokens_prompt": 37,
+       "native_tokens_completion": 13,
+       "native_tokens_completion_images": null,
+       "native_tokens_reasoning": 10,
+       "native_tokens_cached": 0,
+       "num_media_prompt": null,
+       "num_input_audio_prompt": null,
+       "num_media_completion": 0,
+       "num_search_results": null,
+       "num_fetches": null,
+       "web_search_engine": null,
+       "origin": "",
+       "is_byok": false,
+       "finish_reason": "stop",
+       "native_finish_reason": "stop",
+       "service_tier": "default",
+       "usage": 7.448e-06,
+       "router": null,
+       "user_agent": "Python-urllib/3.13",
+       "http_referer": null,
+       "request_id": "req-1793289156-A9syEArCedoQut18OS3R",
+       "session_id": null,
+       "preset_id": null,
+       "api_type": "completions",
+       "id": "gen-1793289156-y0hkkWWnbLCWrhX4YW5h",
+       "upstream_id": "chatcmpl-Ra5u76Hc0T12l1XfXwJHExb9",
+       "provider_responses": [
+        {
+         "endpoint_id": "a34868e3-d8e3-46c4-acf2-19c86ae3365a",
+         "id": "chatcmpl-Ra5u76Hc0T12l1XfXwJHExb9",
+         "is_byok": false,
+         "latency": 68,
+         "model_permaslug": "deepseek/deepseek-v4.1-flash-20261017",
+         "provider_name": "DeepInfra",
+         "status": 200
+        }
+       ],
+       "total_cost": 7.448e-06,
+       "cache_discount": null,
+       "upstream_inference_cost": 0,
+       "provider_name": "DeepInfra",
+       "response_cache_source_id": null,
+       "data_region": "global",
+       "workspace_id": "8eb09fcc-5e4a-4af5-b09e-cf25adb387a6"
+      }
+     },
+     "generation_status": 200,
+     "generation_fetched_at": "2026-10-29T15:52:48.016889Z",
+     "verdict": {
+      "pin": {
+       "tag": "deepinfra/fp8",
+       "provider": "DeepInfra"
+      },
+      "served_by": {
+       "response.provider": "DeepInfra",
+       "openrouter_metadata.endpoints.selected": "DeepInfra",
+       "generation.provider_name": "DeepInfra"
+      },
+      "tried": [
+       "DeepInfra"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+     }
+    }
+   ],
+   "reply_exists": true,
+   "spend_rows": [
+    {
+     "at": "2026-10-29T15:52:36.770743Z",
+     "call": "f8d_2",
+     "event": "reserve",
+     "id": "0ddd7fc625604237a086e83c3832b798",
+     "job": "s1-becf0d90ce26",
+     "max_tokens": 131072,
+     "model": "deepseek/deepseek-v4.1-flash-1017",
+     "seat": "maker",
+     "spent_before_usd": 0,
+     "tag": "deepinfra/fp8",
+     "worst_usd": 0.03854134
+    },
+    {
+     "at": "2026-10-29T15:52:48.017663Z",
+     "call": "f8d_2",
+     "cost_usd": 7.448e-06,
+     "event": "settle",
+     "id": "0ddd7fc625604237a086e83c3832b798",
+     "job": "s1-becf0d90ce26",
+     "source": "generation.total_cost"
+    }
+   ],
+   "reading_rc": 0,
+   "status": {
+    "read_at": "2026-10-29T15:55:53.213853Z",
+    "writer": "tools/edi/or_call.py@f740e9543765",
+    "job_id": "s1-becf0d90ce26",
+    "key_usage_usd": 0.845546237,
+    "baseline_usd": 0.845538789,
+    "key_delta_usd": 7e-06,
+    "ledger_sum_usd": 7e-06,
+    "total_usd": 7e-06,
+    "last_settle_at": "2026-10-29T15:52:48.017663Z"
+   },
+   "reading_after_3min": true,
+   "inst_after": 0.845546237,
+   "inst_delta_total": 7.447999999965482e-06,
+   "err": ""
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (1 values)"
+}

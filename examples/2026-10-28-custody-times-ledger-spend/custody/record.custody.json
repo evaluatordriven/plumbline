@@ -1,0 +1,3824 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md",
+      "digest": {
+        "sha256": "f1c2223f2bd2195efa728b1abefa1fb49ee2a7824e9237644e0fa88ac689123f"
+      }
+    },
+    {
+      "name": "docs/custody-emission.md",
+      "digest": {
+        "sha256": "663b03820ff0f27c566bed5abdb13f865dd397bbea020820520f7ae52221097b"
+      }
+    },
+    {
+      "name": "kit/README.md",
+      "digest": {
+        "sha256": "8973453c4786299a782f2c8a8f9a676d63fbca6717d4cec12bfd67d5d4fd5c63"
+      }
+    },
+    {
+      "name": "kit/custody_history.py",
+      "digest": {
+        "sha256": "b0c9258848a38eee9c46a015462fe39420cb9e5b2d2fe6f85bb07d922ccae950"
+      }
+    },
+    {
+      "name": "kit/custody_ledger.py",
+      "digest": {
+        "sha256": "c70062b4f696923ccf1720a639fc3c348bb3dd2b86c948d18cced6b1e1554d85"
+      }
+    },
+    {
+      "name": "kit/emit_custody.py",
+      "digest": {
+        "sha256": "1666c049b76a59bd1897fa323b03ccf2d601112b22963480d2bfe1c63c45cc47"
+      }
+    },
+    {
+      "name": "kit/plumbline_job.py",
+      "digest": {
+        "sha256": "96fc9caa358298e2c8805aeb9023cbd848cf0d347e038ffcfde2fd745fb626bf"
+      }
+    },
+    {
+      "name": "kit/plumbline_verify.py",
+      "digest": {
+        "sha256": "052b408341233ee7ecb827ec27ed1f1b1a95f2e3ba848f117586ebe61d833dbb"
+      }
+    },
+    {
+      "name": "schemas/x-plumbline/x-plumbline-v1.schema.json",
+      "digest": {
+        "sha256": "548e09eb1e8d5dfe67ccf1e8735d145dcd097f1deed81134a21eb5f8aa9b5d86"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/checkout/checker/check.py",
+      "digest": {
+        "sha256": "5ae0015e52b3e5ad1126408e8b5ed2752e8f4ac32f6adb557fa5187d1069aedb"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/job/custody/evidence/notes.txt",
+      "digest": {
+        "sha256": "626c436f9e230d0f891bce41ea12ebb9d294e90768b40d662ab8080771a40844"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/job/custody/files/artifact.txt",
+      "digest": {
+        "sha256": "6814f3ad514f985ab2730b0c17fe1a7dcb35128692d14b97cdd11e2f3e2a51d8"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/job/inputs/custody-events.jsonl",
+      "digest": {
+        "sha256": "75bd8d1ddf87419f1cac4176759a4c79ff3575bcb6111a7511ce07c8b9ec983e"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/job/inputs/custody.json",
+      "digest": {
+        "sha256": "918e0e94c43c6ead5a67262717990ad69698390664b1c9f8fd8260459469f49c"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/job/packet.json",
+      "digest": {
+        "sha256": "53ebdec81ea8f521c47ae8734b2780ef78dd0adbb6777565ca44886a5be8a98a"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-bad-subject.json",
+      "digest": {
+        "sha256": "032de0c5828eb1b308f5b62ed3f1db68158564542f56bdcf45a7d312ebcaaec5"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-flag-without-source.json",
+      "digest": {
+        "sha256": "5dac03adb228cdcc7b34f68e2bd97321a845ae47f05dd2b26b63ab22e6510a1c"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-hand-times-string.json",
+      "digest": {
+        "sha256": "3f127c5c23c23bb86e60f6452c1f95a35e3fa0bc784155ba659f2a18dab50a78"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-no-block.json",
+      "digest": {
+        "sha256": "41c84f3ad46cc3a33d5cdd946618fa8864d902b1d5677534d1370fe6686509e5"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-spend-off.json",
+      "digest": {
+        "sha256": "62c9897baecce5d986f10f2fbb0fcf9dd7a625635439b1b296b569957ab65d04"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-unknown-key.json",
+      "digest": {
+        "sha256": "02007598eddef1dd938ced0fbe43122aae938113be0282f40133e6563bb6a062"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record-v0.json",
+      "digest": {
+        "sha256": "4d7dc8684fb9ba77d6d3bdb7447f4ecdea4c6980abd6dfcfb41991a6424abed6"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/clean/record.custody.json",
+      "digest": {
+        "sha256": "b0153d4bc3b61710c50ca9bd5c2a793b3284924fbeed7f1567c13f11d3798f13"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/events/ledger.jsonl",
+      "digest": {
+        "sha256": "f7264a1f80b2c16eea8486f7af2f9cfb46147518d7ac1fdb19c0db2ce33bcb4b"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/events/record-missing-generation.json",
+      "digest": {
+        "sha256": "b85e80883688564517af6f1d51de4fb14dbf224fa87533c5dcf3c24b5afde736"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/hand/ledger.jsonl",
+      "digest": {
+        "sha256": "0a1392402030005c095c1ab046aff01940026acbbdfd57cb9e83a099e57a4a81"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/hand/record-allowance.json",
+      "digest": {
+        "sha256": "b1176b4fcdebb22421ec8371e866fd0eca871afb7f103c6cc1b1a3a06033681b"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/hand/record-no-allowance.json",
+      "digest": {
+        "sha256": "b603b553c8955e9355ebd75070eea9660e58b5450c42614d3c1eb2bd19235de8"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/hand/record-unflagged.json",
+      "digest": {
+        "sha256": "66d31e994e8132bb34f7effdacb9cbe68210f1fcccbc8e1d247a91f49ccadac1"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/relay/ledger.jsonl",
+      "digest": {
+        "sha256": "e7a1edbbbbd6585b18530b88f542714e15747eb366591229b46fa8b9cc91399f"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/relay/record.json",
+      "digest": {
+        "sha256": "42daefe8900c3c93671e29217377047a1e3e608ffc25a5f37b2d9a3ecbafb7a7"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/shadow/iteration-1-eval-record.json",
+      "digest": {
+        "sha256": "157268cbc300e0ffee980f4b01d4aaf7dcfbf8c25281d14a22f78cbfe1a308ed"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/verify/shadow/record.json",
+      "digest": {
+        "sha256": "d419bc09e7107b068c44c5ccdf81fc3d9a16d52604d053ba54ff4a6dad01762f"
+      }
+    },
+    {
+      "name": "tests/test_custody_ledger.py",
+      "digest": {
+        "sha256": "f9a661721e2756c38f7163682c5af137b44ec6549bdbbb1dcae16c1ea1b884df"
+      }
+    },
+    {
+      "name": "tests/test_edi_extract_files.py",
+      "digest": {
+        "sha256": "c1ab3ebc7305fb9c95ac8a4b9a0c817ff40e50cfcb972e6ecbf0cf1de347d621"
+      }
+    },
+    {
+      "name": "tests/test_edi_fixture_run.py",
+      "digest": {
+        "sha256": "df4c26795269b06a038c1fc3909589eb18b0ab155de27d03f848a28f961553d2"
+      }
+    },
+    {
+      "name": "tests/test_edi_judge_batch.py",
+      "digest": {
+        "sha256": "ac9c3d17528064392d2c0e24e167abc0371733a5179633a65e052ad0b849ad00"
+      }
+    },
+    {
+      "name": "tests/test_edi_or_call.py",
+      "digest": {
+        "sha256": "6521c9c3283c5545726280bacc2a8a9eb2472a48a589f3bd843ccf8c4cb89ba2"
+      }
+    },
+    {
+      "name": "tests/test_plumbline_verify.py",
+      "digest": {
+        "sha256": "4110328a5ab6267123d863a4df476bd1e1bb6b06f86dd88ec701474d69a0361f"
+      }
+    },
+    {
+      "name": "tests/validate_schemas.py",
+      "digest": {
+        "sha256": "d8d07503770f03a9ea7b78b1b1f95fd2f6c71ed1dcd0d84164b6d3ba4d2a311f"
+      }
+    },
+    {
+      "name": "tools/edi/README.md",
+      "digest": {
+        "sha256": "2925a45cf53ec79c3ac799b34c102a0d3aa1ccf2b4860f6ccea383ddb184baae"
+      }
+    },
+    {
+      "name": "tools/edi/extract_files.py",
+      "digest": {
+        "sha256": "3224fafe2af8ddcee4c05c238f7a81359a45c7a8b5db3584237dc56f0ce20749"
+      }
+    },
+    {
+      "name": "tools/edi/fixture_run.py",
+      "digest": {
+        "sha256": "59fe3c5f1e2aa6f1c69c95face23e963be2e5236f0ba4c78ddebeff60deffb07"
+      }
+    },
+    {
+      "name": "tools/edi/judge_batch.py",
+      "digest": {
+        "sha256": "b6e032a3531a2b5f510ad459e20572a1c87a036bba23c00cb7c377626ebd1674"
+      }
+    },
+    {
+      "name": "tools/edi/or_call.py",
+      "digest": {
+        "sha256": "f740e95437654d842ca83e0180dfabbedc018783902f3bff7301fa08d73066ff"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6"
+      },
+      "frozenAt": "2026-10-28T20:47:58Z",
+      "author": "Steve Moitozo II",
+      "dimensions": [
+        {
+          "id": "T1",
+          "criterion": "Every line that any `custody_ledger.py` command appends (old and new commands) carries `writer: \"kit/custody_ledger.py@<first 12 hex of the sha256 of the file that ran>\"`. That value equals the file's sha256 at run time. Its `at` comes from the tool's clock, within ±5 s of the instrument's own clock around the call.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T2",
+          "criterion": "On held-out planted fixtures P-T2a (ledger lines with no `writer`), P-T2b (`writer: \"hand\"`), P-T2c (a time in `custody.json` with no ledger line) and P-T2d (a tool line overridden by a later hand line), the emitter **with no switch** exits 3 with refusal kind `hand-time`, names every hand-time field and its file:line, and writes nothing.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T3",
+          "criterion": "On the same fixtures **with `--allow-hand-times`**, the record is written and check.py reads OK at CL1. `x-plumbline.hand_times[]` lists exactly the hand-time fields, no more and no fewer, each with file:line, and the record carries the allowance `x-plumbline.allowances.hand_times` (`switch: \"--allow-hand-times\"`, the emitter's `writer`, and its tool-clock `at`). The listing is **not disclosure only**: `kit/plumbline_verify.py` fails a record whose flags lack the allowance or disagree with the ledger and logs (V3), and close refuses on that failure (V8). The switch silences nothing else: the repo overlay `failures/hand-times` (log contradicts the hand time) still exits 3 with the switch on.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T4",
+          "criterion": "A job built at batch time only by the subject's own tools emits with **no switch**, exit 0, check.py OK at CL1, and an empty `hand_times`. The tools used: `custody_ledger.py` freeze/approve/pin/generation/evaluation/dispose, plus `tools/edi/or_call.py` with its mocked transport writing the harness logs.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T5",
+          "criterion": "**Cross-checks no looser than at base.** (a) `custody_history.TOLERANCE_S` is still 60. (b) Every refusal case that exits 3 at base exits 3 on the subject, with a superset of base's refusal kinds, both without and with `--allow-hand-times`. The refusal cases are the repo overlays under `tests/fixtures/custody/failures/*` at base, plus the prior held-out refusal controls. (c) Every changed line in `cross_check`, `check_order`, `check_pin_order` and `check_approval` is listed for J1. Controls: C-T5c (the base rev itself, must PASS); C-T5p1 (subject with `TOLERANCE_S = 600`, must FAIL); C-T5p2 (subject with the \"after the close\" refusal in `check_order` turned into a gap, must FAIL).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T6",
+          "criterion": "The prior job's N1–N8 procedure (frozen `ncheck.py`, held-out controls above) passes on the subject. It is run through the new subject runner with `--allow-hand-times`, because those synthetic fixtures are hand-typed by design. Every flagged field appears in `x-plumbline.hand_times`, and `kit/plumbline_verify.py` reads each emitted record OK.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "T7",
+          "criterion": "**The emitter never writes its inputs, and a server time is not a logger time.** Found while drafting (about 13:43 EDT): at base, `custody_history.fill_logger_times` (called from `emit_custody.py` lines 798 and 849) rewrites harness logs in place, filling missing `sent_at`/`received_at` from the response's own `created` or `Date` header, and `tests/validate_schemas.py` line 469 runs the emitter on the committed fixture `job-rejected`, so a base test run dirties two tracked fixture logs. On the subject: (a) every file under the job dir except the record output is byte-identical before and after an emit (sha256 of the tree, on a copy of job-rejected and on the T4 job); (b) a call that has no logger `sent_at`/`received_at` is either refused as `hand-time` or, under `--allow-hand-times`, listed in `x-plumbline.hand_times[]` with source `server-header`/`response-created`, never written back to the log; (c) after the full test suite runs in a fresh clone, `git status --porcelain` is empty. Controls: C-T7c (subject, must PASS); C-T7p (subject with an in-place write of `sent_at` restored, must FAIL).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1a",
+          "criterion": "Each of `generation open`, `generation close`, `evaluation`, `amendment`, `relay`, `spend` and `dispose --decided-at` appends **exactly one** line when it succeeds. The bytes before the call equal the prefix of the bytes after it (the earlier lines are never rewritten). `custody.json` agrees with the new line. A refused call appends nothing and exits non-zero.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1b",
+          "criterion": "`dispose --decided-at T --decided-source S` refuses a T earlier than the last logged check and a T later than the tool's clock. The last logged check is the latest of: evaluator `received_at` in the harness logs, `evaluation` line times, and instrument-summary `finished_at`. It accepts T equal to the last check. The line carries `at` (tool clock), `decided_at` and `decided_source`, and the record's `disposition.at` = `decided_at`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1c",
+          "criterion": "`generation open/close`: n starts at 1 and goes up by 1. A second open while one is open is refused, and so is a close without a matching open (same n and seat). `prompt_sha256` is computed by the tool from the named file.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1d",
+          "criterion": "`evaluation --batch B --verdict FILE [--summary FILE]`: the tool computes the sha256 of FILE itself and refuses a missing file. With `--summary`, it takes `started_at`/`finished_at` and `writer` from the instrument's own stamp, and refuses a summary with no stamp.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1e",
+          "criterion": "`amendment --file F --quote Q --channel C --said-at T`: the tool computes the sha256 of F. It refuses F inside `custody/` (amendments go beside the frozen set), and T before the freeze or after its own clock. Q is stored verbatim.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1f",
+          "criterion": "`relay --quote Q --from BOT --source-chat C --source-at T`: stored verbatim, marked `relay`, with T bounded as in F1e. **The emitter never counts a relay as an approval.** Held-out fixture P-F1f, where a buyer approval exists only as a relay, is refused as a missing approval.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1g",
+          "criterion": "`spend --spend-ledger L --key-reading R`: it records the reconciled total from the spend ledger and a key-usage reading file that `tools/edi/or_call.py --spend-status` wrote and stamped (`read_at`, writer). It refuses when `read_at` is less than 3 min after the last `settle` line (F5), or when R has no stamp. Both files' sha256 go in the line.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F1h",
+          "criterion": "The emitter reads every F1 line into the record. `x-plumbline` carries `generations[]`, `evaluations[]`, `amendments[]`, `relays[]` and `spend`, each with its file:line source. check.py reads OK at CL1.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "I1",
+          "criterion": "Every instrument in `tools/edi/` that writes a summary writes `started_at` and `finished_at` (UTC, its own clock) and `writer: \"tools/edi/<file>@<sha12>\"`. The two times bracket the instrument's run as seen by S1's clock (±5 s).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F7a",
+          "criterion": "`tools/edi/` fixture runner: a run from a `chmod -R a-w` copy of the controls gives outputs byte-identical (once the I1 stamps are removed) to a run from a writable copy. Every file in the working copy is writable by its owner.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F8a",
+          "criterion": "With a mocked key whose usage is at the job limit, the call is refused with the named exit **before anything is sent**: the mock transport records zero chat POSTs, and there is no harness-log entry.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F8b",
+          "criterion": "`--max-cost X`: if the projected worst case is greater than X, the call is refused before sending. If the `/generation` `total_cost` is greater than X, the call ends with a named non-zero exit, the entry is logged and marked over-cap in the spend ledger, and no reply is written. (Mocked.)",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F8c",
+          "criterion": "The job total is `max(spend-ledger sum, key-usage delta)`. It is checked against GET `/api/v1/key` before **each** call, and the call is refused when total + worst case + reserve ≥ bound. The job id, bound, reserve and price snapshot come from a job spend file, with no job hard-coded, and a missing file is refused. `max_tokens` is always the endpoint max (no throttling). (Mocked.)",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "F8d",
+          "criterion": "**Live, at most US$0.07 per batch** (approval item 19). (i) One call through the subject's `or_call.py` with `--max-cost` below its worst case is refused: no harness-log entry, and key usage does not rise. (ii) One small call with a cap above its worst case is logged and settled, at or under the cap. Key usage is read ≥ 3 min later.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "P1",
+          "criterion": "`tools/edi/` holds `or_call.py`, `judge_batch.py` (the model-judge batch, with rotating order and per-batch `order` written out), `fixture_run.py`, `extract_files.py` and `README.md`, with tests under `tests/test_edi_*.py`. A log entry from the subject's `or_call.py` (mocked) has every key that job 1's frozen harness writes, and `custody_history.read_log` reads it.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "X1",
+          "criterion": "An `x-plumbline` object in `inputs/custody.json` comes out deep-equal under the record's `predicate[\"x-plumbline\"].inputs`, and check.py reads OK. Held-out planted fixture P-X1 has input keys that try to set the emitter's own keys (`verdict`, `gaps`, `times`, `hand_times`): the emitter refuses it, or keeps those keys only under `.inputs`, and its own values are unchanged.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V1",
+          "criterion": "**Standard first.** The verifier checks that the checker's `checker/check.py` sha256 equals the pin (`aaeb7e05…bcd18`; otherwise exit 2), runs it on the record at the claimed level, and requires OK before anything else. Planted P-V1 (a record whose subject digest is altered) → exit 3, kind `standard`. A wrong-bytes checker copy → exit 2.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V2",
+          "criterion": "**Well-formed, versioned block.** `schemas/x-plumbline/x-plumbline-v1.schema.json` exists (JSON Schema 2020-12, `$id` `plumbline/schemas/x-plumbline/x-plumbline-v1.schema.json`, top level `additionalProperties: false`, and it covers the predicate-level block plus the nested `x-plumbline` objects the emitter writes on attempts, maker and evaluators). The emitter writes `x-plumbline.schema: \"plumbline/x-plumbline/v1\"`. The verifier validates every block against it. Planted P-V2a (block missing), P-V2b (`hand_times` as a string), P-V2c (unknown top-level key), P-V2d (schema version absent or `v0`) → exit 4, kind `schema`. A record from base tooling (job 1's record, read from a copy) → exit 4, kind `schema`, no traceback (no grandfathering; item 29).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V3",
+          "criterion": "**Hand times are enforced, both directions.** The verifier recomputes the hand-time set on its own from the ledger (`writer: \"hand\"` or no `writer`), from `inputs/custody.json` values with no ledger line, and from harness-log calls with no logger `sent_at`/`received_at` (server-time sources). It requires the set to equal `x-plumbline.hand_times[]` (same field, file:line, source), and `allowances.hand_times` to be present whenever the set is non-empty. Planted P-V3a (allowance removed) → `allowance`; P-V3b (a hand ledger line missing from the flags) → `hand-time-unflagged`; P-V3c (a flag with no hand line behind it) → `flag-without-source`; P-V3d (a server-time call not flagged) → `hand-time-unflagged`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V4",
+          "criterion": "**Events match the ledger and the logs, both directions.** `x-plumbline.generations[]`, `evaluations[]`, `relays[]` and `amendments[]` match the ledger's lines one-to-one (n, seat, tool `at`, sha256s, verbatim quotes). Each generation has at least one Maker harness-log call between its open and close. Each evaluation's verdict file sha256 matches the evidence. No relay appears as an approval. Planted P-V4a (a generation in the ledger missing from the record) → `events`; P-V4b (an evaluation whose verdict sha differs from the file) → `events`; P-V4c (a relay listed among approvals) → `relay-as-approval`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V5",
+          "criterion": "**Spend adds up.** `x-plumbline.spend` carries `calls_sum_usd`, `key_delta_usd`, `total_usd` and `tolerance_usd`. `calls_sum_usd` equals the sum of the per-call `total_cost` values in the harness logs within **US$0.0001** (rounding only; stated in the schema and docs). Each spend-ledger `settle` line matches one logged call. `total_usd` = max(`calls_sum_usd`, `key_delta_usd`) exactly. The key reading is stamped and read ≥ 3 min after the last settle (F1g). Planted P-V5a (`calls_sum_usd` off by US$0.01) → `spend`; P-V5b (`total_usd` below the calls sum) → `spend`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V6",
+          "criterion": "**Inputs never shadow emitter-owned keys.** Input data appears only under `x-plumbline.inputs`. Every emitter-owned key (`verdict`, `gaps`, `times`, `time_tolerance_s`, `hand_times`, `allowances`, `generations`, `evaluations`, `relays`, `amendments`, `spend`, `schema`) holds the value the verifier re-derives from the §5 record, ledger and logs. Planted P-V6 (a record where `inputs.verdict`/`inputs.hand_times` values were copied over the owned keys) → `shadow`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V7",
+          "criterion": "**Never writes its inputs, and stands alone.** The sha256 of every file under the record, files, evidence and ledger paths is identical before and after a run. A run from a `chmod -R a-w` copy gives the same result and output. `kit/plumbline_verify.py` does not import `kit/emit_custody.py` (static import check; it may use `custody_history.read_log` to parse logs), so the emitter's logic is checked by separate code. Planted C-V7p (a verifier copy that writes a `.verified` marker beside the record) → FAIL.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V8",
+          "criterion": "**Close refuses on a verify failure.** `plumbline_job.py close` runs the emitter, then the verifier on the new record. If the verifier fails, close exits non-zero (the verifier's code), prints `NOT CLOSED: Plumbline verify failed (<kind>)`, writes a run-log row `close_refused` with the kind, and writes **no** `closed` row. (The packet's terminal state is still set by `plumbline.py --job-close` before custody, because the emitter needs it. \"Refuse\" means no `closed` row and a non-zero exit; re-running close after a fix retries.) Planted P-V8 (a scratch copy of the subject whose emitter drops `allowances`, closing a job with hand times) → exit 4, `close_refused`, no `closed` row. Clean: the T4 job closes with exit 0 and a `closed` row. `plumbline_job.py custody` (re-emit) also runs the verifier and returns its code.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "V9",
+          "criterion": "**Tests and docs.** `tests/test_plumbline_verify*.py` covers every kind in V1–V8 with repo fixtures in new folders. `docs/custody-emission.md` documents the interface, the exit codes, the kinds, the US$0.0001 spend tolerance, and the two layers (G3).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G1",
+          "criterion": "`git diff --name-status 3df1ce5..<rev>` ⊆ the allow-list (edits only where edits are allowed; new files only where new files are allowed; no deletions). The protected bytes equal the pins. Every base file under `tests/fixtures/` and `dot-plumbline/jobs/` is byte-identical.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G2",
+          "criterion": "Every test that exists at base passes on the subject with the frozen venv, and its result equals its result at 3df1ce5 when run the same way (base-test isolation). Every new test passes. Each part has at least one new test file (T, F1, I/F7, F8, P, X, V).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G3",
+          "criterion": "`docs/custody-emission.md` names every new command, `--allow-hand-times`, the `writer` field, `x-plumbline.hand_times`, `x-plumbline.inputs` and `tools/edi/`. It also explains **the two layers**: the standard layer (custody check.py at CL1, which ignores every `x-` key per SPEC.md line 141) and the Plumbline layer (`kit/plumbline_verify.py`, which runs check.py first and then enforces `x-plumbline`). It says plainly that `x-` keys are enforced by Plumbline only, and it names the verifier's exit codes and failure kinds. `kit/README.md` names `tools/edi/` and `kit/plumbline_verify.py`.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G4",
+          "criterion": "The guide exists at that exact path, is added in the diff (`A`), is non-empty UTF-8, and the whole diff passes G1's allow-list. Controls: C-G4c (a base clone with a held-out clean guide, must PASS); C-G4p (the same text at `docs/ORCHESTRATOR-FIELD-GUIDE.md`, must FAIL).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G5",
+          "criterion": "**Status line.** One of the first 15 lines contains `status`, `non-normative` and `doctrine wins` (the doc is non-normative, and the doctrine wins on conflict). Controls: C-G5c (clean); C-G5p (status line removed).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G6",
+          "criterion": "**Required rules present** (anchored phrases; each group needs one alternative from every list). B1 tripwire: `same failure class` + `3 times`/`three times`/`third time` + `change the request`. B2: `shared key` + `spend guard` + `upper bound`. B3: `pre-read` + `optional` + `approval sheet`. C1: `finish_reason` + `length` + `empty content` + `own failure class`. C2: `no throttling` + `endpoint max` + `reasoning limit`. C3: `size each task`/`sized task`/`size the task`/`size each request`/`sized request`/`size the request`. C4: `finish_reason` + `every call`. C5: `cap counts` + `iterations`. C6: `command that writes`. C7: `standing rules`. C8: `live test` + `freeze gate`. C9: `write-once`. C10: `relayed approval(s)` + `not an approval`/`not approvals`. C11: `/tmp`. F: `carried forward`, plus a heading containing it. Controls: C-G6c (clean); C-G6p (the tripwire count made vague).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "G7",
+          "criterion": "**Leak scan.** None of: `Steve`, `Moitozo`, `S2` (case-sensitive), an email address, `/workspace`, `/Users/`, `/home/`, key material (`sk-or-`, `sk-` + 16 or more key characters) or a key fingerprint; and none of the denylisted verbatim phrases from the Owner's card answers and quoted messages (28 phrases in `fg_rules.json`, matched on letters and digits only). Model and organization names that the drafts cite (for example VizH, evaluatordriven) are allowed. Controls: C-G7c (clean); C-G7p (a planted Owner quote and a local path).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "J1",
+          "criterion": "Reading the base→subject diff of `kit/emit_custody.py`, `kit/custody_history.py`, `kit/custody_ledger.py` and `kit/plumbline_job.py`, plus the new `kit/plumbline_verify.py` (numbered listing): no cross-check or refusal is loosened, removed or downgraded; `--allow-hand-times` affects only hand-time refusals; and no verifier failure is skipped when a field is absent or can be bypassed at close. Answer `CONFORMS` / `DOES_NOT_CONFORM` with cited lines. Controls: G-J1c (clean: a diff that only adds the writer field); G-J1p1 (tolerance widened to 600 s); G-J1p2 (a different failure type: an early `if allow_hand_times: return` that also skips the order checks).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "J2",
+          "criterion": "Read as a person would, `docs/custody-emission.md` says the following. Hand times are refused by default. The switch **flags** hand times and never verifies them. A relay is a report, not an approval. Reported times are accepted only through the bounding commands. `x-plumbline` is enforced by Plumbline's verifier only; the standard check.py ignores it. Answer as in J1. Controls: G-J2c (clean); G-J2p1 (\"with `--allow-hand-times` the times are verified/trusted\"); G-J2p2 (a different failure type: \"a relayed approval counts as the Owner's approval\"); G-J2p3 (a third type, added with item 29: \"the standard custody check.py validates the `x-plumbline` block\").",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "J3",
+          "criterion": "**G-faithful.** Reading the whole guide (numbered) against the Owner decisions of 2026-10-28 15:52 EDT (the tripwire at exactly 3 of the same failure class, then change the request; the shared key behind the harness pre-call spend guard, with reconciliation an upper bound and no per-job-key recommendation; the cross-family pre-read optional, decided per job on the approval sheet), the item-30 (c) rules, and DOCTRINE.md v0.1 @ `dc61854` (copied verbatim, CC BY 4.0, into the frozen instrument): nothing in the guide contradicts them, and it does not claim to override the doctrine. Controls: G-J3c (clean); G-J3p (the spend rule rewritten to require a per-job key; it must be cited within ±2 lines).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "J4",
+          "criterion": "**G-story.** Every rule from item 30 (b) and (c) that the guide states is paired with its real story (a concrete incident from a real job or review, placed with the rule), in field-guide style. A bare reason or a hypothetical is not a story. Controls: G-J4c (clean); G-J4p (two rules' stories removed; one of those rule lines must be cited within ±2).",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "role": "buyer",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6"
+          },
+          "at": "2026-10-28T21:41:23Z",
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)",
+            "at_source": "inputs/custody-events.jsonl:5"
+          }
+        },
+        {
+          "role": "specialist",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6"
+          },
+          "at": "2026-10-28T21:41:23Z",
+          "adopted": {
+            "document": "Owner sheet items 1-30 (OWNER-APPROVAL.md) + Plumbline DOCTRINE.md v0.1 @ dc61854",
+            "version": "v0.1"
+          },
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)",
+            "at_source": "inputs/custody-events.jsonl:6"
+          }
+        }
+      ],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "DeepSeek V4.1 Flash 1017",
+      "kind": "model",
+      "version": "v4.1-flash-1017",
+      "method": {
+        "sha256": "9dcfea6eef48b4d7b4f94419b2eb31f1dafc0aab43adf3229284be16a4662dd2"
+      },
+      "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "endpoint": "api.deepinfra.com",
+        "readOnly": false
+      },
+      "x-plumbline": {
+        "harness_log": "harness-maker-deepseek.log",
+        "calls": [
+          "harness-maker-deepseek.log#maker_iter1_emitter_a1",
+          "harness-maker-deepseek.log#maker_iter1_verifier_a2",
+          "harness-maker-deepseek.log#maker_iter1_edi_a1",
+          "harness-maker-deepseek.log#maker_iter1_edi_a2",
+          "harness-maker-deepseek.log#maker_iter2_ledger_a1",
+          "harness-maker-deepseek.log#maker_iter2_emitter_a1",
+          "harness-maker-deepseek.log#maker_iter2_verifier_a1",
+          "harness-maker-deepseek.log#maker_iter2_docs_a1",
+          "harness-maker-deepseek.log#maker_iter3_fix_a3",
+          "harness-maker-deepseek.log#maker_iter3_fix_a4"
+        ],
+        "aggregator": "openrouter.ai",
+        "upstream_provider": "DeepInfra",
+        "provider_slug": "deepinfra/fp8",
+        "endpoint_basis": "declared pin (2026-10-28T20:47:58Z) to 'DeepInfra' at api.deepinfra.com, served-by confirmed from generation provider_name",
+        "startedAt_basis": "harness-maker-deepseek.log#maker_iter1_emitter_a1 sent_at",
+        "producedAt_basis": "harness-maker-deepseek.log#maker_iter3_fix_a4 received_at",
+        "startedAt_source": "harness-maker-deepseek.log:211",
+        "producedAt_source": "harness-maker-deepseek.log:2853",
+        "routing": {
+          "pin": {
+            "via": "openrouter.ai",
+            "provider": "DeepInfra",
+            "slug": "deepinfra/fp8",
+            "host": "api.deepinfra.com",
+            "declaredAt": "2026-10-28T20:47:58Z"
+          },
+          "requests": [
+            {
+              "provider": {
+                "allow_fallbacks": false,
+                "order": [
+                  "deepinfra/fp8"
+                ],
+                "zdr": true
+              },
+              "calls": [
+                "harness-maker-deepseek.log#maker_iter1_emitter_a1",
+                "harness-maker-deepseek.log#maker_iter1_verifier_a2",
+                "harness-maker-deepseek.log#maker_iter1_edi_a1",
+                "harness-maker-deepseek.log#maker_iter1_edi_a2",
+                "harness-maker-deepseek.log#maker_iter2_ledger_a1",
+                "harness-maker-deepseek.log#maker_iter2_emitter_a1",
+                "harness-maker-deepseek.log#maker_iter2_verifier_a1",
+                "harness-maker-deepseek.log#maker_iter2_docs_a1",
+                "harness-maker-deepseek.log#maker_iter3_fix_a3",
+                "harness-maker-deepseek.log#maker_iter3_fix_a4"
+              ]
+            }
+          ],
+          "request_ok": true
+        }
+      }
+    },
+    "startedAt": "2026-10-28T22:20:16Z",
+    "producedAt": "2026-10-29T15:24:36Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6"
+      },
+      "runner": {
+        "sha256": "ebd3b7393c6cce9ae2d31795dc01187d1c7c9c5e37f590b45a2d3b6df7625e9a"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "S1",
+        "name": "S1 instrument script (T1-T7, F1a-F1h, I1, F7a, F8a-F8d, P1, X1, V1-V9, G1-G7)",
+        "kind": "script",
+        "model": null,
+        "script": {
+          "name": "run_instrument.sh",
+          "author": "Chief of Staff (Orchestrator) drafter",
+          "digest": {
+            "sha256": "c40c640cdb0ec9ba383acb6cb4e46c54d5012bc9bf78445cd1689197058953af"
+          }
+        }
+      },
+      {
+        "id": "E-GLM",
+        "name": "GLM 5.3 Flash (J1-J4)",
+        "kind": "model",
+        "model": {
+          "family": "glm",
+          "identifier": "z-ai/glm-5.3-flash",
+          "endpoint": "api.z.ai",
+          "readOnly": true
+        },
+        "x-plumbline": {
+          "harness_log": "harness-eval-glm-b3.log",
+          "calls": [
+            "harness-eval-glm-b3.log#J1-b3-1",
+            "harness-eval-glm-b3.log#J1-b3-2",
+            "harness-eval-glm-b3.log#J1-b3-3",
+            "harness-eval-glm-b3.log#J1-b3-4",
+            "harness-eval-glm-b3.log#J2-b3-1",
+            "harness-eval-glm-b3.log#J2-b3-2",
+            "harness-eval-glm-b3.log#J2-b3-3",
+            "harness-eval-glm-b3.log#J2-b3-4",
+            "harness-eval-glm-b3.log#J2-b3-5",
+            "harness-eval-glm-b3.log#J3-b3-1",
+            "harness-eval-glm-b3.log#J3-b3-2",
+            "harness-eval-glm-b3.log#J3-b3-3",
+            "harness-eval-glm-b3.log#J4-b3-1",
+            "harness-eval-glm-b3.log#J4-b3-2",
+            "harness-eval-glm-b3.log#J4-b3-3"
+          ],
+          "aggregator": "openrouter.ai",
+          "upstream_provider": "Z.AI",
+          "provider_slug": "z-ai/fp8",
+          "endpoint_basis": "declared pin (2026-10-28T20:47:58Z) to 'Z.AI' at api.z.ai, served-by confirmed from generation provider_name",
+          "routing": {
+            "pin": {
+              "via": "openrouter.ai",
+              "provider": "Z.AI",
+              "slug": "z-ai/fp8",
+              "host": "api.z.ai",
+              "declaredAt": "2026-10-28T20:47:58Z"
+            },
+            "requests": [
+              {
+                "provider": {
+                  "allow_fallbacks": false,
+                  "order": [
+                    "z-ai/fp8"
+                  ],
+                  "zdr": true
+                },
+                "calls": [
+                  "harness-eval-glm-b3.log#J1-b3-1",
+                  "harness-eval-glm-b3.log#J1-b3-2",
+                  "harness-eval-glm-b3.log#J1-b3-3",
+                  "harness-eval-glm-b3.log#J1-b3-4",
+                  "harness-eval-glm-b3.log#J2-b3-1",
+                  "harness-eval-glm-b3.log#J2-b3-2",
+                  "harness-eval-glm-b3.log#J2-b3-3",
+                  "harness-eval-glm-b3.log#J2-b3-4",
+                  "harness-eval-glm-b3.log#J2-b3-5",
+                  "harness-eval-glm-b3.log#J3-b3-1",
+                  "harness-eval-glm-b3.log#J3-b3-2",
+                  "harness-eval-glm-b3.log#J3-b3-3",
+                  "harness-eval-glm-b3.log#J4-b3-1",
+                  "harness-eval-glm-b3.log#J4-b3-2",
+                  "harness-eval-glm-b3.log#J4-b3-3"
+                ]
+              }
+            ],
+            "request_ok": true
+          }
+        },
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "T1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T1.json",
+          "sha256": "4bd9ad52bb5a13e4657f2efda7c7ee2debfe733a2a48470efb89df7252768549"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T2",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T2.json",
+          "sha256": "ff4dae1d5237d850aaacbf9b87c0dae94ddc9122a41f4db341c94fa1e7de5ca1"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T3",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T3.json",
+          "sha256": "370179faa7e2382c4f8d6255829eafc4a6bb982a5fd7a572874b5841ac3c36a3"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T4",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T4.json",
+          "sha256": "703ae6c9d423f849f518dda32752d7e60b4c6fcc7b5ddf216e542f33b72fa00c"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T5",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T5.json",
+          "sha256": "f56c8ce3f2b6799a64beff17f47cb7ab1224be10dd690fb93dd7ecc3906d8903"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T7",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T7.json",
+          "sha256": "058e276cbd1e9e73925aad2af46e3311e0f7b4dd881ea5846b02a2182f6f2a1f"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1a",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1a.json",
+          "sha256": "6bf18621d62bcf9bcee0f2c8264e06727bb9a97fdc83280df0c1fb204384be98"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1b",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1b does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1b.json",
+          "sha256": "1b7e96401320f39767e52ab5d4c4825e679294661949fb962530696113491b3a"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1c",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1c does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1c.json",
+          "sha256": "26a47c4b33ed6256c5e85f76ae83875300d3c2bec5bd6c74bd0ecc1b8c13f2b0"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1d",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1d does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1d.json",
+          "sha256": "82a4d6e3bfa235099286d4795d5d63dd893059386132f2948ede50529873c106"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1e",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1e does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1e.json",
+          "sha256": "ec29c04ec9964a866b58a9731d0092ba49be8d846d5263b29a18b01941f12d25"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1f",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1f does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1f.json",
+          "sha256": "52c70e63fbd6af00c949efdc693a32d14b0bee14c3da9df99371a74a6f033428"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1g",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1g does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1g.json",
+          "sha256": "82919ba946f91ceb756a1296305fa324f4968a1a3b946a626bab77d5cd8302ef"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F1h",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F1h does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F1h.json",
+          "sha256": "7f59e640bfad429641f659be50b68effa5845fde8b9c973c985732c353df52d7"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "I1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "I1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "I1.json",
+          "sha256": "a31904fdca112e91c09fdb7457e33b8b3d6272cd26e7574c06654284db181f1b"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F7a",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F7a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F7a.json",
+          "sha256": "e7ff9e4e863a2684f4926670a33f476530a5267fe6f14d3fbdab99832131f7c3"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F8a",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F8a does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F8a.json",
+          "sha256": "fd55f561cad36294ddb443c24bafaef6582457c6d784d0b2b4c31d89bceddc6e"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F8b",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F8b does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F8b.json",
+          "sha256": "13aef3a51069609e6f79ac884803d638ce307a032796c833e9ba0ac7a9ab1be1"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F8c",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F8c does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F8c.json",
+          "sha256": "a8e01fc18657c88fb13dba27346e816c94d7833f42dc5682b7a35de564a0600c"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "F8d",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "F8d does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "F8d.json",
+          "sha256": "f9942ee1ee52564521d2c66a97f0aba34fa878dd391557cbedfd0dbe89f74e98"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "P1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "P1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "P1.json",
+          "sha256": "3f8f76b15f0e7824f9983314d2e2f9ca115add532424e20a889320831b66adb8"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "X1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "X1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "X1.json",
+          "sha256": "c554251ce18bba634268c0a892469c4eaf3a6fe61531282dff2c0ad720e1f9de"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V1.json",
+          "sha256": "889c98f974e8b4e77587bddf6e01cc5ca7f1775e90adc05898532cf037b4d94c"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V2",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V2.json",
+          "sha256": "56d36ef9746425301df00dce9074f4d57ca4e54ef5c61afef27391a184e4ee75"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V3",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V3.json",
+          "sha256": "c509f86218351f92cf0a7cf4b3cb5801b1770599976768645873393c71b4e79a"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V4",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V4.json",
+          "sha256": "a22bb375c0e86c47796e75851d1368d71e872aa2634f753a52451cbf0da21c61"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V5",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V5.json",
+          "sha256": "834496e43c035e567ff370ed5b3964299e0d98c117bf8372863c6ac28d607154"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V6",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V6.json",
+          "sha256": "0321b8244adc3e76c077558c4037959825c9034f65af031a71402027f9e338a5"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V7",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V7.json",
+          "sha256": "bdc56f48712f1f68494072d2fb898bf39ac2c0779950b0c55c56bd192306f410"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V8",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V8 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V8.json",
+          "sha256": "67236b9169389d8e78de1d05b4a07ebff43cae696a8b36374ee74c0907920e68"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "V9",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "V9 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "V9.json",
+          "sha256": "8409aefa6f73985a20a171e1adf2741cc65c3be4ba512dcfe2dcc35d756ce7ce"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G1",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G1.json",
+          "sha256": "947590f826652f6874419a1f6f101f5d7969590120d7918ae8f353cbef08f317"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G2",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G2.json",
+          "sha256": "938e4e686c59129cd283a5427525385dfa3d62f251add2b9f05dc3f81a6c127c"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G3",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G3.json",
+          "sha256": "5ca56c5a41689bec7461c8af48ac6dc769ef9daae421d4254aa593bdd0be6600"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G4",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G4.json",
+          "sha256": "c08f37ba74c3c51149e9d36dcc70df4454494ee6af97f74b9d7daff621b89189"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G5",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G5.json",
+          "sha256": "bcd11f28ede79e4011262c803ca37f2bd12c30e7652e88d1f0bccc2dc113e30a"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G6",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G6.json",
+          "sha256": "5420c9aa7a838e10ea37d4698574fe07d93f68917422cd914045125bccf6dd52"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "G7",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "G7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "G7.json",
+          "sha256": "993d8b22a8e03d093969d6dd56ffb6872e19cfcc59a3bad683dbcf157c93d665"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "T6",
+        "evaluator": "S1",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T15:56:38Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "T6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "T6-amend2.json",
+          "sha256": "f522a9119c62241fd31452957f5b8f99b4cf02f1b9f0a6cda1fb417d810cff31"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b3-t6-amend2",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "dimension": "J1",
+        "evaluator": "E-GLM",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T16:05:37Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "J1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "J1-J1-b3-1.json",
+          "sha256": "de71b529f9ae0c057ce2cea84696431fda761bdd58d3e25efc2acceed7575b92"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "glm-b3-J1",
+          "call": "harness-eval-glm-b3.log#J1-b3-1",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:37"
+        }
+      },
+      {
+        "dimension": "J2",
+        "evaluator": "E-GLM",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T16:10:12Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "J2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "J2-J2-b3-3.json",
+          "sha256": "1db029f1f5f7a0cd5cebb8d9c329136bbc54f2c9821e28cef91898d62845dca1"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "glm-b3-J2",
+          "call": "harness-eval-glm-b3.log#J2-b3-3",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:1363"
+        }
+      },
+      {
+        "dimension": "J3",
+        "evaluator": "E-GLM",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T16:19:56Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "J3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "J3-J3-b3-3.json",
+          "sha256": "2e2cf0e14bff9cb64550850d1c19308f00e2c242e0541aca2d6c96d003960750"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "glm-b3-J3",
+          "call": "harness-eval-glm-b3.log#J3-b3-3",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:2468"
+        }
+      },
+      {
+        "dimension": "J4",
+        "evaluator": "E-GLM",
+        "run": 3,
+        "batch": "b3",
+        "at": "2026-10-29T16:21:34Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "J4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "J4-J4-b3-1.json",
+          "sha256": "b3018c08c79dd5b3fc1ad28098d0baff25595b82c13c3ccd74aa096e27675a77"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "glm-b3-J4",
+          "call": "harness-eval-glm-b3.log#J4-b3-1",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:2689"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "id": "C-G1p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "49d3a506f6f75814ffcfc35a0312c228d202439adc9f1595212c47c318cb7284"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G4c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "aa603082ff88e7e86ed845d446f9f411a9b45aba75bda74628a21f5f18bfa90b"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "G4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G4p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "aa603082ff88e7e86ed845d446f9f411a9b45aba75bda74628a21f5f18bfa90b"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G5c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "aa603082ff88e7e86ed845d446f9f411a9b45aba75bda74628a21f5f18bfa90b"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "G5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G5p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "fe41109b75df0e6c0e9eb74a36355e81022de3d8a20f8c5abc8154bdb659df61"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G6c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "aa603082ff88e7e86ed845d446f9f411a9b45aba75bda74628a21f5f18bfa90b"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "G6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G6p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "fd6282382a80ecee261dff12bfc13354f12df3fd7b672bf454dbba875fa0b87e"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G7c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "aa603082ff88e7e86ed845d446f9f411a9b45aba75bda74628a21f5f18bfa90b"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "G7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-G7p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "62ff5a903dce13d0fd23a27d26b00cbcb2141aa16bf03279f5e799c1f46b5e52"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-T5c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "b33c9eb1b74ed24ab5dc63375fca2925ddb42a604064616eb68a42506162b358"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "T5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-T5p1",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "49d3a506f6f75814ffcfc35a0312c228d202439adc9f1595212c47c318cb7284"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-T5p2",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "49d3a506f6f75814ffcfc35a0312c228d202439adc9f1595212c47c318cb7284"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-T7p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "b91cb439fdd57ebe0188d165e6fceb258231d8b37d5b18210235e1f6c0df4c88"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-V7c",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "d97a8fb62acb94cadb58c5ce278c132b5902f935d6447da58520295617afe5bd"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "V7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "C-V7p",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "5b010cf04a7895c0eea0eadfa8b482a6d7c45db75c201f3eb66f829d9490b4be"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1a.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "ced67c16f15f4ab733abdadb6210ee500dc6438643acf870324d08edd6334aa4"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1a",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1b.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "03177cdd945d79be3fa0d1f43f5e617d14df4080f88fc1cc92d4baa8caa264bc"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1b",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1c.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "8337401ecf23f4ea603d289352ae887882b5721a3418706f012384db27f367a7"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F1c",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1c.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "8fbb9c9682493c12a4950a9b47f560278190496b9bfe4e65f809e5065eb4b2c0"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1c",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1d.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "9e937994a8cc6c4f07b9e62966bf619fad0cb90c8049d8a5da2ad382f7fa0724"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1d",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1e.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "82f3ee0111f522b167285b32f3fa57ab1b5134012316b7b0ce2ae35b72b630a5"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F1e",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1e.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "3f6c0013f948d4bacab75f6b9946bc86b49cf093ae9a0faaf4f4d67268f33a9a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1e",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1f.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "f1c1ad0e5432861c3bef1ee9e7e5f9a72f33055832f89c27efc51e40cb809a2a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1f",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1g.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "8cc41ce79326ef08d6eac741b9ab4b2302bd08e50e6f7eb09f92d90b233ba8c7"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F1g",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1g.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "fba06cf67d53dfe1f9be7d39b2d4a506a26409d7b7b865d72ea6a9c8408f4c6e"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1g",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F1h.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "7b3fb5ebea4602502b6488a3a05c9996df228dc36f149b24078c76ded1de2191"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F1h",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F7a.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "f6136d21a785d55a0473757d46ce55434931daa91f553e4992db485053f9c465"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F7a",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8a.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "d40b023c5e48af06519ad81d80057d4e915df533bf642efa19fd49d2a1305c03"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F8a",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8a.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "05d87a7a605d06ecba55d05a743870eecbf3db5228c6307189cc9bfeaee192f2"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F8a",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8b.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "9337e27f51a3c7658af14811f8ddf518b6df813f11f2b1b293e6e96d1d24ea6a"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F8b",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8b.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "94d9d4bc8cc51fd1f12c113cfc42ba12d6726f2d18aa877de12190c1f3d11ff7"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F8b",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8c.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "1b314a2359fa12a9452f19ed147cdcfeb154b049ef2e2f7c03a81c2866f9e8c0"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "F8c",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8c.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "5dd978e717fd0d3157ce45bb78129109d9ed7ba899283e793d054274844d3595"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F8c",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-F8d.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "f4d6736b8d97c8644f33ac9d7484778ed95bd8511debf2abc315d8e54383f62c"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "F8d",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-G1.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "41a449c2d90bd578d1e169c9c988e303dd0f002f6ba0c77064782168b4a889ee"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "G1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-G2.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "6800cfb449af91042def6377cf04967bca0dbeaa690c24d014591c07311de9b2"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-G3.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "7dd63032b8e80c75b0b8db7ffe83617498f91e87e42d980475b0ce4d982a0de8"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "G3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-I1.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "ff0fb0fa571df553305cc5ca3c27a84f52f3e20d76820517b8568d83dfd3738f"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "I1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-P1.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "17929bfb4769eb80a2458669e424462f0c6fac4d3c285571f341431951aed364"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "P1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T1.clean",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "d7edb957d8d6c2845dd3c1e79691f8d3aadd6687b87186845d1282c16524893e"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "T1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T1.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "67a9f2b7c31a7edfb8e88850477a263bce8fff8e2c3e8aed9bf949a1ce37397c"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T2.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "0bb68c2d789e63e31346c1987145212af5391cfbabbfac0eb7ed2cc80c6237ee"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T3.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "d9ae28b22ed3d3cc7bbfb70cc746674a1be003f7ea1e9ce5f98ef86aeb530d8a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T4.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "0405b0f14cda3081e3cbcc932c9af9bbe8aa8596008cab5854c9b8b636977cb4"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T5.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "15d6de4dd43a2fa7206c42aeeb5f78d28b58e9baac4f745dd1b7f4dd286a4e67"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T6.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "c8eac384af89cc9f37e6b70150cbd34f7df98426e163f4fb0881c7c64e1c596f"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-T7.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "0b28ace28ad2c99701a0b0dd8efac115f4d4e051213bb8bac4c1dfc8750b1b51"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "T7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V1.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "1b99715a2ad15fc74a908d58a668631550335aaaf088240426a24b132b9180b7"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V2.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "019e64eeb543aab658d68fd98aa5513286ba60e56123a7d64019dfde723caf8a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V3.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "7c2e0a42ecd6bbedb7e880ce42cdb78bc12eecf26125a1f63dabeeac763351a0"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V4.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "fb45c150c4662d8f99896c288df454db1f469c84c7b00ac26cddbc2a3f78361a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V5.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "07bcec8475aa00ac4544285a58fb41aa6ba5bb45d97606bdaafc7041029e4ace"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V6.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "27b296048c9e1cb65b81d040f6f969ec53321be01660a2a2575e58c088327d5e"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V7.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "67c7b3ff567991e93febac4df38335d1d41e363de25c2896fceca709c413a09a"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V7",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V8.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "ac3eb9bcf8aebc87b1b3d34fa19a8ee8a6819a7746e1ae3b377cf04983a3092f"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V8",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-V9.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "e45eb594ce307791d47c228c0c94169ec06584a56b054b0012deadd7b0c619f8"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "V9",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "OBS-X1.planted",
+        "batch": "b3",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "c2f3a782f3cd57ddcbe66b41fb685e12b006d213e1dcd442e6d4bb571d00dac1"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "X1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/s1-summary.json",
+            "sha256": "bd524e8e105c718ae3d76f853e2859a301f763d57e3b4ac0807d4a43067f3324"
+          },
+          "at": "2026-10-29T15:56:38Z",
+          "at_source": "inputs/custody.json:766"
+        }
+      },
+      {
+        "id": "G-J1p2",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "78df99619cfb67af7313991b5f61580119e430f968b5fdd954f69006d4bdce7b"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J1-batch.json",
+            "sha256": "c8b428414875df3b5b3208b3f02442fc8b3b5714ece468769cd2ddec68d4a6fd"
+          },
+          "call": "harness-eval-glm-b3.log#J1-b3-2",
+          "at": "2026-10-29T16:06:14Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:258"
+        }
+      },
+      {
+        "id": "G-J1c",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "1424a363865e84bdb6fea49e163d3f7bf020d2f0f84a94621c6728aef9b0129b"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "J1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J1-batch.json",
+            "sha256": "c8b428414875df3b5b3208b3f02442fc8b3b5714ece468769cd2ddec68d4a6fd"
+          },
+          "call": "harness-eval-glm-b3.log#J1-b3-3",
+          "at": "2026-10-29T16:06:46Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:479"
+        }
+      },
+      {
+        "id": "G-J1p1",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "785eb1302170ef1f32de5d498305d1b72e1254d762b004448d965d2bfaf52c6f"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J1-batch.json",
+            "sha256": "c8b428414875df3b5b3208b3f02442fc8b3b5714ece468769cd2ddec68d4a6fd"
+          },
+          "call": "harness-eval-glm-b3.log#J1-b3-4",
+          "at": "2026-10-29T16:07:16Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:700"
+        }
+      },
+      {
+        "id": "G-J2p1",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "52f9c8c2857fdee8d78ea02c67f0578d5abb6c577435aab106fd316ed83cd1fb"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J2-batch.json",
+            "sha256": "7c55df21f825b78b84551ebf2eaa0fb0af884fdaac83d207a863ebc4ce992faf"
+          },
+          "call": "harness-eval-glm-b3.log#J2-b3-1",
+          "at": "2026-10-29T16:07:51Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:921"
+        }
+      },
+      {
+        "id": "G-J2p3",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "dac98d0d65ebc284b68556217844e28b19181176b5414ed021601d4156f58d6f"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J2-batch.json",
+            "sha256": "7c55df21f825b78b84551ebf2eaa0fb0af884fdaac83d207a863ebc4ce992faf"
+          },
+          "call": "harness-eval-glm-b3.log#J2-b3-2",
+          "at": "2026-10-29T16:08:27Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:1142"
+        }
+      },
+      {
+        "id": "G-J2c",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "ad0530043fcc18f093dac9028a5522b96d20d281da0137656d4f6d849214f59a"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "J2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J2-batch.json",
+            "sha256": "7c55df21f825b78b84551ebf2eaa0fb0af884fdaac83d207a863ebc4ce992faf"
+          },
+          "call": "harness-eval-glm-b3.log#J2-b3-4",
+          "at": "2026-10-29T16:11:07Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:1584"
+        }
+      },
+      {
+        "id": "G-J2p2",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "e083086fbe4e6b7a31ceb07bb82a0f85835f0dde5b20fb8cfc5156eb4b2af9b4"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J2-batch.json",
+            "sha256": "7c55df21f825b78b84551ebf2eaa0fb0af884fdaac83d207a863ebc4ce992faf"
+          },
+          "call": "harness-eval-glm-b3.log#J2-b3-5",
+          "at": "2026-10-29T16:12:11Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:1805"
+        }
+      },
+      {
+        "id": "G-J3c",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "c1e8e7c5ead584dde2f511fb7ea85e61bd7842d7d0490ace716a6e0aebac2a85"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "J3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J3-batch.json",
+            "sha256": "d741389aa900b5b1ca5ec8f7a4f3b20ea00d6eeb5cd9c69ea0843f2c865df482"
+          },
+          "call": "harness-eval-glm-b3.log#J3-b3-1",
+          "at": "2026-10-29T16:15:37Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:2026"
+        }
+      },
+      {
+        "id": "G-J3p",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "cb385048b720643c2b1246fcae6a3354951c7564e1a4d33f27f32b85ba330aa4"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J3-batch.json",
+            "sha256": "d741389aa900b5b1ca5ec8f7a4f3b20ea00d6eeb5cd9c69ea0843f2c865df482"
+          },
+          "call": "harness-eval-glm-b3.log#J3-b3-2",
+          "at": "2026-10-29T16:16:30Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:2247"
+        }
+      },
+      {
+        "id": "G-J4p",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "33511f1f8a6bfbff7e7a211769e5a71dde3daef71bbfbf3a6a84e590395b21e5"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "J4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J4-batch.json",
+            "sha256": "5ebe8a162a7c6bd67177f059934ad58c28cd6bac6a5b090fb540f45a385398bd"
+          },
+          "call": "harness-eval-glm-b3.log#J4-b3-2",
+          "at": "2026-10-29T16:22:13Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:2910"
+        }
+      },
+      {
+        "id": "G-J4c",
+        "batch": "b3",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "c1e8e7c5ead584dde2f511fb7ea85e61bd7842d7d0490ace716a6e0aebac2a85"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "J4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/b3/glm/J4-batch.json",
+            "sha256": "5ebe8a162a7c6bd67177f059934ad58c28cd6bac6a5b090fb540f45a385398bd"
+          },
+          "call": "harness-eval-glm-b3.log#J4-b3-3",
+          "at": "2026-10-29T16:23:34Z",
+          "at_basis": "received_at",
+          "at_source": "harness-eval-glm-b3.log:3131"
+        }
+      }
+    ],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [
+      "Grokbot's underlying model(s) are not disclosed by its operator; family and identifier recorded as undisclosed.",
+      "Every Maker call was issued by a harness operator, the E-DI Maker bot (a Grok Bot), which issued the logged calls through the frozen harness, extracted the returned files verbatim and committed them (custody/method.md). This was instructed, not enforced.",
+      "Controls and fixtures were held outside the Maker's and Evaluator's working trees with sha256 committed at freeze, but on a shared box both bots could technically read them; non-reading was instructed, not enforced.",
+      "Held-out control case files are digested from /workspace/job-controls/2026-10-28-custody-times-ledger-spend, outside the repo. The record carries their sha256 only, so a stranger cannot re-read the cases. The mutation controls C-T5p1, C-T5p2 and C-G1p have no case file of their own (scheck.py applies the mutation); their case_file is the frozen public instrument custody/freeze/instrument/scheck.py.",
+      "E-GLM ran as four checks (J1-J4) with one harness log each. The base emitter reads one log per evaluator, so the record's E-GLM log (custody/evidence/harness-eval-glm-b3.log) is the four batch-3 logs merged in sent_at order and redacted of held-out control text (handoffs/close/redact_glm_log.py); the full logs' sha256 are in custody/evidence/harness-eval-glm-b3.log.full.sha256 and the full logs stay on the box. Batches 1 and 2 are filed the same way (harness-eval-glm-b1.log, -b2.log) as evidence for runs 1 and 2.",
+      "Controls in the record are batch 3's only (57 S1 + 11 E-GLM, all right). Batches 1 and 2 ran their own controls, all right (custody/evidence/b1/, b2/ summaries and batch files).",
+      "S1 is a script with no call log. Its pass and control time (2026-10-29T15:56:38Z) is the batch-3 S1 run's own finished_at stamp (scheck.py@49d3a506f6f7). T6 is scored under Amendment 2 (AMENDMENT-2-t6-n1-refusal.md, ledger line 8) from that same run's output (custody/evidence/T6-amend2.json; frozen T6 verdict FAIL), so pass s1-b3-t6-amend2 carries the same time. The pass on all 43 checks rests on Amendment 2 (disclosure 20).",
+      "S1's batch-3 per-check evidence files that echoed held-out fixture values (F1a-F1h, F8a-F8d, I1, T2, T3, T6, T6-amend2, T7, V1-V4, V6) are filed redacted (handoffs/close/redact_s1_evidence.py: each such JSON value is replaced by a fixed marker; ids, verdicts and reasons are kept). The full files stay on the Owner's box; their sha256 are in custody/evidence/HELD-ON-BOX.sha256, so a stranger can check the verdicts but not re-read the fixture values.",
+      "The leak scan allows one reviewed hit (handoffs/close/leak-allow.json, by line sha256): a bare function signature that the Maker wrote in its own reasoning in call maker_iter1_edi_a1 equals one line of a held-out reference copy by naming coincidence. The Maker log's digest is pinned (882ee4e6...), so it is filed unredacted.",
+      "The record's Maker call list (maker.calls) leaves out maker_iter1_ledger_a1, maker_iter1_docs_a1, maker_iter3_fix_a1 and maker_iter3_fix_a2, whose /api/v1/generation fetch returned 404 (the base emitter refuses a call with no generation endpoint), and the guide calls, which are in separate logs (harness-maker-deepseek-guide-iter1.log, -iter2.log) because the base emitter reads one Maker log. All of them are in the evidence folder; startedAt is therefore maker_iter1_emitter_a1's sent_at, not the first call's.",
+      "After the approvals and amendments, the generation, evaluation, relay, spend and dispose lines in inputs/custody-events.jsonl were appended by hand by the Orchestrator at the close, not stamped by custody_ledger.py (which at 3df1ce5 has no command for them). They were recorded late: each carries writer \"hand\", recorded_late true, recorded_at and at_source (disclosure 23). The dispose line carries the Owner's decision time and channel as the Orchestrator received them.",
+      "Steve's run go-aheads for iteration 3 (09:55 EDT, card t21s1; 11:08 EDT, card t23s1) were given in the E-DI Maker's own chat and the batch-2 go-ahead (08:25 EDT, card t11s2) in the E-DI Evaluator's own chat; the Orchestrator checked them in those transcripts (ledger \"relay\": true). No source was found for the iteration-1 Maker and Evaluator go-aheads, the guide-a2 go-ahead or the batch-3 go-ahead; they are not in the ledger.",
+      "Spend (bar P6) is reconciled against a key-usage read at the close (custody/evidence/spend-status-close.json): settles US$0.584368826, key delta US$0.603089; the gap 0.01872 is the one reserve with no settle (iteration-1 verifier a1, ruled LOST), kept open at worst case on the Owner's decision; job total US$0.637685. Seven settles use response.usage.cost because the generation fetch failed. The Owner's dashboard figure (US$0.0472) is not reconciled: disclosure 24.",
+      "This record was emitted by base main @ 3df1ce5 (tree 230997f1), not by the branch under test (bar: base tooling only). That emitter cannot pass x-plumbline fields through, so spend, hand times, relays and the post-merge verifier note are in the sidecar custody/x-plumbline.json, sha256 3615556c4449caf88a78032f7f54c460c1544da5ea8fcb858d843df551f1fcf2.",
+      "Close disclosures 1-24 (1-23 accepted by the Owner 2026-10-29 13:15 EDT; first accepted 12:36 EDT (\"Accept the result with disclosures 1–22.\"; item 23 added on his instruction); item 24 added at the close): custody/DISCLOSURES.md, sha256 5d4ec727ccf1914afd49ed6969716bef47502ff946d4cf3fa8ddaba219ab8444."
+    ],
+    "retention": {
+      "location": "github.com/smoitozo/plumbline (private), branch job/2026-10-28-custody-times-ledger-spend, dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend. The full E-GLM logs, the full S1 summaries, the Orchestrator's deviation log and the held-out controls stay on the Owner's box (/workspace/edi-work/2026-10-28-custody-times-ledger-spend, /workspace/job-controls/2026-10-28-custody-times-ledger-spend); the repo has their sha256 only (custody/evidence/HELD-ON-BOX.sha256, custody/evidence/harness-eval-glm-b*.log.full.sha256).",
+      "public": false
+    },
+    "external": [
+      {
+        "requirement": "CL1-15",
+        "subject": "E-GLM",
+        "evidence": {
+          "name": "harness-eval-glm-b3.log",
+          "sha256": "e8c0107e958003e5500888b8132a7490b2c55ec5e66c907050e1c25c677a8698"
+        },
+        "readBy": "Chief of Staff (Orchestrator)"
+      }
+    ],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-10-29T16:36:00Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-10-28-custody-times-ledger-spend",
+      "sources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:5",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:6",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker-deepseek.log:211",
+        "producedAt": "harness-maker-deepseek.log:2853",
+        "checks[s1-b3/T1].at": "inputs/custody.json:766",
+        "checks[s1-b3/T2].at": "inputs/custody.json:766",
+        "checks[s1-b3/T3].at": "inputs/custody.json:766",
+        "checks[s1-b3/T4].at": "inputs/custody.json:766",
+        "checks[s1-b3/T5].at": "inputs/custody.json:766",
+        "checks[s1-b3/T7].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1d].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1e].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1f].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1g].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1h].at": "inputs/custody.json:766",
+        "checks[s1-b3/I1].at": "inputs/custody.json:766",
+        "checks[s1-b3/F7a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8d].at": "inputs/custody.json:766",
+        "checks[s1-b3/P1].at": "inputs/custody.json:766",
+        "checks[s1-b3/X1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V2].at": "inputs/custody.json:766",
+        "checks[s1-b3/V3].at": "inputs/custody.json:766",
+        "checks[s1-b3/V4].at": "inputs/custody.json:766",
+        "checks[s1-b3/V5].at": "inputs/custody.json:766",
+        "checks[s1-b3/V6].at": "inputs/custody.json:766",
+        "checks[s1-b3/V7].at": "inputs/custody.json:766",
+        "checks[s1-b3/V8].at": "inputs/custody.json:766",
+        "checks[s1-b3/V9].at": "inputs/custody.json:766",
+        "checks[s1-b3/G1].at": "inputs/custody.json:766",
+        "checks[s1-b3/G2].at": "inputs/custody.json:766",
+        "checks[s1-b3/G3].at": "inputs/custody.json:766",
+        "checks[s1-b3/G4].at": "inputs/custody.json:766",
+        "checks[s1-b3/G5].at": "inputs/custody.json:766",
+        "checks[s1-b3/G6].at": "inputs/custody.json:766",
+        "checks[s1-b3/G7].at": "inputs/custody.json:766",
+        "checks[s1-b3-t6-amend2/T6].at": "inputs/custody.json:766",
+        "checks[glm-b3-J1/J1].at": "harness-eval-glm-b3.log:37",
+        "checks[glm-b3-J2/J2].at": "harness-eval-glm-b3.log:1363",
+        "checks[glm-b3-J3/J3].at": "harness-eval-glm-b3.log:2468",
+        "checks[glm-b3-J4/J4].at": "harness-eval-glm-b3.log:2689",
+        "controls[C-G1p].at": "inputs/custody.json:766",
+        "controls[C-G4c].at": "inputs/custody.json:766",
+        "controls[C-G4p].at": "inputs/custody.json:766",
+        "controls[C-G5c].at": "inputs/custody.json:766",
+        "controls[C-G5p].at": "inputs/custody.json:766",
+        "controls[C-G6c].at": "inputs/custody.json:766",
+        "controls[C-G6p].at": "inputs/custody.json:766",
+        "controls[C-G7c].at": "inputs/custody.json:766",
+        "controls[C-G7p].at": "inputs/custody.json:766",
+        "controls[C-T5c].at": "inputs/custody.json:766",
+        "controls[C-T5p1].at": "inputs/custody.json:766",
+        "controls[C-T5p2].at": "inputs/custody.json:766",
+        "controls[C-T7p].at": "inputs/custody.json:766",
+        "controls[C-V7c].at": "inputs/custody.json:766",
+        "controls[C-V7p].at": "inputs/custody.json:766",
+        "controls[OBS-F1a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1f.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1h.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F7a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-G2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-I1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-P1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-T1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V8.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V9.planted].at": "inputs/custody.json:766",
+        "controls[OBS-X1.planted].at": "inputs/custody.json:766",
+        "controls[G-J1p2].at": "harness-eval-glm-b3.log:258",
+        "controls[G-J1c].at": "harness-eval-glm-b3.log:479",
+        "controls[G-J1p1].at": "harness-eval-glm-b3.log:700",
+        "controls[G-J2p1].at": "harness-eval-glm-b3.log:921",
+        "controls[G-J2p3].at": "harness-eval-glm-b3.log:1142",
+        "controls[G-J2c].at": "harness-eval-glm-b3.log:1584",
+        "controls[G-J2p2].at": "harness-eval-glm-b3.log:1805",
+        "controls[G-J3c].at": "harness-eval-glm-b3.log:2026",
+        "controls[G-J3p].at": "harness-eval-glm-b3.log:2247",
+        "controls[G-J4p].at": "harness-eval-glm-b3.log:2910",
+        "controls[G-J4c].at": "harness-eval-glm-b3.log:3131",
+        "disposition.at": "inputs/custody-events.jsonl:22"
+      },
+      "events_log": {
+        "name": "inputs/custody-events.jsonl",
+        "sha256": "95da89fbf0471149824d5a475ba9ae0ca83eb6620c7fa58c0b18cd806be998c7"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "iteration": 3,
+      "s5_record": {
+        "name": "iteration-3-eval-record.json",
+        "sha256": "c98b937b67636bba4c4d04cffec1fd7b2736ce6ea67df9609e904a89c65317d5"
+      },
+      "earlier_iterations": [
+        "iteration-1-eval-record.json",
+        "iteration-2-eval-record.json"
+      ],
+      "pass_rule": {
+        "accept": 1,
+        "dimension_floor": 1,
+        "reject": 0,
+        "cap": 3
+      },
+      "disposition_source": "packet.json disposition_state",
+      "packet": {
+        "name": "packet.json",
+        "sha256": "0cf46b459e0ab2d3e4cb7d497030475f3c1b6c258a94be6e16a28d112dea8d0e"
+      },
+      "disposition_at_source": "logged live (inputs/custody-events.jsonl)",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "3df1ce5",
+        "commit": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+        "tree": "230997f1ca9c89ccf035997c4a4db31a0c8ba5fa",
+        "dirty": false,
+        "statedRevision": "230997f1ca9c89ccf035997c4a4db31a0c8ba5fa"
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "harness log",
+        "producedAt": "harness log"
+      },
+      "timeSources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:5",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:6",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker-deepseek.log:211",
+        "producedAt": "harness-maker-deepseek.log:2853",
+        "checks[s1-b3/T1].at": "inputs/custody.json:766",
+        "checks[s1-b3/T2].at": "inputs/custody.json:766",
+        "checks[s1-b3/T3].at": "inputs/custody.json:766",
+        "checks[s1-b3/T4].at": "inputs/custody.json:766",
+        "checks[s1-b3/T5].at": "inputs/custody.json:766",
+        "checks[s1-b3/T7].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1d].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1e].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1f].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1g].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1h].at": "inputs/custody.json:766",
+        "checks[s1-b3/I1].at": "inputs/custody.json:766",
+        "checks[s1-b3/F7a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8d].at": "inputs/custody.json:766",
+        "checks[s1-b3/P1].at": "inputs/custody.json:766",
+        "checks[s1-b3/X1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V2].at": "inputs/custody.json:766",
+        "checks[s1-b3/V3].at": "inputs/custody.json:766",
+        "checks[s1-b3/V4].at": "inputs/custody.json:766",
+        "checks[s1-b3/V5].at": "inputs/custody.json:766",
+        "checks[s1-b3/V6].at": "inputs/custody.json:766",
+        "checks[s1-b3/V7].at": "inputs/custody.json:766",
+        "checks[s1-b3/V8].at": "inputs/custody.json:766",
+        "checks[s1-b3/V9].at": "inputs/custody.json:766",
+        "checks[s1-b3/G1].at": "inputs/custody.json:766",
+        "checks[s1-b3/G2].at": "inputs/custody.json:766",
+        "checks[s1-b3/G3].at": "inputs/custody.json:766",
+        "checks[s1-b3/G4].at": "inputs/custody.json:766",
+        "checks[s1-b3/G5].at": "inputs/custody.json:766",
+        "checks[s1-b3/G6].at": "inputs/custody.json:766",
+        "checks[s1-b3/G7].at": "inputs/custody.json:766",
+        "checks[s1-b3-t6-amend2/T6].at": "inputs/custody.json:766",
+        "checks[glm-b3-J1/J1].at": "harness-eval-glm-b3.log:37",
+        "checks[glm-b3-J2/J2].at": "harness-eval-glm-b3.log:1363",
+        "checks[glm-b3-J3/J3].at": "harness-eval-glm-b3.log:2468",
+        "checks[glm-b3-J4/J4].at": "harness-eval-glm-b3.log:2689",
+        "controls[C-G1p].at": "inputs/custody.json:766",
+        "controls[C-G4c].at": "inputs/custody.json:766",
+        "controls[C-G4p].at": "inputs/custody.json:766",
+        "controls[C-G5c].at": "inputs/custody.json:766",
+        "controls[C-G5p].at": "inputs/custody.json:766",
+        "controls[C-G6c].at": "inputs/custody.json:766",
+        "controls[C-G6p].at": "inputs/custody.json:766",
+        "controls[C-G7c].at": "inputs/custody.json:766",
+        "controls[C-G7p].at": "inputs/custody.json:766",
+        "controls[C-T5c].at": "inputs/custody.json:766",
+        "controls[C-T5p1].at": "inputs/custody.json:766",
+        "controls[C-T5p2].at": "inputs/custody.json:766",
+        "controls[C-T7p].at": "inputs/custody.json:766",
+        "controls[C-V7c].at": "inputs/custody.json:766",
+        "controls[C-V7p].at": "inputs/custody.json:766",
+        "controls[OBS-F1a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1f.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1h.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F7a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-G2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-I1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-P1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-T1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V8.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V9.planted].at": "inputs/custody.json:766",
+        "controls[OBS-X1.planted].at": "inputs/custody.json:766",
+        "controls[G-J1p2].at": "harness-eval-glm-b3.log:258",
+        "controls[G-J1c].at": "harness-eval-glm-b3.log:479",
+        "controls[G-J1p1].at": "harness-eval-glm-b3.log:700",
+        "controls[G-J2p1].at": "harness-eval-glm-b3.log:921",
+        "controls[G-J2p3].at": "harness-eval-glm-b3.log:1142",
+        "controls[G-J2c].at": "harness-eval-glm-b3.log:1584",
+        "controls[G-J2p2].at": "harness-eval-glm-b3.log:1805",
+        "controls[G-J3c].at": "harness-eval-glm-b3.log:2026",
+        "controls[G-J3p].at": "harness-eval-glm-b3.log:2247",
+        "controls[G-J4p].at": "harness-eval-glm-b3.log:2910",
+        "controls[G-J4c].at": "harness-eval-glm-b3.log:3131",
+        "disposition.at": "inputs/custody-events.jsonl:22",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "approvals[0].at": "inputs/custody-events.jsonl:5",
+        "approvals[1].at": "inputs/custody-events.jsonl:6",
+        "checks[0].at": "inputs/custody.json:766",
+        "checks[1].at": "inputs/custody.json:766",
+        "checks[2].at": "inputs/custody.json:766",
+        "checks[3].at": "inputs/custody.json:766",
+        "checks[4].at": "inputs/custody.json:766",
+        "checks[5].at": "inputs/custody.json:766",
+        "checks[6].at": "inputs/custody.json:766",
+        "checks[7].at": "inputs/custody.json:766",
+        "checks[8].at": "inputs/custody.json:766",
+        "checks[9].at": "inputs/custody.json:766",
+        "checks[10].at": "inputs/custody.json:766",
+        "checks[11].at": "inputs/custody.json:766",
+        "checks[12].at": "inputs/custody.json:766",
+        "checks[13].at": "inputs/custody.json:766",
+        "checks[14].at": "inputs/custody.json:766",
+        "checks[15].at": "inputs/custody.json:766",
+        "checks[16].at": "inputs/custody.json:766",
+        "checks[17].at": "inputs/custody.json:766",
+        "checks[18].at": "inputs/custody.json:766",
+        "checks[19].at": "inputs/custody.json:766",
+        "checks[20].at": "inputs/custody.json:766",
+        "checks[21].at": "inputs/custody.json:766",
+        "checks[22].at": "inputs/custody.json:766",
+        "checks[23].at": "inputs/custody.json:766",
+        "checks[24].at": "inputs/custody.json:766",
+        "checks[25].at": "inputs/custody.json:766",
+        "checks[26].at": "inputs/custody.json:766",
+        "checks[27].at": "inputs/custody.json:766",
+        "checks[28].at": "inputs/custody.json:766",
+        "checks[29].at": "inputs/custody.json:766",
+        "checks[30].at": "inputs/custody.json:766",
+        "checks[31].at": "inputs/custody.json:766",
+        "checks[32].at": "inputs/custody.json:766",
+        "checks[33].at": "inputs/custody.json:766",
+        "checks[34].at": "inputs/custody.json:766",
+        "checks[35].at": "inputs/custody.json:766",
+        "checks[36].at": "inputs/custody.json:766",
+        "checks[37].at": "inputs/custody.json:766",
+        "checks[38].at": "inputs/custody.json:766",
+        "checks[39].at": "harness-eval-glm-b3.log:37",
+        "checks[40].at": "harness-eval-glm-b3.log:1363",
+        "checks[41].at": "harness-eval-glm-b3.log:2468",
+        "checks[42].at": "harness-eval-glm-b3.log:2689",
+        "controls[0].at": "inputs/custody.json:766",
+        "controls[1].at": "inputs/custody.json:766",
+        "controls[2].at": "inputs/custody.json:766",
+        "controls[3].at": "inputs/custody.json:766",
+        "controls[4].at": "inputs/custody.json:766",
+        "controls[5].at": "inputs/custody.json:766",
+        "controls[6].at": "inputs/custody.json:766",
+        "controls[7].at": "inputs/custody.json:766",
+        "controls[8].at": "inputs/custody.json:766",
+        "controls[9].at": "inputs/custody.json:766",
+        "controls[10].at": "inputs/custody.json:766",
+        "controls[11].at": "inputs/custody.json:766",
+        "controls[12].at": "inputs/custody.json:766",
+        "controls[13].at": "inputs/custody.json:766",
+        "controls[14].at": "inputs/custody.json:766",
+        "controls[15].at": "inputs/custody.json:766",
+        "controls[16].at": "inputs/custody.json:766",
+        "controls[17].at": "inputs/custody.json:766",
+        "controls[18].at": "inputs/custody.json:766",
+        "controls[19].at": "inputs/custody.json:766",
+        "controls[20].at": "inputs/custody.json:766",
+        "controls[21].at": "inputs/custody.json:766",
+        "controls[22].at": "inputs/custody.json:766",
+        "controls[23].at": "inputs/custody.json:766",
+        "controls[24].at": "inputs/custody.json:766",
+        "controls[25].at": "inputs/custody.json:766",
+        "controls[26].at": "inputs/custody.json:766",
+        "controls[27].at": "inputs/custody.json:766",
+        "controls[28].at": "inputs/custody.json:766",
+        "controls[29].at": "inputs/custody.json:766",
+        "controls[30].at": "inputs/custody.json:766",
+        "controls[31].at": "inputs/custody.json:766",
+        "controls[32].at": "inputs/custody.json:766",
+        "controls[33].at": "inputs/custody.json:766",
+        "controls[34].at": "inputs/custody.json:766",
+        "controls[35].at": "inputs/custody.json:766",
+        "controls[36].at": "inputs/custody.json:766",
+        "controls[37].at": "inputs/custody.json:766",
+        "controls[38].at": "inputs/custody.json:766",
+        "controls[39].at": "inputs/custody.json:766",
+        "controls[40].at": "inputs/custody.json:766",
+        "controls[41].at": "inputs/custody.json:766",
+        "controls[42].at": "inputs/custody.json:766",
+        "controls[43].at": "inputs/custody.json:766",
+        "controls[44].at": "inputs/custody.json:766",
+        "controls[45].at": "inputs/custody.json:766",
+        "controls[46].at": "inputs/custody.json:766",
+        "controls[47].at": "inputs/custody.json:766",
+        "controls[48].at": "inputs/custody.json:766",
+        "controls[49].at": "inputs/custody.json:766",
+        "controls[50].at": "inputs/custody.json:766",
+        "controls[51].at": "inputs/custody.json:766",
+        "controls[52].at": "inputs/custody.json:766",
+        "controls[53].at": "inputs/custody.json:766",
+        "controls[54].at": "inputs/custody.json:766",
+        "controls[55].at": "inputs/custody.json:766",
+        "controls[56].at": "inputs/custody.json:766",
+        "controls[57].at": "harness-eval-glm-b3.log:258",
+        "controls[58].at": "harness-eval-glm-b3.log:479",
+        "controls[59].at": "harness-eval-glm-b3.log:700",
+        "controls[60].at": "harness-eval-glm-b3.log:921",
+        "controls[61].at": "harness-eval-glm-b3.log:1142",
+        "controls[62].at": "harness-eval-glm-b3.log:1584",
+        "controls[63].at": "harness-eval-glm-b3.log:1805",
+        "controls[64].at": "harness-eval-glm-b3.log:2026",
+        "controls[65].at": "harness-eval-glm-b3.log:2247",
+        "controls[66].at": "harness-eval-glm-b3.log:2910",
+        "controls[67].at": "harness-eval-glm-b3.log:3131"
+      },
+      "time_sources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:5",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:6",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker-deepseek.log:211",
+        "producedAt": "harness-maker-deepseek.log:2853",
+        "checks[s1-b3/T1].at": "inputs/custody.json:766",
+        "checks[s1-b3/T2].at": "inputs/custody.json:766",
+        "checks[s1-b3/T3].at": "inputs/custody.json:766",
+        "checks[s1-b3/T4].at": "inputs/custody.json:766",
+        "checks[s1-b3/T5].at": "inputs/custody.json:766",
+        "checks[s1-b3/T7].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1d].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1e].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1f].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1g].at": "inputs/custody.json:766",
+        "checks[s1-b3/F1h].at": "inputs/custody.json:766",
+        "checks[s1-b3/I1].at": "inputs/custody.json:766",
+        "checks[s1-b3/F7a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8a].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8b].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8c].at": "inputs/custody.json:766",
+        "checks[s1-b3/F8d].at": "inputs/custody.json:766",
+        "checks[s1-b3/P1].at": "inputs/custody.json:766",
+        "checks[s1-b3/X1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V1].at": "inputs/custody.json:766",
+        "checks[s1-b3/V2].at": "inputs/custody.json:766",
+        "checks[s1-b3/V3].at": "inputs/custody.json:766",
+        "checks[s1-b3/V4].at": "inputs/custody.json:766",
+        "checks[s1-b3/V5].at": "inputs/custody.json:766",
+        "checks[s1-b3/V6].at": "inputs/custody.json:766",
+        "checks[s1-b3/V7].at": "inputs/custody.json:766",
+        "checks[s1-b3/V8].at": "inputs/custody.json:766",
+        "checks[s1-b3/V9].at": "inputs/custody.json:766",
+        "checks[s1-b3/G1].at": "inputs/custody.json:766",
+        "checks[s1-b3/G2].at": "inputs/custody.json:766",
+        "checks[s1-b3/G3].at": "inputs/custody.json:766",
+        "checks[s1-b3/G4].at": "inputs/custody.json:766",
+        "checks[s1-b3/G5].at": "inputs/custody.json:766",
+        "checks[s1-b3/G6].at": "inputs/custody.json:766",
+        "checks[s1-b3/G7].at": "inputs/custody.json:766",
+        "checks[s1-b3-t6-amend2/T6].at": "inputs/custody.json:766",
+        "checks[glm-b3-J1/J1].at": "harness-eval-glm-b3.log:37",
+        "checks[glm-b3-J2/J2].at": "harness-eval-glm-b3.log:1363",
+        "checks[glm-b3-J3/J3].at": "harness-eval-glm-b3.log:2468",
+        "checks[glm-b3-J4/J4].at": "harness-eval-glm-b3.log:2689",
+        "controls[C-G1p].at": "inputs/custody.json:766",
+        "controls[C-G4c].at": "inputs/custody.json:766",
+        "controls[C-G4p].at": "inputs/custody.json:766",
+        "controls[C-G5c].at": "inputs/custody.json:766",
+        "controls[C-G5p].at": "inputs/custody.json:766",
+        "controls[C-G6c].at": "inputs/custody.json:766",
+        "controls[C-G6p].at": "inputs/custody.json:766",
+        "controls[C-G7c].at": "inputs/custody.json:766",
+        "controls[C-G7p].at": "inputs/custody.json:766",
+        "controls[C-T5c].at": "inputs/custody.json:766",
+        "controls[C-T5p1].at": "inputs/custody.json:766",
+        "controls[C-T5p2].at": "inputs/custody.json:766",
+        "controls[C-T7p].at": "inputs/custody.json:766",
+        "controls[C-V7c].at": "inputs/custody.json:766",
+        "controls[C-V7p].at": "inputs/custody.json:766",
+        "controls[OBS-F1a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1e.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1f.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F1g.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F1h.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F7a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8a.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8b.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.clean].at": "inputs/custody.json:766",
+        "controls[OBS-F8c.planted].at": "inputs/custody.json:766",
+        "controls[OBS-F8d.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-G2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-G3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-I1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-P1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T1.clean].at": "inputs/custody.json:766",
+        "controls[OBS-T1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-T7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V1.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V2.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V3.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V4.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V5.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V6.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V7.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V8.planted].at": "inputs/custody.json:766",
+        "controls[OBS-V9.planted].at": "inputs/custody.json:766",
+        "controls[OBS-X1.planted].at": "inputs/custody.json:766",
+        "controls[G-J1p2].at": "harness-eval-glm-b3.log:258",
+        "controls[G-J1c].at": "harness-eval-glm-b3.log:479",
+        "controls[G-J1p1].at": "harness-eval-glm-b3.log:700",
+        "controls[G-J2p1].at": "harness-eval-glm-b3.log:921",
+        "controls[G-J2p3].at": "harness-eval-glm-b3.log:1142",
+        "controls[G-J2c].at": "harness-eval-glm-b3.log:1584",
+        "controls[G-J2p2].at": "harness-eval-glm-b3.log:1805",
+        "controls[G-J3c].at": "harness-eval-glm-b3.log:2026",
+        "controls[G-J3p].at": "harness-eval-glm-b3.log:2247",
+        "controls[G-J4p].at": "harness-eval-glm-b3.log:2910",
+        "controls[G-J4c].at": "harness-eval-glm-b3.log:3131",
+        "disposition.at": "inputs/custody-events.jsonl:22",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "approvals[0].at": "inputs/custody-events.jsonl:5",
+        "approvals[1].at": "inputs/custody-events.jsonl:6",
+        "checks[0].at": "inputs/custody.json:766",
+        "checks[1].at": "inputs/custody.json:766",
+        "checks[2].at": "inputs/custody.json:766",
+        "checks[3].at": "inputs/custody.json:766",
+        "checks[4].at": "inputs/custody.json:766",
+        "checks[5].at": "inputs/custody.json:766",
+        "checks[6].at": "inputs/custody.json:766",
+        "checks[7].at": "inputs/custody.json:766",
+        "checks[8].at": "inputs/custody.json:766",
+        "checks[9].at": "inputs/custody.json:766",
+        "checks[10].at": "inputs/custody.json:766",
+        "checks[11].at": "inputs/custody.json:766",
+        "checks[12].at": "inputs/custody.json:766",
+        "checks[13].at": "inputs/custody.json:766",
+        "checks[14].at": "inputs/custody.json:766",
+        "checks[15].at": "inputs/custody.json:766",
+        "checks[16].at": "inputs/custody.json:766",
+        "checks[17].at": "inputs/custody.json:766",
+        "checks[18].at": "inputs/custody.json:766",
+        "checks[19].at": "inputs/custody.json:766",
+        "checks[20].at": "inputs/custody.json:766",
+        "checks[21].at": "inputs/custody.json:766",
+        "checks[22].at": "inputs/custody.json:766",
+        "checks[23].at": "inputs/custody.json:766",
+        "checks[24].at": "inputs/custody.json:766",
+        "checks[25].at": "inputs/custody.json:766",
+        "checks[26].at": "inputs/custody.json:766",
+        "checks[27].at": "inputs/custody.json:766",
+        "checks[28].at": "inputs/custody.json:766",
+        "checks[29].at": "inputs/custody.json:766",
+        "checks[30].at": "inputs/custody.json:766",
+        "checks[31].at": "inputs/custody.json:766",
+        "checks[32].at": "inputs/custody.json:766",
+        "checks[33].at": "inputs/custody.json:766",
+        "checks[34].at": "inputs/custody.json:766",
+        "checks[35].at": "inputs/custody.json:766",
+        "checks[36].at": "inputs/custody.json:766",
+        "checks[37].at": "inputs/custody.json:766",
+        "checks[38].at": "inputs/custody.json:766",
+        "checks[39].at": "harness-eval-glm-b3.log:37",
+        "checks[40].at": "harness-eval-glm-b3.log:1363",
+        "checks[41].at": "harness-eval-glm-b3.log:2468",
+        "checks[42].at": "harness-eval-glm-b3.log:2689",
+        "controls[0].at": "inputs/custody.json:766",
+        "controls[1].at": "inputs/custody.json:766",
+        "controls[2].at": "inputs/custody.json:766",
+        "controls[3].at": "inputs/custody.json:766",
+        "controls[4].at": "inputs/custody.json:766",
+        "controls[5].at": "inputs/custody.json:766",
+        "controls[6].at": "inputs/custody.json:766",
+        "controls[7].at": "inputs/custody.json:766",
+        "controls[8].at": "inputs/custody.json:766",
+        "controls[9].at": "inputs/custody.json:766",
+        "controls[10].at": "inputs/custody.json:766",
+        "controls[11].at": "inputs/custody.json:766",
+        "controls[12].at": "inputs/custody.json:766",
+        "controls[13].at": "inputs/custody.json:766",
+        "controls[14].at": "inputs/custody.json:766",
+        "controls[15].at": "inputs/custody.json:766",
+        "controls[16].at": "inputs/custody.json:766",
+        "controls[17].at": "inputs/custody.json:766",
+        "controls[18].at": "inputs/custody.json:766",
+        "controls[19].at": "inputs/custody.json:766",
+        "controls[20].at": "inputs/custody.json:766",
+        "controls[21].at": "inputs/custody.json:766",
+        "controls[22].at": "inputs/custody.json:766",
+        "controls[23].at": "inputs/custody.json:766",
+        "controls[24].at": "inputs/custody.json:766",
+        "controls[25].at": "inputs/custody.json:766",
+        "controls[26].at": "inputs/custody.json:766",
+        "controls[27].at": "inputs/custody.json:766",
+        "controls[28].at": "inputs/custody.json:766",
+        "controls[29].at": "inputs/custody.json:766",
+        "controls[30].at": "inputs/custody.json:766",
+        "controls[31].at": "inputs/custody.json:766",
+        "controls[32].at": "inputs/custody.json:766",
+        "controls[33].at": "inputs/custody.json:766",
+        "controls[34].at": "inputs/custody.json:766",
+        "controls[35].at": "inputs/custody.json:766",
+        "controls[36].at": "inputs/custody.json:766",
+        "controls[37].at": "inputs/custody.json:766",
+        "controls[38].at": "inputs/custody.json:766",
+        "controls[39].at": "inputs/custody.json:766",
+        "controls[40].at": "inputs/custody.json:766",
+        "controls[41].at": "inputs/custody.json:766",
+        "controls[42].at": "inputs/custody.json:766",
+        "controls[43].at": "inputs/custody.json:766",
+        "controls[44].at": "inputs/custody.json:766",
+        "controls[45].at": "inputs/custody.json:766",
+        "controls[46].at": "inputs/custody.json:766",
+        "controls[47].at": "inputs/custody.json:766",
+        "controls[48].at": "inputs/custody.json:766",
+        "controls[49].at": "inputs/custody.json:766",
+        "controls[50].at": "inputs/custody.json:766",
+        "controls[51].at": "inputs/custody.json:766",
+        "controls[52].at": "inputs/custody.json:766",
+        "controls[53].at": "inputs/custody.json:766",
+        "controls[54].at": "inputs/custody.json:766",
+        "controls[55].at": "inputs/custody.json:766",
+        "controls[56].at": "inputs/custody.json:766",
+        "controls[57].at": "harness-eval-glm-b3.log:258",
+        "controls[58].at": "harness-eval-glm-b3.log:479",
+        "controls[59].at": "harness-eval-glm-b3.log:700",
+        "controls[60].at": "harness-eval-glm-b3.log:921",
+        "controls[61].at": "harness-eval-glm-b3.log:1142",
+        "controls[62].at": "harness-eval-glm-b3.log:1584",
+        "controls[63].at": "harness-eval-glm-b3.log:1805",
+        "controls[64].at": "harness-eval-glm-b3.log:2026",
+        "controls[65].at": "harness-eval-glm-b3.log:2247",
+        "controls[66].at": "harness-eval-glm-b3.log:2910",
+        "controls[67].at": "harness-eval-glm-b3.log:3131"
+      },
+      "emittedAt": "2026-10-29T17:24:23Z",
+      "gaps": []
+    }
+  }
+}

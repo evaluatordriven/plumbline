@@ -1,0 +1,28 @@
+Plumbline — custody/v1 emitter plus E-DI kit
+Copyright 2026 Steve Moitozo II
+
+This product includes software developed by Steve Moitozo II.
+
+The code (kit/, tools/, tests/, gate/, schemas/, and their fixtures, except the
+Markdown files under kit/) is licensed under the Apache License, Version 2.0;
+see LICENSE-CODE. The text (README.md, AGENTS.md, CHANGELOG.md, CONTRIBUTING.md,
+SECURITY.md, docs/, standards/, the Markdown files under kit/, and job records)
+is licensed under CC BY 4.0; see LICENSE.
+
+examples/ holds frozen job records: their text is CC BY 4.0, and code frozen inside
+them as evidence (scripts and harness files) is Apache-2.0. examples/subjects/ holds
+copies of this project's own files at earlier commits, under the same split.
+
+schemas/custody/custody-v1.schema.json is vendored byte-for-byte from
+Evaluator Driven — custody record specification
+(https://github.com/evaluatordriven/custody), Copyright 2026 Steve Moitozo II,
+licensed under the Apache License, Version 2.0.
+
+schemas/vendor/e-di@a48a4645/ (job-packet.schema.json, evaluator-record.schema.json
+and fixtures/*.json) is vendored byte-for-byte from
+E-DI — Evaluator Driven Iteration
+(a private repository; public reading copy: https://github.com/evaluatordriven/doctrine)
+at commit a48a4645aaa29947fdc17168d26c69c849941580,
+Copyright 2026 Steve Moitozo II,
+licensed under the Apache License, Version 2.0 (the E-DI text is licensed under CC BY 4.0).
+schemas/vendor/e-di@a48a4645/VENDOR.json lists each file's source path and sha256.

@@ -1,0 +1,95 @@
+{
+ "check": "P5e",
+ "job": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/jobwt/dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend",
+ "ledger": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/jobwt/dot-plumbline/jobs/2026-10-28-custody-times-ledger-spend/inputs/custody-events.jsonl",
+ "freeze": {
+  "at": "2026-10-28T20:47:58Z",
+  "bar_file": "custody/bar.md",
+  "bar_sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6"
+ },
+ "headers": [
+  {
+   "file": "custody/bar.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/bounds",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/controls/README.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/harness/or_call.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/harness/test_or_call.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/drivers.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/fg_rules.json",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/j_listing.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/jbatch.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/judges.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/lib.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/p5check.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/rubric-J1.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/rubric-J2.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/rubric-J3.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/rubric-J4.md",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/run_instrument.sh",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/scheck.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/t4_build.py",
+   "build": "2026-10-28T20:36:28Z"
+  },
+  {
+   "file": "custody/freeze/instrument/t6_subject.py",
+   "build": "2026-10-28T20:36:28Z"
+  }
+ ],
+ "bar_sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+ "verdict": "PASS",
+ "why": []
+}

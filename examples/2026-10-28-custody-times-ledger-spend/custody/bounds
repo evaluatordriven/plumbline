@@ -1,0 +1,15 @@
+STATUS: FROZEN-BUILD 2026-10-28T20:36:28Z — bounds of job 2026-10-28-custody-times-ledger-spend; part of the freeze set, sha256 in MANIFEST.sha256.
+scale: binary per check, 43 checks (S1: T1-T7, F1a-F1h, I1, F7a, F8a-F8d, P1, X1, V1-V9, G1-G7; E-GLM: J1-J4) (1 = PASS as stated; 0 = anything else, incl. NOT-RUN)
+T_accept: 1   T_dim: 1   T_reject: 0
+pass: every check scores 1
+cap: 3 E-DI iterations (packet cap_counts: generations; one generation = one iteration; a void batch does not count)
+maker_attempts: inside an iteration limited only by money, time_end and the tripwire (Owner standing rule 2026-10-28 15:52 EDT): the same failure class 3 times in a row within an iteration -> stop and report to the Orchestrator; finish_reason length with empty content is its own class (harness exit 10): stop, do not retry; every attempt logged with finish_reason
+money: strictly < US$5.00 of all model spend (OpenRouter key /workspace/.openrouter-key, read by path by the harness only)
+money_guard: freeze/harness/or_call.py refuses (exit 6, nothing sent) unless spent + worst-case(call) + 0.10 reserve < 5.00; spent = max(job spend ledger, key usage - baseline)
+spend_ledger: /workspace/edi-work/2026-10-28-custody-times-ledger-spend/spend/spend-ledger.jsonl (baseline key usage 0.317534503 at 2026-10-28T18:56:54Z, key-usage-baseline.json beside it)
+spend_before_open: 0.027446 USD (instrument live tests; key usage 0.344980449 read 2026-10-28T20:35:40Z, 7 min after the last call; counted inside the bound)
+opened: 2026-10-28T20:34:22Z (2026-10-28 16:34:22 EDT)
+time_end: 2026-10-29T04:34:00Z = 2026-10-29 00:34 EDT (UTC-4); no model call may be sent at or after it
+breach: either bound -> needs_owner
+maker: deepseek/deepseek-v4.1-flash-1017 via openrouter.ai, provider {order:["deepinfra/fp8"], allow_fallbacks:false, zdr:true}, max_tokens 131072, no reasoning limit
+model_evaluator: E-GLM z-ai/glm-5.3-flash via openrouter.ai, provider {order:["z-ai/fp8"], allow_fallbacks:false, zdr:true}, max_tokens 131072, temperature 0, readOnly

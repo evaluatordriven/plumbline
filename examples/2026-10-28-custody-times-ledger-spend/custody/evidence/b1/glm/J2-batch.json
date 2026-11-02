@@ -1,0 +1,82 @@
+{
+  "check": "J2",
+  "batch": "1",
+  "order": [
+    "G-J2p2",
+    "subject",
+    "G-J2c",
+    "G-J2p1",
+    "G-J2p3"
+  ],
+  "items": [
+    {
+      "call": "J2-b1-1",
+      "id": "G-J2p2",
+      "messages_sha256": "dfe2c6fa6f2331c1ab8ac7b5cc0089d8041f496fdd05c5f71a7e9b76d7bfdfaa",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "903bc13eac4d2514e47487e2cefc13365251e07fdab6c249dea7add99d08202c",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b1-2",
+      "id": "subject",
+      "messages_sha256": "2dafc9c186cbf20818abb452cde99a28493ef109f48296f6bffe533fa53d339c",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "f6d91960af227078e2f26878dfe3ceb68b31e56a5d590798a6608936c6103eee",
+      "verdict": "DOES_NOT_CONFORM",
+      "lines": [
+        "docs/custody-emission.md:106",
+        "docs/custody-emission.md:96"
+      ]
+    },
+    {
+      "call": "J2-b1-3",
+      "id": "G-J2c",
+      "messages_sha256": "4939b05c5df6a1c70ac497187d9e1cde819b11d406491106751b0a1f0a1e2861",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "4580dfa8395c78de4193be498749e150cbf15cf9a79659b5d8109f020bdef4ac",
+      "verdict": "CONFORMS",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b1-4",
+      "id": "G-J2p1",
+      "messages_sha256": "a602f06d78669ce0411972628e7574523e39e458a0392135a751d926581d186b",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "6911ab3d2a284552b2ab6d313b09d825e3580ccd9821c28161f7fff93581c0f4",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b1-5",
+      "id": "G-J2p3",
+      "messages_sha256": "d4d1d305df39ac2b09c06a23d0be25c7a6206fd41d189f625853676baa392696",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "db72c3b8c7d60c6a679a4cf400ea6519614b9825d4ded153d26f2f6ad1d48f50",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    }
+  ],
+  "log": "harness-E-GLM-J2-b1.log",
+  "dry_run": false,
+  "window": 2,
+  "controls_ok": true,
+  "calls_ok": true,
+  "subject_verdict": "DOES_NOT_CONFORM",
+  "J2": "FAIL"
+}

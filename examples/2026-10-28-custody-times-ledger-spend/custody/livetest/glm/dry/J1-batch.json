@@ -1,0 +1,57 @@
+{
+ "batch": "0",
+ "calls_ok": null,
+ "check": "J1",
+ "controls_ok": null,
+ "dry_run": true,
+ "items": [
+  {
+   "call": "J1-b0-1",
+   "control_ok": null,
+   "finish_reason": null,
+   "id": "subject",
+   "messages_sha256": "6069bf210c56e359f2144532c6a905a34c80f9cf60719f722cd14f3e6d858ae8",
+   "or_call_exit": null,
+   "reply_sha256": null,
+   "verdict": null
+  },
+  {
+   "call": "J1-b0-2",
+   "control_ok": null,
+   "finish_reason": null,
+   "id": "G-J1c",
+   "messages_sha256": "3eb58b4066fcfbf9fe929c4c1fb27e0c8a0f59f6af12e5504051f35645d9a65f",
+   "or_call_exit": null,
+   "reply_sha256": null,
+   "verdict": null
+  },
+  {
+   "call": "J1-b0-3",
+   "control_ok": null,
+   "finish_reason": null,
+   "id": "G-J1p1",
+   "messages_sha256": "9fafb47ba2de25a81b67372a92661fec503350d5453be9deced7e8c045f25d03",
+   "or_call_exit": null,
+   "reply_sha256": null,
+   "verdict": null
+  },
+  {
+   "call": "J1-b0-4",
+   "control_ok": null,
+   "finish_reason": null,
+   "id": "G-J1p2",
+   "messages_sha256": "2d814e65dcf8d850e0b56b8d94518b8887150a975e6f849a4f2c1dd0432292ed",
+   "or_call_exit": null,
+   "reply_sha256": null,
+   "verdict": null
+  }
+ ],
+ "log": "harness-E-GLM-J1-b0.log",
+ "order": [
+  "subject",
+  "G-J1c",
+  "G-J1p1",
+  "G-J1p2"
+ ],
+ "window": 2
+}

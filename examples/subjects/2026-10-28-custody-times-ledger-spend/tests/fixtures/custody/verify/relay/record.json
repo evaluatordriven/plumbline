@@ -1,0 +1,50 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "approvals": [
+        {
+          "role": "relay",
+          "by": "BuyerBot",
+          "at": "2026-01-01T00:02:00Z"
+        }
+      ]
+    },
+    "x-plumbline": {
+      "schema": "plumbline/x-plumbline/v1",
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "hand-entered",
+        "producedAt": "hand-entered"
+      },
+      "hand_times": [],
+      "generations": [],
+      "evaluations": [],
+      "relays": [
+        {
+          "event": "relay",
+          "kind": "relay",
+          "quote": "Ship it.",
+          "from": "BuyerBot",
+          "source_chat": "chat-1",
+          "source_at": "2026-01-01T00:02:00Z",
+          "at": "2026-01-01T00:03:00Z",
+          "writer": "kit/custody_ledger.py@0123456789ab",
+          "source": "inputs/custody-events.jsonl:2"
+        }
+      ],
+      "amendments": [],
+      "spend": {
+        "calls_sum_usd": 0.0,
+        "key_delta_usd": 0.0,
+        "total_usd": 0.0,
+        "tolerance_usd": 0.0001,
+        "source": null
+      }
+    }
+  }
+}

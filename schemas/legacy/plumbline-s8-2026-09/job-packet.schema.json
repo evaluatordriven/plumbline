@@ -1,0 +1,265 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/job-packet.schema.json",
+  "title": "Plumbline job packet",
+  "description": "The must-ask list (E-DI Contracts v1.8 s3) plus orchestrator inputs (s6). Written BEFORE the first generation; an artifact produced before its evaluator existed is not acceptable except as a labelled baseline measurement. Per s3, while ratified=false the must-ask values may live ONLY in the top-level `proposed` block (`ratified: false`), the runtime configuration for those fields must be absent or empty, and the loop's only possible terminal state is needs_owner. This schema enforces that structurally: the must-ask properties are declared forbidden when ratified is false.",
+  "type": "object",
+  "required": ["job_id", "stage", "artifact_spec", "ratified", "constitution_ref"],
+  "additionalProperties": false,
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Orchestrator-assigned. Must be carried on every iteration record so a terminal decision is reconstructable (s6)."
+    },
+    "stage": {
+      "enum": ["elicitation", "architecture", "development", "deployment", "revision"],
+      "description": "Instance-specific stage label. Elicitation is the stage that always terminates needs_owner, because no independent ground truth exists in it."
+    },
+    "artifact_spec": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What is being produced. Example values in the Contracts are EXAMPLE only and must not be copied as defaults."
+    },
+    "constitution_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The standing constitution this job runs under (values, principles, buyer and specialist provenance, escalation classes). Required at every ratification state: the standing frame is what loans the evaluator its authority (s4), so a job without one has an evaluator with no mandate."
+    },
+    "constitution_version": {
+      "type": "string",
+      "description": "The constitution version in force when this packet was written. Recorded so a later reader can tell which standard a decision was judged against, after the standard has moved."
+    },
+    "mandate_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The frame instrument in force for this job (Contracts s1.7, C20). In this workspace that is E-DI-MANDATE.md, whose s7 carries the authorized dimension set (A.1.1-A.5.2) and whose s8 carries the outcome criteria (O1-O4). A must-ask value: ask, do not infer."
+    },
+    "mandate_version": {
+      "type": "string",
+      "description": "The mandate revision in force (its s9 log entry). Recorded so a scoring can be attributed to a frame after the frame has moved — s10.3 makes a mandate change a trigger that re-derives the retained instrument rather than re-using it."
+    },
+    "maker": {
+      "type": "object",
+      "required": ["engine", "version", "feedback_forms"],
+      "additionalProperties": false,
+      "description": "The Maker is a must-ask value (s3, C25): the engine, its version, and the feedback forms it can consume. A loop whose Maker cannot consume feedback is invalid — insert an influence channel or decline to run the loop.",
+      "properties": {
+        "engine": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 },
+        "feedback_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Named forms this generator can actually consume (diff, failing test output, structured violations). An unnamed form is a feedback channel that does not exist."
+        }
+      }
+    },
+    "job_to_be_done": {
+      "type": "object",
+      "required": ["statement"],
+      "additionalProperties": false,
+      "description": "Per-job framing supplied by the buyer. Distinct from the standing constitution: this is what changes job to job, and it must not be re-derived from the constitution.",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The job-to-be-done. One or more may apply; additional jobs are separate packets, not extra fields here."
+        },
+        "pain_points": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The pains this job removes. Each pain should be traceable to a dimension or a principle, or it is wishlist."
+        },
+        "desired_future": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What is different once this works, described in the buyer's environment or behaviour — never as a deliverable we ship. Required in the ratified branch: if the desired future cannot be stated, the job has no evaluable target and belongs in elicitation, not here."
+        }
+      }
+    },
+    "ratified": {
+      "type": "boolean",
+      "description": "False when any must-ask value was proposed rather than agreed. A job with ratified=false can never reach the `accepted` terminal state (s3, s5)."
+    },
+    "buyer": { "$ref": "#/$defs/provenancedRole" },
+    "specialist": { "$ref": "#/$defs/provenancedRole" },
+    "ground_truth": { "$ref": "#/$defs/groundTruth" },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/dimension" },
+      "description": "The dimension set. Authorized by the mandate in force (C20): the standing dimensions are the mandate's s7 A.1.1-A.1.5, and a dimension added beyond them carries the seven-field shape of A.2.1 and is ratified once, covering every job that declares it. Each dimension carries its own observation channel (s7.2)."
+    },
+    "pass_rule": { "$ref": "#/$defs/passRule" },
+    "bounds": { "$ref": "#/$defs/bounds" },
+    "human_seat": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Who decides when a job escalates. Named, not implied. In this workspace a delivery target (e.g. a Telegram topic), never a blocking prompt in a headless run."
+    },
+    "escalation_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Classes that escalate from `evaluating` directly to a human, bypassing regeneration. Values and doctrine questions always belong here (s2, s4)."
+    },
+    "proposed": {
+      "type": "object",
+      "description": "s3: the single permitted home for unratified values. Nowhere else. Not in runtime configuration, not under a pass_rule-shaped field, not as an argument default.",
+      "additionalProperties": false,
+      "properties": {
+        "buyer": { "$ref": "#/$defs/provenancedRole" },
+        "specialist": { "$ref": "#/$defs/provenancedRole" },
+        "ground_truth": { "$ref": "#/$defs/groundTruth" },
+        "dimensions": { "type": "array", "items": { "$ref": "#/$defs/dimension" } },
+        "pass_rule": { "$ref": "#/$defs/passRule" },
+        "bounds": { "$ref": "#/$defs/bounds" },
+        "human_seat": { "type": "string" },
+        "escalation_classes": { "type": "array", "items": { "type": "string" } },
+        "rationale": { "type": "string", "description": "Why each proposed value was chosen, and what the ratification request is." }
+      }
+    },
+    "recorded_at": { "type": "string", "format": "date-time" },
+    "recorded_by": { "type": "string", "description": "The orchestrator identity that wrote this packet." },
+    "baseline": {
+      "type": "boolean",
+      "default": false,
+      "description": "s1: true only for work generated before its evaluator existed, and only when explicitly labelled as a baseline measurement."
+    }
+  },
+  "$defs": {
+    "provenancedRole": {
+      "type": "object",
+      "required": ["name", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "provenance": {
+          "type": "string",
+          "minLength": 1,
+          "description": "s1.1: how this role was established. A rubric that cannot answer 'who is buying this, and which master of the craft approved the standard?' is invalid."
+        }
+      }
+    },
+    "groundTruth": {
+      "type": "object",
+      "required": ["ref", "channel", "version", "hardness"],
+      "additionalProperties": false,
+      "properties": {
+        "ref": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The immutable artifact(s) judged against: source document, invariant, test, reference set, or measurement (s1.2)."
+        },
+        "channel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The channel that carries ground truth to the evaluator. Per s7.2 this channel must not have access to the answer it is being checked against, and the judge must score evidence produced outside the generation path, never the maker's self-report."
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The version of the ground truth in force for this job (s1.6, C19). A scoring against an unnamed version cannot be re-derived once the standard moves."
+        },
+        "hardness": {
+          "enum": ["INVARIANT", "DOCUMENT", "PRIOR"],
+          "description": "How far the Evaluator may lean on it (s1.6, C19): INVARIANT, DOCUMENT or PRIOR. Supplied per job and never defaulted \u2014 a default here would silently grade every future job against a standard nobody agreed."
+        },
+        "normalization": {
+          "type": "string",
+          "description": "s7.3: for stages that verify external state, the declared comparison normalization. Any normalization left undeclared is drift you have chosen not to detect."
+        },
+        "per_run_value": {
+          "type": "string",
+          "description": "s7.3: the field carrying a value fresh on every run (run id, timestamp). Without it a skipped write passes verification whenever the target already holds the intended value."
+        }
+      }
+    },
+    "dimension": {
+      "type": "object",
+      "required": ["name", "anchor", "observation_channel"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "anchor": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a given score means on this dimension, for this job. Anchors are job-specific; anchors borrowed from another job are a promoted example."
+        },
+        "observation_channel": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Which channel produces this dimension's observation. Must be blind to the ground truth it is checked against (s7.2)."
+        },
+        "code_checkable": {
+          "type": "boolean",
+          "default": false,
+          "description": "True when a script can decide this dimension. The evaluator cascade runs code-checkable dimensions first and reserves the model judge for the rest — the cost control."
+        },
+        "weight": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Only meaningful if the pass rule uses a weighted mean. The normative rule is a plain mean unless the job records otherwise."
+        }
+      }
+    },
+    "passRule": {
+      "type": "object",
+      "required": ["t_accept", "t_dim", "t_reject", "cap", "scale"],
+      "additionalProperties": false,
+      "properties": {
+        "t_accept": { "type": "number", "description": "Mean threshold. Fixed before the run and recorded with the job." },
+        "t_dim": { "type": "number", "description": "Per-dimension floor. Required in addition to the mean, so a fatal defect cannot be averaged away." },
+        "t_reject": { "type": "number", "description": "Reject floor. Below this at any iteration => `rejected`. At or above it with the cap reached => `needs_owner`, never `rejected`." },
+        "cap": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total generations permitted, counted from 0 before the first generation and incremented once per generation. Revision does not create an iteration; only a generation does. Checked in `evaluating`, immediately after scoring. Single source of truth for the cap; `bounds` does not restate it."
+        },
+        "scale": {
+          "type": "string",
+          "default": "1-10",
+          "description": "Dimension scores are integers or one-decimal reals on a 1-10 scale unless the job records a different scale alongside its pass rule. Never silently rescale."
+        }
+      }
+    },
+    "bounds": {
+      "type": "object",
+      "required": ["budget_usd", "wall_clock_s"],
+      "additionalProperties": false,
+      "properties": {
+        "budget_usd": { "type": "number", "minimum": 0, "description": "s6: must be enforced, not merely recorded. Cost is a must-ask field, not an adjacent concern." },
+        "wall_clock_s": { "type": "integer", "minimum": 1, "description": "s6: wall-clock bound, enforced by the orchestrator." }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["ratified"], "properties": { "ratified": { "const": true } } },
+      "then": {
+        "required": ["buyer", "specialist", "ground_truth", "dimensions", "pass_rule", "bounds", "human_seat", "escalation_classes", "job_to_be_done", "mandate_ref", "mandate_version", "maker"],
+        "properties": { "proposed": false }
+      }
+    },
+    {
+      "if": { "required": ["ratified"], "properties": { "ratified": { "const": false } } },
+      "then": {
+        "required": ["proposed"],
+        "properties": {
+          "buyer": false,
+          "specialist": false,
+          "ground_truth": false,
+          "dimensions": false,
+          "pass_rule": false,
+          "bounds": false,
+          "human_seat": false,
+          "escalation_classes": false,
+          "mandate_ref": false,
+          "mandate_version": false,
+          "maker": false
+        }
+      }
+    }
+  ]
+}

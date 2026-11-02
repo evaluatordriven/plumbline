@@ -1,0 +1,253 @@
+{
+ "id": "T2",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "cases": {
+   "P-T2a": {
+    "expected": [
+     [
+      "bar.frozenAt",
+      "inputs/custody-events.jsonl",
+      1,
+      "ledger-no-writer"
+     ],
+     [
+      "disposition.at",
+      "inputs/custody-events.jsonl",
+      12,
+      "ledger-no-writer"
+     ]
+    ],
+    "nosw": {
+     "rc": 3,
+     "record_written": false,
+     "kinds": [
+      "hand-time"
+     ],
+     "hand": [
+      [
+       "bar.frozenAt",
+       "inputs/custody-events.jsonl",
+       1,
+       "ledger-no-writer"
+      ],
+      [
+       "disposition.at",
+       "inputs/custody-events.jsonl",
+       12,
+       "ledger-no-writer"
+      ]
+     ]
+    },
+    "nosw_out": "REFUSED (history): 2 fact(s) this record would misstate — nothing written (the existing record is untouched):\n  [hand-time] bar.frozenAt inputs/custody-events.jsonl:1 (ledger-no-writer)\n  [hand-time] disposition.at inputs/custody-events.jsonl:12 (ledger-no-writer)\n  Fix the source (harness log, custody inputs, live event log, or the emitter checkout) and re-emit; see docs/custody-emission.md, 'Refusals'.\n",
+    "sw": {
+     "rc": 0,
+     "record_written": true,
+     "kinds": [],
+     "t0": "2026-10-29T15:52:05.868243Z",
+     "t1": "2026-10-29T15:52:05.947943Z",
+     "out": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t2/P-T2a/custody/record.custody.json  sha256 69fd5f1abb24d68f6c4aa3959d2a1abdb626ce27406829801aaafb2929b61177\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n",
+     "hand_times": [
+      {
+       "field": "bar.frozenAt",
+       "file": "inputs/custody-events.jsonl",
+       "line": 1,
+       "source": "ledger-no-writer"
+      },
+      {
+       "field": "disposition.at",
+       "file": "inputs/custody-events.jsonl",
+       "line": 12,
+       "source": "ledger-no-writer"
+      }
+     ],
+     "allowances": {
+      "hand_times": {
+       "switch": "--allow-hand-times",
+       "writer": "kit/emit_custody.py@1666c049b76a",
+       "at": "2026-10-29T15:52:05Z"
+      }
+     },
+     "check": {
+      "verdict": "OK",
+      "levelAchieved": "CL1",
+      "failed": []
+     }
+    }
+   },
+   "P-T2b": {
+    "expected": [
+     [
+      "bar.approvals[0].at",
+      "inputs/custody-events.jsonl",
+      2,
+      "ledger-hand"
+     ]
+    ],
+    "nosw": {
+     "rc": 3,
+     "record_written": false,
+     "kinds": [
+      "hand-time"
+     ],
+     "hand": [
+      [
+       "bar.approvals[0].at",
+       "inputs/custody-events.jsonl",
+       2,
+       "ledger-hand"
+      ]
+     ]
+    },
+    "nosw_out": "REFUSED (history): 1 fact(s) this record would misstate — nothing written (the existing record is untouched):\n  [hand-time] bar.approvals[0].at inputs/custody-events.jsonl:2 (ledger-hand)\n  Fix the source (harness log, custody inputs, live event log, or the emitter checkout) and re-emit; see docs/custody-emission.md, 'Refusals'.\n",
+    "sw": {
+     "rc": 0,
+     "record_written": true,
+     "kinds": [],
+     "t0": "2026-10-29T15:52:06.060570Z",
+     "t1": "2026-10-29T15:52:06.161748Z",
+     "out": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t2/P-T2b/custody/record.custody.json  sha256 71d74e91195794ed5f223511302f564a6e277ce24f5b963262ec1a41a9e512c1\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n",
+     "hand_times": [
+      {
+       "field": "bar.approvals[0].at",
+       "file": "inputs/custody-events.jsonl",
+       "line": 2,
+       "source": "ledger-hand"
+      }
+     ],
+     "allowances": {
+      "hand_times": {
+       "switch": "--allow-hand-times",
+       "writer": "kit/emit_custody.py@1666c049b76a",
+       "at": "2026-10-29T15:52:06Z"
+      }
+     },
+     "check": {
+      "verdict": "OK",
+      "levelAchieved": "CL1",
+      "failed": []
+     }
+    }
+   },
+   "P-T2c": {
+    "expected": [
+     [
+      "passes.pass-a.at",
+      "inputs/custody.json",
+      95,
+      "inputs-no-ledger"
+     ]
+    ],
+    "nosw": {
+     "rc": 3,
+     "record_written": false,
+     "kinds": [
+      "hand-time"
+     ],
+     "hand": [
+      [
+       "passes.pass-a.at",
+       "inputs/custody.json",
+       95,
+       "inputs-no-ledger"
+      ]
+     ]
+    },
+    "nosw_out": "REFUSED (history): 1 fact(s) this record would misstate — nothing written (the existing record is untouched):\n  [hand-time] passes.pass-a.at inputs/custody.json:95 (inputs-no-ledger)\n  Fix the source (harness log, custody inputs, live event log, or the emitter checkout) and re-emit; see docs/custody-emission.md, 'Refusals'.\n",
+    "sw": {
+     "rc": 0,
+     "record_written": true,
+     "kinds": [],
+     "t0": "2026-10-29T15:52:06.270900Z",
+     "t1": "2026-10-29T15:52:06.341208Z",
+     "out": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t2/P-T2c/custody/record.custody.json  sha256 e0a38540bcb36eb50f0c8229902d551aea82c98083ed45379eb723cb39b87541\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n",
+     "hand_times": [
+      {
+       "field": "passes.pass-a.at",
+       "file": "inputs/custody.json",
+       "line": 95,
+       "source": "inputs-no-ledger"
+      }
+     ],
+     "allowances": {
+      "hand_times": {
+       "switch": "--allow-hand-times",
+       "writer": "kit/emit_custody.py@1666c049b76a",
+       "at": "2026-10-29T15:52:06Z"
+      }
+     },
+     "check": {
+      "verdict": "OK",
+      "levelAchieved": "CL1",
+      "failed": []
+     }
+    }
+   },
+   "P-T2d": {
+    "expected": [
+     [
+      "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "inputs/custody-events.jsonl",
+      13,
+      "ledger-hand"
+     ]
+    ],
+    "nosw": {
+     "rc": 3,
+     "record_written": false,
+     "kinds": [
+      "hand-time"
+     ],
+     "hand": [
+      [
+       "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "inputs/custody-events.jsonl",
+       13,
+       "ledger-hand"
+      ]
+     ]
+    },
+    "nosw_out": "REFUSED (history): 1 fact(s) this record would misstate — nothing written (the existing record is untouched):\n  [hand-time] routing.maker.declaredAt inputs/custody-events.jsonl:13 (ledger-hand)\n  Fix the source (harness log, custody inputs, live event log, or the emitter checkout) and re-emit; see docs/custody-emission.md, 'Refusals'.\n",
+    "sw": {
+     "rc": 0,
+     "record_written": true,
+     "kinds": [],
+     "t0": "2026-10-29T15:52:06.466468Z",
+     "t1": "2026-10-29T15:52:06.532734Z",
+     "out": "custody: wrote /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/t2/P-T2d/custody/record.custody.json  sha256 51edb9ef8e95f7285e5fcb8024f0d772d2ca99f38abba2b449f545c9c6938d09\n  terminal_state=accepted · x-plumbline.verdict=accept · disposition=given · levelClaimed=CL1 · 2 check(s), 2 control(s), 0 violation(s)\n",
+     "hand_times": [
+      {
+       "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "file": "inputs/custody-events.jsonl",
+       "line": 13,
+       "source": "ledger-hand"
+      }
+     ],
+     "allowances": {
+      "hand_times": {
+       "switch": "--allow-hand-times",
+       "writer": "kit/emit_custody.py@1666c049b76a",
+       "at": "2026-10-29T15:52:06Z"
+      }
+     },
+     "check": {
+      "verdict": "OK",
+      "levelAchieved": "CL1",
+      "failed": []
+     }
+    }
+   }
+  },
+  "expect_writer": "kit/emit_custody.py@1666c049b76a",
+  "overlay_sw": {
+   "rc": 3,
+   "record_written": false,
+   "kinds": [
+    "order",
+    "time"
+   ]
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (3 values)"
+}

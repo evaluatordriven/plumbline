@@ -1,0 +1,1 @@
+{"batch": 2, "order": ["G-p1", "subject", "G-c1"], "log": "harness-eval-glm-b2.log", "dry_run": false, "controls_ok": true, "subject_verdict": "DOES_NOT_CONFORM", "N6": "FAIL"}

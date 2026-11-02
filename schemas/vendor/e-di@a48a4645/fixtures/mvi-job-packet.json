@@ -1,0 +1,27 @@
+{
+  "entry": "A",
+  "instrument_profile": "mvi",
+  "job_name": "one-line-readme-fix",
+  "artifact": "README.md",
+  "buyer": "Owner",
+  "specialist": "Owner-as-specialist (docs)",
+  "maker": "agent",
+  "evaluator": "docs-checker",
+  "standard_ref": "typo-free; one sentence clarity",
+  "ground_truth": [
+    {"source": "README.md", "version": "the file under test", "hardness": "DOCUMENT"}
+  ],
+  "mandate_ref": {"doc": "EDI-MANDATE.md", "version": "short form 2026-09-24"},
+  "escalation": "Owner",
+  "bounds": {
+    "T_accept": 8.0,
+    "T_dim": 7.0,
+    "T_reject": 6.0,
+    "cap": 2,
+    "budget": "15m"
+  },
+  "human_seat": "Owner",
+  "mode": "scored",
+  "ratified": true,
+  "notes": "mvi profile example — not a production bar. Evaluator is not the Owner (0028 A)."
+}

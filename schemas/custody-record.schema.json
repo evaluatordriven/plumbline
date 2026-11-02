@@ -1,0 +1,922 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:plumbline:schemas:custody-record",
+  "title": "Plumbline custody/v1 record (DERIVED \u2014 do not hand-edit; run tools/build_schemas.py --custody)",
+  "description": "Derived by tools/build_schemas.py from custody https://github.com/evaluatordriven/custody@3e3ca58de563 (schema/custody-v1.schema.json sha256 ad03af92b47eaa8079f1d2a8e759daa91148aac6f39d8935c22a92ba10199f9f) plus schemas/instance-extensions.json `custody_record` (instance-specific). Every record valid here is valid against the pinned custody schema: this layer only adds constraints.",
+  "x-derivedFrom": {
+    "custody": {
+      "source": "https://github.com/evaluatordriven/custody",
+      "commit": "3e3ca58de5631bdc58291564303a2e9d25a8653e",
+      "schema_sha256": "ad03af92b47eaa8079f1d2a8e759daa91148aac6f39d8935c22a92ba10199f9f"
+    },
+    "instance_layer": "schemas/instance-extensions.json#custody_record"
+  },
+  "allOf": [
+    {
+      "$ref": "https://evaluatordriven.com/schema/custody-v1.schema.json"
+    },
+    {
+      "propertyNames": {
+        "anyOf": [
+          {
+            "enum": [
+              "_type",
+              "predicate",
+              "predicateType",
+              "subject"
+            ]
+          },
+          {
+            "pattern": "^x-"
+          }
+        ]
+      },
+      "properties": {
+        "predicate": {
+          "required": [
+            "x-plumbline"
+          ],
+          "propertyNames": {
+            "anyOf": [
+              {
+                "enum": [
+                  "bar",
+                  "checks",
+                  "controls",
+                  "demonstrations",
+                  "disagreements",
+                  "disposition",
+                  "evaluators",
+                  "external",
+                  "instrument",
+                  "levelClaimed",
+                  "maker",
+                  "producedAt",
+                  "readsBeforeFreeze",
+                  "retention",
+                  "separationGaps",
+                  "specVersion",
+                  "spread",
+                  "startedAt",
+                  "violations"
+                ]
+              },
+              {
+                "pattern": "^x-"
+              }
+            ]
+          },
+          "properties": {
+            "x-plumbline": {
+              "type": "object",
+              "required": [
+                "job_id",
+                "verdict",
+                "terminal_state",
+                "disposition_source"
+              ],
+              "properties": {
+                "verdict": {
+                  "enum": [
+                    "accept",
+                    "regenerate",
+                    "needs_owner",
+                    "reject"
+                  ]
+                },
+                "terminal_state": {
+                  "enum": [
+                    "accepted",
+                    "needs_owner",
+                    "rejected"
+                  ]
+                },
+                "job_id": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "violations": {
+              "items": {
+                "required": [
+                  "x-plumbline"
+                ],
+                "properties": {
+                  "x-plumbline": {
+                    "type": "object",
+                    "required": [
+                      "locator"
+                    ],
+                    "properties": {
+                      "locator": {
+                        "enum": [
+                          "artifact_missed_standard",
+                          "standard_moved",
+                          "dimension_unauthorized",
+                          "frame_at_fault"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "custody-v1": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "$id": "https://evaluatordriven.com/schema/custody-v1.schema.json",
+      "title": "Evaluator Driven custody record (custody/v1), structural layer",
+      "description": "Encodes SPEC.md section 4 for JSON Schema 2020-12 validators. Semantic requirements (section 5) are not expressible here; see checker/check.py. Where this schema and SPEC.md differ, SPEC.md governs. Producers may add fields under keys beginning 'x-'; they are allowed everywhere.",
+      "type": "object",
+      "required": [
+        "_type",
+        "subject",
+        "predicateType",
+        "predicate"
+      ],
+      "properties": {
+        "_type": {
+          "const": "https://in-toto.io/Statement/v1"
+        },
+        "subject": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "name",
+              "digest"
+            ],
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "digest": {
+                "$ref": "#/$defs/digest"
+              }
+            }
+          }
+        },
+        "predicateType": {
+          "const": "https://evaluatordriven.com/custody/v1"
+        },
+        "predicate": {
+          "$ref": "#/$defs/predicate"
+        }
+      },
+      "$defs": {
+        "digest": {
+          "type": "object",
+          "required": [
+            "sha256"
+          ],
+          "properties": {
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?Z$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "model": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "required": [
+                "family",
+                "identifier",
+                "endpoint",
+                "readOnly"
+              ],
+              "properties": {
+                "family": {
+                  "type": "string",
+                  "pattern": "^[a-z]+(-[a-z]+)*$",
+                  "description": "Lowercase letters and hyphens, no version; 'undisclosed' when the builder does not say."
+                },
+                "identifier": {
+                  "$ref": "#/$defs/name"
+                },
+                "endpoint": {
+                  "$ref": "#/$defs/host"
+                },
+                "readOnly": {
+                  "type": "boolean"
+                }
+              }
+            }
+          ]
+        },
+        "outcome": {
+          "enum": [
+            "conforms",
+            "does_not_conform",
+            "unobserved"
+          ]
+        },
+        "predicate": {
+          "type": "object",
+          "required": [
+            "specVersion",
+            "levelClaimed",
+            "bar",
+            "maker",
+            "startedAt",
+            "producedAt",
+            "instrument",
+            "evaluators",
+            "checks",
+            "controls",
+            "disagreements",
+            "violations",
+            "separationGaps",
+            "retention",
+            "external",
+            "disposition"
+          ],
+          "properties": {
+            "specVersion": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+"
+            },
+            "levelClaimed": {
+              "enum": [
+                "CL1",
+                "CL2",
+                "CL3",
+                "baseline"
+              ]
+            },
+            "bar": {
+              "type": "object",
+              "required": [
+                "digest",
+                "frozenAt",
+                "author",
+                "dimensions",
+                "approvals",
+                "publishedAt",
+                "groundTruth",
+                "dissent"
+              ],
+              "properties": {
+                "digest": {
+                  "$ref": "#/$defs/digest"
+                },
+                "frozenAt": {
+                  "$ref": "#/$defs/timestamp"
+                },
+                "author": {
+                  "$ref": "#/$defs/name"
+                },
+                "dimensions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "id",
+                      "criterion",
+                      "scale"
+                    ],
+                    "properties": {
+                      "id": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "criterion": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "scale": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "anchors",
+                              "threshold",
+                              "floor"
+                            ],
+                            "properties": {
+                              "anchors": {
+                                "type": "object",
+                                "minProperties": 1
+                              },
+                              "threshold": {
+                                "type": "number"
+                              },
+                              "floor": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "approvals": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "role",
+                      "by",
+                      "barDigest",
+                      "at",
+                      "adopted"
+                    ],
+                    "properties": {
+                      "role": {
+                        "enum": [
+                          "buyer",
+                          "specialist"
+                        ]
+                      },
+                      "by": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "barDigest": {
+                        "$ref": "#/$defs/digest"
+                      },
+                      "at": {
+                        "$ref": "#/$defs/timestamp"
+                      },
+                      "adopted": {
+                        "oneOf": [
+                          {
+                            "type": "null"
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "document",
+                              "version"
+                            ],
+                            "properties": {
+                              "document": {
+                                "$ref": "#/$defs/name"
+                              },
+                              "version": {
+                                "$ref": "#/$defs/name"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "publishedAt": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "groundTruth": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "name",
+                      "version",
+                      "digest"
+                    ],
+                    "properties": {
+                      "name": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "version": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "digest": {
+                        "$ref": "#/$defs/digest"
+                      }
+                    }
+                  }
+                },
+                "dissent": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "by",
+                      "note"
+                    ],
+                    "properties": {
+                      "by": {
+                        "$ref": "#/$defs/name"
+                      },
+                      "note": {
+                        "$ref": "#/$defs/name"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "maker": {
+              "type": "object",
+              "required": [
+                "name",
+                "kind",
+                "version",
+                "method",
+                "model"
+              ],
+              "properties": {
+                "name": {
+                  "$ref": "#/$defs/name"
+                },
+                "kind": {
+                  "enum": [
+                    "person",
+                    "model",
+                    "script"
+                  ]
+                },
+                "version": {
+                  "$ref": "#/$defs/name"
+                },
+                "method": {
+                  "$ref": "#/$defs/digest"
+                },
+                "model": {
+                  "$ref": "#/$defs/model"
+                }
+              }
+            },
+            "startedAt": {
+              "$ref": "#/$defs/timestamp",
+              "description": "When work on the artifact began (CL1-1)."
+            },
+            "producedAt": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "readsBeforeFreeze": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "instrument": {
+              "type": "object",
+              "required": [
+                "rubric",
+                "runner"
+              ],
+              "properties": {
+                "rubric": {
+                  "$ref": "#/$defs/digest"
+                },
+                "runner": {
+                  "$ref": "#/$defs/digest"
+                }
+              }
+            },
+            "evaluators": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "name",
+                  "kind",
+                  "model"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "name": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "kind": {
+                    "enum": [
+                      "person",
+                      "model",
+                      "script"
+                    ]
+                  },
+                  "model": {
+                    "$ref": "#/$defs/model"
+                  },
+                  "script": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "name",
+                          "author",
+                          "digest"
+                        ],
+                        "properties": {
+                          "name": {
+                            "$ref": "#/$defs/name"
+                          },
+                          "author": {
+                            "$ref": "#/$defs/name"
+                          },
+                          "digest": {
+                            "$ref": "#/$defs/digest"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "sameModelAsMaker": {
+                    "type": "boolean",
+                    "description": "True when this model evaluator is a session of the maker's own model (CL1-6)."
+                  }
+                },
+                "allOf": [
+                  {
+                    "if": {
+                      "properties": {
+                        "kind": {
+                          "const": "script"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ]
+                    },
+                    "then": {
+                      "required": [
+                        "script"
+                      ],
+                      "properties": {
+                        "script": {
+                          "type": "object"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            "checks": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "dimension",
+                  "evaluator",
+                  "run",
+                  "batch",
+                  "at",
+                  "outcome",
+                  "score",
+                  "failureCondition",
+                  "evidence",
+                  "unobserved"
+                ],
+                "properties": {
+                  "dimension": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "evaluator": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "run": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "batch": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "at": {
+                    "$ref": "#/$defs/timestamp"
+                  },
+                  "outcome": {
+                    "$ref": "#/$defs/outcome"
+                  },
+                  "score": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "failureCondition": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "evidence": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "$ref": "#/$defs/evidenceFile"
+                      }
+                    ]
+                  },
+                  "unobserved": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "channel",
+                          "reason"
+                        ],
+                        "properties": {
+                          "channel": {
+                            "$ref": "#/$defs/name"
+                          },
+                          "reason": {
+                            "$ref": "#/$defs/name"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "endpoint": {
+                    "$ref": "#/$defs/host",
+                    "description": "Optional: the host that answered this check, when it differs from its evaluator's."
+                  }
+                }
+              }
+            },
+            "controls": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "batch",
+                  "evaluator",
+                  "case",
+                  "expected",
+                  "outcome"
+                ],
+                "properties": {
+                  "id": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "dimension": {
+                    "description": "Optional: the dimension this control tests (CL1-9).",
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "batch": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "evaluator": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "case": {
+                    "$ref": "#/$defs/digest"
+                  },
+                  "expected": {
+                    "$ref": "#/$defs/outcome"
+                  },
+                  "outcome": {
+                    "$ref": "#/$defs/outcome"
+                  }
+                }
+              }
+            },
+            "spread": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "dimension",
+                  "evaluator",
+                  "runs",
+                  "agreement"
+                ],
+                "properties": {
+                  "dimension": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "evaluator": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "runs": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "agreement": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            },
+            "disagreements": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "dimension",
+                  "checks",
+                  "note"
+                ],
+                "properties": {
+                  "dimension": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "checks": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "minItems": 2
+                  },
+                  "note": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "violations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "dimension",
+                  "description"
+                ],
+                "properties": {
+                  "dimension": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "description": {
+                    "$ref": "#/$defs/name"
+                  }
+                }
+              }
+            },
+            "separationGaps": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "retention": {
+              "type": "object",
+              "required": [
+                "location",
+                "public"
+              ],
+              "properties": {
+                "location": {
+                  "$ref": "#/$defs/name"
+                },
+                "public": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "demonstrations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "dimension",
+                  "evaluator",
+                  "planted",
+                  "outcome",
+                  "at"
+                ],
+                "properties": {
+                  "dimension": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "evaluator": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "planted": {
+                    "$ref": "#/$defs/digest"
+                  },
+                  "outcome": {
+                    "$ref": "#/$defs/outcome"
+                  },
+                  "at": {
+                    "$ref": "#/$defs/timestamp"
+                  }
+                }
+              }
+            },
+            "external": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "requirement",
+                  "subject",
+                  "evidence",
+                  "readBy"
+                ],
+                "properties": {
+                  "requirement": {
+                    "enum": [
+                      "CL1-15",
+                      "CL2-4",
+                      "CL3-3"
+                    ],
+                    "description": "CL2-4 is the 0.x name of CL1-15, accepted until 1.0.0."
+                  },
+                  "evidence": {
+                    "$ref": "#/$defs/evidenceFile"
+                  },
+                  "readBy": {
+                    "$ref": "#/$defs/name"
+                  },
+                  "subject": {
+                    "$ref": "#/$defs/name",
+                    "description": "The evaluator id for CL1-15; the literal 'record' for CL3-3."
+                  }
+                }
+              }
+            },
+            "disposition": {
+              "type": "object",
+              "required": [
+                "state",
+                "by",
+                "at",
+                "acknowledgesUnobserved"
+              ],
+              "properties": {
+                "state": {
+                  "enum": [
+                    "given",
+                    "not_yet_given",
+                    "declined"
+                  ]
+                },
+                "by": {
+                  "$ref": "#/$defs/name"
+                },
+                "at": {
+                  "$ref": "#/$defs/timestamp"
+                },
+                "acknowledgesUnobserved": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "evidenceFile": {
+          "type": "object",
+          "required": [
+            "name",
+            "sha256"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "^(?![/\\\\])(?!(.*[/\\\\])?\\.\\.([/\\\\]|$)).+$",
+              "description": "A relative path in the evidence a verifier is given: not absolute, no '..' segment."
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "host": {
+          "type": "string",
+          "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$",
+          "description": "The host name of the service that answered (SPEC.md section 4)."
+        }
+      }
+    }
+  }
+}

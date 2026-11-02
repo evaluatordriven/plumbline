@@ -1,0 +1,16 @@
+{
+ "pass_id": "evaluator-record-example-B",
+ "kind": "scored",
+ "status": "filed",
+ "channel": "fixture-channel-B",
+ "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "code_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+ "run_ref": "fixture-run-B",
+ "scores": [
+  {
+   "dimension": "clarity",
+   "score": 8.5,
+   "observation": "fixture reading for clarity at pass B"
+  }
+ ]
+}

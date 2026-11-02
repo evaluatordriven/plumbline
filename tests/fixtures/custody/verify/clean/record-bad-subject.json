@@ -1,0 +1,36 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "artifact.txt",
+      "digest": {
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "x-plumbline": {
+      "schema": "plumbline/x-plumbline/v1",
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "hand-entered",
+        "producedAt": "hand-entered"
+      },
+      "hand_times": [],
+      "generations": [],
+      "evaluations": [],
+      "relays": [],
+      "amendments": [],
+      "spend": {
+        "calls_sum_usd": 0.0,
+        "key_delta_usd": 0.0,
+        "total_usd": 0.0,
+        "tolerance_usd": 0.0001,
+        "source": null
+      }
+    }
+  }
+}

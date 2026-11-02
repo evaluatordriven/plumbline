@@ -1,0 +1,16 @@
+{
+ "pass_id": "evaluator-record-saw-gt-A",
+ "kind": "scored",
+ "status": "filed",
+ "channel": "fixture-channel-A",
+ "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "code_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+ "run_ref": "fixture-run-A",
+ "scores": [
+  {
+   "dimension": "clarity",
+   "score": 8.0,
+   "observation": "fixture reading for clarity at pass A"
+  }
+ ]
+}

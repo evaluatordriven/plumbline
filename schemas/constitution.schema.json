@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/constitution.schema.json",
+  "title": "Plumbline standing constitution",
+  "description": "The standing frame for a program: values, core principles, and the buyer/specialist provenance that loans the evaluator its authority (Contracts s1.1, s4). Ratified ONCE per program and versioned, then referenced by every job packet. Per-job framing (job-to-be-done, pain points, desired future, ground truth, thresholds) does NOT live here — it belongs to the job packet. The split exists to remove repeated burden: a standard agreed once should not be re-specified every job, and a re-specified standard is one that will drift.",
+  "type": "object",
+  "required": ["program", "version", "ratified"],
+  "additionalProperties": false,
+  "properties": {
+    "program": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The program this constitution governs. One constitution per program, not per job."
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Semantic version. A job packet records the version it was written under, so a later reader can tell which standard a decision was judged against."
+    },
+    "ratified": {
+      "type": "boolean",
+      "description": "False while any value below is `proposed, unratified`. While false, no job under this constitution can reach the `accepted` terminal state (s3)."
+    },
+    "ratified_at": { "type": "string", "format": "date-time" },
+    "ratified_by": { "type": "string", "description": "Who agreed this standard. Recorded, not implied." },
+    "buyer": { "$ref": "#/$defs/provenancedRole" },
+    "specialist": { "$ref": "#/$defs/provenancedRole" },
+    "values": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/value" },
+      "description": "Ranked, if rank matters. Each value carries a decision rule; see the value definition."
+    },
+    "principles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "statement", "provenance"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "statement": { "type": "string", "minLength": 1 },
+          "provenance": { "type": "string", "minLength": 1, "description": "Where this principle comes from. A principle with no provenance is a preference." },
+          "applies_to_stages": {
+            "type": "array",
+            "items": { "enum": ["elicitation", "architecture", "development", "deployment", "operations", "revision"] },
+            "description": "Restrict a principle to the stages it governs. Omit to apply everywhere."
+          }
+        }
+      }
+    },
+    "escalation_classes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Standing escalation classes that bypass regeneration and go straight to a human. Values and doctrine questions always belong here (s2, s4). Per-job classes are added by the packet, never subtracted from this list."
+    },
+    "human_seat": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Standing delivery target for escalations. In this workspace a queue (e.g. a Telegram topic), never a blocking prompt in a headless run."
+    },
+    "non_negotiable": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Things that are never delegated to any agent at any stage, regardless of confidence or cost."
+    },
+    "proposed": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The single permitted home for unratified standing values (s3). Nowhere else.",
+      "properties": {
+        "values": { "type": "array", "items": { "$ref": "#/$defs/value" } },
+        "principles": { "type": "array", "items": { "type": "object" } },
+        "escalation_classes": { "type": "array", "items": { "type": "string" } },
+        "human_seat": { "type": "string" },
+        "rationale": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "required": ["ratified"], "properties": { "ratified": { "const": true } } },
+      "then": {
+        "required": ["buyer", "specialist", "values", "principles"],
+        "properties": { "proposed": false }
+      }
+    },
+    {
+      "if": { "required": ["ratified"], "properties": { "ratified": { "const": false } } },
+      "then": {
+        "required": ["proposed"],
+        "properties": {
+          "buyer": false,
+          "specialist": false,
+          "values": false,
+          "principles": false,
+          "escalation_classes": false,
+          "human_seat": false
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "provenancedRole": {
+      "type": "object",
+      "required": ["name", "provenance"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "provenance": {
+          "type": "string",
+          "minLength": 1,
+          "description": "s1.1: a rubric that cannot answer 'who is buying this, and which master of the craft approved the standard?' is invalid."
+        }
+      }
+    },
+    "value": {
+      "type": "object",
+      "required": ["name", "statement", "provenance", "decision_rule"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "statement": { "type": "string", "minLength": 1 },
+        "provenance": { "type": "string", "minLength": 1 },
+        "decision_rule": {
+          "type": "string",
+          "minLength": 1,
+          "description": "REQUIRED. What this value forces when two defensible options conflict. A value with no decision rule cannot arbitrate and therefore cannot be applied by an evaluator or an orchestrator — it is decoration, and it will be resolved by whoever is loudest. Stating the rule is what converts a value into something mechanical (s1.1, s4: the evaluator's authority is on loan from the buyer, and a loan needs terms)."
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Optional. Set when values can conflict and must resolve in a fixed order."
+        },
+        "evidence_of_adherence": {
+          "type": "string",
+          "description": "Optional. How adherence to this value could be observed rather than asserted."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,936 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "kit/emit_custody.py",
+      "digest": {
+        "sha256": "4eeb2dc452236b4408d838db82fbe3ef53608366b59b66487937fd72f3a1e424"
+      }
+    },
+    {
+      "name": "kit/custody_history.py",
+      "digest": {
+        "sha256": "004cc4f9e90dc8700af23ff5318f72d1f81492b5229a2f851ff06f81c23ec762"
+      }
+    },
+    {
+      "name": "tools/pack_stranger_bundle.py",
+      "digest": {
+        "sha256": "6530a9261ff524aefea321f0d644a9477292aafd97918fba3e822df8cae518ac"
+      }
+    },
+    {
+      "name": "tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl",
+      "digest": {
+        "sha256": "0a50f89dcd4c1fdcd1dc660a707063e7a1a6f35dde6815577a01ad69b2b572db"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b"
+      },
+      "frozenAt": "2026-10-27T21:57:46Z",
+      "author": "Steve Moitozo II",
+      "dimensions": [
+        {
+          "id": "N1",
+          "criterion": "For every emitted record (all fixture jobs + every real job in the run), `maker.startedAt` = the call logger's request-send time (`sent_at`, written by `freeze/harness/or_call.py`) of the **first** Maker call and `producedAt` = its reply-receive time (`received_at`) of the **last** Maker call, read from the Maker harness log and compared at whole seconds UTC. Equal only if that log's send and receive times are equal. A Maker call logged without both times fails. Fixture `single-call` (one Maker call, send ≠ receive) is in every run. (Amendment 1.)",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N2",
+          "criterion": "On fixture `maker-10min` (two Maker calls; the first call's `sent_at` and the last call's `received_at` 600 s apart), the emitter gives `producedAt − startedAt = 600 s`. (Planted half = control C-N2p.)",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N3",
+          "criterion": "Every time field in the record (`frozenAt`, `startedAt`, `producedAt`, `checks[].at`, approvals, disposition) has an `x-plumbline` source naming a ledger or harness-log file and line; that line carries that time. Any time without a source fails.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N4",
+          "criterion": "On fixture `genreply-null` (a model pass whose `/api/v1/generation` reply is missing/null) the emitter either (a) exits non-zero with a named error, or (b) records that evaluator's CL1-15 evidence absent so check.py reads NOT-CHECKABLE **and** writes an `x-plumbline` flag naming the pass. It never writes an `endpoint` no reply evidences.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N5",
+          "criterion": "On fixture `genreply-full` (all replies present) N4's procedure passes and each endpoint equals the reply's provider host. (Planted half = control C-N5p.)",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N6",
+          "criterion": "The generation-reply code path in `kit/emit_custody.py` has no fallback that derives an `endpoint` from routing config or provider pins. Answer: `CONFORMS`/`DOES_NOT_CONFORM` + cited line numbers.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N7",
+          "criterion": "Each stranger bundle zip contains the record, bar, subject files, every `checks[].evidence` and `external[].evidence` file, **plus** `inputs/custody-events.jsonl` and every maker/evaluator harness log the record's times or endpoints came from.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        },
+        {
+          "id": "N8",
+          "criterion": "Stranger procedure (frozen I7: empty HOME, `env -i`, anonymous clone of custody at pin): check.py reads OK **and** the stranger re-derives `startedAt`, `producedAt` and each endpoint from the bundled ledger/logs, equal to the record.",
+          "scale": {
+            "anchors": {
+              "0": "the check does not PASS as stated (includes NOT-RUN)",
+              "1": "the check PASSES as stated"
+            },
+            "threshold": 1,
+            "floor": 0
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "role": "buyer",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b"
+          },
+          "at": "2026-10-27T21:57:46Z",
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)"
+          }
+        },
+        {
+          "role": "specialist",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b"
+          },
+          "at": "2026-10-27T21:57:46Z",
+          "adopted": {
+            "document": "custody SPEC v0.9.6 @ 3e3ca58 + Plumbline DOCTRINE.md v0.1 section 7 @ dc61854",
+            "version": "v0.9.6+v0.1"
+          },
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)"
+          }
+        }
+      ],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "DeepSeek V4.1 Flash 1017",
+      "kind": "model",
+      "version": "v4.1-flash-1017",
+      "method": {
+        "sha256": "eb7e3f5f80a7179e28fb0dc9d63eab8af18966a6ad925877b01ed020cd98420d"
+      },
+      "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "endpoint": "api.deepinfra.com",
+        "readOnly": false
+      },
+      "x-plumbline": {
+        "harness_log": "harness-maker-deepseek.log",
+        "calls": [
+          "harness-maker-deepseek.log#maker_iter1_call1",
+          "harness-maker-deepseek.log#maker_iter1_call2",
+          "harness-maker-deepseek.log#maker_iter1_call3",
+          "harness-maker-deepseek.log#maker_iter1_call4",
+          "harness-maker-deepseek.log#maker_iter1_gen2_call1",
+          "harness-maker-deepseek.log#maker_iter1_gen2_call2",
+          "harness-maker-deepseek.log#maker_iter1_gen2_call3",
+          "harness-maker-deepseek.log#maker_iter1_gen2_call4",
+          "harness-maker-deepseek.log#maker_iter1_gen3_call1",
+          "harness-maker-deepseek.log#maker_iter1_gen3_call2",
+          "harness-maker-deepseek.log#maker_iter2_gen4_call1",
+          "harness-maker-deepseek.log#maker_iter2_gen4_call2",
+          "harness-maker-deepseek.log#maker_iter2_gen4_call4",
+          "harness-maker-deepseek.log#maker_iter3_gen5_call1",
+          "harness-maker-deepseek.log#maker_iter3_gen5_call2",
+          "harness-maker-deepseek.log#maker_iter3_gen5_call3",
+          "harness-maker-deepseek.log#maker_iter3_gen5_call4"
+        ],
+        "aggregator": "openrouter.ai",
+        "upstream_provider": "DeepInfra",
+        "provider_slug": "deepinfra/fp8",
+        "endpoint_basis": [
+          "declared pin (2026-10-27T21:57:46Z) to 'DeepInfra' at api.deepinfra.com, served-by confirmed from generation provider_name, openrouter_metadata.endpoints selected, response provider",
+          "declared pin (2026-10-27T21:57:46Z) to 'DeepInfra' at api.deepinfra.com, served-by confirmed from openrouter_metadata.endpoints selected, response provider"
+        ],
+        "startedAt_basis": "harness-maker-deepseek.log#maker_iter1_call1 response created",
+        "producedAt_basis": "harness-maker-deepseek.log#maker_iter3_gen5_call4 response Date header",
+        "routing": {
+          "pin": {
+            "via": "openrouter.ai",
+            "provider": "DeepInfra",
+            "slug": "deepinfra/fp8",
+            "host": "api.deepinfra.com",
+            "declaredAt": "2026-10-27T21:57:46Z"
+          },
+          "requests": [
+            {
+              "provider": {
+                "allow_fallbacks": false,
+                "order": [
+                  "deepinfra/fp8"
+                ],
+                "zdr": true
+              },
+              "calls": [
+                "harness-maker-deepseek.log#maker_iter1_call1",
+                "harness-maker-deepseek.log#maker_iter1_call2",
+                "harness-maker-deepseek.log#maker_iter1_call3",
+                "harness-maker-deepseek.log#maker_iter1_call4",
+                "harness-maker-deepseek.log#maker_iter1_gen2_call1",
+                "harness-maker-deepseek.log#maker_iter1_gen2_call2",
+                "harness-maker-deepseek.log#maker_iter1_gen2_call3",
+                "harness-maker-deepseek.log#maker_iter1_gen2_call4",
+                "harness-maker-deepseek.log#maker_iter1_gen3_call1",
+                "harness-maker-deepseek.log#maker_iter1_gen3_call2",
+                "harness-maker-deepseek.log#maker_iter2_gen4_call1",
+                "harness-maker-deepseek.log#maker_iter2_gen4_call2",
+                "harness-maker-deepseek.log#maker_iter2_gen4_call4",
+                "harness-maker-deepseek.log#maker_iter3_gen5_call1",
+                "harness-maker-deepseek.log#maker_iter3_gen5_call2",
+                "harness-maker-deepseek.log#maker_iter3_gen5_call3",
+                "harness-maker-deepseek.log#maker_iter3_gen5_call4"
+              ]
+            }
+          ],
+          "request_ok": true
+        }
+      }
+    },
+    "startedAt": "2026-10-27T23:44:48Z",
+    "producedAt": "2026-10-28T13:58:34Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b"
+      },
+      "runner": {
+        "sha256": "bc13f4272385c658d18bc07a76bfa97ceecb4201e0d1489b970a4766e2e42ca6"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "S1",
+        "name": "S1 instrument script (N1-N5, N7, N8, N9 control)",
+        "kind": "script",
+        "model": null,
+        "script": {
+          "name": "run_instrument.sh",
+          "author": "Orchestrator drafter",
+          "digest": {
+            "sha256": "1a07b6b2fa9d7c00b40038a04b12d2699ee91cdf54954d4e21273c9e2756a422"
+          }
+        }
+      },
+      {
+        "id": "E-GLM",
+        "name": "GLM 5.3 Flash (N6)",
+        "kind": "model",
+        "model": {
+          "family": "glm",
+          "identifier": "z-ai/glm-5.3-flash",
+          "endpoint": "api.z.ai",
+          "readOnly": true
+        },
+        "x-plumbline": {
+          "harness_log": "harness-eval-glm-b4.log",
+          "calls": [
+            "harness-eval-glm-b4.log#n6-b4-1",
+            "harness-eval-glm-b4.log#n6-b4-2",
+            "harness-eval-glm-b4.log#n6-b4-3"
+          ],
+          "aggregator": "openrouter.ai",
+          "upstream_provider": "Z.AI",
+          "provider_slug": "z-ai/fp8",
+          "endpoint_basis": "declared pin (2026-10-27T21:57:46Z) to 'Z.AI' at api.z.ai, served-by confirmed from generation provider_name, openrouter_metadata.endpoints selected, response provider",
+          "routing": {
+            "pin": {
+              "via": "openrouter.ai",
+              "provider": "Z.AI",
+              "slug": "z-ai/fp8",
+              "host": "api.z.ai",
+              "declaredAt": "2026-10-27T21:57:46Z"
+            },
+            "requests": [
+              {
+                "provider": {
+                  "allow_fallbacks": false,
+                  "order": [
+                    "z-ai/fp8"
+                  ],
+                  "zdr": true
+                },
+                "calls": [
+                  "harness-eval-glm-b4.log#n6-b4-1",
+                  "harness-eval-glm-b4.log#n6-b4-2",
+                  "harness-eval-glm-b4.log#n6-b4-3"
+                ]
+              }
+            ],
+            "request_ok": true
+          }
+        },
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "N1",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N2",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N3",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N4",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N5",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N7",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N8",
+        "evaluator": "S1",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:13:53Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N8 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/s1--summary.json",
+          "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "s1-b4"
+        }
+      },
+      {
+        "dimension": "N6",
+        "evaluator": "E-GLM",
+        "run": 1,
+        "batch": "b4",
+        "at": "2026-10-28T14:17:30Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "N6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)",
+        "evidence": {
+          "name": "eval/iter3-b4/n6--n6-b4-1.reply.txt",
+          "sha256": "d42d6ef2241ee539924d7c6b0f8e082d6d019aee24f7daac3925bca73e6d00f3"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "glm-b4",
+          "call": "harness-eval-glm-b4.log#n6-b4-1",
+          "at_basis": "response Date header"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "id": "C-N1c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "179cbfc8692c3a13fe6ba8a92b91539ef86f16250062ab74b66c793ce5ba5e23"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N1p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "404e326951d9cada018c9c3b38a925fe41133ee988e2b059949a6837725753d1"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N1p2",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "d54a2a6bcf3f0d59d2120410a86ff8218889b42e1795b9a67451d358ce021955"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N1",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N2c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "99ae94662c54b870f7cee7f9ce365d483bf56c68aab236d18d772f70482927d8"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N2p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "118301a404f174c4b78daedae42cb5fa096f9079d39388fcc0110f774e141934"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N2",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N3c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "5cd001acb505b711f9cd6c6e78c67331f3bfa14a77e6630f2ad7da7200010f45"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N3p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "44d3b3834f040403cc264f0154523ea174f392b462b009a5c051176578974de2"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N3p0",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "855d9713316ca36d6a5ca5465082a2d5b48d5fb206242a0222b13bb4272d8122"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N3",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N4c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "09281efa7c968d6ea097f9e373a38680eaf27ee4efbe780d52c9b2ef27a368cf"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N4c-b",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "92a26df7b0f68322c019003fde9ed507656d30d1913fb9835bb617203d95028c"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N4p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "4dd47d59a6c44f8423f8c03417e9752e9a2be30440cc03e16e0239e1e24eeb70"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N4",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N5c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "c21c940d239b5bb213e56b8e136074fd166d6c74e756c5f3bf378d30f3fdd5b9"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N5p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "32820fb710c0d0c4b56813b7729bd7e3ffd2e0591731729aca11de1df97c4596"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N5",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N9c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "327d1ab08708a61848a7d3b65bedbb4f36767f2eb691595060c779174f4c22d6"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N9p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "b7e8b479c89edd77445c9cfb39b4a84a46aaadf4465d25240053f68846635a15"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-N9p0",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "a5508bde5fe481bf2417fbe7827f202763a75edb12f194074a2504109a2f7019"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-P5c",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "c5ab5b1ca247752a688e1cd1832d1cff8212b0a85c7db27aa147c0b7435a8039"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-P5p",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "a874e7cb6a93b7e8844fa680758d5519e3cca9684bbd2db6d48c897db69c0021"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "C-P5p2",
+        "batch": "b4",
+        "evaluator": "S1",
+        "case": {
+          "sha256": "e576025a2c6313123721aeee54580c95160fd5c91a0573bc056483da43608a0d"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/s1--summary.json",
+            "sha256": "270770e4e254d19a6770fff8b090b5d43a719063a898ff003d1e8a7848ee52ed"
+          },
+          "at": "2026-10-28T14:13:53Z"
+        }
+      },
+      {
+        "id": "G-c1",
+        "batch": "b4",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "93042a41605e710ecee90054f88a00e30fc05a5c7f4df08ccf590f603f09ca27"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "dimension": "N6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/n6--N6-batch.redacted.json",
+            "sha256": "cf61f2b2269fc97d7b0721bb1494b188dc7d3c7b7c77aae9aec09becb1f5bda7"
+          },
+          "call": "harness-eval-glm-b4.log#n6-b4-2",
+          "at": "2026-10-28T14:23:31Z",
+          "at_basis": "response Date header"
+        }
+      },
+      {
+        "id": "G-p1",
+        "batch": "b4",
+        "evaluator": "E-GLM",
+        "case": {
+          "sha256": "869fb692583143d10a01c976bd94db9c530cb54d280ad85c3cfb268e05c7c729"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "N6",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/eval/iter3-b4/n6--N6-batch.redacted.json",
+            "sha256": "cf61f2b2269fc97d7b0721bb1494b188dc7d3c7b7c77aae9aec09becb1f5bda7"
+          },
+          "call": "harness-eval-glm-b4.log#n6-b4-3",
+          "at": "2026-10-28T14:24:26Z",
+          "at_basis": "response Date header"
+        }
+      }
+    ],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [
+      "Grokbot's underlying model(s) are not disclosed by its operator; family and identifier recorded as undisclosed.",
+      "The Maker's calls were issued by a harness operator, the E-DI Maker bot (a Grok Bot). The operator only issued the logged calls and applied returned patches verbatim (custody/method.md). This was instructed, not enforced.",
+      "Controls and fixtures were held outside the Maker's and Evaluator's working trees with sha256 committed at freeze, but on a shared box both bots could technically read them; non-reading was instructed, not enforced.",
+      "Held-out control case files are digested from /workspace/next-job-controls, outside the repo. The record carries their sha256 only, so a stranger cannot re-read the cases.",
+      "The E-GLM harness logs in the repo are redacted of held-out control text (handoffs/redact_glm_log.py). The full log's sha256 is in custody/evidence/harness-eval-glm-b4.log.full.sha256, and the full log stays outside the repo.",
+      "S1 is a script with no call log. Its pass and control time (2026-10-28T14:13:53Z) was entered by hand from the modification time of the sealed batch-4 s1/summary.json.",
+      "After the freeze, the generation, amendment, evaluation and dispose lines in inputs/custody-events.jsonl were appended by hand by the Orchestrator, not stamped by custody_ledger.py. The dispose line carries the Owner's decision time and channel as the Orchestrator received them.",
+      "This record was emitted by base main @ ff350e3 (tree 4abcfa08), not by the artifact under test (bar: Emitter). Known limitation: that emitter has gap 1 (producedAt), which this job repairs.",
+      "Only iteration 3's §5 record is emitted. Iterations 1 and 2 (fail → regenerate) are recorded in EVAL-ITER1-VERDICT.md, EVAL-ITER2-VERDICT.md and inputs/custody-events.jsonl.",
+      "S1 check extra-1-job-rejected (N3) was scored on the repo fixture that the Maker edited in generation 5 (EVAL-ITER3-VERDICT.md, Notes)."
+    ],
+    "retention": {
+      "location": "github.com/smoitozo/plumbline (private), branch job/2026-10-27-custody-emitter-gaps, dot-plumbline/jobs/2026-10-27-custody-emitter-gaps. Full E-GLM logs and held-out controls stay on the Owner's box (/workspace/edi-batches, /workspace/next-job-controls); the repo has their sha256 only.",
+      "public": false
+    },
+    "external": [
+      {
+        "requirement": "CL1-15",
+        "subject": "E-GLM",
+        "evidence": {
+          "name": "harness-eval-glm-b4.log",
+          "sha256": "b4dce825701e80de976bfa83c1cc43d0e12c0325f02b6fd4948e064755df9a8f"
+        },
+        "readBy": "Chief of Staff (Orchestrator)"
+      }
+    ],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-10-28T14:44:00Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-10-27-custody-emitter-gaps",
+      "events_log": {
+        "name": "inputs/custody-events.jsonl",
+        "sha256": "708359c6062ba97632220543a842295a1a23136a5630981a48d7d4caf0cd9bcb"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "iteration": 3,
+      "s5_record": {
+        "name": "iteration-3-eval-record.json",
+        "sha256": "5714ddea649b6555b322eec81995ec7a2c8d5235424f8b6b4cd35ad76c123f46"
+      },
+      "pass_rule": {
+        "accept": 1,
+        "dimension_floor": 1,
+        "reject": 0,
+        "cap": 3
+      },
+      "disposition_source": "packet.json disposition_state",
+      "packet": {
+        "name": "packet.json",
+        "sha256": "26a0418f2b0559b56ce97caaf17aeb302ec749289fd6db04a15767d08014820b"
+      },
+      "disposition_at_source": "logged live (inputs/custody-events.jsonl)",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "ff350e3",
+        "commit": "ff350e36dc04ea6baf898acd909787fcc7c1b6d4",
+        "tree": "4abcfa08f84d3b34849ad64bcfc281415772ffc1",
+        "dirty": false,
+        "statedRevision": "4abcfa08f84d3b34849ad64bcfc281415772ffc1"
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "harness log",
+        "producedAt": "harness log"
+      },
+      "emittedAt": "2026-10-28T14:44:27Z",
+      "gaps": []
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "entry": "A",
+  "instrument_profile": "mvi",
+  "job_name": "bad-owner-evaluator-object",
+  "artifact": "artifact/iter-2/SKILL.md",
+  "buyer": "Owner (agent must follow vendor docs without guessing)",
+  "maker": "deepseek/deepseek-v4.1-flash",
+  "evaluator": {"name": "Owner"},
+  "mode": "readings",
+  "ratified": true,
+  "notes": "Negative fixture (0032 clause 2): the Owner holds the Evaluator seat in object shape. 0028 A is landed doctrine; the object shape must not route around it."
+}

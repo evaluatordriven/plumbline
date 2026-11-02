@@ -1,0 +1,3 @@
+{"pass_id": "pass-a", "kind": "scored", "status": "filed", "channel": "api", "provider": "example",
+ "model": "example-1", "family": "example", "run_ref": "SYNTHETIC",
+ "scores": [{"dimension": "correctness", "score": 10}, {"dimension": "completeness", "score": 4}]}

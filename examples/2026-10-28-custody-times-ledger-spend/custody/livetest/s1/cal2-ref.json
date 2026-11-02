@@ -1,0 +1,88 @@
+{
+ "base_rev": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+ "controls": {
+  "C-G1p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T5c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-T5p1": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T5p2": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-T7p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  },
+  "C-V7c": {
+   "got": "PASS",
+   "right": true,
+   "want": "PASS"
+  },
+  "C-V7p": {
+   "got": "FAIL",
+   "right": true,
+   "want": "FAIL"
+  }
+ },
+ "controls_manifest_sha256": "d29b6f1a006c76e2e27af90bc9250f6cd87d43004c6e4876b2c883dd92c119d4",
+ "finished_at": "2026-10-28T20:01:14.936226Z",
+ "job": "2026-10-28-custody-times-ledger-spend",
+ "live_f8d": false,
+ "passed": 8,
+ "results": {
+  "F1a": "FAIL",
+  "F1b": "FAIL",
+  "F1c": "PASS",
+  "F1d": "FAIL",
+  "F1e": "PASS",
+  "F1f": "FAIL",
+  "F1g": "PASS",
+  "F1h": "FAIL",
+  "F7a": "FAIL",
+  "F8a": "PASS",
+  "F8b": "PASS",
+  "F8c": "PASS",
+  "F8d": "FAIL",
+  "G1": "PASS",
+  "G2": "FAIL",
+  "G3": "FAIL",
+  "I1": "FAIL",
+  "P1": "FAIL",
+  "T1": "PASS",
+  "T2": "FAIL",
+  "T3": "FAIL",
+  "T4": "FAIL",
+  "T5": "FAIL",
+  "T6": "FAIL",
+  "T7": "FAIL",
+  "V1": "FAIL",
+  "V2": "FAIL",
+  "V3": "FAIL",
+  "V4": "FAIL",
+  "V5": "FAIL",
+  "V6": "FAIL",
+  "V7": "FAIL",
+  "V8": "FAIL",
+  "V9": "FAIL",
+  "X1": "FAIL"
+ },
+ "started_at": "2026-10-28T19:53:32.683040Z",
+ "subject_rev": "14f7d5c50263684a2d0af55ea01c779877b17454",
+ "summary_sha256_on_box": "062597648ffabeee4b1381e4922363375754f26f547d124502805be4e9792c52",
+ "total": 35,
+ "void": false,
+ "void_because": []
+}

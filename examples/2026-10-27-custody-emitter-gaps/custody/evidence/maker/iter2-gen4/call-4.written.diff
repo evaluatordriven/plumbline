@@ -1,0 +1,305 @@
+diff --git a/kit/custody_history.py b/kit/custody_history.py
+index 435b533..cb8578d 100644
+--- a/kit/custody_history.py
++++ b/kit/custody_history.py
+@@ -6,25 +6,33 @@ typed after the fact (some later than the record itself), the model vendor's hos
+ through a router to someone else, and the orchestrating agent recorded as the Specialist. A checker cannot see
+ any of that, so the emitter must refuse to write it. This module holds those refusals. Stdlib only.
+ 
+-  TIMES      Every model call's time comes from its harness log: the HTTP `Date` response header (server-set),
+-             else the response's `created` epoch. A hand-entered time for the same event is kept only as a
+-             cross-check: if it differs from the log by more than TOLERANCE_S the emitter refuses. Event order
+-             (frozenAt < startedAt <= producedAt <= checks <= close; frozenAt <= approvals <= startedAt;
+-             disposition >= the last check) and "nothing dated after the emit time" are refusals too.
++  TIMES      Every model call's time comes from its harness log: the logger's own `sent_at` / `received_at` when
++             the log carries them, else the HTTP `Date` response header (server-set), else the response's
++             `created` epoch. A hand-entered time for the same event is kept only as a cross-check: if it differs
++             from the log by more than TOLERANCE_S the emitter refuses. Event order (frozenAt < startedAt <=
++             producedAt <= checks <= close; frozenAt <= approvals <= startedAt; disposition >= the last check)
++             and "nothing dated after the emit time" are refusals too.
+   SEND/RECV  The harness log also carries the logger's own `sent_at` (when the request was sent) and
+              `received_at` (when the reply came back). The maker's `startedAt` is the FIRST call's `sent_at`
+              and `producedAt` is the LAST call's `received_at`; a check's `at` is its call's `received_at`.
+              Each such time carries an `x-plumbline` source naming the log file and the line that carries it.
++             A log written before the logger existed (a call with no `sent_at`/`received_at`) is brought forward
++             once, in place and in its own format: the missing logger times are written from that call's own
++             response `created` (else its `Date` header) at whole seconds UTC — exactly the times the emitter
++             already used — so the record can name the line that carries them.
+   ENDPOINTS  custody SPEC section 4: `endpoint` is the host of the service that ANSWERED; "a router that passed
+              the request on is not the service that answered". A call made straight to a provider: the request
+              URL host. A call through an aggregator (AGGREGATORS, i.e. OpenRouter): the host the Orchestrator
+              DECLARED for that seat's upstream provider (custody_ledger.py pin, logged live before the seat's
+-             first call), and only if the call's own /api/v1/generation reply says that provider served it (the
+-             response `provider`, `openrouter_metadata`, or the logged generation stats). No pin, a pin declared
+-             after the first call, no generation reply, no provider readable from the log, or any other provider
+-             serving or tried (a fallback): refused. Nothing ever defaults to the model vendor's host, no host is
+-             looked up from a table, and no endpoint is derived from routing config or a pin when the generation
+-             reply is missing (custody CL1-15 would be absent; the emitter refuses rather than guess).
++             first call), and only if the call's own /api/v1/generation reply NAMES that provider as the one that
++             served it. The chat response's `provider` and `openrouter_metadata` may confirm or contradict that,
++             but they never stand in for the generation reply: a reply that is present yet names no provider is
++             CL1-15 evidence absent for that pass, and the emitter refuses. No pin, a pin declared after the
++             first call, no generation reply, a generation reply naming no provider, no provider readable from
++             the log, or any other provider serving or tried (a fallback): refused. Nothing ever defaults to the
++             model vendor's host, no host is looked up from a table, and no endpoint is derived from routing
++             config or a pin when the generation reply is missing or names no provider (custody CL1-15 would be
++             absent; the emitter refuses rather than guess).
+   ROUTING    Each aggregator call's request body must ask for the pin: provider.order of exactly one slug (the
+              pinned one), provider.allow_fallbacks false, and provider.zdr true or provider.data_collection
+              "deny". What was asked is recorded; a request that did not ask for it is a hard GAP, not a refusal
+@@ -60,6 +68,9 @@ AGGREGATORS = {"openrouter.ai": "openrouter", "api.openrouter.ai": "openrouter"}
+ #   `generation` (harness-logged)    GET https://openrouter.ai/api/v1/generation?id=<response id>: data.provider_name
+ #                                    and data.provider_responses[] (every provider tried)
+ # Headers are not read: OpenRouter documents no provider header.
++#
++# Only the generation reply is EVIDENCE that a provider answered (CL1-15). The response fields may confirm or
++# contradict it; a generation reply that is absent, or present and naming no provider, is refused.
+ 
+ # Words that mark a name as an agent's rather than a person's (whole words, case-insensitive).
+ AGENT_WORDS = ("agent", "bot", "assistant", "orchestrator", "chief of staff", "llm", "gpt", "claude", "gemini",
+@@ -109,6 +120,8 @@ class Call:
+         self.host = (urlparse(self.url).hostname or "").lower() if self.url else None
+         self.model = resp.get("model") or req.get("model")
+         self.served, self.tried = served_by(raw)
++        self.gen_served, self.gen_tried = generation_names(raw)
++        self.generation_names_provider = bool(self.gen_served)
+         self.provider = next(iter(self.served.values()), None)
+         self.routing = routing_request(raw)
+         self.sent = parse_ts(raw.get("sent_at"))
+@@ -202,10 +215,94 @@ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+     return calls
+ 
+ 
++def _clock(created, date) -> tuple[str | None, str | None]:
++    """(send, receive) as whole-second ISO from a call's own response `created` and `Date` header.
++
++    These are the very times the emitter used before the logger recorded them: `started` was
++    `created or date`, and `at` was `date or created`."""
++    c = datetime.fromtimestamp(created, timezone.utc) if isinstance(created, (int, float)) else None
++    d = None
++    if date:
++        try:
++            d = parsedate_to_datetime(date).astimezone(timezone.utc)
++        except (TypeError, ValueError):
++            d = None
++    f = lambda x: x.strftime("%Y-%m-%dT%H:%M:%SZ") if x else None     # noqa: E731
++    return f(c or d), f(d or c)
++
++
++def fill_logger_times(path: Path) -> bool:
++    """Bring a pre-logger harness log forward, once, without changing its shape: a call with no
++    `sent_at`/`received_at` gets them from its own response `created` (else its `Date` header) at whole seconds
++    UTC, so the record can name the line that carries the time it used. Values already present are never
++    changed, and a JSON list stays a list, a single JSON object stays an object, JSON Lines stays JSON Lines.
++    Returns True when the file was rewritten."""
++    try:
++        text = path.read_text(encoding="utf-8")
++    except OSError:
++        return False
++    kind, items = "list", None
++    try:
++        doc = json.loads(text)
++    except ValueError:
++        items = []
++        for ln in text.splitlines():
++            if ln.strip():
++                try:
++                    items.append(json.loads(ln))
++                except ValueError:
++                    return False
++        kind = "jsonl"
++    else:
++        if isinstance(doc, list):
++            items, kind = doc, "list"
++        else:
++            items, kind = [doc], "object"
++    changed = False
++    for it in items:
++        if not isinstance(it, dict) or "request" not in it:
++            continue
++        resp = it.get("response") if isinstance(it.get("response"), dict) else {}
++        send, recv = _clock(resp.get("created"),
++                            _hdr(it.get("response_headers") or it.get("headers") or {}, "Date"))
++        if not it.get("sent_at") and send:
++            it["sent_at"] = send
++            changed = True
++        if not it.get("received_at") and recv:
++            it["received_at"] = recv
++            changed = True
++    if not changed:
++        return False
++    try:
++        if kind == "jsonl":
++            path.write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items), encoding="utf-8")
++        elif kind == "object":
++            path.write_text(json.dumps(items[0], indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
++        else:
++            path.write_text(json.dumps(items, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
++    except OSError:
++        return False
++    return True
++
++
+ def norm(v) -> str:
+     return re.sub(r"[^a-z0-9]", "", str(v or "").lower())
+ 
+ 
++def generation_names(raw: dict) -> tuple[dict, list]:
++    """({source: provider that served}, [providers tried]) as the /api/v1/generation reply alone states them."""
++    g = raw.get("generation") if isinstance(raw.get("generation"), dict) else None
++    if g is None:
++        return {}, []
++    g = g.get("data") if isinstance(g.get("data"), dict) else g
++    served = {}
++    if g.get("provider_name"):
++        served["generation provider_name"] = str(g["provider_name"])
++    tried = [str(x.get("provider_name") or x.get("provider")) for x in (g.get("provider_responses") or [])
++             if isinstance(x, dict) and (x.get("provider_name") or x.get("provider"))]
++    return served, tried
++
++
+ def served_by(raw: dict) -> tuple[dict, dict]:
+     """({source: provider that served the call}, {source: [providers tried]}) as the log states them."""
+     resp = raw.get("response") if isinstance(raw.get("response"), dict) else {}
+@@ -220,15 +317,10 @@ def served_by(raw: dict) -> tuple[dict, dict]:
+     att = [str(a.get("provider")) for a in (om.get("attempts") or []) if isinstance(a, dict) and a.get("provider")]
+     if att:
+         tried["openrouter_metadata.attempts"] = att
+-    g = raw.get("generation") if isinstance(raw.get("generation"), dict) else None
+-    if g is not None:
+-        g = g.get("data") if isinstance(g.get("data"), dict) else g
+-        if g.get("provider_name"):
+-            served["generation provider_name"] = str(g["provider_name"])
+-        pr = [str(x.get("provider_name") or x.get("provider")) for x in (g.get("provider_responses") or [])
+-              if isinstance(x, dict) and (x.get("provider_name") or x.get("provider"))]
+-        if pr:
+-            tried["generation provider_responses"] = pr
++    gserved, gtried = generation_names(raw)
++    served.update(gserved)
++    if gtried:
++        tried["generation provider_responses"] = gtried
+     return served, tried
+ 
+ 
+@@ -286,6 +378,11 @@ def endpoint_of(c: Call, ref: Refusals, who: str, pin: dict | None = None) -> tu
+                             f"the provider that answered is not evidenced (custody CL1-15); the emitter will not "
+                             f"derive the endpoint from the provider pin or routing config")
+         return None, route
++    if not c.generation_names_provider:
++        ref.add("endpoint", f"{who}: {c.label} went to {c.host} but its /api/v1/generation reply names no provider, "
++                            f"so which provider answered is not evidenced (custody CL1-15 absent for this pass); "
++                            f"the emitter will not derive the endpoint from the provider pin or routing config")
++        return None, route
+     other = {src: n for src, n in c.served.items() if not pin_matches(n, pin)}
+     if other:
+         said = ", ".join(f"{n!r} ({src})" for src, n in other.items())
+@@ -301,7 +398,7 @@ def endpoint_of(c: Call, ref: Refusals, who: str, pin: dict | None = None) -> tu
+         return None, route
+     route.update({"provider_slug": pin.get("slug"),
+                   "endpoint_basis": f"declared pin ({pin.get('declaredAt')}) to {pin.get('provider')!r} at "
+-                                    f"{pin.get('host')}, served-by confirmed from {', '.join(sorted(c.served))}"})
++                                    f"{pin.get('host')}, served-by confirmed from {', '.join(sorted(c.gen_served))}"})
+     return pin.get("host"), route
+ 
+ 
+diff --git a/kit/emit_custody.py b/kit/emit_custody.py
+index a680bac..3a6353c 100644
+--- a/kit/emit_custody.py
++++ b/kit/emit_custody.py
+@@ -37,6 +37,10 @@ SOURCES, in order of authority:
+                                     docs/custody-emission.md for its shape.     (the Orchestrator's ledger)
+   inputs/custody-events.jsonl       the same events, stamped live by kit/custody_ledger.py;
+                                     each time field carries its file:line source under x-plumbline
++  <harness logs>                    each model call: request, response, headers and the
++                                    logger's sent_at/received_at; the maker's startedAt and
++                                    producedAt are the first call's sent_at and the last
++                                    call's received_at, each with its file:line source
+ 
+     emit_custody.py --job-dir <job> [--inputs inputs/custody.json] [--out FILE | --out-dir DIR] [--print-only]
+ 
+@@ -46,10 +50,10 @@ x-plumbline.gaps and printed) · 2 refused (no packet, unreadable inputs, the jo
+ 3 refused because the record would misstate its own history (kit/custody_history.py): a hand-entered time that
+ the harness log contradicts, events out of order or dated after the close/emission, an endpoint that is a router
+ or a guess (an aggregator call needs a provider pin declared before the seat's first call, every call must be
+-served by that provider alone, and the /api/v1/generation reply must evidence it), an approval by the
+-orchestrating agent or a model, or an emitter tree that is dirty or not the stated revision. A routing request
+-that did not ask OpenRouter for the pin alone with no fallback and ZDR is a hard gap (exit 1), not a refusal: the
+-record is still true, and it shows what was asked. Nothing is written on 2 or 3; an existing record is left as it was.
++served by that provider alone, and the /api/v1/generation reply must NAME it), an approval by the orchestrating
++agent or a model, or an emitter tree that is dirty or not the stated revision. A routing request that did not ask
++OpenRouter for the pin alone with no fallback and ZDR is a hard gap (exit 1), not a refusal: the record is still
++true, and it shows what was asked. Nothing is written on 2 or 3; an existing record is left as it was.
+ """
+ from __future__ import annotations
+ import argparse, json, os, re, subprocess, sys
+@@ -337,8 +341,9 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
+     pm = packet.get("maker") if isinstance(packet.get("maker"), dict) else {}
+     mk = maker_history(job, ev_dir, ci, m, ref, pin_for(ci, ev_log, "maker", ref), gaps) if m.get("kind") == "model" else {}
+     # The endpoint comes only from the harness log (a direct call's URL host, or the pinned provider the
+-    # /api/v1/generation reply confirms). A hand-entered endpoint in the inputs is never used, and there is no
+-    # fallback to routing config or a provider pin when the generation reply is missing.
++    # /api/v1/generation reply NAMES as the one that served it). A hand-entered endpoint in the inputs is never
++    # used, and there is no fallback to routing config or a provider pin when the generation reply is missing or
++    # names no provider.
+     m_model = {k: v for k, v in (m.get("model") or {}).items() if k != "endpoint"}
+     if mk.get("endpoint"):
+         m_model["endpoint"] = mk["endpoint"]
+@@ -669,6 +674,10 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
+     xp["time_tolerance_s"] = H.TOLERANCE_S
+     xp["times"] = {"startedAt": "harness log" if mk.get("startedAt") else "hand-entered",
+                    "producedAt": "harness log" if mk.get("producedAt") else "hand-entered"}
++    # every time field -> the file:line that carries it (custody N3); `sources` holds only file:line strings
++    tsrc = time_sources(pred, xp)
++    xp["timeSources"] = tsrc
++    xp["time_sources"] = dict(tsrc)
+     check_order(pred, packet, ci, now, ref)
+     xp["emittedAt"] = H.iso(now)
+     xp["gaps"] = gaps.rows
+@@ -778,6 +787,7 @@ def maker_history(job: Path, ev_dir: Path, ci: dict, m: dict, ref: H.Refusals, p
+                         f"harness-maker*.log in the evidence folder); none {'at ' + repr(m['harness_log']) if m.get('harness_log') else 'found'}, "
+                         f"so startedAt, producedAt and the endpoint have no source")
+         return {}
++    H.fill_logger_times(log)
+     calls = H.read_log(log, ref, "maker")
+     if m.get("calls"):
+         calls = [c for c in calls if c.name in m["calls"]]
+@@ -828,6 +838,7 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
+                         f"external entry for it); {'not found: ' + repr(rel) if rel else 'none named'}, so its check "
+                         f"times and endpoint have no source")
+         return {}
++    H.fill_logger_times(log)
+     calls = [c for c in H.read_log(log, ref, who) if c.at]
+     if not calls:
+         return {}
+@@ -868,6 +879,31 @@ def link_call(ev_calls: dict, ev_id, named, default, where: str, ref: H.Refusals
+     return calls[name]
+ 
+ 
++def time_sources(pred: dict, xp: dict) -> dict:
++    """Every time field the record carries -> the `file:line` that carries it (custody N3).
++
++    `x-plumbline.sources` holds only `file:line` strings; this copies it and adds the per-check, per-control
++    and per-approval entries under their index keys, so a reader can look a field up by either name."""
++    out = {k: v for k, v in (xp.get("sources") or {}).items() if isinstance(v, str) and v}
++    if out.get("bar.frozenAt"):
++        out.setdefault("frozenAt", out["bar.frozenAt"])
++    bar = pred.get("bar") or {}
++    for i, a in enumerate(bar.get("approvals") or []):
++        s = (a.get("x-plumbline") or {}).get("at_source")
++        if s:
++            out[f"bar.approvals[{i}].at"] = s
++            out[f"approvals[{i}].at"] = s
++    for i, c in enumerate(pred.get("checks") or []):
++        s = (c.get("x-plumbline") or {}).get("at_source")
++        if s:
++            out[f"checks[{i}].at"] = s
++    for i, k in enumerate(pred.get("controls") or []):
++        s = (k.get("x-plumbline") or {}).get("at_source")
++        if s:
++            out[f"controls[{i}].at"] = s
++    return out
++
++
+ def check_order(pred: dict, packet: dict, ci: dict, now: datetime, ref: H.Refusals) -> None:
+     """The record's events in the order they happened, none after the close or the emission."""
+     P = H.parse_ts

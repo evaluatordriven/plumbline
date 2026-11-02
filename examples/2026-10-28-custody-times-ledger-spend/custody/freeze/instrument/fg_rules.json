@@ -1,0 +1,188 @@
+{
+  "_status": "FROZEN-BUILD 2026-10-28T20:36:28Z — G4-G7 rules (published to the Maker), job 2026-10-28-custody-times-ledger-spend; sha256 in ../../MANIFEST.sha256. This key is ignored by the checks.",
+  "path": "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md",
+  "normalize": "lowercase; drop the characters * _ ` and backslash; map curly quotes to straight and en/em dashes to '-'; collapse all whitespace to one space",
+  "status": {
+    "within_first_lines": 15,
+    "line_must_contain_all": [
+      "status",
+      "non-normative",
+      "doctrine wins"
+    ]
+  },
+  "groups": {
+    "B1-tripwire": [
+      [
+        "same failure class"
+      ],
+      [
+        "3 times",
+        "three times",
+        "third time"
+      ],
+      [
+        "change the request"
+      ]
+    ],
+    "B2-shared-key": [
+      [
+        "shared key"
+      ],
+      [
+        "spend guard"
+      ],
+      [
+        "upper bound"
+      ]
+    ],
+    "B3-pre-read": [
+      [
+        "pre-read"
+      ],
+      [
+        "optional"
+      ],
+      [
+        "approval sheet"
+      ]
+    ],
+    "C1-length-empty": [
+      [
+        "finish_reason"
+      ],
+      [
+        "length"
+      ],
+      [
+        "empty content"
+      ],
+      [
+        "own failure class"
+      ]
+    ],
+    "C2-no-throttling": [
+      [
+        "no throttling"
+      ],
+      [
+        "endpoint max"
+      ],
+      [
+        "reasoning limit"
+      ]
+    ],
+    "C3-sized-tasks": [
+      [
+        "size each task",
+        "size the task",
+        "sized task",
+        "size each request",
+        "sized request",
+        "size the request"
+      ]
+    ],
+    "C4-finish-logged": [
+      [
+        "finish_reason"
+      ],
+      [
+        "every call"
+      ]
+    ],
+    "C5-cap": [
+      [
+        "cap counts"
+      ],
+      [
+        "iterations"
+      ]
+    ],
+    "C6-write-command": [
+      [
+        "command that writes"
+      ]
+    ],
+    "C7-standing-rules": [
+      [
+        "standing rules"
+      ]
+    ],
+    "C8-live-test-gate": [
+      [
+        "live test"
+      ],
+      [
+        "freeze gate"
+      ]
+    ],
+    "C9-write-once": [
+      [
+        "write-once"
+      ]
+    ],
+    "C10-relays": [
+      [
+        "relayed approval",
+        "relayed approvals"
+      ],
+      [
+        "not an approval",
+        "not approvals"
+      ]
+    ],
+    "C11-no-tmp": [
+      [
+        "/tmp"
+      ]
+    ],
+    "F-carried-forward": [
+      [
+        "carried forward"
+      ]
+    ]
+  },
+  "carried_forward_heading": "^#{1,6} .*carried forward",
+  "deny_regex": [
+    "\\bsteve\\b",
+    "moitozo",
+    "(?-i:\\bS2\\b)",
+    "\\b[\\w.+-]+@[a-z0-9-]+(\\.[a-z0-9-]+)*\\.(com|org|net|io|dev|ai|edu|gov|co|me|app|xyz)\\b",
+    "/workspace\\b",
+    "/users/",
+    "/home/",
+    "sk-or-",
+    "\\bsk-[a-z0-9_-]{16,}",
+    "key[^\\n]{0,24}(fingerprint|sha256|sha-256|hash)[^\\n]{0,12}[0-9a-f]{8,}"
+  ],
+  "deny_phrases": [
+    "Ratified proceed",
+    "I agree with all of these",
+    "Item 29 - (A) approved as recommended",
+    "Item 28 - (B) fix it in this job",
+    "Remaining - (A) approved as recommended",
+    "Adopt the tripwire: after the same Maker failure 3 times, stop and change the request",
+    "Keep the shared key with the spend guard",
+    "Make the cross-family pre-read optional, decided per job",
+    "Use the same openrouter key I gave you last time",
+    "Item 30: the Maker writes the field guide in this job, with bar checks for it",
+    "Paraphrase my words as Owner decisions; no verbatim quotes in the doc",
+    "When I said three iterations, I was talking about three iterations of the EDI loop",
+    "Looks like you choked the evaluator model",
+    "don't put your work in /tmp",
+    "As Owner I give disposition: accepted",
+    "stop choking the model",
+    "run the controls and instrument from a writable copy of freeze/ with byte-identical, hash-verified files",
+    "I accept iteration 2 with the gaps logged",
+    "ratified (and yes, PRIOR makes sense)",
+    "amend the bar as Buyer to extend the time bound so gen 3 can run",
+    "Amend P5(e) so headers carry the build time",
+    "As Buyer I amend the bar to raise the cap from 3 to 4 generations",
+    "As Buyer I amend the cap to 3 E-DI iterations, with Maker attempts limited only by budget",
+    "As Buyer I approve AMENDMENT-4",
+    "I approve the sheet as-is",
+    "Tighten N1 to use the logger's send and receive times",
+    "Close job 2026-10-27-custody-emitter-gaps and write its CL1 custody record",
+    "under $5 in LLM processing and under 2hrs of my time"
+  ],
+  "deny_phrase_rule": "a phrase matches after normalization and after dropping every character that is not a letter, digit or space (so punctuation and quote marks do not matter)"
+}

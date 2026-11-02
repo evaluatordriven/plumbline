@@ -1,0 +1,1 @@
+extract_patch: lines 2-308 of /workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/custody/evidence/maker/iter1-gen2/call-4.reply.txt -> /workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/custody/evidence/maker/iter1-gen2/call-4.patch

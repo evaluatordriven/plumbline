@@ -1,0 +1,35 @@
+{
+ "batch": "1",
+ "calls_ok": true,
+ "check": "J4",
+ "controls_ok": true,
+ "dry_run": false,
+ "items": [
+  {
+   "call": "J4-b1-1",
+   "control_ok": true,
+   "finish_reason": null,
+   "id": "G-J4p",
+   "messages_sha256": "616a1d4c8dfee2fc69db078506127e29538565bcc4ab41afb3dd14228e91ea9a",
+   "or_call_exit": 5,
+   "reply_sha256": "4e64d37bfbc549d5c2e73aee96f25982b628428b440162686c6c267ac7a9d8c9",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J4-b1-2",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J4c",
+   "messages_sha256": "26ac9069f72d85a504d35152544e1fd14d6803b1cef7a58ad24a8f38e30a566b",
+   "or_call_exit": 0,
+   "reply_sha256": "4c519909e02ed89e3c4d8ecfb9ff233f270c56e79191590e7538545ce9a49959",
+   "verdict": "CONFORMS"
+  }
+ ],
+ "log": "harness-E-GLM-J4-b1.log",
+ "order": [
+  "G-J4p",
+  "G-J4c"
+ ],
+ "window": 2
+}

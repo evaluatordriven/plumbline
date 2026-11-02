@@ -1,0 +1,512 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "bar": {
+    "file": "custody/bar.md",
+    "frozenAt": "2026-10-27T21:57:46Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+        "at": "2026-10-27T21:57:46Z",
+        "adopted": null
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+        "at": "2026-10-27T21:57:46Z",
+        "adopted": {
+          "document": "custody SPEC v0.9.6 @ 3e3ca58 + Plumbline DOCTRINE.md v0.1 section 7 @ dc61854",
+          "version": "v0.9.6+v0.1"
+        }
+      }
+    ],
+    "author": "Steve Moitozo II",
+    "dimensions": [
+      {
+        "id": "N1",
+        "plumbline_dimension": "N1",
+        "criterion": "For every emitted record (all fixture jobs + every real job in the run), `maker.startedAt` = the call logger's request-send time (`sent_at`, written by `freeze/harness/or_call.py`) of the **first** Maker call and `producedAt` = its reply-receive time (`received_at`) of the **last** Maker call, read from the Maker harness log and compared at whole seconds UTC. Equal only if that log's send and receive times are equal. A Maker call logged without both times fails. Fixture `single-call` (one Maker call, send ≠ receive) is in every run. (Amendment 1.)",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N1 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N2",
+        "plumbline_dimension": "N2",
+        "criterion": "On fixture `maker-10min` (two Maker calls; the first call's `sent_at` and the last call's `received_at` 600 s apart), the emitter gives `producedAt − startedAt = 600 s`. (Planted half = control C-N2p.)",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N2 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N3",
+        "plumbline_dimension": "N3",
+        "criterion": "Every time field in the record (`frozenAt`, `startedAt`, `producedAt`, `checks[].at`, approvals, disposition) has an `x-plumbline` source naming a ledger or harness-log file and line; that line carries that time. Any time without a source fails.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N3 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N4",
+        "plumbline_dimension": "N4",
+        "criterion": "On fixture `genreply-null` (a model pass whose `/api/v1/generation` reply is missing/null) the emitter either (a) exits non-zero with a named error, or (b) records that evaluator's CL1-15 evidence absent so check.py reads NOT-CHECKABLE **and** writes an `x-plumbline` flag naming the pass. It never writes an `endpoint` no reply evidences.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N4 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N5",
+        "plumbline_dimension": "N5",
+        "criterion": "On fixture `genreply-full` (all replies present) N4's procedure passes and each endpoint equals the reply's provider host. (Planted half = control C-N5p.)",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N5 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N6",
+        "plumbline_dimension": "N6",
+        "criterion": "The generation-reply code path in `kit/emit_custody.py` has no fallback that derives an `endpoint` from routing config or provider pins. Answer: `CONFORMS`/`DOES_NOT_CONFORM` + cited line numbers.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N6 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N7",
+        "plumbline_dimension": "N7",
+        "criterion": "Each stranger bundle zip contains the record, bar, subject files, every `checks[].evidence` and `external[].evidence` file, **plus** `inputs/custody-events.jsonl` and every maker/evaluator harness log the record's times or endpoints came from.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N7 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      },
+      {
+        "id": "N8",
+        "plumbline_dimension": "N8",
+        "criterion": "Stranger procedure (frozen I7: empty HOME, `env -i`, anonymous clone of custody at pin): check.py reads OK **and** the stranger re-derives `startedAt`, `producedAt` and each endpoint from the bundled ledger/logs, equal to the record.",
+        "scale": {
+          "anchors": {
+            "0": "the check does not PASS as stated (includes NOT-RUN)",
+            "1": "the check PASSES as stated"
+          },
+          "threshold": 1,
+          "floor": 0
+        },
+        "failureCondition": "N8 does not PASS as the criterion states, or is not run (bar.md: binary scale, threshold 1)"
+      }
+    ]
+  },
+  "orchestrator": {
+    "name": "Chief of Staff (Orchestrator)",
+    "kind": "agent",
+    "aliases": []
+  },
+  "routing": {
+    "maker": {
+      "via": "openrouter.ai",
+      "provider": "DeepInfra",
+      "slug": "deepinfra/fp8",
+      "host": "api.deepinfra.com",
+      "declaredAt": "2026-10-27T21:57:46Z"
+    },
+    "E-GLM": {
+      "via": "openrouter.ai",
+      "provider": "Z.AI",
+      "slug": "z-ai/fp8",
+      "host": "api.z.ai",
+      "declaredAt": "2026-10-27T21:57:46Z"
+    },
+    "eval-glm": {
+      "via": "openrouter.ai",
+      "provider": "Z.AI",
+      "slug": "z-ai/fp8",
+      "host": "api.z.ai",
+      "declaredAt": "2026-10-27T22:32:11Z"
+    }
+  },
+  "levelClaimed": "CL1",
+  "files_dir": "../../..",
+  "subject": [
+    "kit/emit_custody.py",
+    "kit/custody_history.py",
+    "tools/pack_stranger_bundle.py",
+    "tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl"
+  ],
+  "maker": {
+    "name": "DeepSeek V4.1 Flash 1017",
+    "kind": "model",
+    "version": "v4.1-flash-1017",
+    "method_file": "custody/method.md",
+    "harness_log": "harness-maker-deepseek.log",
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek/deepseek-v4.1-flash-1017",
+      "readOnly": false
+    }
+  },
+  "instrument": {
+    "rubric_file": "custody/bar.md",
+    "runner_file": "handoffs/iter3-evaluator-b4.md"
+  },
+  "evaluators": [
+    {
+      "id": "S1",
+      "name": "S1 instrument script (N1-N5, N7, N8, N9 control)",
+      "kind": "script",
+      "script": {
+        "name": "run_instrument.sh",
+        "author": "Orchestrator drafter",
+        "file": "custody/freeze/instrument/run_instrument.sh"
+      }
+    },
+    {
+      "id": "E-GLM",
+      "name": "GLM 5.3 Flash (N6)",
+      "kind": "model",
+      "harness_log": "harness-eval-glm-b4.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "readOnly": true
+      }
+    }
+  ],
+  "passes": {
+    "s1-b4": {
+      "evaluator": "S1",
+      "run": 1,
+      "batch": "b4",
+      "at": "2026-10-28T14:13:53Z",
+      "dimensions": [
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5",
+        "N7",
+        "N8"
+      ],
+      "evidence": {
+        "N1": "eval/iter3-b4/s1--summary.json",
+        "N2": "eval/iter3-b4/s1--summary.json",
+        "N3": "eval/iter3-b4/s1--summary.json",
+        "N4": "eval/iter3-b4/s1--summary.json",
+        "N5": "eval/iter3-b4/s1--summary.json",
+        "N7": "eval/iter3-b4/s1--summary.json",
+        "N8": "eval/iter3-b4/s1--summary.json"
+      }
+    },
+    "glm-b4": {
+      "evaluator": "E-GLM",
+      "run": 1,
+      "batch": "b4",
+      "call": "n6-b4-1",
+      "dimensions": [
+        "N6"
+      ],
+      "evidence": {
+        "N6": "eval/iter3-b4/n6--n6-b4-1.reply.txt"
+      }
+    }
+  },
+  "controls": [
+    {
+      "id": "C-N1c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N1c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N1"
+    },
+    {
+      "id": "C-N1p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N1p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N1"
+    },
+    {
+      "id": "C-N1p2",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N1p2/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N1"
+    },
+    {
+      "id": "C-N2c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N2c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N2"
+    },
+    {
+      "id": "C-N2p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N2p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N2"
+    },
+    {
+      "id": "C-N3c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N3c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N3"
+    },
+    {
+      "id": "C-N3p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N3p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N3"
+    },
+    {
+      "id": "C-N3p0",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N3p0/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N3"
+    },
+    {
+      "id": "C-N4c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N4c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N4"
+    },
+    {
+      "id": "C-N4c-b",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N4c-b/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N4"
+    },
+    {
+      "id": "C-N4p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N4p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N4"
+    },
+    {
+      "id": "C-N5c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N5c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N5"
+    },
+    {
+      "id": "C-N5p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N5p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z",
+      "dimension": "N5"
+    },
+    {
+      "id": "C-N9c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N9c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "C-N9p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N9p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "C-N9p0",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/record-level/C-N9p0/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "C-P5c",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/p5/C-P5c/CONTROL.json",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "C-P5p",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/p5/C-P5p/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "C-P5p2",
+      "batch": "b4",
+      "evaluator": "S1",
+      "case_file": "/workspace/next-job-controls/controls/p5/C-P5p2/CONTROL.json",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/eval/iter3-b4/s1--summary.json",
+      "at": "2026-10-28T14:13:53Z"
+    },
+    {
+      "id": "G-c1",
+      "batch": "b4",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/next-job-controls/controls/glm/G-c1.txt",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "dimension": "N6",
+      "call": "n6-b4-2",
+      "evidence_file": "custody/evidence/eval/iter3-b4/n6--N6-batch.redacted.json"
+    },
+    {
+      "id": "G-p1",
+      "batch": "b4",
+      "evaluator": "E-GLM",
+      "case_file": "/workspace/next-job-controls/controls/glm/G-p1.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "N6",
+      "call": "n6-b4-3",
+      "evidence_file": "custody/evidence/eval/iter3-b4/n6--N6-batch.redacted.json"
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "E-GLM",
+      "evidence_file": "harness-eval-glm-b4.log",
+      "readBy": "Chief of Staff (Orchestrator)"
+    }
+  ],
+  "retention": {
+    "location": "github.com/smoitozo/plumbline (private), branch job/2026-10-27-custody-emitter-gaps, dot-plumbline/jobs/2026-10-27-custody-emitter-gaps. Full E-GLM logs and held-out controls stay on the Owner's box (/workspace/edi-batches, /workspace/next-job-controls); the repo has their sha256 only.",
+    "public": false
+  },
+  "separationGaps": [
+    "Grokbot's underlying model(s) are not disclosed by its operator; family and identifier recorded as undisclosed.",
+    "The Maker's calls were issued by a harness operator, the E-DI Maker bot (a Grok Bot). The operator only issued the logged calls and applied returned patches verbatim (custody/method.md). This was instructed, not enforced.",
+    "Controls and fixtures were held outside the Maker's and Evaluator's working trees with sha256 committed at freeze, but on a shared box both bots could technically read them; non-reading was instructed, not enforced.",
+    "Held-out control case files are digested from /workspace/next-job-controls, outside the repo. The record carries their sha256 only, so a stranger cannot re-read the cases.",
+    "The E-GLM harness logs in the repo are redacted of held-out control text (handoffs/redact_glm_log.py). The full log's sha256 is in custody/evidence/harness-eval-glm-b4.log.full.sha256, and the full log stays outside the repo.",
+    "S1 is a script with no call log. Its pass and control time (2026-10-28T14:13:53Z) was entered by hand from the modification time of the sealed batch-4 s1/summary.json.",
+    "After the freeze, the generation, amendment, evaluation and dispose lines in inputs/custody-events.jsonl were appended by hand by the Orchestrator, not stamped by custody_ledger.py. The dispose line carries the Owner's decision time and channel as the Orchestrator received them.",
+    "This record was emitted by base main @ ff350e3 (tree 4abcfa08), not by the artifact under test (bar: Emitter). Known limitation: that emitter has gap 1 (producedAt), which this job repairs.",
+    "Only iteration 3's §5 record is emitted. Iterations 1 and 2 (fail → regenerate) are recorded in EVAL-ITER1-VERDICT.md, EVAL-ITER2-VERDICT.md and inputs/custody-events.jsonl.",
+    "S1 check extra-1-job-rejected (N3) was scored on the repo fixture that the Maker edited in generation 5 (EVAL-ITER3-VERDICT.md, Notes)."
+  ],
+  "disposition": {
+    "by": "Steve Moitozo II",
+    "at": "2026-10-28T14:44:00Z",
+    "acknowledgesUnobserved": []
+  }
+}

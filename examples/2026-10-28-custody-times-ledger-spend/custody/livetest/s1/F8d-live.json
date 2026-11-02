@@ -1,0 +1,55 @@
+{
+ "i": {
+  "cap": 0.001,
+  "err": "or_call: REFUSED by --max-cost (worst case 0.03854134 > 0.001); nothing sent, nothing logged\n",
+  "inst_delta": 0.0,
+  "key_delta": 0.0,
+  "rc": 8,
+  "reply_exists": false
+ },
+ "id": "F8d",
+ "ii": {
+  "cap": 0.05,
+  "err": "",
+  "inst_delta_total": 7.448000000020993e-06,
+  "rc": 0,
+  "reading_after_3min": true,
+  "reply_exists": true,
+  "spend_rows": [
+   {
+    "at": "2026-10-28T20:28:02.408257Z",
+    "call": "f8d_2",
+    "event": "reserve",
+    "id": "8b5561e2f3164c4dba33a497aadd8e9f",
+    "job": "s1-e4b72c86e420",
+    "max_tokens": 131072,
+    "model": "deepseek/deepseek-v4.1-flash-1017",
+    "seat": "maker",
+    "spent_before_usd": 0.0,
+    "tag": "deepinfra/fp8",
+    "worst_usd": 0.03854134
+   },
+   {
+    "at": "2026-10-28T20:28:14.219129Z",
+    "call": "f8d_2",
+    "cost_usd": 7.448e-06,
+    "event": "settle",
+    "id": "8b5561e2f3164c4dba33a497aadd8e9f",
+    "source": "generation.total_cost"
+   }
+  ],
+  "status": {
+   "baseline_usd": 0.344973001,
+   "job_id": "s1-e4b72c86e420",
+   "key_delta_usd": 7e-06,
+   "key_usage_usd": 0.344980449,
+   "last_settle_at": "2026-10-28T20:28:14.219129Z",
+   "ledger_sum_usd": 7e-06,
+   "read_at": "2026-10-28T20:31:19.471879Z",
+   "total_usd": 7e-06,
+   "writer": "tools/edi/or_call.py@b4854c893159"
+  }
+ },
+ "reasons": [],
+ "verdict": "PASS"
+}

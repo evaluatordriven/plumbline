@@ -1,0 +1,41 @@
+{
+  "job": "2026-10-27-custody-emitter-gaps",
+  "frozenAt": "2026-10-27T21:57:27Z",
+  "barFile": "custody/bar.md",
+  "barDigest": "sha256:3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+  "manifestDigest": "sha256:2e9a77fb60a57bdfe889ab7075734c71e62eb67696a7f678a082d8007937dcdd",
+  "controlsManifestDigest": "sha256:9764d8e4d5a0bad067f44379f08035e0e41de6df6acc00a2c9e31641139760bf",
+  "approvals": [
+    {
+      "role": "buyer",
+      "by": "Steve Moitozo II (S2)",
+      "barDigest": "sha256:3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+      "statement": "I approve bar digest 3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b with manifest 2e9a77fb60a57bdfe889ab7075734c71e62eb67696a7f678a082d8007937dcdd as Buyer; freeze it, open the job, and push the job branch",
+      "at": "2026-10-27T21:56Z",
+      "atLocal": "2026-10-27 17:56 ET (America/New_York, UTC-4)",
+      "channel": "Grok Bot chat, Chief of Staff (relayed to the drafter by the Orchestrator)"
+    },
+    {
+      "role": "specialist",
+      "adopted": true,
+      "by": "Steve Moitozo II (S2)",
+      "specialist": "custody SPEC v0.9.6 @ 3e3ca58de5631bdc58291564303a2e9d25a8653e + Plumbline DOCTRINE.md v0.1 section 7 @ dc61854ba7d763aa2ae12db30fddbb51265ede85",
+      "barDigest": "sha256:3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+      "at": "2026-10-27T21:56Z",
+      "basis": "Specialist adoption per the approved sheet (16:59 ET, OWNER-APPROVAL-RECORD.md) and amendments 1-2; bound to this digest by the 17:56 ET approval"
+    }
+  ],
+  "pins": {
+    "custody": "3e3ca58de5631bdc58291564303a2e9d25a8653e",
+    "doctrine": "dc61854ba7d763aa2ae12db30fddbb51265ede85",
+    "e-di": "a48a464",
+    "plumblineMain": "ff350e3",
+    "orCallSha256": "55e8981c1b75a30aef551ac0810b0891b7d41df8d32878db9710650d7ba06b38",
+    "checkPySha256": "aaeb7e0532c950ee1736207b0a91ff9d810533fccecdb2c7708312408e5bcd18",
+    "controlsRepoCommit": "e2a50d4",
+    "draftCommit": "90165ab"
+  },
+  "heldOutControls": "not in the plumbline repo; pinned by controlsManifestDigest only",
+  "note": "frozenAt is when the freeze set was made read-only and this receipt written. The ledger (kit/custody_ledger.py) stamps its own freeze event when it runs in the job folder, after this receipt; its approve and pin events follow that freeze by design (approve requires a prior freeze), so their times are later than the 17:56 ET approval they record. P5(e): headers FROZEN-BUILD 2026-10-27T21:53:35Z <= ledger freeze time.",
+  "recordedBy": "Chief of Staff (Orchestrator)"
+}

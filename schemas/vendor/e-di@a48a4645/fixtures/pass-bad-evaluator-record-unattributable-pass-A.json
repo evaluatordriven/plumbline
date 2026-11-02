@@ -1,0 +1,16 @@
+{
+ "pass_id": "bad-evaluator-record-unattributable-pass-A",
+ "kind": "scored",
+ "status": "filed",
+ "channel": "fixture-channel-A",
+ "rubric_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+ "code_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+ "run_ref": "fixture-run-A",
+ "scores": [
+  {
+   "dimension": "D1",
+   "score": 8.0,
+   "observation": "fixture reading"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+  "check": "J1",
+  "batch": "3",
+  "order": [
+    "subject",
+    "G-J1p2",
+    "G-J1c",
+    "G-J1p1"
+  ],
+  "items": [
+    {
+      "call": "J1-b3-1",
+      "id": "subject",
+      "messages_sha256": "0fcfc07a7865613dadc589fc75e626ccf6cf882a840c96421903931d53ad1038",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "d0179510e26493501b895e3f9c3e0debaad656de3a24e35d9b93f7b7aacd3b27",
+      "verdict": "CONFORMS",
+      "lines": [
+        "kit/emit_custody.py:881",
+        "kit/emit_custody.py:1020",
+        "kit/emit_custody.py:1203",
+        "kit/plumbline_job.py:256",
+        "kit/plumbline_job.py:259",
+        "kit/plumbline_job.py:99",
+        "kit/plumbline_verify.py:393",
+        "kit/plumbline_verify.py:919"
+      ]
+    },
+    {
+      "call": "J1-b3-2",
+      "id": "G-J1p2",
+      "messages_sha256": "2d814e65dcf8d850e0b56b8d94518b8887150a975e6f849a4f2c1dd0432292ed",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "3944564f3bf1c4e738c860d5099e4fe3fc1e990f173562eddc92f7d922db7eb4",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J1-b3-3",
+      "id": "G-J1c",
+      "messages_sha256": "3eb58b4066fcfbf9fe929c4c1fb27e0c8a0f59f6af12e5504051f35645d9a65f",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "98b1c9bd4bb80bc2878984ff94e939cc7f193cd4561d078cddb31aacd050fc77",
+      "verdict": "CONFORMS",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J1-b3-4",
+      "id": "G-J1p1",
+      "messages_sha256": "9fafb47ba2de25a81b67372a92661fec503350d5453be9deced7e8c045f25d03",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "8d8c26b69e689a201957da24326ab8bbbbcb80fdd92270e46f8a45efdc2b4661",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    }
+  ],
+  "log": "harness-E-GLM-J1-b3.log",
+  "dry_run": false,
+  "window": 2,
+  "controls_ok": true,
+  "calls_ok": true,
+  "subject_verdict": "CONFORMS",
+  "J1": "PASS"
+}

@@ -1,0 +1,25 @@
+STATUS: FROZEN-BUILD 2026-10-27T21:53:35Z — sha256 in MANIFEST.sha256
+
+# BOUNDS — job 2026-10-27-custody-emitter-gaps
+Transcribed verbatim from bar.md ("Scale and pass rule") and brief.json / brief.entry-B.json `bounds`
+(the two briefs' `bounds` are identical). No new terms; on any difference bar.md governs.
+
+## bar.md
+Bounds T_accept 1, T_dim 1, T_reject 0, cap 3 generations.
+Budget < US$10 and < 10 h; either breach → `needs_owner`.
+
+## brief.json `bounds`
+{
+ "T_accept": 1,
+ "T_dim": 1,
+ "T_reject": 0,
+ "cap": 3,
+ "cap_counts": "generations",
+ "budget": {
+  "amount": 10,
+  "unit": "USD",
+  "lt": true,
+  "time_hours_lt": 10,
+  "note": "strictly under US$10 of all model/API spend and under 10 h wall, first Maker dispatch to disposition; either breach -> needs_owner"
+ }
+}

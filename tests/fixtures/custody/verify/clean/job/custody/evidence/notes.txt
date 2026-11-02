@@ -1,0 +1,1 @@
+No harness logs: these fixtures plant verifier faults, not model calls.

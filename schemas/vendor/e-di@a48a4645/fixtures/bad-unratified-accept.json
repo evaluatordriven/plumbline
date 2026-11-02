@@ -1,0 +1,12 @@
+{
+  "entry": "A",
+  "instrument_profile": "full",
+  "job_name": "should-fail",
+  "artifact": "x",
+  "buyer": "b",
+  "maker": "m",
+  "evaluator": "e",
+  "ratified": false,
+  "terminal_state": "accepted",
+  "mode": "scored"
+}

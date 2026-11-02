@@ -1,0 +1,163 @@
+step: tests/validate_schemas.py
+--- corpus fixture battery (43 files), derived vs corpus schema ---
+fixture                                               plumbline   corpus
+bad-census-on-scored.json                                 False    False
+bad-entry-b-no-reads.json                                 False    False
+bad-evaluator-record-below-floor-unnamed.json             False    False
+bad-evaluator-record-empty-observation.json               False    False
+bad-evaluator-record-extra-key.json                       False    False
+bad-evaluator-record-instrument-string.json               False    False
+bad-evaluator-record-pass-disagreement.json               False    False
+bad-evaluator-record-regenerate-without-violation.json      False    False
+bad-evaluator-record-unattributable-pass.json             False    False
+bad-evaluator-record-unfiled-pass.json                    False    False
+bad-evaluator-record-unlabelled-extension.json            False    False
+bad-mode-absent.json                                      False    False
+bad-owner-evaluator-object.json                           False    False
+bad-readings-empty-bounds.json                            False    False
+bad-readings-rejected.json                                False    False
+bad-unratified-accept.json                                False    False
+bad-unratified-filled.json                                False    False
+evaluator-record-example.json                             False    False
+evaluator-record-saw-gt.json                              False    False
+example-job-packet.json                                   False     True
+mvi-job-packet.json                                       False     True
+pass-bad-evaluator-record-below-floor-unnamed-A.json      False    False
+pass-bad-evaluator-record-below-floor-unnamed-B.json      False    False
+pass-bad-evaluator-record-empty-observation-A.json        False    False
+pass-bad-evaluator-record-empty-observation-B.json        False    False
+pass-bad-evaluator-record-extra-key-A.json                False    False
+pass-bad-evaluator-record-extra-key-B.json                False    False
+pass-bad-evaluator-record-instrument-string-A.json        False    False
+pass-bad-evaluator-record-instrument-string-B.json        False    False
+pass-bad-evaluator-record-pass-disagreement-A.json        False    False
+pass-bad-evaluator-record-pass-disagreement-B.json        False    False
+pass-bad-evaluator-record-regenerate-without-violation-A.json      False    False
+pass-bad-evaluator-record-regenerate-without-violation-B.json      False    False
+pass-bad-evaluator-record-unattributable-pass-A.json      False    False
+pass-bad-evaluator-record-unattributable-pass-B.json      False    False
+pass-bad-evaluator-record-unfiled-pass-A.json             False    False
+pass-bad-evaluator-record-unlabelled-extension-A.json      False    False
+pass-bad-evaluator-record-unlabelled-extension-B.json      False    False
+pass-evaluator-record-example-A.json                      False    False
+pass-evaluator-record-example-B.json                      False    False
+pass-evaluator-record-saw-gt-A.json                       False    False
+pass-evaluator-record-saw-gt-B.json                       False    False
+readings-census.json                                       True     True
+  (plumbline accepting FEWER than the corpus is the intended direction: the instance layer constrains itself more, and the corpus's validator remains the floor.)
+
+[PASS] doctrine · ratified:false with must-asks at top level is rejected                                            
+[PASS] doctrine · ratified:false with only `proposed` is accepted                                                   
+[PASS] doctrine · ratified:false may never reach terminal accepted                                                  
+[PASS] doctrine · terminal_state without outcome is incomplete                                                      
+[PASS] doctrine · terminal accepted pairs with outcome accepted                                                     
+[PASS] doctrine · no_observation forces terminal needs_owner                                                        
+[PASS] doctrine · no_artifact forces terminal needs_owner                                                           
+[PASS] doctrine · census forces terminal accepted on a readings job                                                 
+[PASS] doctrine · census on a scored job is rejected (outcome/state/mode must agree)                                
+[PASS] doctrine · readings job carrying bounds is rejected (no bar exists)                                          
+[PASS] doctrine · readings job naming a Specialist is rejected (naming one late does not license scoring)           
+[PASS] doctrine · readings job may not produce rejected                                                             
+[PASS] doctrine · entry B without reads_before_freeze is rejected                                                   
+[PASS] doctrine · Owner may not hold the Evaluator seat (string form)                                               
+[PASS] doctrine · Owner may not hold the Evaluator seat (object name form)                                          
+[PASS] doctrine · Maker and Evaluator may be different engines                                                      
+[PASS] doctrine · ground truth hardness is a closed enum                                                            
+[PASS] doctrine · a dimension with no observation cannot be recorded                                                
+[PASS] doctrine · instrument_in_force is required on the record (C30)                                               
+[PASS] doctrine · instrument_in_force names rubric AND runner hashes                                                
+[PASS] doctrine · violation class is the closed four-locator enum (rule 4)                                          
+[PASS] doctrine · SEVERITY P0/P1/P2 must not appear — the corpus defines no severity scale                          
+[PASS] doctrine · a shortfall with no remedy is legal (remedy is optional; fabricated ones are the defect)          
+[PASS] doctrine · verdict synonyms are rejected — no 'minor-revision' beside 'regenerate'                           
+[PASS] doctrine · ratified:false on a record is representable but can never be accepted (loop rule)                 
+[PASS] doctrine · a record that names no pass is rejected (v1.20.0 / §5)                                            
+[PASS] doctrine · a pass with an unknown kind is rejected (§5: scored or confirmation)                              
+[PASS] instance · a scored job must name its standing constitution (instance layer, subordinate to the mandate)     
+[PASS] instance · stage is optional today — but the applies_to_stages dependency is OPEN, not settled               
+[PASS] instance · the Maker must carry the task classes it has SHOWN, not claimed (§4.1 / rule 10)                  
+[PASS] instance · budget without a stated unit is rejected (the unit is the point)                                  
+[PASS] instance · an undecidable escalation must carry what was tried and why no answer is observable               
+[PASS] instance · an undecidable escalation with the four required things is accepted                               
+[PASS] instance · a discoverable question may be recorded without escalation fields (it is resolved, not asked)     
+[PASS] audit · an audit record with the three checkable extensions validates as a §5 record                         
+[PASS] audit · an audit record missing artifact_ref is rejected                                                     
+[PASS] audit · audit fields outside instance_extensions violate the corpus §5 shape                                 
+[PASS] audit · an audit still obeys every §5 rule (no observation ⇒ no record)                                      
+[PASS] alignment · job-packet schema names the corpus pin it was derived from                                       
+[PASS] alignment · evaluator-record schema names the corpus pin it was derived from                                 
+[PASS] alignment · audit-record schema names the corpus pin it was derived from                                     
+[PASS] alignment · checklist is built from the pinned Contracts (v1.22.0)                                           
+[PASS] alignment · the pin still matches the corpus on disk (1016e871ff2d5177)                                      
+[PASS] alignment · no fixture is accepted by Plumbline and rejected by the corpus (0 violations)                    
+[PASS] custody · pin names custody@3e3ca58de563 and the vendored schema is its bytes                                
+[PASS] custody · derived custody schema regenerates byte-identical (no upstream given)                              
+[PASS] custody · --require-upstream with no custody checkout is NOT a pass (exit 2)                                 
+[PASS] custody · a custody schema that moved is reported as drift (exit 1)                                          
+[PASS] custody · a hand-edited derived custody schema is reported (exit 1)                                          
+[PASS] custody · an edited vendored custody schema is reported (exit 1)                                             
+[PASS] custody · fixture job emits with no gap (exit 0)                                                             
+[PASS] custody · emitted record is valid against the PINNED custody schema                                          
+[PASS] custody · emitted record is valid against the derived Plumbline custody schema                               
+[PASS] custody · a bare predicate.verdict is refused (verdict rides only in x-plumbline)                            
+[PASS] custody · a violation with no rule-4 locator is refused                                                      
+[PASS] custody · x-plumbline.verdict outside Plumbline's four verdicts is refused                                   
+[PASS] custody · record carries no file the fixture lacks: every digest is a file's                                 
+[PASS] custody · disposition.state is the packet's, not the verdict's (reject + given)                              
+[PASS] custody · no recorded disposition is emitted as null and named, never guessed (exit 1)                       
+[PASS] custody · a remedy not verbatim in evaluator evidence is dropped, not written                                
+[PASS] custody · a violation whose bar dimension nobody recorded is null and named, not guessed (exit 1)            
+[PASS] custody · same model as maker is computed from identifiers and its family gap recorded                       
+[PASS] custody · with no custody inputs the record is honest: nulls, named gaps, exit 1                             
+[PASS] custody · a job with no terminal state gets no custody record (exit 2)                                       
+[PASS] custody · failure fixture hand-times (exit 3, [time], nothing written)                                       
+[PASS] custody · failure fixture after-emit (exit 3, [after-emit], nothing written)                                 
+[PASS] custody · failure fixture router-endpoint (exit 3, [endpoint], nothing written)                              
+[PASS] custody · failure fixture agent-approval (exit 3, [approval], nothing written)                               
+[PASS] custody · hand times typed after the maker call also break event order (exit 3, [order], nothing written)    
+[PASS] custody · a refusal leaves an existing record byte-for-byte as it was                                        
+[PASS] custody · a hand time 61 s off its harness call (tolerance 60 s) (exit 3, [time], nothing written)           
+[PASS] custody · a hand time 59 s off is accepted, and the record carries the LOG's time                            
+[PASS] custody · a hand vendor host when the log shows the routed upstream (exit 3, [endpoint], nothing written)    
+[PASS] custody · the endpoint refusal names the upstream the log shows                                              
+[PASS] custody · matching pin: endpoint is the pinned host; aggregator, provider, slug and routing request recorded 
+[PASS] custody · pinned provider, another provider served the call (fallback) (exit 3, [endpoint], nothing written) 
+[PASS] custody · the fallback refusal names who served it and the pin                                               
+[PASS] custody · pinned provider, the log does not say who served the call (exit 3, [endpoint], nothing written)    
+[PASS] custody · the missing-provider refusal says so                                                               
+[PASS] custody · a pin declared after the seat's first call (exit 3, [order], nothing written)                      
+[PASS] custody · served by the pin after another provider was tried (exit 3, [endpoint], nothing written)           
+[PASS] custody · an attempted fallback is named                                                                     
+[PASS] custody · an aggregator call with no provider pin declared (exit 3, [endpoint], nothing written)             
+[PASS] custody · no pin: the refusal says the emitter will not guess                                                
+[PASS] custody · a pin typed into the inputs but never logged live (exit 3, [endpoint], nothing written)            
+[PASS] custody · a request without no-fallback + ZDR is written with a HARD gap (exit 1), what it asked recorded    
+[PASS] custody · the gapped routing record is still valid against the PINNED custody schema                         
+[PASS] custody · data_collection deny in place of zdr is accepted (exit 0)                                          
+[PASS] custody · a log without the request body: routing request unreadable is a hard gap (exit 1)                  
+[PASS] custody · ledger pin is refused once the seat's log has a call (exit 3)                                      
+[PASS] custody · ledger pin before the first call logs the pin live and in the inputs (exit 0)                      
+[PASS] custody · ledger pin refuses the aggregator's own host as the endpoint (exit 2)                              
+[PASS] custody · a model maker with no harness log (exit 3, [time], nothing written)                                
+[PASS] custody · a recorded model identifier the log's calls did not run (exit 3, [model], nothing written)         
+[PASS] custody · a control linked to no call in the harness log (exit 3, [time], nothing written)                   
+[PASS] custody · an approval by the maker model (exit 3, [approval], nothing written)                               
+[PASS] custody · an approval marked kind: model (exit 3, [approval], nothing written)                               
+[PASS] custody · approvals with no orchestrator named in the ledger (exit 3, [approval], nothing written)           
+[PASS] custody · the orchestrator, even marked agent with adopted set (exit 3, [approval], nothing written)         
+[PASS] custody · an agent-like approver not marked kind: agent (exit 3, [approval], nothing written)                
+[PASS] custody · an agent approval with adopted null (exit 3, [approval], nothing written)                          
+[FAIL] custody · an agent approval marked kind: agent WITH adopted set is written (exit 0)                          event log, or the emitter checkout) and re-emit; see docs/custody-emission.md, 'Refusals'.
+[PASS] custody · an approver who is not the packet's named seat holder (exit 3, [approval], nothing written)        
+[PASS] custody · a ledger approval time that differs from the live event log (exit 3, [time], nothing written)      
+[PASS] custody · a ledger that matches the live event log is written and says so                                    
+[PASS] custody · a bar that changed after its logged freeze (exit 3, [order], nothing written)                      
+[PASS] custody · the record names the emitter's commit and tree, clean                                              
+[PASS] custody · a stated revision matching the emitter's tree is accepted (survives git am)                        
+[PASS] custody · a stated revision the emitter is not at (exit 3, [revision], nothing written)                      
+[PASS] custody · an emitter whose tree has an uncommitted edit (exit 3, [revision], nothing written)                
+[PASS] custody · an emitter outside any git checkout (exit 3, [revision], nothing written)                          
+[PASS] custody · stranger bundle: manifest sha256s match, required files present, packing is deterministic          
+
+111/112 PASSED — 1 FAILED:
+  - custody · an agent approval marked kind: agent WITH adopted set is written (exit 0)

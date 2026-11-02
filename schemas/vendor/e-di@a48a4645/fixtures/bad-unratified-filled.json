@@ -1,0 +1,23 @@
+{
+  "entry": "A",
+  "instrument_profile": "full",
+  "job_name": "unratified-filled",
+  "artifact": "x.md",
+  "buyer": "Owner",
+  "maker": "m",
+  "evaluator": "e",
+  "specialist": "s",
+  "standard_ref": "rubric",
+  "human_seat": "Owner",
+  "bounds": {
+    "T_accept": 8.5,
+    "T_dim": 7.0,
+    "T_reject": 6.0,
+    "cap": 3,
+    "budget": "$1"
+  },
+  "mode": "scored",
+  "ratified": false,
+  "terminal_state": "needs_owner",
+  "outcome": "needs_owner"
+}

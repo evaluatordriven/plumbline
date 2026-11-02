@@ -1,0 +1,5 @@
+# Plumbline runtime and test dependency (JSON Schema draft 2020-12).
+jsonschema>=4,<5
+# Optional, not needed by the suites:
+#   PyYAML   - reading ~/.hermes/config.yaml (corpus fallback, gate plugin config) and tools/run_conformance_read.py
+#   requests - tools/run_conformance_read.py only

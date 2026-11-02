@@ -1,0 +1,18 @@
+{
+  "pass_id": "glm-b4",
+  "kind": "scored",
+  "status": "filed",
+  "channel": "openrouter.ai -> Z.AI",
+  "rubric_sha256": "aa466539a25cc64421c451cb23da6324c0d09884c5d24741e8cbefe53366a346",
+  "code_sha256": "616760242939ae5da88310909a84ce9e6bd464f0e55ae7005f2714d7d749ee81",
+  "run_ref": "custody/evidence/harness-eval-glm-b4.log#n6-b4-1",
+  "provider": "Z.AI",
+  "model": "z-ai/glm-5.3-flash",
+  "family": "glm",
+  "scores": [
+    {
+      "dimension": "N6",
+      "score": 1
+    }
+  ]
+}

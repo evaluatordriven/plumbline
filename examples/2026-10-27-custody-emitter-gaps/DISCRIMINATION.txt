@@ -1,0 +1,85 @@
+# S1 discrimination run, 2026-10-27 17:54 EDT (amendment 2): run_instrument.sh batch /tmp/pl-main (main ff350e3) <controls copy> <out>; exit 0
+== controls verified against MANIFEST.sha256 (sha256 9764d8e4d5a0bad067f44379f08035e0e41de6df6acc00a2c9e31641139760bf)
+== C1 checker controls (custody's own fixtures @ pin): check.py must return each expected verdict
+  C1 cl1-fail-approval-bound-to-other-bar         expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-file-differs                    expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-frozen-after-start              expect FAILED        got FAILED        ok
+  C1 cl1-fail-bar-frozen-at-start                 expect FAILED        got FAILED        ok
+  C1 cl1-fail-evidence-file-differs               expect FAILED        got FAILED        ok
+  C1 cl1-fail-maker-wrote-bar-undisclosed         expect FAILED        got FAILED        ok
+  C1 cl1-fail-no-clean-control                    expect FAILED        got FAILED        ok
+  C1 cl1-fail-same-model-session-undeclared       expect FAILED        got FAILED        ok
+  C1 cl1-fail-tampered-artifact                   expect FAILED        got FAILED        ok
+  C1 cl1-fail-unobserved-not-acknowledged         expect FAILED        got FAILED        ok
+  C1 cl1-pass-adopted-specialist                  expect OK            got OK            ok
+  C1 cl1-pass-basic                               expect OK            got OK            ok
+  C1 cl1-pass-extension-fields                    expect OK            got OK            ok
+  C1 cl1-pass-not-yet-given-with-violation        expect OK            got OK            ok
+  C1 cl1-pass-same-model-session-declared         expect OK            got OK            ok
+  C1 cl1-unchecked-evidence-file-not-supplied     expect NOT-CHECKABLE got NOT-CHECKABLE ok
+  C1 cl1-unchecked-model-evaluator-settings-only  expect NOT-CHECKABLE got NOT-CHECKABLE ok
+== record-level controls: each clean control PASSes, each planted control FAILs, its named check(s)
+  C-N1c    N1  expect PASS got PASS  ok
+  C-N1p    N1  expect FAIL got FAIL  ok
+  C-N1p2   N1  expect FAIL got FAIL  ok
+  C-N2c    N1  expect PASS got PASS  ok
+  C-N2c    N2  expect PASS got PASS  ok
+  C-N2p    N1  expect FAIL got FAIL  ok
+  C-N2p    N2  expect FAIL got FAIL  ok
+  C-N3c    N3  expect PASS got PASS  ok
+  C-N3p    N3  expect FAIL got FAIL  ok
+  C-N3p0   N3  expect FAIL got FAIL  ok
+  C-N4c-b  N4  expect PASS got PASS  ok
+  C-N4c    N4  expect PASS got PASS  ok
+  C-N4p    N4  expect FAIL got FAIL  ok
+  C-N5c    N5  expect PASS got PASS  ok
+  C-N5p    N5  expect FAIL got FAIL  ok
+  C-N9c    N7  expect PASS got PASS  ok
+  C-N9c    N8  expect PASS got PASS  ok
+  C-N9p    N7  expect FAIL got FAIL  ok
+  C-N9p    N8  expect FAIL got FAIL  ok
+  C-N9p0   N7  expect FAIL got FAIL  ok
+  C-N9p0   N8  expect FAIL got FAIL  ok
+== P5(e) controls (amendment 2): p5check.py on each synthetic job folder
+  C-P5c    P5e expect PASS got PASS  ok
+  C-P5p    P5e expect FAIL got FAIL  ok
+  C-P5p2   P5e expect FAIL got FAIL  ok
+== subject: ff350e36dc04ea6baf898acd909787fcc7c1b6d4 on the held-out fixtures
+  N1 on F-genreply-full                    PASS
+  N1 on F-genreply-null                    PASS
+  N1 on F-maker-10min                      PASS
+  N1 on F-single-call                      FAIL
+  N1 on extra-1-job-rejected               FAIL
+  N1 FAIL
+  N2 PASS
+  N3 FAIL
+  N4 FAIL
+  N5 PASS
+  N7 FAIL
+  N8 FAIL
+== mutants of the subject's own outputs (planted; must FAIL)
+  M-N2p  n1 expect FAIL got FAIL
+  M-N2p  n2 expect FAIL got FAIL
+  M-N1p  n1 expect FAIL got FAIL
+  M-N5p  n4 expect FAIL got FAIL
+  M-N9p  n7 expect FAIL got FAIL · n8 expect FAIL got FAIL · check.py OK (N9: expect OK)
+{"controls": "as expected", "mutants": "as expected", "subject": {"N1": "FAIL", "N2": "PASS", "N3": "FAIL", "N4": "FAIL", "N5": "PASS", "N7": "FAIL", "N8": "FAIL"}, "scores": {"N1": 0, "N2": 1, "N3": 0, "N4": 0, "N5": 1, "N7": 0, "N8": 0}}
+# <out>/mutants/SHA256SUMS
+de690f2de8b259a7c5d2d3f6c978dc3bfe3afbdd8f8024ec74f7344d40221333  M-N1p-n1.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N1p-n1.json.stderr
+23267a6b9ea8261e6812940315218cf55ae6858e8599171c0443ab241dc2cd05  M-N1p.record.json
+fe754019e3bb8f616d37a9fafd3d7e698feb5817323c7008ba8aee7979f037ca  M-N2p-n1.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N2p-n1.json.stderr
+bcc00ad89faa3b5f80a47b19a35be3d1f66edae9db7035ab7f1576d3bd858a51  M-N2p-n2.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N2p-n2.json.stderr
+3a1b4ff4cbb3d201abba35dd76a9dd2aa511fb63d8f32b3d4dcab2a23d6a4c7e  M-N2p.record.json
+c45745c1e2d3fdde8fab3e5f0ede33172183a361b5f7509b8e13808899e8d826  M-N5p-n4.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N5p-n4.json.stderr
+7338cd1e9ec13b643660bc06ee9f442986fb189d54c910bfc5c443ceba5f6a6a  M-N5p.check.json
+4f80dffb87e63fecaef1a32fb327415c2353eaca9547172c168abbac132030ad  M-N5p.emit.json
+e7d520b69c972b18a38994ce49b5b3e44314f56a3ac111c46223402b36c869b0  M-N5p.record.json
+7f20bf71f2ed41ee3204ea27778cf42e215ac302f62f148023aa93565c7f07d4  M-N9p-n7.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N9p-n7.json.stderr
+b46179f49c32220104687d2129092ea54db6d60526523826a4ff6d4d258aef44  M-N9p-n8.json
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  M-N9p-n8.json.stderr
+5ea8a23bce3c0cdf48e6772e0d943cd52f6c3ea625abdc8a56ac0d64af14d5df  M-N9p.bundle.zip

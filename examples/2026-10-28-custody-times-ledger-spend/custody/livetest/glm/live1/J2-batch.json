@@ -1,0 +1,57 @@
+{
+ "batch": "1",
+ "calls_ok": true,
+ "check": "J2",
+ "controls_ok": true,
+ "dry_run": false,
+ "items": [
+  {
+   "call": "J2-b1-1",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J2p2",
+   "messages_sha256": "dfe2c6fa6f2331c1ab8ac7b5cc0089d8041f496fdd05c5f71a7e9b76d7bfdfaa",
+   "or_call_exit": 0,
+   "reply_sha256": "6368bdd77225ee05a4c9fe4ca88d72fdf1117d24a4337a0f8a09348bf82fb500",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J2-b1-2",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J2c",
+   "messages_sha256": "4939b05c5df6a1c70ac497187d9e1cde819b11d406491106751b0a1f0a1e2861",
+   "or_call_exit": 0,
+   "reply_sha256": "0f0a2420c7db8b1d6fdd350b84878995c7f6fa0434eb0b54508b4f5c4b9b56c6",
+   "verdict": "CONFORMS"
+  },
+  {
+   "call": "J2-b1-3",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J2p1",
+   "messages_sha256": "a602f06d78669ce0411972628e7574523e39e458a0392135a751d926581d186b",
+   "or_call_exit": 0,
+   "reply_sha256": "095d54d7a8722d9e94dcd25752516dd84e6d02d5feab92b3ef79a4e8af3c6475",
+   "verdict": "DOES_NOT_CONFORM"
+  },
+  {
+   "call": "J2-b1-4",
+   "control_ok": true,
+   "finish_reason": "stop",
+   "id": "G-J2p3",
+   "messages_sha256": "d4d1d305df39ac2b09c06a23d0be25c7a6206fd41d189f625853676baa392696",
+   "or_call_exit": 0,
+   "reply_sha256": "a882f2ef7b0fca02a869ba5b0f30c46121b79d0541e50eba9ca2ea4602a071e5",
+   "verdict": "DOES_NOT_CONFORM"
+  }
+ ],
+ "log": "harness-E-GLM-J2-b1.log",
+ "order": [
+  "G-J2p2",
+  "G-J2c",
+  "G-J2p1",
+  "G-J2p3"
+ ],
+ "window": 2
+}

@@ -1,0 +1,222 @@
+{
+  "$schema": "plumbline/schemas/compliance-checklist.json",
+  "title": "E-DI Contracts \u00a79 compliance checklist \u2014 machine-readable (v1.22.0)",
+  "description": "DERIVED from Contracts \u00a79 by tools/build_schemas.py, with the authored `why` annotations re-attached by clause id (they are authored, not generated \u2014 a wholesale regeneration loses them). Ids are stable and never renumbered (Contracts \u00a712); retired ids stay reserved.",
+  "contracts_version": "1.22.0",
+  "contracts_source": "github.com/smoitozo/e-di@a48a4645aaa2 (EDI-MACHINE-CONTRACTS.md)",
+  "contracts_sha256": "1016e871ff2d51776dc21009c1a668c24a3d508f5ec2d80a70ade12decd6dc86",
+  "rule_index": {
+    "in_scope": 82,
+    "line": 70,
+    "schema": 2,
+    "none": 10,
+    "uncovered": 0,
+    "note": "Published by the corpus in EDI-RULE-INDEX.json. Every NORMATIVE rule has exactly one disposition; an uncovered rule is a corpus defect, not an implementation one."
+  },
+  "outcomes_vocabulary": {
+    "note": "The corpus's readings vocabulary (Instrument, 'Readings \u2014 and when scoring is allowed'), aligned here so the audit speaks the doctrine's words. The pre-2026-09-29 names (pass / fail / not_assessed) are aliases only.",
+    "conforms": "The clause holds, with the observation cited.",
+    "does_not_conform": "The clause does not hold, or holds only partially. The observation must name which part holds and which does not.",
+    "not_assessed": "The auditor did not inspect the code path this clause covers. NOT the same as does_not_conform: this is 'could not be judged', which per \u00a75 forces needs_owner, never rejected."
+  },
+  "scoring": {
+    "method": "clause score: 10 = conforms, 5 = does_not_conform; not_assessed clauses are omitted from dimensions and listed in unjudged_dimensions",
+    "rationale": "\u00a73 requires a mean threshold AND a per-dimension floor. For conformance both are 10: every clause must hold. A non-conformance scores above the reject floor deliberately \u2014 a divergence is remediable and opens a new job, it is not a discarded artifact."
+  },
+  "provenance": {
+    "clauses_parsed": 35,
+    "annotations_reattached": 12,
+    "retired_ids_reserved": [
+      "C17"
+    ]
+  },
+  "clauses": [
+    {
+      "id": "C1",
+      "clause": "Buyer recorded with provenance on every job; Specialist recorded with provenance only when a bar is in force",
+      "section": "\u00a71.1",
+      "why": "A rubric that cannot answer 'who is buying this, and which master of the craft approved the standard?' is invalid. \u00a74 loans the evaluator its authority from these two."
+    },
+    {
+      "id": "C2",
+      "clause": "ground truth named, with the channel that carries it",
+      "section": "\u00a71.2"
+    },
+    {
+      "id": "C3",
+      "clause": "Evaluator written before the first generation",
+      "section": "\u00a71.3",
+      "why": "Work generated before its evaluator existed is not acceptable except as a labelled baseline measurement."
+    },
+    {
+      "id": "C4",
+      "clause": "pass rule (average + per-dimension floor) fixed before the run and recorded",
+      "section": "\u00a73",
+      "why": "An average alone permits a fatal defect to be averaged away. Thresholds must not be code defaults, and must not restate the EXAMPLE values."
+    },
+    {
+      "id": "C5",
+      "clause": "cap and budget set; both enforced",
+      "section": "\u00a73",
+      "why": "The cap is finite and recorded with the job; the implementation must state whether it counts generations or regenerations."
+    },
+    {
+      "id": "C6",
+      "clause": "roles separate; no self-scoring anywhere in the path",
+      "section": "\u00a74"
+    },
+    {
+      "id": "C7",
+      "clause": "observation channel blind to the answer it is checked against; no self-report scoring",
+      "section": "\u00a77.2",
+      "why": "Two distinct blindnesses: the channel must not see the answer, AND the judge must score independent observation rather than the maker's self-report."
+    },
+    {
+      "id": "C8",
+      "clause": "Evaluator output validates against \u00a75",
+      "section": "\u00a75",
+      "why": "Structured data, never prose alone. Exactly four verdict values \u2014 no synonyms."
+    },
+    {
+      "id": "C9",
+      "clause": "terminal state is one of accepted / needs_owner / rejected",
+      "section": "\u00a72",
+      "why": "Terminal states are exactly three. There is no fifth state in which the loop quietly ends."
+    },
+    {
+      "id": "C10",
+      "clause": "external writes verified by read-back",
+      "section": "\u00a77.3",
+      "why": "Declare the normalization; carry a value fresh on every run, or a skipped write passes verification whenever the target already holds the intended value."
+    },
+    {
+      "id": "C11",
+      "clause": "escalation classes defined, the human seat named, and the Orchestrator escalates rather than decides on values, doctrine, capability gaps, and Buyer/Specialist conflict",
+      "section": "\u00a72, \u00a74"
+    },
+    {
+      "id": "C12",
+      "clause": "every iteration persisted, so a terminal decision is reconstructable",
+      "section": "\u00a76"
+    },
+    {
+      "id": "C13",
+      "clause": "instruments retained with the artifact: \u00a75's evaluation record (complete), plus an instrument record with the rubric (anchors and provenance), Evaluator identity, ground-truth version, and the control runs from each comparison",
+      "section": "\u00a710.1",
+      "why": "A judge without a rubric has nothing to execute; a revision without the accepted version to re-run as a control cannot detect regression."
+    },
+    {
+      "id": "C14",
+      "clause": "a revision is judged against a same-batch control: re-use of the retained instrument supplied and recorded, fresh bounds, the control's noise floor measured (N repeats, spread max\u2212min), per-dimension deltas against that control, and regression distinguished from below-bar \u2014 never attributed from a pooled average, and a run without a same-batch control is uncontrolled",
+      "section": "\u00a710.2",
+      "why": "Equality against a stored number cannot distinguish 'this write landed' from 'it was already there', and instrument drift is reported as a change in the artifact."
+    },
+    {
+      "id": "C15",
+      "clause": "the record written on any external write carries a value fresh on every run (a run id, a timestamp), and equality is compared under a normalization declared before comparing",
+      "section": "\u00a77.3",
+      "why": "An idempotent retry is the common case. A freshness value asserts more than a byte-comparison can, so the weaker record cannot claim \u00a77.3 unequivocally."
+    },
+    {
+      "id": "C16",
+      "clause": "the Orchestrator persists each iteration's artifact, verdict and state transition; only the Orchestrator applies the pass rule, cap and escalation; and it enforces the cap, the budget, the state machine and role separation \u2014 with no artifact reaching terminal `accepted` without a version-matched Evaluator record",
+      "section": "\u00a76",
+      "why": "\u00a76's obligations are declared NORMATIVE by its heading and were reachable by no checklist line. An orchestrator that does not enforce them cannot be audited."
+    },
+    {
+      "id": "C18",
+      "clause": "instance extensions are labelled as instance-specific in every artifact they emit, do not weaken \u00a73, \u00a74 or \u00a77, and are recorded with the job",
+      "section": "\u00a78"
+    },
+    {
+      "id": "C19",
+      "clause": "ground truth is recorded with its version and its hardness grade, the grade supplied per job and never defaulted, and no dimension claims ground truth harder than its channel carries",
+      "section": "\u00a71.6"
+    },
+    {
+      "id": "C20",
+      "clause": "the frame is supplied as a Principal-authored mandate with scope and exclusions; the dimension set is authorized by it, a dimension it neither authorizes nor excludes is escalated as a frame question rather than scored, and no excluded dimension is scored",
+      "section": "\u00a71.7"
+    },
+    {
+      "id": "C21",
+      "clause": "where the mandate names a source of record read-only, the artifact is submitted against it and the source is not revised by the Maker",
+      "section": "\u00a71.7"
+    },
+    {
+      "id": "C22",
+      "clause": "every observation channel declares a measured spread (N repeated passes of a fixed input, `max \u2212 min` per dimension), recorded with the job; no delta inside that spread is reported as improvement, regression or a reason for a verdict; and the spread is re-measured when a \u00a710.3 trigger fires",
+      "section": "\u00a710.6"
+    },
+    {
+      "id": "C23",
+      "clause": "a corpus, rubric or doctrine that judges other work is scored against its own Principal-authored mandate, and while that mandate is unratified no dimension scoring it against its purpose is `pass`",
+      "section": "\u00a71.7, \u00a712"
+    },
+    {
+      "id": "C24",
+      "clause": "a retained instrument is re-derived rather than re-used when any \u00a710.3 trigger fires \u2014 Buyer, Specialist's standard, ground truth, Evaluator, mandate \u2014 and the instrument change is recorded with the revision",
+      "section": "\u00a710.3"
+    },
+    {
+      "id": "C25",
+      "clause": "the Maker is a supplied, recorded choice with the feedback forms it can consume named; a violation beyond its capability escalates as a capability gap rather than being iterated; and suitability is demonstrated by the next evaluation, not asserted",
+      "section": "\u00a74.1"
+    },
+    {
+      "id": "C26",
+      "clause": "every violation states the shortfall with the observation and a class; a remedy is included where the Evaluator has an insight into rectification and its absence is not a defect in the record; a fabricated remedy is itself a violation",
+      "section": "\u00a75"
+    },
+    {
+      "id": "C27",
+      "clause": "every dimension carries the observation its score rests on, produced by the channel the dimension names; an empty or missing `observation` means the dimension could not be judged \u2014 a forced `needs_owner`, never a synthesised, averaged or below-floor score",
+      "section": "\u00a75"
+    },
+    {
+      "id": "C28",
+      "clause": "the record carries a terminal state (accepted / needs_owner / rejected) and the outcome it exited under (accepted / rejected / needs_owner / census / no_observation / no_artifact); a `no_observation` job's terminal state is `needs_owner`; a `no_artifact` job's terminal state is `needs_owner`; a readings-only job's terminal state is `accepted` with outcome `census`",
+      "section": "\u00a72"
+    },
+    {
+      "id": "C29",
+      "clause": "a job with no Specialist named at the outset declares `mode: readings`, supplies no thresholds and may not score; its pass rule is the readings form; outcome `census` requires every readable dimension to conform and terminal `accepted`; a `does not conform` reading exits `needs_owner` with outcome `needs_owner`; and it may not produce `rejected`",
+      "section": "\u00a73"
+    },
+    {
+      "id": "C30",
+      "clause": "the record names the instrument in force \u2014 its version, and the hash of the rubric and the code that implements it \u2014 and that instrument is retained with the artifact; the manifest names it, so it is hashed like every other retained instrument",
+      "section": "\u00a75, \u00a710.1"
+    },
+    {
+      "id": "C31",
+      "clause": "a run in which the Maker produced no artifact records outcome `no_artifact` with terminal state `needs_owner`; the test is structural, never a character count; the record names which side failed; and a null iteration is not counted against the cap and does not displace the incumbent",
+      "section": "\u00a72"
+    },
+    {
+      "id": "C32",
+      "clause": "an `entry: B` job is a labelled baseline (\u00a71.5); it is legal only if `reads_before_freeze` names the reads that could reveal a defect and states they came after the rubric was frozen; C3 is not satisfied by the artifact already existing; a live artifact that fails is `rejected` plus an Owner disposition and is not deleted; a fix is a new job; procedure is Instrument Entry B and this line does not restate it",
+      "section": "\u00a71.5"
+    },
+    {
+      "id": "C33",
+      "clause": "a scored job carries a frame before generation: `ground_truth` rows with source, version, and hardness; `mandate_ref` as doc plus version; a non-empty `escalation` route. Readings jobs are not subject to this line. Feedback forms, the dimension set, retained-instrument reuse, task classes, and escalation classes are not structurally enforced",
+      "section": "\u00a71.6, \u00a71.7, \u00a73"
+    },
+    {
+      "id": "C34",
+      "clause": "a \u00a75 record names the passes that produced it; every named pass is filed beside it with its declared shape and kind, a voided attempt is filed as `void` with its cause, and a record naming a pass that is not filed fails; a dimension observed by a single pass is labelled, not failed; and the range across an artifact's passes is not `spread`, which \u00a710.6 owns as a channel property measured on one fixed input",
+      "section": "\u00a75, \u00a710.1"
+    },
+    {
+      "id": "C35",
+      "clause": "the instrument's dimension list is the job's vocabulary: a record's `dimensions[].name`, a filed pass's `scores[].dimension` and a channel output's dimension key use those identifiers verbatim; a pass naming a dimension the record does not declare fails as *evidence not attributable*, and a declared dimension no filed pass observed fails as resting on zero passes \u2014 zero is not one, and rule 10's single-pass label is unchanged; the instrument-to-record link is a duty on the author, not structurally enforced",
+      "section": "\u00a75"
+    },
+    {
+      "id": "C36",
+      "clause": "a `regenerate` verdict carries at least one violation, because an iteration that names nothing it is tasked with is not an iteration; and a dimension scored below `T_dim` carries a violation whose class is rule 4's locator and whose `dimension` names it, while a violation whose shortfall is the pass rule's mean names no dimension and is complete without one; a `regenerate` with no violation, or a below-floor dimension with no violation naming it, fails the record",
+      "section": "\u00a74, \u00a75"
+    }
+  ]
+}

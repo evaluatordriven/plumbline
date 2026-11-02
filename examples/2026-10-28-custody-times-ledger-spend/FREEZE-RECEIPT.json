@@ -1,0 +1,65 @@
+{
+  "job": "2026-10-28-custody-times-ledger-spend",
+  "openedAt": "2026-10-28T20:34:22Z",
+  "openedAtLocal": "2026-10-28 16:34:22 EDT (UTC-4)",
+  "frozenBuildHeader": "2026-10-28T20:36:28Z",
+  "ledgerFreezeAt": "2026-10-28T20:47:58Z",
+  "ledgerFreezeNote": "a first freeze at 20:37:39Z without --orchestrator was never committed; set aside on the box and re-run (DRY-RUN.txt item 3)",
+  "timeEnd": "2026-10-29T04:34:00Z",
+  "timeEndLocal": "2026-10-29 00:34 EDT (UTC-4)",
+  "barFile": "custody/bar.md",
+  "barDigest": "sha256:72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+  "manifestDigest": "sha256:acdf764b32bab5e0fa4615590714c49162cbbaecddd00c03c6d8121b59b85d98",
+  "controlsManifestDigest": "sha256:fe03346b4b62240ec461f3feedc89ae28b6d96fc177e967852566cec1a655ccf",
+  "zdrSnapshotDigest": "sha256:10c6ee29469bf1195d4f2429a4b1ddfbeb926200bb301610e7a94e3dd6850bf2",
+  "boundsDigest": "sha256:cb7ea66de45d741ed925d015035b4465019ee5606ce212d48c359a3c9887cae0",
+  "interfaceDigest": "sha256:31d17ead852d2d634d11b13d49a7846ae0702e061f6e1fc49bf42096bdadf6a8",
+  "makerMessagesIter1Ledger": "sha256:78307b143b94a7c2e6ebb89158afcf52cf16a23acc90309240e09e35d6b90032",
+  "handoffsIter1Manifest": "sha256:1289963821426fb5de14097e6359c5171ef8d3dc73ee664f31361d05cc5a7cd6",
+  "ledgerSha256AtFreeze": "82a28d2015a7a605d3f48ff839931b8a8d54927e837cb4c0ff065573225db984",
+  "custodyJsonSha256AtFreeze": "30afb5184dcda1890100ca7db6602c23a6143b0f2631e5e4ffbdc4f0ba89f534",
+  "ownerApproval": {
+    "OWNER-APPROVAL.md": "20d5ff994e946eb938c859e928b80d116bd34f232e2b119a62d92fa9f8307c1c",
+    "OWNER-APPROVAL.e41aae44.md (sheet as ratified 14:50 EDT)": "e41aae4452ed52ce1d2500b5b4d036747576285350d274711df84fdfcc81fe1a"
+  },
+  "approvals": [],
+  "approvalsNote": "PENDING. Steve Moitozo II must himself approve the frozen bar digest with this manifest; then APPROVE-apply.sh --apply (his verbatim words, time, message id) is run and committed, and handoffs/iter1/fill_handoffs.py writes MAKER.md and EVALUATOR.md. Each bot must then get Steve's own yes in its own chat before any model call. An agent's report is not an approval.",
+  "pins": {
+    "plumblineMain": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+    "e-di": "a48a4645aaa29947fdc17168d26c69c849941580",
+    "doctrine": "dc61854ba7d763aa2ae12db30fddbb51265ede85",
+    "custody": "3e3ca58",
+    "checkPy": "aaeb7e0532c950ee1736207b0a91ff9d810533fccecdb2c7708312408e5bcd18",
+    "orCallSha256": "d2b320398a8de7a240de30cf9ea3ee54aa5fed8a2d1bc2a616b75fba9713d574",
+    "orCallJob1Sha256": "d345c1516325dbbe800073b747aaad0381bc46de12a656187a2ab0646b5c7880",
+    "runInstrumentSha256": "c40c640cdb0ec9ba383acb6cb4e46c54d5012bc9bf78445cd1689197058953af",
+    "scheckSha256": "49d3a506f6f75814ffcfc35a0312c228d202439adc9f1595212c47c318cb7284",
+    "jbatchSha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+    "judgesSha256": "c03975507d4a3dbe5e7ffd9ea59e94b7de73aaf797dccb058cb661dc18e62ba4",
+    "driversSha256": "fa0127645fbbb705c7ea259b99b15312ae5e580ade6b3c5133c975af3155db19",
+    "fgRulesSha256": "90baf63b798a5d7aefa58e488b69293e05498c8d94ee1d730e77d12b95e4f588",
+    "rubrics": {
+      "J1": "bed8e9b8ce98e81554e8f411ed30a0e153ebd984441043586781bffc92a380c0",
+      "J2": "8f63bd340e1c669eb7a5f25194bcbe39530d2787eb91a92377715b8c0283aa0e",
+      "J3": "ab00c7b701427bde2c5797847cbeed668fce899bc49087b2594ada5d98ebbc20",
+      "J4": "08d06e407844ee1e15bc4319d19aacba02cf59be4e3181fddc61e29942d441d6"
+    }
+  },
+  "routing": {
+    "maker": "DeepInfra deepinfra/fp8 api.deepinfra.com",
+    "E-GLM/eval-glm": "Z.AI z-ai/fp8 api.z.ai",
+    "via": "openrouter.ai",
+    "maxTokens": 131072
+  },
+  "spend": {
+    "bound_usd_lt": 5.0,
+    "reserve_usd": 0.1,
+    "key": "/workspace/.openrouter-key (by path only)",
+    "keyUsageBaseline": 0.317534503,
+    "spentBeforeOpen_usd": 0.027446,
+    "reconciliation": "job spend ledger 12 reserve + 12 settle, sum 0.027438498; plus the S1 F8d live call 0.0000074 through the reference tree's own ledger; key usage delta 0.027446 (read 2026-10-28 16:35:40 EDT, 7.5 min after the last call at 16:28:03 EDT); counted inside the bound"
+  },
+  "heldOutControls": "not in this repository; /workspace/job-controls/2026-10-28-custody-times-ledger-spend pinned by controlsManifestDigest only. Live-test evidence that contains control text stays on the box (custody/livetest/HELD-ON-BOX.sha256); only verdict-only extracts are committed.",
+  "p5check": "PASS (P5-CHECK.json)",
+  "recordedBy": "Chief of Staff (Orchestrator) drafter"
+}

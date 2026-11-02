@@ -1,0 +1,30 @@
+{
+ "check": "J2",
+ "batch": "3",
+ "call": "J2-b3-3",
+ "id": "subject",
+ "messages_sha256": "83f034f0016db07b99eb30344d30c37b5e3b53ef46c9db436231156993e8392e",
+ "or_call_exit": 0,
+ "or_call_stderr": "",
+ "finish_reason": "stop",
+ "reply_sha256": "86d055e8247c4fc1670e43db364a807bee9ce6b6b5f2f38cbef05528494c1b1f",
+ "verdict": "CONFORMS",
+ "lines": [
+  "docs/custody-emission.md:9",
+  "docs/custody-emission.md:45",
+  "docs/custody-emission.md:56",
+  "docs/custody-emission.md:62",
+  "docs/custody-emission.md:87",
+  "docs/custody-emission.md:96",
+  "docs/custody-emission.md:103",
+  "docs/custody-emission.md:109",
+  "docs/custody-emission.md:130",
+  "docs/custody-emission.md:137",
+  "docs/custody-emission.md:141",
+  "docs/custody-emission.md:149",
+  "docs/custody-emission.md:155",
+  "docs/custody-emission.md:192",
+  "docs/custody-emission.md:421",
+  "docs/custody-emission.md:486"
+ ]
+}

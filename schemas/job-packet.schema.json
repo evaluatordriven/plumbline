@@ -1,0 +1,909 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/job-packet.schema.json",
+  "title": "Plumbline job packet (derived: E-DI corpus \u00a73 + \u00a76, plus the Plumbline instance layer)",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "entry",
+    "instrument_profile",
+    "job_name",
+    "artifact",
+    "buyer",
+    "maker",
+    "evaluator",
+    "ratified",
+    "mode"
+  ],
+  "properties": {
+    "entry": {
+      "enum": [
+        "A",
+        "B"
+      ]
+    },
+    "instrument_profile": {
+      "enum": [
+        "full",
+        "mvi"
+      ]
+    },
+    "job_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "buyer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "specialist": {
+      "type": "string"
+    },
+    "maker": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "evaluator": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "ground_truth": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "source",
+          "version",
+          "hardness"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1
+          },
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "hardness": {
+            "enum": [
+              "INVARIANT",
+              "DOCUMENT",
+              "PRIOR"
+            ]
+          },
+          "channel": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "mandate_ref": {
+      "type": "object",
+      "required": [
+        "doc",
+        "version"
+      ],
+      "properties": {
+        "doc": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "standard_ref": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        {
+          "type": "object",
+          "minProperties": 1
+        }
+      ]
+    },
+    "bounds": {
+      "type": "object",
+      "properties": {
+        "cap_counts": {
+          "enum": [
+            "generations",
+            "regenerations"
+          ]
+        }
+      }
+    },
+    "human_seat": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "escalation": {
+      "oneOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object"
+        }
+      ]
+    },
+    "level": {
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "scored",
+        "readings"
+      ]
+    },
+    "ratified": {
+      "type": "boolean"
+    },
+    "terminal_state": {
+      "enum": [
+        "accepted",
+        "needs_owner",
+        "rejected"
+      ]
+    },
+    "outcome": {
+      "enum": [
+        "accepted",
+        "census",
+        "needs_owner",
+        "rejected",
+        "no_observation",
+        "no_artifact"
+      ]
+    },
+    "reads_before_freeze": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "array",
+          "minItems": 1
+        }
+      ]
+    },
+    "proposed": {
+      "type": "object"
+    },
+    "disposition": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": "string"
+    },
+    "k": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "INSTANCE-SPECIFIC. O2's iteration bound, declared PER JOB (mandate B.1.2: \"found by iteration <= k or within x% of budget, with k and x declared per job\"). The corpus declares neither, so Plumbline does, and the packet emitter refuses a scored brief that omits them: a bound declared after the fact is not a bound."
+    },
+    "x": {
+      "type": "number",
+      "minimum": 0,
+      "description": "INSTANCE-SPECIFIC. O2's budget tolerance in per cent, declared PER JOB, alongside k (mandate B.1.2, verbatim). Both are terms, so both are written at open by the brief."
+    },
+    "disposition_state": {
+      "type": "string",
+      "enum": [
+        "given",
+        "not_yet_given",
+        "declined"
+      ],
+      "description": "INSTANCE-SPECIFIC, and it exists because the corpus's own `disposition` is `string|null` and a null cannot distinguish 'not yet given' from 'declined'. Verdict and disposition are separate acts, so an accepted artifact with no disposition is a COMPLETE record; the state is recorded as one of three and never as the absence of one (corpus maintainer, 2026-10-05). The corpus field carries the Owner's act when there is one."
+    },
+    "run_log_exempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reason",
+        "declared_by"
+      ],
+      "description": "INSTANCE-SPECIFIC. A job the run-log does not name, declaring WHY it is not named, in the folder the exemption is about \u2014 \u00a710.1's own split, and the corpus maintainer's correction (2026-10-05): a tolerance that lives in a checker is not counted, not in the check's output, and not in the folder it is about, so adding one is invisible. The guard fails any folder that is neither named in the log nor declares itself here.",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "declared_by": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "close": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verdict",
+        "date",
+        "kit_revision",
+        "counts",
+        "skipped"
+      ],
+      "description": "INSTANCE-SPECIFIC. The close act's own record, written into the packet by the kit's --record-close. The corpus models a job's END on the packet (terminal_state and outcome); it does not model what the close itself did NOT read, and that is the fact that matters. Measured 2026-10-05: the kit learned to skip `superseded/` and `inputs/`, and the skip existed only on stdout, which disappears with the terminal. A close that read fewer files than the folder holds says so here.",
+      "properties": {
+        "verdict": {
+          "enum": [
+            "CLOSEABLE"
+          ]
+        },
+        "date": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kit_revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "billed_reroll": {
+          "type": "boolean",
+          "description": "INSTANCE-SPECIFIC. True when a regeneration was tasked with a violation the Maker could not act on \u2014 the Contracts' own definition: \"A regeneration tasked with a violation it cannot act on is not an iteration; it is a billed reroll.\" B.4.2 counts these. Written by the Orchestrator at close, using the doctrine's term rather than a parallel one."
+        },
+        "escalation_kind": {
+          "type": "string",
+          "enum": [
+            "capability_gap",
+            "cap_reached",
+            "below_floor",
+            "other"
+          ],
+          "description": "INSTANCE-SPECIFIC. Which escalation the job ended on, distinguishing a capability gap (\u00a74, \u00a76) from spending the cap."
+        },
+        "misalignment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "found_at_iteration"
+          ],
+          "description": "INSTANCE-SPECIFIC. O2's fact: where the run diverged from the bound, and the spend at that point. A rate nobody can recompute is an assertion.",
+          "properties": {
+            "found_at_iteration": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "spend_usd": {
+              "type": "number",
+              "minimum": 0
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "skipped": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer"
+          }
+        },
+        "skipped_files": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "elicitation",
+        "architecture",
+        "development",
+        "deployment",
+        "operations",
+        "revision"
+      ],
+      "description": "INSTANCE-SPECIFIC, OPTIONAL. The chain-of-loops stage this job belongs to. Deliberately NOT required: it is a label, and a label prevents no defect \u2014 the Instrument's Refusals say 'no clause without a job that needed it'. Doctrine is stage-agnostic: it knows one job, one artifact, one pass rule, one record, one terminal state. A stage is a job label, never a licence to score two artifacts in one job.",
+      "plumbline_note": "OPEN DEPENDENCY (not yet resolved). (1) The elicitation rule is NOT carried by this field \u2014 a job with no independent ground truth cannot be scored regardless of any label, because C33 requires non-empty ground_truth, mandate_ref and escalation on a scored job and an unratified job can never reach `accepted`. This field classifies; it does not gate. (2) constitution.schema.json declares principles[].applies_to_stages against the same enum, so making this field optional ORPHANED that scoping: a principle restricted to one stage can no longer be evaluated. Either this field returns (required where a stage-scoped principle is in force) or applies_to_stages is demoted. Do not leave both in the tree unresolved."
+    },
+    "constitution_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "INSTANCE-SPECIFIC. The standing constitution this job runs under (Plumbline schemas/constitution.schema.json): the Owner's values, principles and escalation classes for the program, each value carrying a decision_rule so it can arbitrate. Subordinate to mandate_ref \u2014 the mandate is the doctrine's frame instrument; this is the instance's encoding of it."
+    },
+    "constitution_version": {
+      "type": "string",
+      "minLength": 1,
+      "description": "INSTANCE-SPECIFIC. The constitution version in force when this packet was written, recorded so a later reader can tell which standard a decision was judged against after the standard has moved (Contracts \u00a710.3 makes a Buyer or standard change a revalidation trigger)."
+    },
+    "job_to_be_done": {
+      "type": "object",
+      "required": [
+        "statement"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC framing supplied by the Buyer for this job \u2014 the same material Contracts \u00a71.1 requires (whose problem is solved) in the Buyer's words rather than the record's. Per-job, never re-derived from the constitution.",
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "pain_points": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The pains this job removes. Each should be traceable to a dimension or a principle, or it is wishlist."
+        },
+        "desired_future": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What is different once this works, described in the Buyer's environment or behaviour \u2014 never as a deliverable we ship. If it cannot be stated, the job has no evaluable target and belongs in elicitation."
+        },
+        "gains": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The gains the Buyer expects (Playbook \u00a76: Buyer defines jobs-to-be-done, pains AND gains)."
+        }
+      }
+    },
+    "discoverability": {
+      "type": "object",
+      "required": [
+        "classification",
+        "question"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC gate in front of every escalation (Mandate M6, failure F5: the Owner is asked questions the system could have answered itself). Doctrine requires escalation to be without interrogation; this records the attempt that earns the right to ask.",
+      "properties": {
+        "classification": {
+          "enum": [
+            "discoverable",
+            "undecidable"
+          ],
+          "description": "discoverable = answerable by search, measurement, reading the repo, probing the record, or running the code \u2192 resolve it and never ask. undecidable = values, doctrine, Buyer intent, priority, risk appetite \u2192 escalate."
+        },
+        "question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "attempted": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "What was tried. Instrument: an escalation carries the question, what was tried, why no observable answer exists, and the options with a recommendation."
+        },
+        "why_no_observable_answer": {
+          "type": "string"
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Options with a recommendation. A question handed over without options is work pushed back, not escalated."
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "readings"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "allOf": [
+          {
+            "not": {
+              "required": [
+                "bounds"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "specialist"
+              ]
+            }
+          },
+          {
+            "properties": {
+              "terminal_state": {
+                "not": {
+                  "const": "rejected"
+                }
+              },
+              "outcome": {
+                "not": {
+                  "const": "rejected"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ratified": {
+            "const": false
+          }
+        },
+        "required": [
+          "ratified"
+        ]
+      },
+      "then": {
+        "allOf": [
+          {
+            "properties": {
+              "terminal_state": {
+                "not": {
+                  "const": "accepted"
+                }
+              }
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "bounds"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "specialist"
+              ]
+            }
+          },
+          {
+            "not": {
+              "required": [
+                "standard_ref"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "scored"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "then": {
+        "required": [
+          "specialist",
+          "bounds",
+          "ground_truth",
+          "mandate_ref",
+          "escalation"
+        ],
+        "properties": {
+          "bounds": {
+            "type": "object",
+            "required": [
+              "T_accept",
+              "T_dim",
+              "T_reject",
+              "cap",
+              "budget"
+            ]
+          },
+          "ground_truth": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "ratified": {
+            "const": true
+          }
+        },
+        "required": [
+          "ratified"
+        ]
+      },
+      "then": {
+        "required": [
+          "human_seat",
+          "standard_ref"
+        ]
+      }
+    },
+    {
+      "if": {
+        "required": [
+          "terminal_state"
+        ]
+      },
+      "then": {
+        "required": [
+          "outcome"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "enum": [
+              "no_observation",
+              "no_artifact"
+            ]
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "properties": {
+          "terminal_state": {
+            "const": "needs_owner"
+          }
+        },
+        "required": [
+          "terminal_state"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "census"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "properties": {
+          "terminal_state": {
+            "const": "accepted"
+          },
+          "mode": {
+            "const": "readings"
+          }
+        },
+        "required": [
+          "terminal_state",
+          "mode"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "outcome": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "outcome"
+        ]
+      },
+      "then": {
+        "properties": {
+          "terminal_state": {
+            "const": "rejected"
+          },
+          "mode": {
+            "const": "scored"
+          }
+        },
+        "required": [
+          "terminal_state",
+          "mode"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "entry": {
+            "const": "B"
+          }
+        },
+        "required": [
+          "entry"
+        ]
+      },
+      "then": {
+        "required": [
+          "reads_before_freeze"
+        ]
+      }
+    },
+    {
+      "not": {
+        "properties": {
+          "evaluator": {
+            "const": "Owner"
+          }
+        },
+        "required": [
+          "evaluator"
+        ]
+      }
+    },
+    {
+      "not": {
+        "properties": {
+          "evaluator": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "const": "Owner"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "required": [
+          "evaluator"
+        ]
+      }
+    },
+    {
+      "not": {
+        "properties": {
+          "evaluator": {
+            "type": "object",
+            "properties": {
+              "who": {
+                "const": "Owner"
+              }
+            },
+            "required": [
+              "who"
+            ]
+          }
+        },
+        "required": [
+          "evaluator"
+        ]
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: a scored job must name its stage's standing constitution, and a ratified job must carry it. Weakening check: this adds a requirement; it removes none and contradicts none of the corpus's own if/then blocks.",
+      "if": {
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "const": "scored"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "constitution_ref",
+          "constitution_version"
+        ]
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: the Maker is an object carrying engine, version, feedback forms and task classes on a scored job (rule 10 / \u00a74.1). On a readings job the Maker is not scored, so the corpus's looser string form stands.",
+      "if": {
+        "required": [
+          "mode"
+        ],
+        "properties": {
+          "mode": {
+            "const": "scored"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "maker": {
+            "$ref": "#/$defs/makerWithTaskClasses"
+          }
+        }
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: bounds.budget takes the declared {amount, unit} shape so the unit cannot be omitted. Applies wherever bounds is present.",
+      "if": {
+        "required": [
+          "bounds"
+        ]
+      },
+      "then": {
+        "properties": {
+          "bounds": {
+            "properties": {
+              "budget": {
+                "$ref": "#/$defs/plumblineBudget"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "comment": "INSTANCE-SPECIFIC: an undecidable escalation must carry what was tried and why no observable answer exists \u2014 the discoverability gate. A discoverable question may not be escalated at all; it is resolved.",
+      "if": {
+        "required": [
+          "discoverability"
+        ],
+        "properties": {
+          "discoverability": {
+            "properties": {
+              "classification": {
+                "const": "undecidable"
+              }
+            },
+            "required": [
+              "classification"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "discoverability": {
+            "required": [
+              "attempted",
+              "why_no_observable_answer",
+              "options"
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "description": "DERIVED \u2014 do not hand-edit; regenerate with tools/build_schemas.py. Corpus machine authority: github.com/smoitozo/e-di@a48a4645aaa2 (Contracts v1.22.0). Field names are the corpus's; the instance layer is confined to the properties its own descriptions label INSTANCE-SPECIFIC (Contracts \u00a78 / C18). While ratified=false the must-ask values may live ONLY in the top-level `proposed` block and the loop's only possible terminal state is needs_owner \u2014 enforced structurally here, and in the corpus schema this file composes.",
+  "$defs": {
+    "plumblineBudget": {
+      "type": "object",
+      "required": [
+        "amount",
+        "unit"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC shape for bounds.budget. Doctrine requires the budget as a must-ask and says the unit is stated (Instrument sheet: 'budget ___ (unit stated)'); this fixes the shape so the unit cannot go missing.",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "USD",
+            "wall_clock_s",
+            "tokens"
+          ]
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "makerWithTaskClasses": {
+      "type": "object",
+      "required": [
+        "engine",
+        "version",
+        "feedback_forms",
+        "task_classes"
+      ],
+      "additionalProperties": false,
+      "description": "INSTANCE-SPECIFIC tightening of the corpus's maker (which accepts a string). Contracts \u00a74.1 and Instrument rule 10 require the engine, its version, the feedback forms it can consume, AND the task classes it has been shown to perform \u2014 generation and revision are different classes, each shown by a completed run, never by a claim about the engine. C33 does not structurally enforce task classes; Plumbline does, because a loop that will iterate needs the revision class and an unproven one is a billed reroll.",
+      "properties": {
+        "engine": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "feedback_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          },
+          "description": "Named forms this engine can actually consume (diff, failing test output, structured violations). An unnamed form is a feedback channel that does not exist (Contracts \u00a73: the loop is invalid without one)."
+        },
+        "task_classes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "class",
+              "shown_by"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "class": {
+                "enum": [
+                  "generation",
+                  "revision"
+                ]
+              },
+              "shown_by": {
+                "type": "string",
+                "minLength": 1,
+                "description": "The completed run that shows this class. A claim about the engine is not evidence."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

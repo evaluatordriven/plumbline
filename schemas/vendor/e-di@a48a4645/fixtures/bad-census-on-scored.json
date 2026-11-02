@@ -1,0 +1,23 @@
+{
+  "entry": "A",
+  "instrument_profile": "full",
+  "job_name": "census-on-scored",
+  "artifact": "x.md",
+  "buyer": "b",
+  "specialist": "s",
+  "maker": "m",
+  "evaluator": "e",
+  "standard_ref": "r",
+  "human_seat": "Owner",
+  "bounds": {
+    "T_accept": 8.5,
+    "T_dim": 7.0,
+    "T_reject": 6.0,
+    "cap": 3,
+    "budget": "$1"
+  },
+  "mode": "scored",
+  "ratified": true,
+  "terminal_state": "accepted",
+  "outcome": "census"
+}

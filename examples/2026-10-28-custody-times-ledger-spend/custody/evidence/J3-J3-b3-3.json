@@ -1,0 +1,18 @@
+{
+ "check": "J3",
+ "batch": "3",
+ "call": "J3-b3-3",
+ "id": "subject",
+ "messages_sha256": "c8e8f43dbe92eea5c26bb3fb1fd1e9c22c4eb6e2eb36735adf66141a8e0d9caf",
+ "or_call_exit": 0,
+ "or_call_stderr": "",
+ "finish_reason": "stop",
+ "reply_sha256": "b922be390827426d673959e128d27672a59c3e4ab7676faf9a6091682c15b5e8",
+ "verdict": "CONFORMS",
+ "lines": [
+  "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md:30",
+  "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md:63",
+  "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md:67",
+  "docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md:68"
+ ]
+}

@@ -1,0 +1,167 @@
+{
+  "pass_id": "s1-b2",
+  "kind": "scored",
+  "status": "filed",
+  "channel": "S1 script, batch 2",
+  "rubric_sha256": "72e92dc7580e2447f19dfff66aaac02d8484157a6283dcfdda6c7bb2de7561c6",
+  "code_sha256": "c40c640cdb0ec9ba383acb6cb4e46c54d5012bc9bf78445cd1689197058953af",
+  "run_ref": "custody/evidence/b2/s1-summary.json",
+  "scores": [
+    {
+      "dimension": "T1",
+      "score": 1
+    },
+    {
+      "dimension": "T2",
+      "score": 1
+    },
+    {
+      "dimension": "T3",
+      "score": 0
+    },
+    {
+      "dimension": "T4",
+      "score": 1
+    },
+    {
+      "dimension": "T5",
+      "score": 1
+    },
+    {
+      "dimension": "T6",
+      "score": 0
+    },
+    {
+      "dimension": "T7",
+      "score": 1
+    },
+    {
+      "dimension": "F1a",
+      "score": 1
+    },
+    {
+      "dimension": "F1b",
+      "score": 1
+    },
+    {
+      "dimension": "F1c",
+      "score": 1
+    },
+    {
+      "dimension": "F1d",
+      "score": 1
+    },
+    {
+      "dimension": "F1e",
+      "score": 1
+    },
+    {
+      "dimension": "F1f",
+      "score": 0
+    },
+    {
+      "dimension": "F1g",
+      "score": 1
+    },
+    {
+      "dimension": "F1h",
+      "score": 1
+    },
+    {
+      "dimension": "I1",
+      "score": 1
+    },
+    {
+      "dimension": "F7a",
+      "score": 1
+    },
+    {
+      "dimension": "F8a",
+      "score": 1
+    },
+    {
+      "dimension": "F8b",
+      "score": 1
+    },
+    {
+      "dimension": "F8c",
+      "score": 1
+    },
+    {
+      "dimension": "F8d",
+      "score": 1
+    },
+    {
+      "dimension": "P1",
+      "score": 0
+    },
+    {
+      "dimension": "X1",
+      "score": 1
+    },
+    {
+      "dimension": "V1",
+      "score": 0
+    },
+    {
+      "dimension": "V2",
+      "score": 0
+    },
+    {
+      "dimension": "V3",
+      "score": 0
+    },
+    {
+      "dimension": "V4",
+      "score": 0
+    },
+    {
+      "dimension": "V5",
+      "score": 0
+    },
+    {
+      "dimension": "V6",
+      "score": 0
+    },
+    {
+      "dimension": "V7",
+      "score": 0
+    },
+    {
+      "dimension": "V8",
+      "score": 0
+    },
+    {
+      "dimension": "V9",
+      "score": 1
+    },
+    {
+      "dimension": "G1",
+      "score": 1
+    },
+    {
+      "dimension": "G2",
+      "score": 1
+    },
+    {
+      "dimension": "G3",
+      "score": 1
+    },
+    {
+      "dimension": "G4",
+      "score": 1
+    },
+    {
+      "dimension": "G5",
+      "score": 1
+    },
+    {
+      "dimension": "G6",
+      "score": 1
+    },
+    {
+      "dimension": "G7",
+      "score": 1
+    }
+  ]
+}

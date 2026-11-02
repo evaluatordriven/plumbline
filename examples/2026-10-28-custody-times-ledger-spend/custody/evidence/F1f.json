@@ -1,0 +1,4771 @@
+{
+ "id": "F1f",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "seq": {
+   "calls": [
+    {
+     "args": [
+      "generation",
+      "open",
+      "--seat",
+      "maker",
+      "--prompt",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/prompt-1.json"
+     ],
+     "rc": 0,
+     "stdout": "logged generation at 2026-10-29T15:48:55Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:48:55.472746Z",
+     "t1": "2026-10-29T15:48:55.525139Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "generation",
+       "action": "open",
+       "seat": "maker",
+       "n": 1,
+       "prompt_file": "inputs/prompt-1.json",
+       "prompt_sha256": "185f02646fbf53a8182ea8dfe6533f72e20f78671db54389493d749e35367374",
+       "at": "2026-10-29T15:48:55Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.open1",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "generation",
+      "open",
+      "--seat",
+      "maker",
+      "--prompt",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/prompt-1.json"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: generation 1 for maker is still open; close it first\n",
+     "t0": "2026-10-29T15:48:56.625779Z",
+     "t1": "2026-10-29T15:48:56.671515Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.open-again",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "generation",
+      "close",
+      "--seat",
+      "maker",
+      "--n",
+      "2",
+      "--outcome",
+      "x",
+      "--fix-kind",
+      "code"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: no open generation 2 for maker\n",
+     "t0": "2026-10-29T15:48:57.772208Z",
+     "t1": "2026-10-29T15:48:57.829561Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.close-wrong-n",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "generation",
+      "close",
+      "--seat",
+      "eval-m",
+      "--n",
+      "1",
+      "--outcome",
+      "x",
+      "--fix-kind",
+      "code"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: no open generation 1 for eval-m\n",
+     "t0": "2026-10-29T15:48:58.930089Z",
+     "t1": "2026-10-29T15:48:58.973530Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.close-wrong-seat",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "generation",
+      "close",
+      "--seat",
+      "maker",
+      "--n",
+      "1",
+      "--outcome",
+      "F1 outcome",
+      "--fix-kind",
+      "code"
+     ],
+     "rc": 0,
+     "stdout": "logged generation at 2026-10-29T15:49:00Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:00.131571Z",
+     "t1": "2026-10-29T15:49:00.185485Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "generation",
+       "action": "close",
+       "seat": "maker",
+       "n": 1,
+       "outcome": "F1 outcome",
+       "fix_kind": "code",
+       "at": "2026-10-29T15:49:00Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.close1",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "generation",
+      "close",
+      "--seat",
+      "maker",
+      "--n",
+      "1",
+      "--outcome",
+      "x",
+      "--fix-kind",
+      "code"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: generation 1 for maker is already closed\n",
+     "t0": "2026-10-29T15:49:01.286031Z",
+     "t1": "2026-10-29T15:49:01.334417Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.close1-again",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "generation",
+      "open",
+      "--seat",
+      "maker",
+      "--prompt",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/prompt-2.json"
+     ],
+     "rc": 0,
+     "stdout": "logged generation at 2026-10-29T15:49:02Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:02.435085Z",
+     "t1": "2026-10-29T15:49:02.482145Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "generation",
+       "action": "open",
+       "seat": "maker",
+       "n": 2,
+       "prompt_file": "inputs/prompt-2.json",
+       "prompt_sha256": "dfd70131144523ec457ae87bda5e12f40bcb9c83e8162fe56d6dc72a67efa7b6",
+       "at": "2026-10-29T15:49:02Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.open2",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "generation",
+      "close",
+      "--seat",
+      "maker",
+      "--n",
+      "2",
+      "--outcome",
+      "F1 outcome 2",
+      "--fix-kind",
+      "test"
+     ],
+     "rc": 0,
+     "stdout": "logged generation at 2026-10-29T15:49:03Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:03.582948Z",
+     "t1": "2026-10-29T15:49:03.626943Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "generation",
+       "action": "close",
+       "seat": "maker",
+       "n": 2,
+       "outcome": "F1 outcome 2",
+       "fix_kind": "test",
+       "at": "2026-10-29T15:49:03Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "c.close2",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "evaluation",
+      "--batch",
+      "b1",
+      "--evaluator",
+      "eval-m",
+      "--verdict",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/custody/evidence/no-such.txt",
+      "--iteration",
+      "1"
+     ],
+     "rc": 2,
+     "stdout": "",
+     "stderr": "REFUSED: no verdict file at /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/custody/evidence/no-such.txt\n",
+     "t0": "2026-10-29T15:49:04.727934Z",
+     "t1": "2026-10-29T15:49:04.780528Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "d.verdict-missing",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "evaluation",
+      "--batch",
+      "b1",
+      "--evaluator",
+      "eval-m",
+      "--verdict",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/custody/evidence/f1-verdict.txt",
+      "--iteration",
+      "1"
+     ],
+     "rc": 0,
+     "stdout": "logged evaluation at 2026-10-29T15:49:05Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:05.881075Z",
+     "t1": "2026-10-29T15:49:05.927173Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "evaluation",
+       "batch": "b1",
+       "evaluator": "eval-m",
+       "verdict_file": "custody/evidence/f1-verdict.txt",
+       "verdict_sha256": "97a0ec50fe50fce7a12496e8de5c87db13594c2f8bad34d7f4a814b0aa68987a",
+       "at": "2026-10-29T15:49:05Z",
+       "iteration": "1",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "d.verdict",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "evaluation",
+      "--batch",
+      "b2",
+      "--evaluator",
+      "eval-m",
+      "--summary",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/summary-nostamp.json",
+      "--iteration",
+      "1"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: summary /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/summary-nostamp.json has no started_at stamp; an instrument summary must stamp itself\n",
+     "t0": "2026-10-29T15:49:07.028020Z",
+     "t1": "2026-10-29T15:49:07.073799Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "d.summary-nostamp",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "evaluation",
+      "--batch",
+      "b2",
+      "--evaluator",
+      "eval-m",
+      "--summary",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/inputs/summary.json",
+      "--iteration",
+      "1"
+     ],
+     "rc": 0,
+     "stdout": "logged evaluation at 2026-10-29T15:49:08Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:08.174382Z",
+     "t1": "2026-10-29T15:49:08.249477Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "evaluation",
+       "batch": "b2",
+       "evaluator": "eval-m",
+       "verdict_file": "inputs/summary.json",
+       "verdict_sha256": "dd5c017ce687cef254e5851b658a249fbba03eed55e27a8a261ef3bb319871d7",
+       "at": "2026-10-29T15:49:08Z",
+       "iteration": "1",
+       "summary_file": "inputs/summary.json",
+       "summary_sha256": "dd5c017ce687cef254e5851b658a249fbba03eed55e27a8a261ef3bb319871d7",
+       "started_at": "2026-10-29T15:48:37Z",
+       "finished_at": "2026-10-29T15:49:07Z",
+       "summary_writer": "tools/edi/judge_batch.py@s1f1aaaaaaaa",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "d.summary",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "amendment",
+      "--file",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/custody/files/f1-amend.md",
+      "--quote",
+      "F1 Buyer: “D2 means every section” — ✓",
+      "--channel",
+      "f1 msg",
+      "--said-at",
+      "2026-10-29T15:48:47Z"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: amendment file /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/custody/files/f1-amend.md is inside custody/; amendments go beside the frozen set\n",
+     "t0": "2026-10-29T15:49:09.350507Z",
+     "t1": "2026-10-29T15:49:09.398648Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "e.in-custody",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "amendment",
+      "--file",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/amendments/f1-amend.md",
+      "--quote",
+      "F1 Buyer: “D2 means every section” — ✓",
+      "--channel",
+      "f1 msg",
+      "--said-at",
+      "2026-10-29T15:47:47Z"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: --said-at 2026-10-29T15:47:47Z is before the freeze at 2026-10-29T15:48:47Z\n",
+     "t0": "2026-10-29T15:49:10.499214Z",
+     "t1": "2026-10-29T15:49:10.548563Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "e.early",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "amendment",
+      "--file",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/amendments/f1-amend.md",
+      "--quote",
+      "F1 Buyer: “D2 means every section” — ✓",
+      "--channel",
+      "f1 msg",
+      "--said-at",
+      "2026-10-29T15:59:09Z"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: --said-at 2026-10-29T15:59:09Z is after the tool's clock 2026-10-29T15:49:11Z\n",
+     "t0": "2026-10-29T15:49:11.649296Z",
+     "t1": "2026-10-29T15:49:11.697865Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "e.future",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "amendment",
+      "--file",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/amendments/f1-amend.md",
+      "--quote",
+      "F1 Buyer: “D2 means every section” — ✓",
+      "--channel",
+      "f1 msg",
+      "--said-at",
+      "2026-10-29T15:48:47Z"
+     ],
+     "rc": 0,
+     "stdout": "logged amendment at 2026-10-29T15:49:12Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:12.798467Z",
+     "t1": "2026-10-29T15:49:12.849138Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "amendment",
+       "file": "amendments/f1-amend.md",
+       "file_sha256": "1d638be934fa08bfdcab1fd5bc7cc0a69e1d728f286ddce39ac59a08de4ebc5f",
+       "quote": "F1 Buyer: “D2 means every section” — ✓",
+       "channel": "f1 msg",
+       "said_at": "2026-10-29T15:48:47Z",
+       "at": "2026-10-29T15:49:12Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "e.ok",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "relay",
+      "--quote",
+      "Steve: “Ratified proceed” ✓",
+      "--from",
+      "S1 relay",
+      "--source-chat",
+      "f1 chat",
+      "--source-at",
+      "2026-10-29T15:47:47Z"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: --source-at 2026-10-29T15:47:47Z is before the freeze at 2026-10-29T15:48:47Z\n",
+     "t0": "2026-10-29T15:49:13.950021Z",
+     "t1": "2026-10-29T15:49:14.025713Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "f.early",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "relay",
+      "--quote",
+      "Steve: “Ratified proceed” ✓",
+      "--from",
+      "S1 relay",
+      "--source-chat",
+      "f1 chat",
+      "--source-at",
+      "2026-10-29T15:59:15Z"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: --source-at 2026-10-29T15:59:15Z is after the tool's clock 2026-10-29T15:49:15Z\n",
+     "t0": "2026-10-29T15:49:15.126366Z",
+     "t1": "2026-10-29T15:49:15.175416Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "f.future",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "relay",
+      "--quote",
+      "Steve: “Ratified proceed” ✓",
+      "--from",
+      "S1 relay",
+      "--source-chat",
+      "f1 chat",
+      "--source-at",
+      "2026-10-29T15:48:47Z"
+     ],
+     "rc": 0,
+     "stdout": "logged relay at 2026-10-29T15:49:16Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:49:16.275984Z",
+     "t1": "2026-10-29T15:49:16.322210Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "relay",
+       "kind": "relay",
+       "quote": "Steve: “Ratified proceed” ✓",
+       "from": "S1 relay",
+       "source_chat": "f1 chat",
+       "source_at": "2026-10-29T15:48:47Z",
+       "at": "2026-10-29T15:49:16Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "f.ok",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "spend",
+      "--spend-ledger",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/spend-ledger.jsonl",
+      "--key-reading",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/reading-early.json"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: key reading at 2026-10-29T15:49:17.472486Z is less than 3 min after the last settle at 2026-10-29T15:49:00Z; read the key again later\n",
+     "t0": "2026-10-29T15:49:17.480201Z",
+     "t1": "2026-10-29T15:49:17.545464Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "g.early",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "spend",
+      "--spend-ledger",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/spend-ledger.jsonl",
+      "--key-reading",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/reading-nostamp.json"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: key reading /workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/reading-nostamp.json has no read_at/writer stamp; run tools/edi/or_call.py --spend-status\n",
+     "t0": "2026-10-29T15:49:18.646344Z",
+     "t1": "2026-10-29T15:49:18.690070Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "g.nostamp",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "spend",
+      "--spend-ledger",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/spend-ledger.jsonl",
+      "--key-reading",
+      "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/f1/jobs/2026-10-28-s1-t4-tool-built/spend/reading.json"
+     ],
+     "rc": 0,
+     "stdout": "logged spend at 2026-10-29T15:52:01Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:52:01.188641Z",
+     "t1": "2026-10-29T15:52:01.241679Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "spend",
+       "spend_ledger": "spend/spend-ledger.jsonl",
+       "spend_ledger_sha256": "a34bda1b88a1a95bcfd4c23af64c465db6614882b6b181e99baa633414dc53f2",
+       "key_reading": "spend/reading.json",
+       "key_reading_sha256": "e494e7df3dfed1cc0b148626d1e45e62811cb27c28174804190f21a2646470d0",
+       "ledger_sum_usd": 1e-05,
+       "key_delta_usd": 0.0,
+       "total_usd": 1e-05,
+       "read_at": "2026-10-29T15:52:01.180738Z",
+       "last_settle_at": "2026-10-29T15:49:00Z",
+       "at": "2026-10-29T15:52:01Z",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "g.ok",
+     "expect": "ok"
+    },
+    {
+     "args": [
+      "dispose",
+      "--by",
+      "F1 Buyer",
+      "--state",
+      "given",
+      "--decided-at",
+      "2026-10-29T15:49:06Z",
+      "--decided-source",
+      "s1 f1"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: decided_at 2026-10-29T15:49:06Z is before the last logged check at 2026-10-29T15:49:08Z\n",
+     "t0": "2026-10-29T15:52:02.342645Z",
+     "t1": "2026-10-29T15:52:02.389349Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "b.early",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "dispose",
+      "--by",
+      "F1 Buyer",
+      "--state",
+      "given",
+      "--decided-at",
+      "2026-10-29T16:02:03Z",
+      "--decided-source",
+      "s1 f1"
+     ],
+     "rc": 3,
+     "stdout": "",
+     "stderr": "REFUSED: decided_at 2026-10-29T16:02:03Z is after the tool's clock 2026-10-29T15:52:03Z\n",
+     "t0": "2026-10-29T15:52:03.490121Z",
+     "t1": "2026-10-29T15:52:03.535086Z",
+     "refused_text": true,
+     "prefix_kept": true,
+     "appended": [],
+     "ledger_same": true,
+     "custody_same": true,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "T4 Buyer",
+       "acknowledgesUnobserved": []
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "b.future",
+     "expect": "refuse"
+    },
+    {
+     "args": [
+      "dispose",
+      "--by",
+      "F1 Buyer",
+      "--state",
+      "given",
+      "--decided-at",
+      "2026-10-29T15:49:08Z",
+      "--decided-source",
+      "s1 f1"
+     ],
+     "rc": 0,
+     "stdout": "logged dispose at 2026-10-29T15:52:04Z\n",
+     "stderr": "",
+     "t0": "2026-10-29T15:52:04.635718Z",
+     "t1": "2026-10-29T15:52:04.687696Z",
+     "refused_text": false,
+     "prefix_kept": true,
+     "appended": [
+      {
+       "event": "dispose",
+       "by": "F1 Buyer",
+       "at": "2026-10-29T15:52:04Z",
+       "decided_at": "2026-10-29T15:49:08Z",
+       "decided_source": "s1 f1",
+       "state": "given",
+       "writer": "kit/custody_ledger.py@c70062b4f696"
+      }
+     ],
+     "ledger_same": false,
+     "custody_same": false,
+     "custody_after": {
+      "custody_inputs": "plumbline/custody-inputs/v1",
+      "note": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+      "levelClaimed": "CL1",
+      "orchestrator": {
+       "name": "S1 T4 builder",
+       "kind": "agent",
+       "aliases": []
+      },
+      "bar": {
+       "file": "custody/bar.md",
+       "author": "T4 Buyer",
+       "publishedAt": null,
+       "groundTruth": [],
+       "dissent": [],
+       "dimensions": [
+        {
+         "id": "D1",
+         "plumbline_dimension": "correctness",
+         "criterion": "every stated figure matches the source table",
+         "scale": {
+          "anchors": {
+           "1": "figures wrong",
+           "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "any figure differs from the source table"
+        },
+        {
+         "id": "D2",
+         "plumbline_dimension": "completeness",
+         "criterion": "every section the brief names is present",
+         "scale": {
+          "anchors": {
+           "1": "sections missing",
+           "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+         },
+         "failureCondition": "a section the brief names is absent or empty"
+        }
+       ],
+       "frozenAt": "2026-10-29T15:48:47Z",
+       "approvals": [
+        {
+         "role": "buyer",
+         "by": "T4 Buyer",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:49Z",
+         "adopted": null
+        },
+        {
+         "role": "specialist",
+         "by": "T4 Specialist",
+         "kind": "person",
+         "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+         "at": "2026-10-29T15:48:50Z",
+         "adopted": null
+        }
+       ]
+      },
+      "maker": {
+       "name": "fixture-maker",
+       "kind": "model",
+       "version": "0.0.1",
+       "method_file": "custody/method.md",
+       "model": {
+        "family": "deepseek",
+        "identifier": "deepseek/deepseek-v4.1-flash-1017",
+        "readOnly": false
+       },
+       "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+      },
+      "evaluators": [
+       {
+        "id": "eval-m",
+        "name": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "kind": "model",
+        "model": {
+         "family": "glm",
+         "identifier": "z-ai/glm-5.3-flash",
+         "readOnly": true
+        },
+        "harness_log": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "passes": {
+       "pass-a": {
+        "evaluator": "eval-m",
+        "run": 1,
+        "batch": "b1",
+        "evidence": {
+         "D1": "pass-a-D1.txt",
+         "D2": "pass-a-D2.txt"
+        },
+        "call": "eval_artifact"
+       }
+      },
+      "controls": [
+       {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K1-clean.md",
+        "expected": "conforms",
+        "outcome": "conforms",
+        "evidence_file": "custody/evidence/control-K1.txt",
+        "call": "eval_k1"
+       },
+       {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "eval-m",
+        "case_file": "custody/controls/K2-planted.md",
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "dimension": "D2",
+        "evidence_file": "custody/evidence/control-K2.txt",
+        "call": "eval_k2"
+       }
+      ],
+      "external": [
+       {
+        "requirement": "CL1-15",
+        "subject": "eval-m",
+        "evidence_file": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+        "readBy": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+       }
+      ],
+      "retention": {
+       "location": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+       "public": false
+      },
+      "disposition": {
+       "by": "F1 Buyer",
+       "acknowledgesUnobserved": [],
+       "at": "2026-10-29T15:49:08Z",
+       "state": "given"
+      },
+      "routing": {
+       "maker": {
+        "via": "openrouter.ai",
+        "provider": "DeepInfra",
+        "slug": "deepinfra/fp8",
+        "host": "api.deepinfra.com",
+        "declaredAt": "2026-10-29T15:48:51Z"
+       },
+       "eval-m": {
+        "via": "openrouter.ai",
+        "provider": "Z.AI",
+        "slug": "z-ai/fp8",
+        "host": "api.z.ai",
+        "declaredAt": "2026-10-29T15:48:53Z"
+       }
+      }
+     },
+     "tag": "b.ok",
+     "expect": "ok"
+    }
+   ],
+   "freeze_at": "2026-10-29T15:48:47Z",
+   "last_check": "2026-10-29T15:49:08Z",
+   "summary_stamp": {
+    "started_at": "2026-10-29T15:48:37Z",
+    "finished_at": "2026-10-29T15:49:07Z",
+    "writer": "tools/edi/judge_batch.py@s1f1aaaaaaaa",
+    "verdicts": [
+     "D1 10"
+    ]
+   },
+   "amend_quote": "F1 Buyer: “D2 means every section” — ✓",
+   "relay_quote": "Steve: “Ratified proceed” ✓",
+   "shas": {
+    "prompt-1": "185f02646fbf53a8182ea8dfe6533f72e20f78671db54389493d749e35367374",
+    "prompt-2": "dfd70131144523ec457ae87bda5e12f40bcb9c83e8162fe56d6dc72a67efa7b6",
+    "verdict": "97a0ec50fe50fce7a12496e8de5c87db13594c2f8bad34d7f4a814b0aa68987a",
+    "amend": "1d638be934fa08bfdcab1fd5bc7cc0a69e1d728f286ddce39ac59a08de4ebc5f",
+    "ledger": "a34bda1b88a1a95bcfd4c23af64c465db6614882b6b181e99baa633414dc53f2",
+    "reading": "e494e7df3dfed1cc0b148626d1e45e62811cb27c28174804190f21a2646470d0"
+   },
+   "reading": {
+    "read_at": "2026-10-29T15:52:01.180738Z",
+    "writer": "tools/edi/or_call.py@f740e9543765",
+    "job_id": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+    "key_usage_usd": 1.0,
+    "baseline_usd": 1.0,
+    "key_delta_usd": 0.0,
+    "ledger_sum_usd": 1e-05,
+    "total_usd": 1e-05,
+    "last_settle_at": "2026-10-29T15:49:00.122937Z"
+   },
+   "maker_call_rc": 0,
+   "spend_rows": [
+    {
+     "at": "2026-10-29T15:49:00.120462Z",
+     "call": "maker_f1",
+     "event": "reserve",
+     "id": "6ae9c79787e84c3f96a6a7290e3efc70",
+     "job": "2026-10-28-s1-t4-tool-built",
+     "max_tokens": 131072,
+     "model": "deepseek/deepseek-v4.1-flash-1017",
+     "seat": "maker",
+     "spent_before_usd": 0,
+     "tag": "deepinfra/fp8",
+     "worst_usd": 0.0393265
+    },
+    {
+     "at": "2026-10-29T15:49:00.122937Z",
+     "call": "maker_f1",
+     "cost_usd": 1e-05,
+     "event": "settle",
+     "id": "6ae9c79787e84c3f96a6a7290e3efc70",
+     "job": "2026-10-28-s1-t4-tool-built",
+     "source": "generation.total_cost"
+    }
+   ]
+  },
+  "t4_dispose": [
+   {
+    "event": "dispose",
+    "by": "T4 Buyer",
+    "at": "2026-10-29T15:48:43Z",
+    "decided_at": "2026-10-29T15:45:40Z",
+    "decided_source": "harness-eval-m.log#eval_k2 received_at",
+    "state": "given",
+    "writer": "kit/custody_ledger.py@c70062b4f696"
+   }
+  ],
+  "t4_record_disposition": {
+   "state": "given",
+   "by": "T4 Buyer",
+   "at": "2026-10-29T15:45:40Z",
+   "acknowledgesUnobserved": []
+  },
+  "p_f1f": {
+   "rc": 3,
+   "kinds": [
+    "approval"
+   ],
+   "written": false
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (176 values)"
+}

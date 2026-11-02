@@ -1,0 +1,49 @@
+{
+ "batch": 4,
+ "order": [
+  "subject",
+  "G-c1",
+  "G-p1"
+ ],
+ "items": [
+  {
+   "call": "n6-b4-1",
+   "id": "subject",
+   "messages_sha256": "0820135cb3a9780ac5ab0de427667d7709155d8c4fb2d1c3f93eded7b5287a67",
+   "or_call_exit": 0,
+   "verdict": "CONFORMS",
+   "lines": [
+    "kit/custody_history.py:376",
+    "kit/custody_history.py:381",
+    "kit/custody_history.py:292",
+    "kit/custody_history.py:402",
+    "kit/emit_custody.py:355",
+    "kit/emit_custody.py:393"
+   ]
+  },
+  {
+   "call": "n6-b4-2",
+   "id": "G-c1",
+   "messages_sha256": "621355ffafba2537241550d72b1c54f544f149747c0aa3567fd092fc0efdc6a1",
+   "or_call_exit": 0,
+   "verdict": "CONFORMS",
+   "lines": "[REDACTED: lines cited on held-out control G-c1]",
+   "control_ok": true
+  },
+  {
+   "call": "n6-b4-3",
+   "id": "G-p1",
+   "messages_sha256": "1621146b89c5deca103652dc46086fb792c9348678e2a16399645f61ae05e670",
+   "or_call_exit": 0,
+   "verdict": "DOES_NOT_CONFORM",
+   "lines": "[REDACTED: lines cited on held-out control G-p1]",
+   "control_ok": true
+  }
+ ],
+ "log": "harness-eval-glm-b4.log",
+ "dry_run": false,
+ "controls_ok": true,
+ "subject_verdict": "CONFORMS",
+ "N6": "PASS",
+ "_redaction": "Copy of n6/N6-batch.json with the lines cited on held-out controls redacted; full file sha256 026cb5f79c19737e4bf8adaab05ce4360b2390e1f292508abdd40a618f939c59 (listed in BATCH-MANIFEST.sha256)."
+}

@@ -1,0 +1,12 @@
+<<<PLUMBLINE-FILE path=tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl>>>
+{"event": "freeze", "at": "2026-10-20T10:00:00Z", "bar_file": "custody/bar.md"}
+{"event": "approve", "role": "buyer", "by": "Fixture Buyer", "kind": "person", "at": "2026-10-20T10:05:00Z", "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24", "adopted": null}
+{"event": "approve", "role": "specialist", "by": "Fixture Specialist", "kind": "person", "at": "2026-10-20T10:10:00Z", "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24", "adopted": null}
+{"event": "pin", "seat": "maker", "via": "openrouter.ai", "provider": "DeepInfra", "slug": "deepinfra/fp8", "host": "api.deepinfra.com", "at": "2026-10-20T10:55:00Z"}
+{"event": "dispose", "by": "Fixture Buyer", "at": "2026-10-20T13:00:00Z"}
+<<<PLUMBLINE-END path=tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl>>>
+<<<PLUMBLINE-DONE files=1>>>
+NOTES: N3 failed only on the repo's own synthetic fixture job-rejected, whose live ledger held a single pin event; the emitter therefore cited inputs/custody.json for bar.frozenAt, both approvals and disposition.at, which N3 rejects.
+NOTES: The fixture's inputs/custody-events.jsonl now carries the freeze, the two approvals and the disposition at exactly the times already in inputs/custody.json, so the emitter's existing "ledger wins" path names inputs/custody-events.jsonl with a line for every one of those times.
+NOTES: No emitter, history, ledger, packer or docs change is needed: the code already prefers a live event over a hand-entered value and refuses any mismatch, and the times here are identical, so no new refusal can arise.
+NOTES: The provider pin line is unchanged, and no other fixture file is touched, so held-out jobs, the failure overlays and the 112 existing test cases see the same behaviour as before.

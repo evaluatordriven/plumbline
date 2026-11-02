@@ -1,0 +1,2 @@
+extract_files: wrote kit/emit_custody.py (57069 bytes, sha256 c97e2f7ee641e6400496f04b0fb280152a68168682bcf60b718a868a2c05d2fa)
+extract_files: wrote tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl (745 bytes, sha256 8ec4796f7c55e55a1f44dc0a21812b84a1325189cf61d8566f3dff3be57a10aa)

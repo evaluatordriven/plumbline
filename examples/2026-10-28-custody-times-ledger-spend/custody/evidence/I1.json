@@ -1,0 +1,105 @@
+{
+ "id": "I1",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "exists": {
+   "fixture_run.py": true,
+   "judge_batch.py": true,
+   "or_call.py": true
+  },
+  "fixture_run": {
+   "rc": 0,
+   "t0": "2026-10-29T15:52:28.105235Z",
+   "t1": "2026-10-29T15:52:28.135003Z",
+   "stderr": "",
+   "out": {
+    "started_at": "2026-10-29T15:52:28.130185Z",
+    "finished_at": "2026-10-29T15:52:28.131077Z",
+    "writer": "tools/edi/fixture_run.py@59fe3c5f1e2a",
+    "files": [
+     {
+      "path": "a.txt",
+      "sha256": "18677ad1ee0d2191b7f8bce12cd4c8c209aa1d69741144c0affb99a5ba2e5232",
+      "mode": "0o644"
+     },
+     {
+      "path": "ro.txt",
+      "sha256": "ad2bc497724d04f76bb6abd5f142c86f202d12bc0a60c854f136e63f0c3242fc",
+      "mode": "0o644"
+     },
+     {
+      "path": "run.sh",
+      "sha256": "c9b3008586f86b8caab3d6692eae9b2010eb47ca76dfac2d2aa2176ff6017b7e",
+      "mode": "0o644"
+     },
+     {
+      "path": "secret.txt",
+      "sha256": "9737fe84ce3cf6d8ddc82385ca8277c6afa1d2ceb6979eb9137159d8e2cd3029",
+      "mode": "0o644"
+     },
+     {
+      "path": "sub/deep.txt",
+      "sha256": "a6fb411bc8dfc9dade5e4dba899bb8ed1591a52d27a7d4be51dc6bcbeb7aeeb7",
+      "mode": "0o644"
+     }
+    ]
+   },
+   "expect_writer": "tools/edi/fixture_run.py@59fe3c5f1e2a"
+  },
+  "judge_batch_init": 0,
+  "judge_batch": {
+   "rc": 0,
+   "t0": "2026-10-29T15:52:28.188044Z",
+   "t1": "2026-10-29T15:52:28.385184Z",
+   "stderr": "",
+   "out": {
+    "started_at": "2026-10-29T15:52:28.215079Z",
+    "finished_at": "2026-10-29T15:52:28.379620Z",
+    "writer": "tools/edi/judge_batch.py@b6e032a3531a",
+    "batch": 2,
+    "order": [
+     "i1-b",
+     "i1-c",
+     "i1-a"
+    ],
+    "results": [
+     {
+      "id": "i1-b",
+      "call": "batch2_000_i1-b",
+      "exit": 0,
+      "reply_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/i1/jb/out/reply-000-i1-b.txt"
+     },
+     {
+      "id": "i1-c",
+      "call": "batch2_001_i1-c",
+      "exit": 0,
+      "reply_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/i1/jb/out/reply-001-i1-c.txt"
+     },
+     {
+      "id": "i1-a",
+      "call": "batch2_002_i1-a",
+      "exit": 0,
+      "reply_file": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/eval/b3/s1/work/i1/jb/out/reply-002-i1-a.txt"
+     }
+    ]
+   },
+   "expect_writer": "tools/edi/judge_batch.py@b6e032a3531a",
+   "expect_order": [
+    {
+     "id": "i1-b",
+     "text": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    },
+    {
+     "id": "i1-c",
+     "text": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    },
+    {
+     "id": "i1-a",
+     "text": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    }
+   ]
+  }
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (3 values)"
+}

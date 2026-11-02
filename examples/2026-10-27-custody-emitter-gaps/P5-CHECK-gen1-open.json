@@ -1,0 +1,67 @@
+{
+ "check": "P5e",
+ "job": "/workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps",
+ "ledger": "/workspace/plumbline-pr/dot-plumbline/jobs/2026-10-27-custody-emitter-gaps/inputs/custody-events.jsonl",
+ "freeze": {
+  "at": "2026-10-27T21:57:46Z",
+  "bar_file": "custody/bar.md",
+  "bar_sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b"
+ },
+ "headers": [
+  {
+   "file": "custody/bar.md",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/bounds",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/controls/README.md",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/harness/or_call.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/harness/test_or_call.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/derive.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/mutate.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/n6_batch.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/ncheck.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/p5check.py",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/rubric-N6.md",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/run_instrument.sh",
+   "build": "2026-10-27T21:53:35Z"
+  },
+  {
+   "file": "custody/freeze/instrument/subject.py",
+   "build": "2026-10-27T21:53:35Z"
+  }
+ ],
+ "bar_sha256": "3ced9bc04bfa2ae329bd57aff2197b9c49a3544f48cec2ccf8ce6469f22a970b",
+ "verdict": "PASS",
+ "why": []
+}

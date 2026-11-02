@@ -1,0 +1,203 @@
+{
+ "id": "T6",
+ "verdict": "FAIL",
+ "reasons": [
+  "N verdicts {'N1': 'FAIL', 'N2': 'PASS', 'N3': 'PASS', 'N4': 'PASS', 'N5': 'PASS', 'N7': 'PASS', 'N8': 'PASS'}",
+  "4 records < 5"
+ ],
+ "obs": {
+  "rc": 0,
+  "stderr": "",
+  "summary": {
+   "controls": "as expected",
+   "mutants": "as expected",
+   "subject": {
+    "N1": "FAIL",
+    "N2": "PASS",
+    "N3": "PASS",
+    "N4": "PASS",
+    "N5": "PASS",
+    "N7": "PASS",
+    "N8": "PASS"
+   },
+   "scores": {
+    "N1": 0,
+    "N2": 1,
+    "N3": 1,
+    "N4": 1,
+    "N5": 1,
+    "N7": 1,
+    "N8": 1
+   }
+  },
+  "runs": [
+   {
+    "run": "F-genreply-full",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": []
+   },
+   {
+    "run": "F-genreply-null",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": false,
+    "record_hand_fields": [],
+    "verify_rc": null,
+    "verify_kinds": null
+   },
+   {
+    "run": "F-maker-10min",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": []
+   },
+   {
+    "run": "F-single-call",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-glm.log#eval_artifact.received_at",
+     "harness-eval-glm.log#eval_artifact.sent_at",
+     "harness-eval-glm.log#eval_k1.received_at",
+     "harness-eval-glm.log#eval_k1.sent_at",
+     "harness-eval-glm.log#eval_k2.received_at",
+     "harness-eval-glm.log#eval_k2.sent_at",
+     "routing.eval-glm.declaredAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": []
+   },
+   {
+    "run": "extra-1-job-rejected",
+    "nosw_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-a.log#eval_artifact.received_at",
+     "harness-eval-a.log#eval_artifact.sent_at",
+     "harness-eval-a.log#eval_k1.received_at",
+     "harness-eval-a.log#eval_k1.sent_at",
+     "harness-eval-a.log#eval_k2.received_at",
+     "harness-eval-a.log#eval_k2.sent_at",
+     "harness-maker-fixture.log#0.received_at",
+     "harness-maker-fixture.log#0.sent_at",
+     "passes.pass-a.at",
+     "producedAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "startedAt"
+    ],
+    "record_written": true,
+    "record_hand_fields": [
+     "bar.approvals[0].at",
+     "bar.approvals[1].at",
+     "bar.frozenAt",
+     "disposition.at",
+     "harness-eval-a.log#eval_artifact.received_at",
+     "harness-eval-a.log#eval_artifact.sent_at",
+     "harness-eval-a.log#eval_k1.received_at",
+     "harness-eval-a.log#eval_k1.sent_at",
+     "harness-eval-a.log#eval_k2.received_at",
+     "harness-eval-a.log#eval_k2.sent_at",
+     "harness-maker-fixture.log#0.received_at",
+     "harness-maker-fixture.log#0.sent_at",
+     "passes.pass-a.at",
+     "producedAt",
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "startedAt"
+    ],
+    "verify_rc": 0,
+    "verify_kinds": []
+   }
+  ],
+  "min_runs": 5
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (9 values)"
+}

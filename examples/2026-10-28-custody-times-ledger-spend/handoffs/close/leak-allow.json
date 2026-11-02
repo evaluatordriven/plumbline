@@ -1,0 +1,12 @@
+[
+ {
+  "file": "harness-maker-deepseek.log",
+  "line_sha256": "b11f40135fc6f2192be4486477a6753d519db7e4a133238601d0794ab2ccc2ca",
+  "why": "A bare Python function signature that the Maker wrote in its own reasoning in call maker_iter1_edi_a1, for the spend-file loader of tools/edi/or_call.py (the base 3df1ce5 has the same function with type annotations). It equals one line of a held-out reference copy by coincidence of naming; no other control text is in the log. The log's sha256 is pinned (882ee4e6...), so it cannot be redacted."
+ },
+ {
+  "file": "record.custody.json",
+  "line_sha256": "968fe96ee4c37b510c475ad03d5835da7ca0e939368ca53a20e0d75bf97d0733",
+  "why": "The record's subject list names the subject file tools/edi/or_call.py (a public path in the evaluated revision f95e0d3, custody/subject-f95e0d3.sha256) in the emitter's pretty-printed JSON form; a held-out fixture log carries the same generic `name` line for the same public file. No held-out text is involved."
+ }
+]

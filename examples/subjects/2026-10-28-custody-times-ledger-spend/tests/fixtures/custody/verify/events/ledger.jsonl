@@ -1,0 +1,3 @@
+{"event": "freeze", "at": "2026-01-01T00:00:00Z", "bar_file": "custody/bar.md", "bar_sha256": "0000000000000000000000000000000000000000000000000000000000000000", "writer": "kit/custody_ledger.py@0123456789ab"}
+{"event": "generation", "action": "open", "seat": "maker", "n": 1, "prompt_file": "custody/prompt.md", "prompt_sha256": "1111111111111111111111111111111111111111111111111111111111111111", "at": "2026-01-01T00:01:00Z", "writer": "kit/custody_ledger.py@0123456789ab"}
+{"event": "generation", "action": "close", "seat": "maker", "n": 1, "outcome": "done", "fix_kind": null, "at": "2026-01-01T00:10:00Z", "writer": "kit/custody_ledger.py@0123456789ab"}

@@ -1,0 +1,83 @@
+{
+ "id": "F7a",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "rw": {
+   "rc": 0,
+   "stderr": "",
+   "src_changed": [],
+   "out": {
+    "started_at": "2026-10-29T15:52:28.409091Z",
+    "finished_at": "2026-10-29T15:52:28.410421Z",
+    "writer": "tools/edi/fixture_run.py@59fe3c5f1e2a",
+    "files": [
+     {
+      "path": "a.txt",
+      "sha256": "18677ad1ee0d2191b7f8bce12cd4c8c209aa1d69741144c0affb99a5ba2e5232",
+      "mode": "0o644"
+     },
+     {
+      "path": "ro.txt",
+      "sha256": "ad2bc497724d04f76bb6abd5f142c86f202d12bc0a60c854f136e63f0c3242fc",
+      "mode": "0o644"
+     },
+     {
+      "path": "run.sh",
+      "sha256": "c9b3008586f86b8caab3d6692eae9b2010eb47ca76dfac2d2aa2176ff6017b7e",
+      "mode": "0o644"
+     },
+     {
+      "path": "secret.txt",
+      "sha256": "9737fe84ce3cf6d8ddc82385ca8277c6afa1d2ceb6979eb9137159d8e2cd3029",
+      "mode": "0o644"
+     },
+     {
+      "path": "sub/deep.txt",
+      "sha256": "a6fb411bc8dfc9dade5e4dba899bb8ed1591a52d27a7d4be51dc6bcbeb7aeeb7",
+      "mode": "0o644"
+     }
+    ]
+   },
+   "unwritable_in_work": []
+  },
+  "ro": {
+   "rc": 0,
+   "stderr": "",
+   "src_changed": [],
+   "out": {
+    "started_at": "2026-10-29T15:52:28.437192Z",
+    "finished_at": "2026-10-29T15:52:28.438015Z",
+    "writer": "tools/edi/fixture_run.py@59fe3c5f1e2a",
+    "files": [
+     {
+      "path": "a.txt",
+      "sha256": "18677ad1ee0d2191b7f8bce12cd4c8c209aa1d69741144c0affb99a5ba2e5232",
+      "mode": "0o644"
+     },
+     {
+      "path": "ro.txt",
+      "sha256": "ad2bc497724d04f76bb6abd5f142c86f202d12bc0a60c854f136e63f0c3242fc",
+      "mode": "0o644"
+     },
+     {
+      "path": "run.sh",
+      "sha256": "c9b3008586f86b8caab3d6692eae9b2010eb47ca76dfac2d2aa2176ff6017b7e",
+      "mode": "0o644"
+     },
+     {
+      "path": "secret.txt",
+      "sha256": "9737fe84ce3cf6d8ddc82385ca8277c6afa1d2ceb6979eb9137159d8e2cd3029",
+      "mode": "0o644"
+     },
+     {
+      "path": "sub/deep.txt",
+      "sha256": "a6fb411bc8dfc9dade5e4dba899bb8ed1591a52d27a7d4be51dc6bcbeb7aeeb7",
+      "mode": "0o644"
+     }
+    ]
+   },
+   "unwritable_in_work": []
+  }
+ }
+}

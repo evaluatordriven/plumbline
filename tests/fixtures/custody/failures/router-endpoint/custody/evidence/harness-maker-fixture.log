@@ -1,0 +1,31 @@
+{
+  "request": {
+    "url": "https://openrouter.ai/api/v1/chat/completions",
+    "model": "fixture/maker-1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "SYNTHETIC FIXTURE PROMPT"
+      }
+    ]
+  },
+  "response": {
+    "id": "gen-synthetic-maker",
+    "created": 1792494000,
+    "model": "fixture/maker-1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "SYNTHETIC"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "provider": "Fixture Upstream Cloud"
+  },
+  "response_headers": {
+    "Date": "Tue, 20 Oct 2026 11:00:07 GMT"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "pass_id": "glm-b2-J3",
+  "kind": "scored",
+  "status": "filed",
+  "channel": "openrouter.ai -> Z.AI",
+  "rubric_sha256": "ab00c7b701427bde2c5797847cbeed668fce899bc49087b2594ada5d98ebbc20",
+  "code_sha256": "47e89cedd1bf2c8e3fb4f02d0293bd69a1cc048bc76adf170b78283c0b05c2bd",
+  "run_ref": "custody/evidence/harness-eval-glm-b2.log#J3-b2-3",
+  "provider": "Z.AI",
+  "model": "z-ai/glm-5.3-flash",
+  "family": "glm",
+  "scores": [
+    {
+      "dimension": "J3",
+      "score": 1
+    }
+  ]
+}

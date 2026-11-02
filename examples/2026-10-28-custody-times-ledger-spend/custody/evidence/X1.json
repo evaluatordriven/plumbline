@@ -1,0 +1,72 @@
+{
+ "id": "X1",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "clean": {
+   "rc": 0,
+   "written": true,
+   "check": {
+    "verdict": "OK",
+    "levelAchieved": "CL1",
+    "failed": []
+   },
+   "owned": {
+    "verdict": "accept",
+    "gaps": [],
+    "times": {
+     "startedAt": "harness log",
+     "producedAt": "harness log"
+    },
+    "hand_times": []
+   }
+  },
+  "x1": {
+   "rc": 0,
+   "written": true,
+   "check": {
+    "verdict": "OK",
+    "levelAchieved": "CL1",
+    "failed": []
+   },
+   "inputs_expected": {
+    "note": "S1 X1 input",
+    "nested": {
+     "a": [
+      1,
+      2,
+      {
+       "b": "✓"
+      }
+     ]
+    }
+   },
+   "inputs": {
+    "note": "S1 X1 input",
+    "nested": {
+     "a": [
+      1,
+      2,
+      {
+       "b": "✓"
+      }
+     ]
+    }
+   }
+  },
+  "px1": {
+   "rc": 0,
+   "written": true,
+   "kinds": [],
+   "owned": {
+    "verdict": "accept",
+    "gaps": [],
+    "times": {
+     "startedAt": "harness log",
+     "producedAt": "harness log"
+    },
+    "hand_times": []
+   }
+  }
+ }
+}

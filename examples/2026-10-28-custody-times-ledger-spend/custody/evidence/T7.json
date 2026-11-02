@@ -1,0 +1,226 @@
+{
+ "id": "T7",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "jr": {
+   "rc": 3,
+   "kinds": [
+    "hand-time"
+   ],
+   "hand": [
+    [
+     "bar.approvals[0].at",
+     "inputs/custody-events.jsonl",
+     2,
+     "ledger-no-writer"
+    ],
+    [
+     "bar.approvals[1].at",
+     "inputs/custody-events.jsonl",
+     3,
+     "ledger-no-writer"
+    ],
+    [
+     "bar.frozenAt",
+     "inputs/custody-events.jsonl",
+     1,
+     "ledger-no-writer"
+    ],
+    [
+     "disposition.at",
+     "inputs/custody-events.jsonl",
+     5,
+     "ledger-no-writer"
+    ],
+    [
+     "harness-eval-a.log#eval_artifact.received_at",
+     "harness-eval-a.log",
+     37,
+     "server-header"
+    ],
+    [
+     "harness-eval-a.log#eval_artifact.sent_at",
+     "harness-eval-a.log",
+     18,
+     "response-created"
+    ],
+    [
+     "harness-eval-a.log#eval_k1.received_at",
+     "harness-eval-a.log",
+     76,
+     "server-header"
+    ],
+    [
+     "harness-eval-a.log#eval_k1.sent_at",
+     "harness-eval-a.log",
+     57,
+     "response-created"
+    ],
+    [
+     "harness-eval-a.log#eval_k2.received_at",
+     "harness-eval-a.log",
+     115,
+     "server-header"
+    ],
+    [
+     "harness-eval-a.log#eval_k2.sent_at",
+     "harness-eval-a.log",
+     96,
+     "response-created"
+    ],
+    [
+     "harness-maker-fixture.log#0.received_at",
+     "harness-maker-fixture.log",
+     44,
+     "server-header"
+    ],
+    [
+     "harness-maker-fixture.log#0.sent_at",
+     "harness-maker-fixture.log",
+     24,
+     "response-created"
+    ],
+    [
+     "passes.pass-a.at",
+     "inputs/custody.json",
+     110,
+     "inputs-no-ledger"
+    ],
+    [
+     "producedAt",
+     "inputs/custody.json",
+     90,
+     "inputs-no-ledger"
+    ],
+    [
+     "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "inputs/custody-events.jsonl",
+     4,
+     "ledger-no-writer"
+    ],
+    [
+     "startedAt",
+     "inputs/custody.json",
+     89,
+     "inputs-no-ledger"
+    ]
+   ],
+   "changed": [],
+   "written": false
+  },
+  "jr-sw": {
+   "rc": 0,
+   "kinds": [],
+   "hand": [],
+   "changed": [],
+   "written": true,
+   "hand_times": [
+    {
+     "field": "bar.approvals[0].at",
+     "file": "inputs/custody-events.jsonl",
+     "line": 2,
+     "source": "ledger-no-writer"
+    },
+    {
+     "field": "bar.approvals[1].at",
+     "file": "inputs/custody-events.jsonl",
+     "line": 3,
+     "source": "ledger-no-writer"
+    },
+    {
+     "field": "bar.frozenAt",
+     "file": "inputs/custody-events.jsonl",
+     "line": 1,
+     "source": "ledger-no-writer"
+    },
+    {
+     "field": "harness-maker-fixture.log#0.sent_at",
+     "file": "harness-maker-fixture.log",
+     "line": 24,
+     "source": "response-created"
+    },
+    {
+     "field": "harness-maker-fixture.log#0.received_at",
+     "file": "harness-maker-fixture.log",
+     "line": 44,
+     "source": "server-header"
+    },
+    {
+     "field": "startedAt",
+     "file": "inputs/custody.json",
+     "line": 89,
+     "source": "inputs-no-ledger"
+    },
+    {
+     "field": "producedAt",
+     "file": "inputs/custody.json",
+     "line": 90,
+     "source": "inputs-no-ledger"
+    },
+    {
+     "field": "harness-eval-a.log#eval_artifact.sent_at",
+     "file": "harness-eval-a.log",
+     "line": 18,
+     "source": "response-created"
+    },
+    {
+     "field": "harness-eval-a.log#eval_artifact.received_at",
+     "file": "harness-eval-a.log",
+     "line": 37,
+     "source": "server-header"
+    },
+    {
+     "field": "harness-eval-a.log#eval_k1.sent_at",
+     "file": "harness-eval-a.log",
+     "line": 57,
+     "source": "response-created"
+    },
+    {
+     "field": "harness-eval-a.log#eval_k1.received_at",
+     "file": "harness-eval-a.log",
+     "line": 76,
+     "source": "server-header"
+    },
+    {
+     "field": "harness-eval-a.log#eval_k2.sent_at",
+     "file": "harness-eval-a.log",
+     "line": 96,
+     "source": "response-created"
+    },
+    {
+     "field": "harness-eval-a.log#eval_k2.received_at",
+     "file": "harness-eval-a.log",
+     "line": 115,
+     "source": "server-header"
+    },
+    {
+     "field": "[REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256]",
+     "file": "inputs/custody-events.jsonl",
+     "line": 4,
+     "source": "ledger-no-writer"
+    },
+    {
+     "field": "passes.pass-a.at",
+     "file": "inputs/custody.json",
+     "line": 110,
+     "source": "inputs-no-ledger"
+    },
+    {
+     "field": "disposition.at",
+     "file": "inputs/custody-events.jsonl",
+     "line": 5,
+     "source": "ledger-no-writer"
+    }
+   ]
+  },
+  "t4_changed": [],
+  "log_hand_count": 8,
+  "log_sources": [
+   "server-header",
+   "response-created"
+  ],
+  "porcelain_after_suite": ""
+ },
+ "redaction": "REDACTED: held-out S1 fixture text; full file held on the Owner's box, sha256 in HELD-ON-BOX.sha256 (2 values)"
+}

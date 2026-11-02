@@ -1,0 +1,85 @@
+{
+ "status": 200,
+ "headers": {
+  "Date": "Tue, 27 Oct 2026 18:23:32 GMT",
+  "Content-Type": "application/json"
+ },
+ "body": {
+  "id": "gen-1793125412-22uA9fCvBMGFF1JIzc6s",
+  "object": "chat.completion",
+  "created": 1793125412,
+  "model": "deepseek/deepseek-v4.1-flash-1017",
+  "provider": "DeepInfra",
+  "system_fingerprint": null,
+  "service_tier": "default",
+  "choices": [
+   {
+    "index": 0,
+    "logprobs": null,
+    "finish_reason": "stop",
+    "native_finish_reason": "stop",
+    "message": {
+     "role": "assistant",
+     "content": "Evaluator-Driven Iteration (E-DI) is a delegation discipline for iterating work under a fixed quality standard: you can delegate the doing, but never responsibility for the standard. Its loop has three roles\u2014the Maker produces and revises the work, the Evaluator judges it against the fixed standard, and the Orchestrator routes bounds and authors script evaluators\u2014and it exits only through one of three named conditions: accepted, needs_owner, or rejected.",
+     "refusal": null,
+     "reasoning": "We need answer concise professional one paragraph. Need include definition primary purpose delegation discipline can delegate doing never responsibility standard. Three loop roles Maker produces/revises, Evaluator judges against fixed standard, Orchestrator routes bounds authors script evaluators. Named exit conditions accepted needs_owner rejected. One paragraph concise professional. Ensure all included.",
+     "reasoning_details": [
+      {
+       "type": "reasoning.text",
+       "text": "We need answer concise professional one paragraph. Need include definition primary purpose delegation discipline can delegate doing never responsibility standard. Three loop roles Maker produces/revises, Evaluator judges against fixed standard, Orchestrator routes bounds authors script evaluators. Named exit conditions accepted needs_owner rejected. One paragraph concise professional. Ensure all included.",
+       "format": "unknown",
+       "index": 0
+      }
+     ]
+    }
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 117,
+   "completion_tokens": 163,
+   "total_tokens": 280,
+   "cost": 5.9388e-05,
+   "is_byok": false,
+   "prompt_tokens_details": {
+    "cached_tokens": 0,
+    "cache_write_tokens": 0,
+    "audio_tokens": 0,
+    "video_tokens": 0
+   },
+   "cost_details": {
+    "upstream_inference_cost": 5.9388e-05,
+    "upstream_inference_prompt_cost": 1.1466e-05,
+    "upstream_inference_completions_cost": 4.7922e-05
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 66,
+    "image_tokens": 0,
+    "audio_tokens": 0
+   }
+  },
+  "openrouter_metadata": {
+   "requested": "deepseek/deepseek-v4.1-flash-1017",
+   "strategy": "direct",
+   "region": "MIA",
+   "summary": "available=2, selected=DeepInfra",
+   "attempt": 1,
+   "is_byok": false,
+   "endpoints": {
+    "total": 36,
+    "available": [
+     {
+      "provider": "DeepInfra",
+      "model": "deepseek/deepseek-v4.1-flash-20261017",
+      "selected": true
+     },
+     {
+      "provider": "DeepInfra",
+      "model": "deepseek/deepseek-v4.1-flash-20261017",
+      "selected": false
+     }
+    ]
+   },
+   "generation_time": 3353
+  }
+ }
+}

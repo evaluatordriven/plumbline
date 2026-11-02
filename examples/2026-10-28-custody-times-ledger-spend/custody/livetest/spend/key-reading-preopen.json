@@ -1,0 +1,1 @@
+{"ledger": "/workspace/edi-work/2026-10-28-custody-times-ledger-spend/spend/spend-ledger.jsonl", "ledger_spent_usd": 0.027438, "bound_usd": 5.0, "reserve_usd": 0.1, "key_usage_baseline": 0.317534503, "key_usage_now": 0.344980449, "key_usage_delta_usd": 0.027446, "spent_usd": 0.027446, "headroom_usd": 4.872554}

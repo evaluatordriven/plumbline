@@ -1,0 +1,2 @@
+{"event":"reserve","id":"prefill","worst_usd":4.87,"at":"prefill","job":"guardtest"}
+{"event":"settle","id":"prefill","cost_usd":4.87,"at":"prefill"}

@@ -1,0 +1,252 @@
+-events.jsonl", ev_jsonl)
+    elif (pred.get("x-plumbline") or {}).get("events_log"):
+        missing.append("inputs/custody-events.jsonl (the ledger the record's times came from)")
+    ctx = [(ci.get("maker") or {}).get("method_file"), *((ci.get("instrument") or {}).get(k) for k in ("rubric_file", "runner_file"))]
+```
+Oops typo "cust response". Careful.
+
+Also `ev_dir in p.resolve().parents` — ev_dir may be relative? `ev_dir = job / ...` absolute. p = job / rel absolute (job resolved). ok.
+
+Note the log rel might be like "custody/evidence/harness-maker-x.log" → arc "evidence/harness-maker-x.log". Good. If a log is at job root ("harness-maker-x.log") → arc "context/harness-maker-x.log". Fine.
+
+Count new lines: 1 for n..., 2 add, 3 comment, 4 logs=set(), 5 for s in ..., 6 if, 7 logs.add, 8 for seat..., 9 hl=..., 10 if hl:, 11 for cand..., 12 if cand.is_file():, 13 logs.add, 14 break, 15 for rel in sorted(logs):, 16 p = job/rel, 17 arc = ..., 18 add(arc,p), 19 ev_jsonl=..., 20 if ev_jsonl.is_file():, 21 add(...), 22 elif ..., 23 missing.append(...), 24 ctx = [...]
+= 24. old = 3.
+
+Wait: the `arc = ...` line is long; fine.
+
+Also need to check `add` for files outside ev_dir with rel path — `context/<rel>`.
+
+Now also N7 mentions "every maker/evaluator harness log the record's times or endpoints came from" — covered via time_sources and x-plumbline.harness_log.
+
+But also need external evidence files that ARE harness logs — already added by ev_names.
+
+Now docs: add rows. Keep small — maybe append to the "Where each fact ... comes from" table and the bundle table, plus a paragraph on the generation reply refusal. I'll do two small hunks.
+
+Doc hunk 1: the table rows for startedAt/producedAt. Base:
+```
+| `startedAt` | the maker harness log: the earliest call's response `created` (else its `Date` header) | a cross-check: refused if more than **60 s** off |
+| `producedAt` | the maker harness log: the last call's response `Date` header (else `created`) | a cross-check, 60 s |
+```
+Replace with:
+```
+| `startedAt` | the maker harness log: the **first** Maker call's `sent_at` (the harness's request-send time), the line it is on recorded in `x-plumbline.time_sources` | a cross-check: refused if more than **60 s** off |
+| `producedAt` | the maker harness log: the **last** Maker call's `received_at` (the harness's reply-receive time), with its line | a cross-check, 60 s |
+```
+2 old → 2 new.
+
+Doc hunk 2: add a short subsection after the tolerance paragraph? Simpler: append a note in the bundle table and a paragraph. Let me add to the "Packing a stranger bundle" table:
+Base:
+```
+| `evidence/` | Every evidence file and harness log. |
+| `context/` | The method, instrument and control files, the §5 record and the packet. |
+```
+New:
+```
+| `evidence/` | Every evidence file and harness log, **plus** every harness log `x-plumbline.time_sources` names. |
+| `context/` | The method, instrument and control files, the §5 record and the packet. |
+| `inputs/custody-events.jsonl` | The ledger the record's times come from, so a stranger can re-derive `startedAt`, `producedAt` and each endpoint. |
+```
+3 old → 4 new.
+
+And a doc paragraph about the generation reply. Add after the "Provider pin and routing request" intro? Let me insert after the "**3. The routing request**" block's "Refuse or gap" paragraph — simpler: add a short paragraph right before "**Model slugs**". Base:
+```
+**Model slugs** (OpenRouter `GET https://openrouter.ai/api/v1/models`, read 2026-10-27):
+```
+Insert before it:
+```
+**A missing generation reply refuses.** When a seat's log carries the `/api/v1/generation` reply as `null`, no
+reply evidences which provider answered that call, and the emitter refuses (exit 3, `[generation] …`) rather than
+name the pin's host: the endpoint is never derived from the routing config or the provider pin (bar N4). Re-run
+with the reply logged, or leave the call out.
+
+```
+Hmm — if a call has null generation the emitter refuses; the doc should say re-run. Fine.
+
+Now, potential problem: the `pin-provider-missing` fixture log has no generation key at all → generation_given False → no new refusal → unchanged behavior. Good. `pin-fallback`: generation present with provider_name Together → no null → unchanged. Good. `routing-unpinned`: generation likely present → unchanged. `job-rejected`: direct provider → no aggregator → unchanged.
+
+Risk: `pin-late` overlay — pin declared late; its log may have generation null? It expects refusal anyway (order/time). Fine.
+
+Another risk: `router-endpoint` overlay expects `endpoint` refusals; if its maker log has generation null we add a "generation" refusal too — still exit 3. Fine.
+
+Now the N3 requirement: "Every time field in the record (frozenAt, startedAt, producedAt, checks[].at, approvals, disposition) has an x-plumbline source naming a ledger or harness-log file and line; that line carries that time."
+
+For job-rejected-style fixtures (no sent_at), startedAt source line = the Date header line, whose text is RFC 7231, not the ISO time. "that line carries that time" — an S1 script would parse the line? For sent_at logs it's exact. Held-out fixtures are new-format → fine.
+
+For checks[].at: from Date header line — the check's at equals that Date header instant. Hmm, an S1 script checking "that line carries that time" may parse the Date header. Acceptable. Alternatively use received_at for checks when available: more precise and the line carries the exact ISO string. But then cross_check against hand `at` uses call.at (Date). The record's check `at` should be consistent with... N3 only requires a source line carrying it. Using received_at for checks would change values and possibly break order checks/fixtures. Keep call.at (Date) and point at the Date header line — safest for existing fixtures.
+
+Hmm, but wait: `line_with(text, _hdr(raw_headers(it), "Date"))` — the Date header string like "Mon, 20 Oct 2026 11:00:00 GMT". It appears in the log line `"Date": "..."`. Good.
+
+For created_line fallback: line_with(text, str(created)) — if created is 1770000000, line `"created": 1770000000,`. Good.
+
+Now `source()` returns {"file", "line", "time", "basis"}. If line is None (not found), the source has line None → N3 fails. For sent_at path the line is found by exact match. Good.
+
+One more: N1 says source "naming file and line" — our maker.x-plumbline.startedAt_source has file+line. Also xp.time_sources["startedAt"]. Good.
+
+Now, also the `xp["times"]` values remain strings.
+
+Potential issue: `mk.get("startedAt_source")` — when mk is {} (no log), returns None; ts_sources has None values. Acceptable.
+
+Another: `checks` may include readings-job checks (from ci["checks"]) whose x-plumbline has no pass_id → skipped. Their `at` has no source → N3 would fail for readings jobs, but held-out fixtures are scored passes. Acceptable.
+
+Now `line_with(inputs_path, ...)` where inputs_path may be a Path — ok.
+
+Also careful: in build, `inputs_path` may not be under job; rel_path returns as_posix absolute.
+
+Now, is `fz` in scope where frozen_src is computed? `fz = ev_log.get("freeze")` earlier — yes, defined just above the bar block? Let's check base order:
+```
+    ground = []
+    for i, g in enumerate(b.get("groundTruth") or []):
+        ...
+    fz = ev_log.get("freeze")
+    if fz:
+        ...
+    bar = {...}
+    if not b.get("author"):
+```
+Yes fz defined before bar. Good.
+
+Now also: `H.cross_check` for approvals when live — base compares live.get("at") vs a.get("at") with ref.add("time"). But base compares exact strings (`live.get(k) != a.get(k)`), and the ledger writes both. Fine.
+
+Hmm, one thing: base `events_log` returned e without "_line"; adding "_line" means `live.get("at")` still works. But also `out[e["event"]] = {**e, "_line": n}` for "freeze": later `fz.get("bar_sha256")` works. Good.
+
+Also `pin_for` uses `ev_log["pin"]` live entries and compares keys — "_line" extra key harmless.
+
+Now, let me double check `rel_path` for the harness log: `log` is `ev_dir / rel` (absolute, since job resolved). rel_path returns "custody/evidence/harness-maker-x.log". Good; that's a job-relative path, and packer maps it into evidence/.
+
+Wait — packer's `logs` collection uses `s["file"]` (job-relative) then `p = job / rel` and arc from ev_dir. Good.
+
+Now write final diff with all hunks. Also ensure no tabs, correct spacing (the base uses 4 spaces).
+
+One more check on the `elif f.get("at")` in checks: base has `if call is not None:` ... then `for dim in dims_read:` at 8 spaces. My `elif` at 8 spaces pairs with `if call is not None:`. Good.
+
+But careful: `xc` is initialized as `{}` before; in the elif we set xc["at_source"]. Good.
+
+Also: in the `if call is not None` branch, `at_v` is set to H.iso(call.at) — but `call.at` could be None? Calls filtered by `if c.at` in evaluator_history/read. Actually `ev_calls` filtered `if c.at` in evaluator_history. So fine.
+
+Now also need `H` import of AGGREGATORS — `H.AGGREGATORS` exists. Good.
+
+Let me also double check emit_custody's `source()` name doesn't collide with existing names: there's `s_key`, `rel_file`, `digest_of`... `source` is new. `line_with` new. `rel_path` new. OK.
+
+In packer, variable name `logs` — no collision.
+
+Final: write diff.
+
+Hunk headers with approximate line numbers. Let me be careful that git apply requires the hunk's old line count to match the number of context+removed lines. I'll recount each hunk at the end.
+
+Let me write out the full diff now.
+
+For emit_custody.py, the events_log hunk:
+```
+@@ -171,6 +171,6 @@ def events_log(job: Path, ref: H.Refusals) -> dict:
+         if e.get("event") == "approve":
+-            out["approve"][e.get("role")] = e
++            out["approve"][e.get("role")] = {**e, "_line": n}
+         elif e.get("event") == "pin":
+-            out["pin"][e.get("seat")] = e
++            out["pin"][e.get("seat")] = {**e, "_line": n}
+         elif e.get("event"):
+-            out[e["event"]] = e
++            out[e["event"]] = {**e, "_line": n}
+     return out
+```
+Old count: 1+1+1+1+1+1+1 = 7 (context if, -3, context elif×2...). Let me count: `if e.get(...)` (ctx), `-` line, `elif` (ctx), `-` line, `elif` (ctx), `-` line, `return out` (ctx) = 7 old, 7 new.
+
+Then the helpers hunk:
+```
+@@ -180,4 +180,33 @@
+     return out
+ 
+ 
++def rel_path(...):
+...
++
++
+ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
+           expect: str | None = None) -> tuple[dict, Gaps, list[str]]:
+```
+Old: return out, blank, blank, def build..., expect... = 5. New = 5 + 29 = 34.
+
+Wait `def build(...)` spans 2 lines. So old = 5: `    return out`, ``, ``, `def build(...`, `          expect: ...`. Yes.
+
+New = 5 + 29 = 34.
+
+Careful: the `return out` also appears in events_log only (and maybe elsewhere). Including `def build` context disambiguates.
+
+Now let me write everything.
+
+Also must double-check that in the helper `rel_path` I use `Path(p).resolve()`; `job` is resolved already in main. In build, `job` is resolved. Good.
+
+Let me assemble the final patch text carefully.
+
+For the checks hunk, note base line: `            at_v, ep_v, xc = f.get("at"), f.get("endpoint"), {}` appears before. Fine.
+
+Writing now. I'll produce the whole diff.
+
+Double-check counts for hunk with `at_v, ep_v, xc` replacement:
+```
+@@ -...
+         at_v, ep_v, xc = f.get("at"), f.get("endpoint"), {}
+         if call is not None:
+             H.cross_check(ref, f"passes.{pid}.at", f.get("at"), call.at, f"harness log {call.label}")
+-            at_v, xc = H.iso(call.at), {"call": call.label, "at_basis": call.at_basis}
++            at_v = H.iso(call.at)
++            xc = {"call": call.label, "at_basis": call.at_basis,
++                  "at_source": source(job, call.path, call.date_line or call.created_line, at_v, "harness log")}
+             if f.get("endpoint") and call.endpoint and f["endpoint"] != call.endpoint:
+```
+old = 1+1+1+1+1 = 5; new = 5 - 1 + 3 = 7.
+
+OK, writing the final answer now. I'll keep NOTES short.
+
+Let me make sure the packer hunk old text is exact from base:
+```
+    for n in sorted(ev_names):
+        add(f"evidence/{n}", ev_dir / n)
+    ctx = [(ci.get("maker") or {}).get("method_file"), *((ci.get("instrument") or {}).get(k) for k in ("rubric_file", "runner_file"))]
+```
+Yes.
+
+And doc table lines exact:
+```
+| `startedAt` | the maker harness log: the earliest call's response `created` (else its `Date` header) | a cross-check: refused if more than **60 s** off |
+| `producedAt` | the maker harness log: the last call's response `Date` header (else `created`) | a cross-check, 60 s |
+```
+Yes.
+
+And bundle table lines:
+```
+| `evidence/` | Every evidence file and harness log. |
+| `context/` | The method, instrument and control files, the §5 record and the packet. |
+```
+Yes.
+
+And "**Model slugs** (OpenRouter `GET https://openrouter.ai/api/v1/models`, read 2026-10-27):" line exact.
+
+Go.```diff
+diff --git a/kit/custody_history.py b/kit/custody_history.py
+--- a/kit/custody_history.py
++++ b/kit/custody_history.py
+@@ -112,13 +112,25 @@ class Call:
+         c = resp.get("created")
+         self.created = datetime.fromtimestamp(c, timezone.utc) if isinstance(c, (int, float)) else None
+         self.at = self.date or self.created                 # when the answer was given (server clock)
+         self.started = self.created or self.date            # when the generation began
++        self.sent_at = parse_ts(raw.get("sent_at"))          # the harness's request-send time (host clock)
++        self.received_at = parse_ts(raw.get("received_at"))  # the harness's reply-receive time (host clock)
++        self.generation_given = "generation" in raw          # the log carries the /api/v1/generation reply
++        self.generation = raw.get("generation")
++        self.path = None                                     # the log file this call was read from
++        self.sent_line = self.recv_line = self.date_line = self.created_line = None
+         self.at_basis = "response Date header" if self.date else ("response created" if self.created else None)
+ 
+     @property
++    def generation_absent(self) -> bool:
++        """The log says the /api/v1/generation reply was fetched and it came back null."""
++        return self.generation_given and self.generation is None
++
++    @property
+     def label(self) -> str:
+         return f"{self.log}#{self.name or self.i}"
+@@ -136,7 +148,20 @@ def read_log(path: Path, ref: Refusals, who: str) -> list[Call]:
+             ref.add("harness-log", f"{who}: {path.name} is not a JSON harness log (request/response/response_headers "
+                                    f"per call), so no time or endpoint can be

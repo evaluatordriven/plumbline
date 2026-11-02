@@ -1,0 +1,53 @@
+{
+  "note": "SYNTHETIC FAILURE FIXTURE (routing-unpinned): served by the pinned provider, but the request allowed fallbacks and did not ask for ZDR",
+  "request": {
+    "url": "https://openrouter.ai/api/v1/chat/completions",
+    "model": "fixture/maker-1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "SYNTHETIC FIXTURE PROMPT"
+      }
+    ],
+    "temperature": 0,
+    "provider": {
+      "order": [
+        "deepinfra/fp8",
+        "together"
+      ]
+    }
+  },
+  "response": {
+    "id": "gen-synthetic-None",
+    "object": "chat.completion",
+    "created": 1792494000,
+    "model": "fixture/maker-1",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "SYNTHETIC artifact text"
+        },
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "prompt_tokens": 10,
+      "completion_tokens": 5,
+      "total_tokens": 15
+    },
+    "provider": "DeepInfra"
+  },
+  "response_headers": {
+    "Date": "Tue, 20 Oct 2026 11:00:07 GMT",
+    "Content-Type": "application/json"
+  },
+  "generation": {
+    "data": {
+      "id": "gen-synthetic-None",
+      "model": "fixture/maker-1",
+      "provider_name": "DeepInfra"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "entry": "A",
+  "instrument_profile": "mvi",
+  "job_name": "bad-mode-absent",
+  "artifact": "artifact/iter-2/SKILL.md",
+  "buyer": "Owner (agent must follow vendor docs without guessing)",
+  "maker": "deepseek/deepseek-v4.1-flash",
+  "evaluator": "z-ai/glm-5.3-flash",
+  "ratified": true,
+  "notes": "Negative fixture (0032 clause 1): otherwise-legal scored packet with no mode key. mode is required; absence must not silently default to scored."
+}

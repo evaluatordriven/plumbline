@@ -1,0 +1,96 @@
+{
+  "check": "J2",
+  "batch": "3",
+  "order": [
+    "G-J2p1",
+    "G-J2p3",
+    "subject",
+    "G-J2c",
+    "G-J2p2"
+  ],
+  "items": [
+    {
+      "call": "J2-b3-1",
+      "id": "G-J2p1",
+      "messages_sha256": "a602f06d78669ce0411972628e7574523e39e458a0392135a751d926581d186b",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "d16004008577b6e5982930628110d9ff0652f9af04a308b5385a00b9f25dc9d3",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b3-2",
+      "id": "G-J2p3",
+      "messages_sha256": "d4d1d305df39ac2b09c06a23d0be25c7a6206fd41d189f625853676baa392696",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "59056812d0a79657043ba5504b13ce6b001913d9efc93d13e3868961276aa12d",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b3-3",
+      "id": "subject",
+      "messages_sha256": "83f034f0016db07b99eb30344d30c37b5e3b53ef46c9db436231156993e8392e",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "86d055e8247c4fc1670e43db364a807bee9ce6b6b5f2f38cbef05528494c1b1f",
+      "verdict": "CONFORMS",
+      "lines": [
+        "docs/custody-emission.md:9",
+        "docs/custody-emission.md:45",
+        "docs/custody-emission.md:56",
+        "docs/custody-emission.md:62",
+        "docs/custody-emission.md:87",
+        "docs/custody-emission.md:96",
+        "docs/custody-emission.md:103",
+        "docs/custody-emission.md:109",
+        "docs/custody-emission.md:130",
+        "docs/custody-emission.md:137",
+        "docs/custody-emission.md:141",
+        "docs/custody-emission.md:149",
+        "docs/custody-emission.md:155",
+        "docs/custody-emission.md:192",
+        "docs/custody-emission.md:421",
+        "docs/custody-emission.md:486"
+      ]
+    },
+    {
+      "call": "J2-b3-4",
+      "id": "G-J2c",
+      "messages_sha256": "4939b05c5df6a1c70ac497187d9e1cde819b11d406491106751b0a1f0a1e2861",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "ef2aad31ba8394e22ef252d52ba8c7e553f8854aa00f8e64844c999b7bfe4bb2",
+      "verdict": "CONFORMS",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    },
+    {
+      "call": "J2-b3-5",
+      "id": "G-J2p2",
+      "messages_sha256": "dfe2c6fa6f2331c1ab8ac7b5cc0089d8041f496fdd05c5f71a7e9b76d7bfdfaa",
+      "or_call_exit": 0,
+      "or_call_stderr": "",
+      "finish_reason": "stop",
+      "reply_sha256": "f9b1de1419487bb43cb76e283a3a2608eb8282a00be09bf851005d0310d78748",
+      "verdict": "DOES_NOT_CONFORM",
+      "control_ok": true,
+      "lines_removed": "held-out control: line numbers would locate the planted edit"
+    }
+  ],
+  "log": "harness-E-GLM-J2-b3.log",
+  "dry_run": false,
+  "window": 2,
+  "controls_ok": true,
+  "calls_ok": true,
+  "subject_verdict": "CONFORMS",
+  "J2": "PASS"
+}

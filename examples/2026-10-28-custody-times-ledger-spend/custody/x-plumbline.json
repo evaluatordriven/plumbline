@@ -1,0 +1,252 @@
+{
+  "schema": "plumbline/x-plumbline sidecar (job-local; base emitter 3df1ce5 cannot carry x-plumbline)",
+  "job_id": "2026-10-28-custody-times-ledger-spend",
+  "emitter": {
+    "rev": "3df1ce52eddfe18705e380c4b6e99cf617cfa24b",
+    "tree": "230997f1ca9c89ccf035997c4a4db31a0c8ba5fa",
+    "why_base": "bar: base tooling only for this job's own record (bar.md lines 145-157)"
+  },
+  "hand_times": {
+    "ledger": "inputs/custody-events.jsonl",
+    "lines": [
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22
+    ],
+    "note": "every line from 9 on is hand-appended (writer \"hand\"); the last is the dispose line written by CLOSE-apply.sh. Disclosure item 23."
+  },
+  "ledger_sha256_after_import": "2d527ce3f42ff504c7bfba24b901bc9f9a5f2fb0393e111c2f52f562732514e8",
+  "spend": {
+    "settled_usd": 0.584368826,
+    "reserves": 75,
+    "settles": 74,
+    "open_reserves": [
+      {
+        "call": "maker_iter1_verifier_a1",
+        "id": "19701ada497e40abac36ff4b9130eb76",
+        "at": "2026-10-28T22:46:37.575725Z",
+        "worst_usd": 0.05331592
+      }
+    ],
+    "settle_sources": {
+      "generation.total_cost": [
+        "livetest_maker_smoke",
+        "J1-b1-1",
+        "J2-b1-1",
+        "J1-b1-2",
+        "J1-b1-3",
+        "J2-b1-2",
+        "J2-b1-3",
+        "J2-b1-4",
+        "J3-b1-1",
+        "J3-b1-2",
+        "J4-b1-2",
+        "maker_iter1_emitter_a1",
+        "maker_iter1_verifier_a2",
+        "maker_iter1_edi_a1",
+        "maker_iter1_edi_a2",
+        "J1-b1-1",
+        "J1-b1-2",
+        "J1-b1-3",
+        "J1-b1-4",
+        "J2-b1-1",
+        "J2-b1-2",
+        "J2-b1-3",
+        "J2-b1-4",
+        "J2-b1-5",
+        "J3-b1-1",
+        "J3-b1-2",
+        "J3-b1-3",
+        "J4-b1-1",
+        "J4-b1-2",
+        "J4-b1-3",
+        "maker_iter2_ledger_a1",
+        "maker_iter2_emitter_a1",
+        "maker_iter2_verifier_a1",
+        "maker_iter2_docs_a1",
+        "maker_iter2_guide_a1",
+        "maker_iter2_guide_a2",
+        "J1-b2-1",
+        "J1-b2-2",
+        "J1-b2-3",
+        "J1-b2-4",
+        "J2-b2-1",
+        "J2-b2-2",
+        "J2-b2-3",
+        "J2-b2-4",
+        "J2-b2-5",
+        "J3-b2-1",
+        "J3-b2-2",
+        "J3-b2-3",
+        "J4-b2-1",
+        "J4-b2-2",
+        "maker_iter3_fix_a3",
+        "maker_iter3_fix_a4",
+        "J1-b3-1",
+        "J1-b3-2",
+        "J1-b3-3",
+        "J1-b3-4",
+        "J2-b3-1",
+        "J2-b3-2",
+        "J2-b3-3",
+        "J2-b3-4",
+        "J2-b3-5",
+        "J3-b3-1",
+        "J3-b3-2",
+        "J3-b3-3",
+        "J4-b3-1",
+        "J4-b3-2",
+        "J4-b3-3"
+      ],
+      "response.usage.cost": [
+        "J4-b1-1",
+        "maker_iter1_ledger_a1",
+        "maker_iter1_docs_a1",
+        "maker_iter1_guide_a1",
+        "J4-b2-3",
+        "maker_iter3_fix_a1",
+        "maker_iter3_fix_a2"
+      ]
+    },
+    "last_settle_at": "2026-10-29T16:23:54.926127Z",
+    "key_usage_baseline": {
+      "file": "custody/evidence/key-usage-baseline.json",
+      "usage": 0.317534503
+    },
+    "key_usage_close": 0.920623777,
+    "key_delta_usd": 0.603089,
+    "total_usd": 0.637685,
+    "reconciled": true,
+    "reconciliation": {
+      "read": "custody/evidence/spend-status-close.json",
+      "read_sha256": "b7b783371c7e921ffc3f052c4ea5e62cc8469589d3435551942091003945197d",
+      "read_at": "2026-10-29T17:17:39Z",
+      "key_usage_close": 0.920623777,
+      "key_usage_baseline": 0.317534503,
+      "key_delta_usd": 0.603089,
+      "settled_usd": 0.584368826,
+      "key_minus_settled_usd": 0.01872,
+      "key_minus_settled_note": "the iteration-1 verifier a1 call (reserve 19701ada, ruled LOST, no settle) is the only unsettled call; the same gap was 0.018699 at iter1 and 0.018706 at iter2. Its reserve stays open at worst case on the Owner's decision (2026-10-29 13:15 EDT).",
+      "total_usd": 0.637685,
+      "total_rule": "max(ledger settles + open reserves at worst case, key-usage delta) = the frozen harness's spent_usd",
+      "bound_usd": 5.0,
+      "headroom_usd": 4.262315,
+      "key_usage_daily_utc": {
+        "utc_day": "2026-10-29",
+        "key_usage_daily": 0.447278793,
+        "ledger_settled_that_utc_day": 0.458975439,
+        "settled_across_midnight": [
+          {
+            "call": "maker_iter1_docs_a1",
+            "reserved_at": "2026-10-28T23:52:20.827671Z",
+            "settled_at": "2026-10-29T00:02:53.777597Z",
+            "cost_usd": 0.01171898896
+          }
+        ],
+        "ledger_by_request_utc_day": 0.44725645,
+        "residual_usd": 2.2343e-05
+      },
+      "key_usage_weekly": 0.920623777,
+      "key_usage_monthly": 0.920623777,
+      "owner_dashboard": {
+        "today_usd": 0.0472,
+        "relayed_at": "2026-10-29 13:16 EDT",
+        "reconciled": false,
+        "see": "custody/DISCLOSURES.md item 24"
+      }
+    },
+    "p6": "MET at the close read: spend from the replies (settles) reconciled with a key-usage read >= 3 min after the last call (custody/evidence/spend-status-close.json, frozen harness, no model call; Owner decision 2026-10-29 13:15 EDT \"Do the final spend read.\"). The Owner's dashboard figure is not reconciled: disclosure 24."
+  },
+  "relays": [
+    {
+      "at": "2026-10-29T12:25:00Z",
+      "from": "E-DI Evaluator",
+      "chat": "Evaluator chat, card t11s2",
+      "source": "VERIFY-iter2-batch2-orchestrator.md lines 8-9 (held on the box): user-role message at 08:25 EDT; minute only"
+    },
+    {
+      "at": "2026-10-29T13:55:00Z",
+      "from": "E-DI Maker",
+      "chat": "Maker chat, card t21s1",
+      "source": "handoffs/iter3/EVALUATOR.md line 16: 09:55 EDT; minute only"
+    },
+    {
+      "at": "2026-10-29T15:08:00Z",
+      "from": "E-DI Maker",
+      "chat": "Maker chat, card t23s1",
+      "source": "handoffs/iter3/EVALUATOR.md line 19: 11:08 EDT; minute only"
+    }
+  ],
+  "evaluations": [
+    {
+      "batch": 1,
+      "s1": "17/39",
+      "glm_log_sha256": "63e756da6a52c5c7985862e61a2d164c1a7ac577dda5190b61e9e686a10055c6",
+      "glm_redacted_calls": [
+        "J1-b1-1",
+        "J1-b1-3",
+        "J1-b1-4",
+        "J2-b1-1",
+        "J2-b1-3",
+        "J2-b1-4",
+        "J2-b1-5",
+        "J3-b1-1",
+        "J3-b1-2",
+        "J4-b1-1",
+        "J4-b1-2"
+      ]
+    },
+    {
+      "batch": 2,
+      "s1": "27/39",
+      "glm_log_sha256": "ef2fd7f2972277520e1a64abb361fbb57c83a1b55daace899c43524bdae1677e",
+      "glm_redacted_calls": [
+        "J1-b2-1",
+        "J1-b2-2",
+        "J1-b2-3",
+        "J2-b2-1",
+        "J2-b2-3",
+        "J2-b2-4",
+        "J2-b2-5",
+        "J3-b2-1",
+        "J3-b2-2",
+        "J4-b2-2",
+        "J4-b2-3"
+      ]
+    },
+    {
+      "batch": 3,
+      "s1": "38/39",
+      "glm_log_sha256": "e8c0107e958003e5500888b8132a7490b2c55ec5e66c907050e1c25c677a8698",
+      "glm_redacted_calls": [
+        "J1-b3-2",
+        "J1-b3-3",
+        "J1-b3-4",
+        "J2-b3-1",
+        "J2-b3-2",
+        "J2-b3-4",
+        "J2-b3-5",
+        "J3-b3-1",
+        "J3-b3-2",
+        "J4-b3-2",
+        "J4-b3-3"
+      ]
+    }
+  ],
+  "disclosures": {
+    "file": "custody/DISCLOSURES.md",
+    "items": 24
+  },
+  "post_merge_verifier": "after the subject is merged, kit/plumbline_verify.py is run once on this record, post hoc and non-gating (bar.md lines 145-157); expected exit 4 (no x-plumbline block in a base-emitted record); filed as an amendment after the real close"
+}

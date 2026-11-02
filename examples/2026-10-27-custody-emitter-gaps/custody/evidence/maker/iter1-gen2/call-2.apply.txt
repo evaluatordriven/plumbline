@@ -1,0 +1,2 @@
+error: patch failed: kit/emit_custody.py:490
+error: kit/emit_custody.py: patch does not apply

@@ -1,0 +1,1 @@
+{"event": "freeze", "at": "2026-01-01T00:00:00Z", "bar_file": "custody/bar.md", "bar_sha256": "0000000000000000000000000000000000000000000000000000000000000000", "writer": "kit/custody_ledger.py@0123456789ab"}

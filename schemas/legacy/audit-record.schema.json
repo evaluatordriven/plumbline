@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "plumbline/schemas/audit-record.schema.json",
+  "title": "Plumbline conformance audit record",
+  "description": "A §5 evaluator record whose subject is an INSTANCE rather than an artifact. Carries every §5 field, plus audit-specific fields. This is an instance extension under Contracts §8: labelled, recorded, and weakening nothing in §3, §4, or §7. It exists because the audit is itself an evaluator run — if Plumbline's own output were prose, Plumbline would fail the doctrine it enforces.",
+  "type": "object",
+  "required": [
+    "job_id", "iteration", "dimensions", "pass_rule", "violations", "verdict",
+    "ground_truth_ref", "evaluator_identity", "channel_blind", "ratified",
+    "artifact_ref", "method_note", "verdict_derivation"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "job_id": { "type": "string", "minLength": 1 },
+    "iteration": { "type": "integer", "minimum": 0 },
+    "supersedes": {
+      "type": "string",
+      "description": "The job_id of the record this one supersedes, if any. Corrections and re-audits are NEW records — the superseded record is retained unedited, because a record that can be silently rewritten cannot show whether a finding was fixed, worsened, or reappeared."
+    },
+    "revision_reason": {
+      "type": "string",
+      "description": "Required in practice when supersedes is set: what changed and why. Where a revision corrects the AUDIT rather than the instance, say so explicitly — an auditor that quietly patches its own errors is indistinguishable from one that never made them."
+    },
+    "artifact_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "What was audited, pinned to an exact revision. MUST carry a value fresh on every run (commit SHA + date) — §7.3 applied to the audit itself, so a re-run is distinguishable from a stale entry."
+    },
+    "dimensions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "score", "scale", "anchor_note", "evidence_channel", "ground_truth_access"],
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "description": "The clause id and text, e.g. 'C4 pass rule (average + per-dimension floor)'." },
+          "score": { "type": "number", "description": "10 = clause holds; 5 = clause fails. A fail sits above the reject floor deliberately: a divergence is remediable and opens a new job, it is not a discarded artifact." },
+          "scale": { "type": "string" },
+          "anchor_note": { "type": "string", "description": "Why this score, with the specific evidence. Must name which part holds where a clause is partially satisfied." },
+          "evidence_channel": { "type": "string" },
+          "ground_truth_access": { "enum": ["none", "blind_to_gt", "saw_gt"] },
+          "evidence_ref": { "type": "string", "description": "Path or identifier where the cited evidence lives, so a reader can re-examine it without re-running the audit." }
+        }
+      }
+    },
+    "unevidenced_dimensions": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Clauses not inspected. §5: these force needs_human, never rejected — 'could not be judged' is a different fact from 'judged and found wanting'. Do not synthesise a below-floor score for them."
+    },
+    "pass_rule": {
+      "type": "object",
+      "required": ["accept", "dimension_floor", "reject", "cap"],
+      "additionalProperties": false,
+      "properties": {
+        "accept": { "type": "number" },
+        "dimension_floor": { "type": "number" },
+        "reject": { "type": "number" },
+        "cap": { "type": "integer", "description": "Audits are single-pass: remediation is a NEW audit (a new job), never a re-run of this one, so the record of what was found is never overwritten." }
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "class", "severity", "evidence", "fix"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string" },
+          "class": { "type": "string" },
+          "severity": { "enum": ["P0", "P1", "P2"] },
+          "evidence": { "type": "string", "description": "The quoted code, line reference, or observed behaviour. A finding without a specific citation is not a finding." },
+          "fix": { "type": "string" }
+        }
+      }
+    },
+    "verdict": { "enum": ["accept", "regenerate", "needs_human", "reject"], "description": "Exactly the four §5 values. No synonyms." },
+    "ground_truth_ref": { "type": "string", "description": "For conformance audits this is the Contracts §9 checklist and its version." },
+    "evaluator_identity": { "type": "string", "description": "model + version, and whether the audit was static or executed." },
+    "channel_blind": { "type": "boolean" },
+    "channel_blind_note": { "type": "string", "description": "Where channel_blind is false, say why. A static audit did not observe the instance's runtime evidence channels, so it may not claim §7.2 on the instance's behalf." },
+    "ratified": { "type": "boolean" },
+    "method_note": { "type": "string", "description": "How the audit was performed and its limits — static vs executed, revision, what was not inspected." },
+    "verdict_derivation": { "type": "string", "description": "The arithmetic that produced the verdict, from the §3 algebra. Makes the verdict checkable rather than asserted." },
+    "next_order": { "type": "array", "items": { "type": "string" }, "description": "Remediation order, cheapest-decisive first." }
+  }
+}

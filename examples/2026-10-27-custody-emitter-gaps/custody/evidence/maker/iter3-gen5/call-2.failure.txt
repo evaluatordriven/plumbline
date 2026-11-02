@@ -1,0 +1,61 @@
+step: tests/validate_schemas.py
+--- corpus fixture battery (43 files), derived vs corpus schema ---
+fixture                                               plumbline   corpus
+bad-census-on-scored.json                                 False    False
+bad-entry-b-no-reads.json                                 False    False
+bad-evaluator-record-below-floor-unnamed.json             False    False
+bad-evaluator-record-empty-observation.json               False    False
+bad-evaluator-record-extra-key.json                       False    False
+bad-evaluator-record-instrument-string.json               False    False
+bad-evaluator-record-pass-disagreement.json               False    False
+bad-evaluator-record-regenerate-without-violation.json      False    False
+bad-evaluator-record-unattributable-pass.json             False    False
+bad-evaluator-record-unfiled-pass.json                    False    False
+bad-evaluator-record-unlabelled-extension.json            False    False
+bad-mode-absent.json                                      False    False
+bad-owner-evaluator-object.json                           False    False
+bad-readings-empty-bounds.json                            False    False
+bad-readings-rejected.json                                False    False
+bad-unratified-accept.json                                False    False
+bad-unratified-filled.json                                False    False
+evaluator-record-example.json                             False    False
+evaluator-record-saw-gt.json                              False    False
+example-job-packet.json                                   False     True
+mvi-job-packet.json                                       False     True
+pass-bad-evaluator-record-below-floor-unnamed-A.json      False    False
+pass-bad-evaluator-record-below-floor-unnamed-B.json      False    False
+pass-bad-evaluator-record-empty-observation-A.json        False    False
+pass-bad-evaluator-record-empty-observation-B.json        False    False
+pass-bad-evaluator-record-extra-key-A.json                False    False
+pass-bad-evaluator-record-extra-key-B.json                False    False
+pass-bad-evaluator-record-instrument-string-A.json        False    False
+pass-bad-evaluator-record-instrument-string-B.json        False    False
+pass-bad-evaluator-record-pass-disagreement-A.json        False    False
+pass-bad-evaluator-record-pass-disagreement-B.json        False    False
+pass-bad-evaluator-record-regenerate-without-violation-A.json      False    False
+pass-bad-evaluator-record-regenerate-without-violation-B.json      False    False
+pass-bad-evaluator-record-unattributable-pass-A.json      False    False
+pass-bad-evaluator-record-unattributable-pass-B.json      False    False
+pass-bad-evaluator-record-unfiled-pass-A.json             False    False
+pass-bad-evaluator-record-unlabelled-extension-A.json      False    False
+pass-bad-evaluator-record-unlabelled-extension-B.json      False    False
+pass-evaluator-record-example-A.json                      False    False
+pass-evaluator-record-example-B.json                      False    False
+pass-evaluator-record-saw-gt-A.json                       False    False
+pass-evaluator-record-saw-gt-B.json                       False    False
+readings-census.json                                       True     True
+  (plumbline accepting FEWER than the corpus is the intended direction: the instance layer constrains itself more, and the corpus's validator remains the floor.)
+Traceback (most recent call last):
+  File "/workspace/edi-work/2026-10-27-custody-emitter-gaps/maker-iter3-gen5/tests/validate_schemas.py", line 535, in <module>
+    r6 = json.loads((TMP / "noinputs.json").read_text())["predicate"]
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 548, in read_text
+    return PathBase.read_text(self, encoding, errors, newline)
+           ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 632, in read_text
+    with self.open(mode='r', encoding=encoding, errors=errors, newline=newline) as f:
+         ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/workspace/edi-work/2026-10-27-custody-emitter-gaps/tmp-maker-gen5/plumbline-custody-vd61bfxz/noinputs.json'

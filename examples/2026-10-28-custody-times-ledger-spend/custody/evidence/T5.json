@@ -1,0 +1,268 @@
+{
+ "id": "T5",
+ "verdict": "PASS",
+ "reasons": [],
+ "obs": {
+  "tolerance": 60,
+  "anchor_lines": [
+   1160
+  ],
+  "cases": [
+   {
+    "case": "overlay:after-emit",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "after-emit",
+      "order",
+      "time"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "after-emit",
+      "hand-time",
+      "order",
+      "time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "after-emit",
+      "order",
+      "time"
+     ]
+    }
+   },
+   {
+    "case": "overlay:agent-approval",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "approval"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "approval",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "approval"
+     ]
+    }
+   },
+   {
+    "case": "overlay:hand-times",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "order",
+      "time"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "hand-time",
+      "order",
+      "time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "order",
+      "time"
+     ]
+    }
+   },
+   {
+    "case": "overlay:pin-fallback",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "overlay:pin-late",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "order",
+      "time"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "hand-time",
+      "order",
+      "time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "order",
+      "time"
+     ]
+    }
+   },
+   {
+    "case": "overlay:pin-provider-missing",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "overlay:router-endpoint",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "prior:C-N4c",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "prior:C-N4c-b",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "prior:C-N4p",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   },
+   {
+    "case": "prior:F-genreply-null",
+    "base": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    },
+    "nosw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint",
+      "hand-time"
+     ]
+    },
+    "sw": {
+     "rc": 3,
+     "kinds": [
+      "endpoint"
+     ]
+    }
+   }
+  ],
+  "min_cases": 11
+ }
+}

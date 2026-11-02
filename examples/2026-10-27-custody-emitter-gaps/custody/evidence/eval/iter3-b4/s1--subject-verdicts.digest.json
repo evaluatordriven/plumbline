@@ -1,0 +1,110 @@
+{
+ "_note": "Per-check S1 verdicts on subject c7db5b04 over held-out fixtures and the repository fixture job-rejected. Record time values quoted from held-out fixtures (F-* runs) redacted; reasons on extra-1-job-rejected (public repo fixture tests/fixtures/custody/job-rejected) verbatim; each full file by sha256 (also in BATCH-MANIFEST.sha256).",
+ "verdicts": [
+  {
+   "file": "s1/subject/N1-F-genreply-full.json",
+   "sha256": "842b5bddc4c5928f2e2ff57394e26fe6845db2fd5144240810dbfad9deae1589",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-F-maker-10min.json",
+   "sha256": "c0d68fa290ac12a4e29abf83b5b8c1d2db85570c449d1491a177e373b8e49152",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-F-single-call.json",
+   "sha256": "def709bb7bffb04f449df6cd9a93fa9ceffc7614160315c47fa11fd11f5a7e31",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N1-extra-1-job-rejected.json",
+   "sha256": "ec2faa3b57a9568214c6719147ba8f25bb2b172c6ddfcbdb989524cde23eab28",
+   "check": "N1",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N2.json",
+   "sha256": "6c5e18569bc2ad8c6d64f993d95f34af17798bfe917f45fd01af2fd9ccd7bbb5",
+   "check": "N2",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N3-F-genreply-full.json",
+   "sha256": "8c989c730f85d9521c8516ae9c8974eb8f980920df1b9205a59524407a4b94d6",
+   "check": "N3",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N3-F-maker-10min.json",
+   "sha256": "dc6881bb13ddb9d9abf8bde5a24fac67ba8fb221f7bbc939331644058dab36d2",
+   "check": "N3",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N3-F-single-call.json",
+   "sha256": "0d84b18faebe71e4fe37295e5e7961396cf4128f6d3da08c064ba95811066b5d",
+   "check": "N3",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N3-extra-1-job-rejected.json",
+   "sha256": "6835c70d10f8207cd49b2fc32668a8b591156dbc4c6587ab49460378e58fcc50",
+   "check": "N3",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N4.json",
+   "sha256": "a5fecae3211f0167ac9baa02435c755a3ebab84ecb1e76db2628225920e1d7e7",
+   "check": "N4",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N5.json",
+   "sha256": "236b20bb9a320c6f0d5c2a4939f974c76c9059c1a4b877b05953a061f9d7e302",
+   "check": "N5",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N7-F-genreply-full.json",
+   "sha256": "b1e877e75532aa10ad28cb8cf5db0c26da1fddc24fe159a5714fc765d5577eff",
+   "check": "N7",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N7-F-maker-10min.json",
+   "sha256": "ed33ef9297dff854fa26d6eabdf325d26298a64c1b5b410bfd2463faa8321656",
+   "check": "N7",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N8-F-genreply-full.json",
+   "sha256": "ad3cb03be9d5dbfaa4fd820e779af87af2c7e6bce7581dc98ddd75032d49d07c",
+   "check": "N8",
+   "verdict": "PASS",
+   "why": []
+  },
+  {
+   "file": "s1/subject/N8-F-maker-10min.json",
+   "sha256": "fdd3baf6eb28496adca3e0edb9d6e23130ac8ae3d330f3ceb5d1134e601ec2fe",
+   "check": "N8",
+   "verdict": "PASS",
+   "why": []
+  }
+ ]
+}

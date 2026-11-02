@@ -1,0 +1,15 @@
+name: plumbline-gate
+version: 0.1.0
+description: >-
+  The discoverability gate. Two doors: plumbline_escalate refuses an escalation that records no
+  attempt, names no method, restates its own question as the reason, offers fewer than two options,
+  recommends something that is not one of its options, or names no seat — and a pre_tool_call hook
+  blocks `clarify` unless an escalation was accepted this turn. Rules live in
+  discoverability-rules.json as data, so the definition is portable to a host that is not Hermes;
+  only the thin adapter is host-specific. It CANNOT see the turn's reply — there is no pre-send hook
+  in the host and the send is deliberately not a tool call — so it governs the paths the agent routes
+  through and measures coverage rather than claiming to catch everything.
+author: Steve Moitozo II <smoitozo@users.noreply.github.com>
+kind: backend
+provides_tools:
+  - plumbline_escalate
