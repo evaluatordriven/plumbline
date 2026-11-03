@@ -10,6 +10,7 @@ import os
 
 NOT_RECORDED = "not recorded"
 MISSING = "missing"
+UNREADABLE = "unreadable"
 TIMEOUT = "timeout"
 
 # The closed set of reasons a turn can carry.
@@ -54,7 +55,11 @@ def record_arm(exit_code, output: bytes | None) -> dict:
 
 
 def freeze(paths: list[str]) -> dict:
-    """Map every path to the hex sha256 of its bytes, or MISSING if the path is gone."""
+    """Map every path to the hex sha256 of its bytes, or a sentinel if it cannot be read.
+
+    A path that is gone is ``MISSING``. A path that is a directory, or that the
+    process may not read, is ``UNREADABLE``. Neither raises: the record survives.
+    """
     frozen = {}
     for path in paths:
         try:
@@ -62,6 +67,8 @@ def freeze(paths: list[str]) -> dict:
                 frozen[path] = hashlib.sha256(handle.read()).hexdigest()
         except FileNotFoundError:
             frozen[path] = MISSING
+        except OSError:
+            frozen[path] = UNREADABLE
     return frozen
 
 
@@ -117,6 +124,8 @@ def snapshot(root: str) -> dict:
                     files[path] = hashlib.sha256(handle.read()).hexdigest()
             except FileNotFoundError:
                 continue
+            except OSError:
+                files[path] = UNREADABLE
     return files
 
 
@@ -129,21 +138,35 @@ def changed_paths(before: dict, after: dict) -> list[str]:
     )
 
 
+def normalize_ignore(rules) -> list[str]:
+    """Each rule as components, with ``.`` dropped and no leading or trailing slash."""
+    normalised = []
+    for rule in rules:
+        parts = [
+            part
+            for part in rule.replace("\\", "/").split("/")
+            if part not in ("", ".")
+        ]
+        if parts:
+            normalised.append("/".join(parts))
+    return normalised
+
+
 def matches_ignore(rel: str, rules) -> bool:
     """True when ``rel`` (relative to the turn root) matches one ignore rule.
 
     A rule with no slash matches that name as any path component, at any depth.
     A rule with a slash is a path relative to the turn root, matched by component
-    from the start of ``rel``.
+    from the start of ``rel``. Rules are normalised first, so ``./build`` and
+    ``build/`` both mean ``build``.
     """
     parts = rel.replace("\\", "/").split("/")
-    for rule in rules:
-        rule = rule.replace("\\", "/")
+    for rule in normalize_ignore(rules):
         if "/" not in rule:
             if rule in parts:
                 return True
         else:
-            rule_parts = [part for part in rule.split("/") if part]
+            rule_parts = rule.split("/")
             if parts[: len(rule_parts)] == rule_parts:
                 return True
     return False

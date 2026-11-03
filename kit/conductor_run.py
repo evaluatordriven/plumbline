@@ -50,7 +50,12 @@ def run(
     ``ignore`` names paths the snapshot still records but does not judge. A rule
     with no slash matches that name as any path component. Ignoring ``__pycache__``
     re-opens the bytecode plant: the planted ``.pyc`` is listed in ``ignored.paths``
-    and is not a reason to refuse.
+    and is not a reason to refuse. In a git checkout you will usually want
+    ``ignore=[".git"]``: an honest Maker that runs ``git status`` or ``git add``
+    rewrites ``.git/index`` and is otherwise flagged.
+
+    This detects; it is not a sandbox. Only files under ``cwd`` are watched: writes
+    outside it, including through symlinks inside it, are not seen.
 
     ``test_cmd`` is run first and its exit and combined output are kept verbatim: an
     empty output stays empty, and no hash is invented for it. The frozen paths and the
@@ -68,14 +73,30 @@ def run(
     the turn was dispatched or not.
     """
     root = os.path.realpath(cwd) if cwd is not None else os.path.realpath(os.getcwd())
-    rules = list(ignore or [])
-    missing = [
-        path for path in freeze_paths
-        if not os.path.exists(conductor_software.resolve(path, root))
-    ]
-    if missing:
-        raise ValueError("frozen path missing at start: " + ", ".join(missing))
+    rules = conductor_software.normalize_ignore(list(ignore or []))
+
+    # A frozen path that is absent, a directory, or unreadable is a caller error,
+    # not a turn: refuse before the RED run so nothing is dispatched.
+    bad = []
+    for path in freeze_paths:
+        resolved = conductor_software.resolve(path, root)
+        if not os.path.exists(resolved):
+            bad.append(path + " (missing)")
+        elif not os.path.isfile(resolved):
+            bad.append(path + " (not a file)")
+        elif not os.access(resolved, os.R_OK):
+            bad.append(path + " (unreadable)")
+    if bad:
+        raise ValueError("frozen path unusable at start: " + ", ".join(bad))
+
     frozen_paths = [conductor_software.resolve(path, root) for path in freeze_paths]
+
+    # An ignore rule that covers a frozen path would let that path move unjudged.
+    for path in frozen_paths:
+        rel = os.path.relpath(path, root)
+        if conductor_software.matches_ignore(rel, rules):
+            raise ValueError("ignore rule covers a frozen path: " + rel)
+
     editable_paths = [conductor_software.resolve(path, root) for path in editable]
 
     red_exit, red_output = _run(test_cmd, root, timeout_s)
