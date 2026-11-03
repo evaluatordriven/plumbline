@@ -7,7 +7,15 @@ cited by its commit.
 ## Unreleased
 
 **Added**
+- `kit/conductor_loop.py`: a multi-round loop driver. It calls `run()`; it does not reimplement the gate. It dispatches the Maker and the Evaluator, applies the pass rule, and writes the record. It does not score, diagnose, or decide, and it sends nothing. The conductor is still unbuilt.
+- A file outside the editable set that is unreadable both before and after a turn is recorded as `unreadable` both times. A Maker that makes it readable, edits it, and makes it unreadable again changes it unseen. This detects; it is not a sandbox.
+- `ignored.rules` records each ignore rule normalised (`./.git/` is recorded as `.git`), not the caller's text. Backslashes are stored as `/`.
 - `kit/conductor_software.py` and `kit/conductor_run.py`: a single-turn release-gate building block. It detects a green base, a frozen path in the editable set, an edit or a new file outside that set, a Maker that changed nothing, a non-zero Maker exit, a moved freeze, and a timeout. Nothing is skipped by default: `.git` and `__pycache__` are recorded. The caller may pass an ignore list; ignored paths are listed on the record. Ignoring `__pycache__` re-opens a bytecode plant. An ignore rule that covers a frozen path is refused up front. In a git checkout you will usually want `ignore=[".git"]`: an honest Maker that runs `git status` or `git add` rewrites `.git/index` and is otherwise flagged. A frozen path that is absent, a directory, or unreadable at the start is refused before anything runs. A path that becomes unreadable or becomes a directory during the turn is recorded as `unreadable`, not raised. This detects; it is not a sandbox: only files under cwd are watched, so writes outside it, including through symlinks inside it, are not seen. The default bound is 600 seconds. A command that starts its own session leaves the process group and is not killed; this is not a sandbox. It does not stop edits. It is not the conductor: routing, cap, budget, the state machine, and persistence are not here. The conductor is still unbuilt.
+
+**Fixed**
+- `kit/conductor_loop.py`: the Evaluator's cost is summed, not dropped. Every Evaluator run's cost record is added to the round cost and to the job's spend, so `budget.amount` is enforced across the Evaluator as well as the Maker. With `budget.amount > 0` an Evaluator that writes no cost record stops the job as `budget unmeasured`; it never runs unmetered.
+- `kit/conductor_loop.py`: the clock binds **per command**. Each Maker turn and each Evaluator run is given the smaller of `timeout_s` and the time left before the deadline, so a single long command cannot run past the bound the packet declared.
+- `kit/conductor_loop.py`: the separation-gap sentence cites **Contracts §4.2** for the Architect's unrecorded proposed packet, so the record points at the clause that governs it.
 
 ## 0.1.0 (2026-11-02)
 
