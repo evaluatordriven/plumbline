@@ -4,6 +4,11 @@ Versions follow Semantic Versioning 2.0.0. Before 1.0.0 any release may change w
 what the verifier accepts; every such change is listed under **Breaking**. Each release is a git tag and is
 cited by its commit.
 
+## Unreleased
+
+**Added**
+- `kit/conductor_software.py` and `kit/conductor_run.py`: a single-turn release-gate building block. It detects a green base, a frozen path in the editable set, an edit or a new file outside that set, a Maker that changed nothing, a non-zero Maker exit, a moved freeze, and a timeout. Nothing is skipped by default: `.git` and `__pycache__` are recorded. The caller may pass an ignore list; ignored paths are listed on the record. Ignoring `__pycache__` re-opens a bytecode plant. The default bound is 600 seconds. A command that starts its own session leaves the process group and is not killed; this is not a sandbox. It does not stop edits. It is not the conductor: routing, cap, budget, the state machine, and persistence are not here. The conductor is still unbuilt.
+
 ## 0.1.0 (2026-11-02)
 
 First public-facing cut: a custody/v1 emitter plus an E-DI kit.
