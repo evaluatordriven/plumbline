@@ -93,11 +93,16 @@ def refuse_editable(editable: list[str], frozen: list[str]) -> bool:
     )
 
 
-def dispatch_reason(red_exit, editable: list[str], frozen: list[str]) -> str | None:
-    """None when the turn may be dispatched, otherwise the reason it may not be."""
+def dispatch_reason(red_exit, editable: list[str], frozen: list[str], require_red: bool = True) -> str | None:
+    """None when the turn may be dispatched, otherwise the reason it may not be.
+
+    ``require_red`` False does not refuse a suite that already passed. A timeout
+    and a frozen path in the editable set are still refused. The default keeps
+    the published behaviour.
+    """
     if red_exit == TIMEOUT:
         return TIMEOUT
-    if refuse_dispatch(red_exit):
+    if require_red and refuse_dispatch(red_exit):
         return NO_RED
     if refuse_editable(list(editable), list(frozen)):
         return FROZEN_IS_EDITABLE
@@ -139,7 +144,11 @@ def changed_paths(before: dict, after: dict) -> list[str]:
 
 
 def normalize_ignore(rules) -> list[str]:
-    """Each rule as components, with ``.`` dropped and no leading or trailing slash."""
+    """Each rule as components, with ``.`` dropped and no leading or trailing slash.
+
+    ``run()`` stores this normalised form in ``ignored.rules``, not the caller's
+    text. ``./.git/`` is recorded as ``.git``. Backslashes are stored as ``/``.
+    """
     normalised = []
     for rule in rules:
         parts = [
@@ -201,6 +210,7 @@ def gate(
     rerun_exit=None,
     maker_exit=None,
     changes: list[str] | None = None,
+    require_red: bool = True,
 ) -> dict:
     """Decide whether a turn counts, from the recordings it was handed.
 
@@ -226,7 +236,7 @@ def gate(
     red = record_red(red_exit, red_output)
     hashes_unchanged = not hash_moved(frozen, after)
 
-    refusal = dispatch_reason(red_exit, editable, list(frozen))
+    refusal = dispatch_reason(red_exit, editable, list(frozen), require_red)
     if refusal is not None:
         return _verdict(False, refusal, red, hashes_unchanged)
 
