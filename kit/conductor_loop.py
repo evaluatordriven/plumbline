@@ -372,7 +372,7 @@ def _problems(packet, record_dir, root, evaluator_fn) -> list[str]:
     scripts = []
     escalations = []
     if isinstance(orch, list):
-        for item in orch:
+        for index, item in enumerate(orch):
             if not isinstance(item, dict):
                 continue
             if item.get("does") == "rounds" and item.get("kind") == "script":
@@ -380,7 +380,9 @@ def _problems(packet, record_dir, root, evaluator_fn) -> list[str]:
             if item.get("does") == "escalations":
                 escalations.append(item)
             if not str(item.get("tested") or "").strip():
-                problems.append("escalations holder has no tested")
+                problems.append(
+                    "holders.orchestrator[%d] (%s) has no tested" % (index, item.get("does"))
+                )
     if len(scripts) != 1:
         problems.append("holders.orchestrator has no script holder for rounds")
     if len(escalations) != 1:
@@ -654,6 +656,13 @@ def _snapshot_editable(root, editable, dest):
             shutil.copy2(src, target)
 
 
+def _clear(path):
+    if os.path.islink(path) or os.path.isfile(path):
+        os.remove(path)
+    elif os.path.isdir(path):
+        shutil.rmtree(path)
+
+
 def _restore(root, editable, snap):
     for rel in editable:
         if os.path.isabs(rel):
@@ -661,12 +670,10 @@ def _restore(root, editable, snap):
         live = os.path.join(root, rel)
         saved = os.path.join(snap, rel)
         if not os.path.lexists(saved):
+            _clear(live)
             continue
-        if os.path.islink(live) or os.path.isfile(live):
-            os.remove(live)
-        elif os.path.isdir(live):
-            shutil.rmtree(live)
-        if os.path.isdir(saved):
+        _clear(live)
+        if os.path.isdir(saved) and not os.path.islink(saved):
             shutil.copytree(saved, live, symlinks=True)
         elif os.path.isfile(saved):
             parent = os.path.dirname(live)
@@ -745,7 +752,8 @@ def _dump(path, body):
 
 
 def _sha_file(path) -> str:
-    return hashlib.sha256(open(path, "rb").read()).hexdigest()
+    with open(path, "rb") as handle:
+        return hashlib.sha256(handle.read()).hexdigest()
 
 
 def _tree_sha(path) -> str:
@@ -758,5 +766,6 @@ def _tree_sha(path) -> str:
             full = os.path.join(dirpath, name)
             rel = os.path.relpath(full, path).replace(os.sep, "/")
             digest.update(rel.encode("utf-8"))
-            digest.update(open(full, "rb").read())
+            with open(full, "rb") as handle:
+                digest.update(handle.read())
     return digest.hexdigest()
