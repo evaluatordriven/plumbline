@@ -98,16 +98,13 @@ The kit is the part that travels. These four things are what a deployment instal
 into `~/.hermes/skills/`. That is where the doctrine's procedure lives, and it is canonical — do not write your
 own version of it.
 
-**2. The corpus's plugin `edi-loop` — take it if your program runs on Hermes.** Canonical copy:
-`integrations/hermes-edi-loop/` in the corpus (proposals 0023, mirrored under 0034). Copy it into
-`~/.hermes/plugins/edi-loop/`, give it the corpus path (`$EDI_CORPUS`, or `plugins.edi-loop.corpus` in
-`~/.hermes/config.yaml`), and **restart the gateway — there is no hot reload.** A file swap without a restart
-leaves the old code live while disk reads new.
-
-It registers four tools (`edi_validate_job_packet`, `edi_check_terminal_state`, `edi_check_role_separation`,
-`edi_check_best_artifact_handoff`) and it **shells out to the corpus's own checkers at call time, pinning no
-corpus version** — so it is not a second ruler. The same check the kit runs at open and close is the check it
-runs in flight; the difference is only when it can be called.
+**2. The doctrine's public checkers — use them.** The four deterministic checks live in
+[`evaluatordriven/doctrine`](https://github.com/evaluatordriven/doctrine/tree/f8bfb79/contracts/tools) at `contracts/tools/` (pin `f8bfb79`, v0.2.1):
+`validate_job_packet.py`, `check_role_separation.py`, `check_terminal_state.py` and
+`check_best_artifact_handoff.py`. Run them directly; do not re-implement them. The earlier `edi-loop` Hermes
+plugin wrapped these same checks, but its corpus copy (`integrations/hermes-edi-loop/`) no longer exists and
+it is not part of the public contracts, so nothing here depends on it. The same check the kit runs at open and
+close is the check you run in flight; the difference is only when it is called.
 
 **3. Two traps, both measured on this repo rather than read about:**
 
