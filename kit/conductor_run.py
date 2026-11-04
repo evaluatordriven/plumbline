@@ -38,6 +38,8 @@ def run(
     cwd: str | None = None,
     timeout_s: float | None = DEFAULT_TIMEOUT_S,
     ignore: list[str] | None = None,
+    require_red: bool = True,
+    maker_env: dict | None = None,
 ) -> dict:
     """Run one turn and return the gate's verdict plus the recorded arms and commit.
 
@@ -50,12 +52,17 @@ def run(
     ``ignore`` names paths the snapshot still records but does not judge. A rule
     with no slash matches that name as any path component. Ignoring ``__pycache__``
     re-opens the bytecode plant: the planted ``.pyc`` is listed in ``ignored.paths``
-    and is not a reason to refuse. In a git checkout you will usually want
+    and is not a reason to refuse. ``ignored.rules`` records each rule normalised
+    (``./.git/`` is recorded as ``.git``), not the caller's text. Backslashes are
+    stored as ``/``. In a git checkout you will usually want
     ``ignore=[".git"]``: an honest Maker that runs ``git status`` or ``git add``
     rewrites ``.git/index`` and is otherwise flagged.
 
     This detects; it is not a sandbox. Only files under ``cwd`` are watched: writes
-    outside it, including through symlinks inside it, are not seen.
+    outside it, including through symlinks inside it, are not seen. A file outside
+    the editable set that is unreadable both before and after a turn is recorded
+    as ``unreadable`` both times. A Maker that makes it readable, edits it, and
+    makes it unreadable again changes it unseen. This detects; it is not a sandbox.
 
     ``test_cmd`` is run first and its exit and combined output are kept verbatim: an
     empty output stays empty, and no hash is invented for it. The frozen paths and the
@@ -104,7 +111,9 @@ def run(
     before = conductor_software.snapshot(root)
 
     dispatched = (
-        conductor_software.dispatch_reason(red_exit, editable_paths, frozen_paths)
+        conductor_software.dispatch_reason(
+            red_exit, editable_paths, frozen_paths, require_red
+        )
         is None
     )
 
@@ -112,7 +121,11 @@ def run(
     maker_output = None
     changes: list[str] = []
     if dispatched:
-        maker_exit, maker_output = _run(maker_cmd, root, timeout_s)
+        env = None
+        if maker_env is not None:
+            env = os.environ.copy()
+            env.update({str(key): str(value) for key, value in maker_env.items()})
+        maker_exit, maker_output = _run(maker_cmd, root, timeout_s, env=env)
         changes = conductor_software.changed_paths(
             before, conductor_software.snapshot(root)
         )
@@ -142,6 +155,7 @@ def run(
         rerun_exit=rerun_exit,
         maker_exit=maker_exit,
         changes=judged,
+        require_red=require_red,
     )
     result["maker"] = conductor_software.record_arm(maker_exit, maker_output)
     result["rerun"] = conductor_software.record_arm(rerun_exit, rerun_output)
@@ -150,7 +164,7 @@ def run(
     return result
 
 
-def _run(cmd: list[str], cwd: str, timeout_s: float | None) -> tuple[int | str, bytes]:
+def _run(cmd: list[str], cwd: str, timeout_s: float | None, env: dict | None = None) -> tuple[int | str, bytes]:
     """Run an argv list with no shell and return (exit code, combined output).
 
     A command that outlives ``timeout_s`` is killed along with anything it spawned,
@@ -164,6 +178,7 @@ def _run(cmd: list[str], cwd: str, timeout_s: float | None) -> tuple[int | str, 
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         start_new_session=_POSIX,
+        env=env,
     )
     try:
         output, _ = process.communicate(timeout=timeout_s)
