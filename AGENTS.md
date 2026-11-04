@@ -119,7 +119,9 @@ become its own law.
   Orchestrator (Playbook §6, Contracts §4). One party may hold several — **recorded as such**. The Owner may
   never hold the Evaluator seat on the same job. The Maker never grades its own work.
 - **The Evaluator recommends; the Orchestrator applies.** Only the Orchestrator applies the pass rule, the
-  cap, and escalation. An Evaluator that decides whether to iterate has collapsed two roles.
+  cap, and escalation. An Evaluator that decides whether to iterate has collapsed two roles. Applying
+  escalation means handing `needs_owner` to the Architect, which writes the options and the recommendation;
+  the Orchestrator delivers them to the Owner and writes none of it (Contracts §4).
 - **Pass rule = `mean >= T_accept` AND `min >= T_dim`.** An average alone lets a fatal defect be averaged
   away.
 - **A verdict needs ≥2 scored runs.** One run is a sample, not a measurement, and a reading resting on one
@@ -182,7 +184,8 @@ Declared in `schemas/instance-extensions.json`. Each item is Plumbline's, not th
 - **The discoverability gate** — before any escalation, classify: *discoverable* (search, measurement, reading
   the repo, probing the record, running the code) → resolve it and never ask; *undecidable* (values, doctrine,
   Buyer intent, priority, risk appetite) → escalate, carrying the question, what was tried, why no observable
-  answer exists, **and the options with a recommendation**. An escalation without options is work pushed back.
+  answer exists, **and the options with a recommendation** — written by the Architect, delivered by the
+  Orchestrator. An escalation without options is work pushed back.
   Metric: **discoverable-escalation rate**.
 - **Two dimensions the Contracts cannot supply** — *operator burden* and *proportionality*. Three of the
   direction's four falsification conditions cannot be contract violations, so a contract-derived evaluator is
@@ -204,9 +207,10 @@ Declared in `schemas/instance-extensions.json`. Each item is Plumbline's, not th
 
 ## Enforcement available to this instance
 
-The **`edi-loop` Hermes plugin** (installed, corpus copy at `integrations/hermes-edi-loop/`) exposes four
-deterministic checks as tools — `edi_validate_job_packet`, `edi_check_terminal_state`,
-`edi_check_role_separation`, `edi_check_best_artifact_handoff`. **Use them; do not re-implement them here.**
+The doctrine's public checkers in `evaluatordriven/doctrine` `contracts/tools/` (pin `f8bfb79`, v0.2.1) are
+the four deterministic checks — `validate_job_packet.py`, `check_terminal_state.py`,
+`check_role_separation.py`, `check_best_artifact_handoff.py`. **Use them; do not re-implement them here.**
+(The older `edi-loop` Hermes plugin wrapped them; its corpus copy no longer exists and nothing depends on it.)
 The skill is `evaluator-driven-iteration`.
 
 **One gate.** Plumbline validates against the corpus's `tools/validate_job_packet.py`. A private jsonschema
@@ -257,7 +261,7 @@ them (one profile per role, model pinned per profile — the §4 role-independen
 
 | Profile | Seat | Tools | Notes |
 |---|---|---|---|
-| `<program>-conductor` | Orchestrator | none | Routes, enforces bounds, applies the pass rule, runs the discoverability gate. Decides nothing. |
+| `<program>-conductor` | Orchestrator | none | Routes, enforces bounds, applies the pass rule, runs the discoverability gate; hands `needs_owner` to the Architect and delivers its options. Decides nothing. |
 | `<program>-maker` | Maker | file, terminal (write) | Works in a git worktree |
 | `<program>-eval` | Evaluator | file, terminal (read/run) | **Different model family** from the Maker. No write tools. |
 | `<program>-deploy` | Deployment | terminal, web | Read-back verification scripts |

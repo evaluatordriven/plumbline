@@ -189,7 +189,7 @@ Tick every box before you freeze:
 
 - Mechanical. If the bar is binary, every dimension must pass. If the bar scores dimensions, the bar states both the average threshold and the per-dimension floor, and the pass rule applies both; an average alone lets a fatal defect hide (doctrine rule 6). Report what failed, quote the instrument's reason in plain words, and say what it means for the work.
 - **Name the exit.** Every job ends in one of three states (doctrine §5): **accepted** (the work passed the rule fixed before it began), **needs owner** (the cap was reached without a pass while the work stayed above the reject floor, or an escalation fired, or the instrument failed), or **rejected** (below the reject floor). The reject floor is part of the bar. Below it, work not yet in use is discarded; work already in use is never discarded by the loop.
-- At the cap the state is `needs owner`. Bring the Owner the best version the job produced, never the bin, with three options: accept it with a disposition beside the verdict, amend the bar, or reject it. Give your recommendation and the clock arithmetic for each. The verdict stays as the loop produced it; the Owner's decision is written beside it.
+- At the cap the state is `needs owner`. Hand it to the Architect with the best version the job produced, never the bin. The Architect writes the options (accept it with a disposition beside the verdict, amend the bar, or reject it), its recommendation and the clock arithmetic for each; you deliver that analysis to the Owner unchanged. The verdict stays as the loop produced it; the Owner's decision is written beside it.
 - An amendment mid-run is an Owner act, not a fourth exit. The job still ends in one of the three states, and the amendment is recorded beside the frozen set and named in the record.
 - **When the bar contradicts itself, prove it, amend it before you score, and get the amended text to the Maker.** If two terms of the bar cannot both hold for a correct subject, no Maker change can pass. Write the proof before you amend: name the two terms, show the correct subject each one requires, and show that no subject can satisfy both. Take that proof to the Owner; the Architect writes the amendment, the Owner ratifies it, and it is filed beside the frozen set. Do not amend a bar because the work is failing it; that is tuning the standard to the draft.
   - If the amendment changes what the Maker must produce, the Maker sees the amended wording the Evaluator will score against, with any held-out detail redacted, not just the news that something changed.
@@ -245,7 +245,7 @@ Tick every box before you freeze:
 
 ## 6. Working with the Owner
 
-- The Owner decides; you recommend. Lead with the answer, give your recommendation, and offer real options. Show the clock arithmetic when time matters.
+- The Owner decides; the Architect recommends; you deliver. At `needs owner`, hand the question to the Architect, then bring the Owner its options and recommendation, leading with the answer. Show the clock arithmetic when time matters.
 - When the Owner gives a principle — don't starve a model, the cap counts loop iterations — apply it everywhere it fits, not only where it was said, and write it down here.
 - Own your mistakes plainly. "I froze an 800-token cap" beats explaining.
 - Push only on the Owner's authority, and cite the message.
