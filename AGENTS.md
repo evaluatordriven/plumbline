@@ -121,7 +121,9 @@ become its own law.
 - **The Evaluator recommends; the Orchestrator applies.** Only the Orchestrator applies the pass rule, the
   cap, and escalation. An Evaluator that decides whether to iterate has collapsed two roles. Applying
   escalation means handing `needs_owner` to the Architect, which writes the options and the recommendation;
-  the Orchestrator delivers them to the Owner and writes none of it (Contracts §4).
+  the Orchestrator delivers them to the Owner and writes none of it. **Plumbline rule** (Owner ruling
+  2026-11-04, `schemas/instance-extensions.json` → `escalation_pen`): no doctrine tier names this pen, and
+  Contracts §4's "recommends … and the Architect decides" is about a design gap, not `needs_owner`.
 - **Pass rule = `mean >= T_accept` AND `min >= T_dim`.** An average alone lets a fatal defect be averaged
   away.
 - **A verdict needs ≥2 scored runs.** One run is a sample, not a measurement, and a reading resting on one
@@ -185,7 +187,7 @@ Declared in `schemas/instance-extensions.json`. Each item is Plumbline's, not th
   the repo, probing the record, running the code) → resolve it and never ask; *undecidable* (values, doctrine,
   Buyer intent, priority, risk appetite) → escalate, carrying the question, what was tried, why no observable
   answer exists, **and the options with a recommendation** — written by the Architect, delivered by the
-  Orchestrator. An escalation without options is work pushed back.
+  Orchestrator (Plumbline rule: `escalation_pen`). An escalation without options is work pushed back.
   Metric: **discoverable-escalation rate**.
 - **Two dimensions the Contracts cannot supply** — *operator burden* and *proportionality*. Three of the
   direction's four falsification conditions cannot be contract violations, so a contract-derived evaluator is
