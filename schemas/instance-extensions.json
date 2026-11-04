@@ -724,5 +724,24 @@
       "Every predicate key is a custody section-4 field (read from the pinned schema's own property list) or begins with `x-`.",
       "A remedy appears only under x-plumbline.remedy, with the evidence file it was read from, and only when that file contains it verbatim; the emitter never writes one."
     ]
+  },
+  "escalation_pen": {
+    "status": "INSTANCE-SPECIFIC. Owner ruling 2026-11-04 (instance practice; it amends no doctrine tier). Cite this entry; do not restate it.",
+    "question": "When a job stops at needs_owner, who writes the options and the recommendation the Owner receives?",
+    "rule": "The Architect writes the question's analysis: diagnosis, options and recommendation (and `tried` where loop() left none). The Orchestrator, or the escalations holder that replaces it, delivers that text to the Owner unchanged, with its path and sha256, and writes none of it. The Owner decides.",
+    "why": "Options at needs_owner usually include another round with changes or an amendment to the bar. What goes into the next round's packet is the Architect's decision (DOCTRINE D3.routing), and the Orchestrator must never decide what an iteration is given (Contracts §4 roles table).",
+    "doctrine_relationship": "THIS IS PLUMBLINE'S RULE, NOT THE DOCTRINE'S. No tier names the author at needs_owner: D4.11 and Instrument I12 require the options and a recommendation but name no pen. Contracts §4's 'where it sees a gap it recommends, as an escalation requires (Instrument I12), and the Architect decides' is about a design gap and is not a source for this rule. Declared per job through the Instrument sheet's 'escalation route — to whom'.",
+    "option_structure": {
+      "label": "Plumbline reading of the Instrument ('Report where the frame failed', beside I12: 'these are the ways it could be resolved, this is the one I recommend, and this is what changes in the record if you rule otherwise').",
+      "checks": [
+        "at least two options",
+        "each option carries an id",
+        "each option carries if_chosen: what changes in the record if it is chosen",
+        "the recommendation names exactly one option id"
+      ],
+      "not_checked": "Clock or cost figures. They appear nowhere in the corpus; they are Architect practice when time matters, and measured figures come only from a start loop() recorded. They are never a gate."
+    },
+    "diagnosis": "INSTANCE-SPECIFIC field beside I12's four (question, tried, why_unobservable, options with a recommendation): the Architect's statement of why the job stopped. Required non-blank by Plumbline; the corpus does not require it.",
+    "pending": "Asked of the doctrine maintainer to carry the pen at the tier that owns it. When that lands, replace this entry's citation with the doctrine's and drop the rule here."
   }
 }
