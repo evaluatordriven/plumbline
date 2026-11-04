@@ -16,6 +16,7 @@ cited by its commit.
 - `kit/conductor_loop.py`: the Evaluator's cost is summed, not dropped. Every Evaluator run's cost record is added to the round cost and to the job's spend, so `budget.amount` is enforced across the Evaluator as well as the Maker. With `budget.amount > 0` an Evaluator that writes no cost record stops the job as `budget unmeasured`; it never runs unmetered.
 - `kit/conductor_loop.py`: the clock binds **per command**. Each Maker turn and each Evaluator run is given the smaller of `timeout_s` and the time left before the deadline, so a single long command cannot run past the bound the packet declared.
 - `kit/conductor_loop.py`: the separation-gap sentence cites **Contracts §4.2** for the Architect's unrecorded proposed packet, so the record points at the clause that governs it.
+- `kit/conductor_loop.py`: the held-out check fails closed. A held-out path that cannot be opened or read (missing, a directory, a symlink loop, no read permission) raises an error naming the path and the OS error instead of being skipped as "no leak"; `loop()` then stops with `held-out unreadable` (terminal state and outcome `needs_owner`) before that round's Maker turn, and the round record gives the method, `by`, `result: "fail"` and that reason. A held-out line with no alphanumeric character (such as `{` or `},` in pretty-printed JSON) is no longer counted as a leak; every line with a letter or digit still is, however short.
 
 ## 0.1.0 (2026-11-02)
 
