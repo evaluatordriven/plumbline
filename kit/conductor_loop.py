@@ -31,6 +31,7 @@ CLOCK = "clock"
 BUDGET = "budget"
 BUDGET_UNMEASURED = "budget unmeasured"
 HELD_OUT = "held-out leak"
+HELD_OUT_UNREADABLE = "held-out unreadable"
 NOT_DISPATCHED = "not dispatched"
 PACKET_REFUSED = "packet refused"
 
@@ -51,6 +52,7 @@ _STATES = {
     BUDGET: ("needs_owner", "needs_owner"),
     BUDGET_UNMEASURED: ("needs_owner", "needs_owner"),
     HELD_OUT: ("needs_owner", "needs_owner"),
+    HELD_OUT_UNREADABLE: ("needs_owner", "needs_owner"),
     NOT_DISPATCHED: ("needs_owner", "needs_owner"),
     PACKET_REFUSED: ("needs_owner", "needs_owner"),
 }
@@ -62,6 +64,12 @@ _CLASSES = {
     "frame_at_fault",
 }
 _VERDICTS = {"accept", "regenerate", "needs_owner", "reject"}
+_HELD_METHOD = (
+    "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, "
+    "undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the "
+    "findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read "
+    "fails the check"
+)
 _GAP_GATE = (
     "The gate rerun is a script Evaluator reading held in the same module as "
     "Orchestrator dispatch (DOCTRINE D3.holder, rule 5)."
@@ -122,12 +130,23 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
             "defects": defects,
             "solutions": solutions,
         }
-        leak = _held_out(json.dumps(findings), loaded["evaluator"].get("held_out") or [])
+        try:
+            leak = _held_out(json.dumps(findings), loaded["evaluator"].get("held_out") or [])
+        except OSError as exc:
+            stop = HELD_OUT_UNREADABLE
+            _write_round(
+                record_dir, number, None, None,
+                {"method": _HELD_METHOD, "result": "fail", "by": "loop()", "reason": str(exc)},
+                None, None, None, False, best_round, 0, stop,
+            )
+            last = number
+            round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
+            break
         findings_path = os.path.join(record_dir, "findings-%02d.json" % number)
         if leak:
             stop = HELD_OUT
             _write_round(
-                record_dir, number, None, None, {"method": "line and sha256 scan", "result": "fail", "by": "loop()"},
+                record_dir, number, None, None, {"method": _HELD_METHOD, "result": "fail", "by": "loop()"},
                 None, None, None, False, best_round, 0, stop,
             )
             last = number
@@ -258,7 +277,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
                 best_round, best_scores = number, scores
             elif scores and (best_scores is None or _better(scores, best_scores)):
                 best_round, best_scores = number, scores
-        held = {"method": "line and sha256 scan", "result": "pass" if not leak else "fail", "by": "loop()"}
+        held = {"method": _HELD_METHOD, "result": "pass" if not leak else "fail", "by": "loop()"}
         _write_round(
             record_dir, number, result, _sha_file(findings_path), held,
             evaluator_rows, reading, pass_rule, mismatch, best_round, round_cost, stop,
@@ -608,15 +627,22 @@ def _better(new, old) -> bool:
 
 
 def _held_out(text, paths) -> bool:
+    """True if a held-out file's sha256 or one of its lines is in ``text``.
+
+    A path that cannot be opened and read raises ``OSError`` naming the path
+    and the OS error: the check was not made, so it is neither "no leak" nor
+    a leak. A line with no alphanumeric character (``{``, ``},``) is not
+    evidence; every other line is, however short.
+    """
     for path in paths:
         try:
             data = open(path, "rb").read()
-        except OSError:
-            continue
+        except OSError as exc:
+            raise OSError("held-out path %s cannot be read: %s" % (path, exc)) from exc
         if hashlib.sha256(data).hexdigest() in text:
             return True
         for line in data.decode("utf-8", "replace").splitlines():
-            if line.strip() and line in text:
+            if any(ch.isalnum() for ch in line) and line in text:
                 return True
     return False
 
