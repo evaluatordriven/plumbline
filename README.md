@@ -139,9 +139,11 @@ The custody record schema is derived the same way from the vendored `schemas/cus
 Every program Plumbline touches carries its content in a directory named **`dot-plumbline/`**, in the
 program's own space and committed — **never** gitignored, it is evidence. No leading dot, so nothing is hidden.
 Contracts §10.1 retains the records *with the artifact*, so an audit of another program lives in that
-program's repository. In this public repository `dot-plumbline/` holds only Plumbline's README and its ratified
-`constitution.json`; Plumbline's own job, audit and probe records are kept in a private evidence archive, and
-two of its jobs are published, frozen, under `examples/` (below).
+program's repository. The initial public snapshot shipped only this README and the ratified
+`constitution.json`. Older job, audit and probe records stay in the private evidence archive, and
+two of those jobs are published, frozen, under `examples/` (below). From 2026-11-05 a job that
+closes on this program is committed under `dot-plumbline/jobs/` and appended to
+`dot-plumbline/run-log.json`. Do not backfill. Do not leave the only copy in local scratch.
 
 ```
 dot-plumbline/
