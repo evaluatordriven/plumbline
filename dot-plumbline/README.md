@@ -24,12 +24,11 @@ dot-plumbline/
                      tools/check_operating_loop.py — the commit, the checks that ran, the failures
 ```
 
-**In the public repository** only `README.md` and `constitution.json` are present: Plumbline's own `jobs/`,
-`run-log.json`, `audits/`, `probes/` and `operating-loop.jsonl` stay in its private evidence archive, and two
-jobs are published, frozen, under `examples/`.
+**The initial public snapshot** shipped only `README.md` and `constitution.json`. Older job, audit and probe records stay in the private evidence archive; two of those jobs are published, frozen, under `examples/`. That carve-out is historical. It is not the rule for a job that closes from here.
 
-Only the parts that exist are present. `jobs/` and `run-log.json` appear when this program's
-first job runs; an empty placeholder would be structure nothing asked for.
+From 2026-11-05 (Owner): a job that closes on this program is committed in this directory. `jobs/<job_id>/` holds the packet, the artifact, and the record. `run-log.json` gains one append-only row. Do not backfill jobs that closed before that date. Do not leave the only copy in local scratch.
+
+Only the parts that exist are present. An empty placeholder is structure nothing asked for. `jobs/` and `run-log.json` appear with the first job closed under this rule.
 
 ## What does not go here
 
