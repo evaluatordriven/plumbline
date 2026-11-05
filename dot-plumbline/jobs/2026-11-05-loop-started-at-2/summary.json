@@ -1,0 +1,17 @@
+{
+  "accepted_round": 1,
+  "best_round": 1,
+  "cap": 4,
+  "commit": "aec85b1c70c7fb62effe950b9097224a40b7b5b6",
+  "cost": 0.09745529700000001,
+  "escalation": null,
+  "outcome": "accepted",
+  "packet_sha256": "9cb9ae27044bebfc5059644fedcc9d0510b2cbec4cc35bb81d24bb8d9ed03235",
+  "rounds": 1,
+  "rounds_sha256": [
+    "9c64baf5214c1423b869523fbec47bbcffe8853f7c2eec4a4d20273979469979"
+  ],
+  "separation_gaps": [],
+  "stop": "accepted",
+  "terminal_state": "accepted"
+}
