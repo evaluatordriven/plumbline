@@ -4,16 +4,21 @@ This is not the conductor. It dispatches one turn at a time by calling
 kit.conductor_run.run. It does not score, diagnose, or decide. It sends
 nothing and never restarts a stopped job. The conductor is still unbuilt.
 
-Every record this module writes carries wall-clock stamps, taken from the
-local zone and spelled as ISO 8601 at second precision with a numeric offset.
-``started_at`` is taken once, when ``loop()`` is entered, before the packet is
-loaded. ``ended_at`` is taken when the summary is built, so it appears on the
-summary only. Each written round record carries both, inside the job window
-and in order across rounds. An escalation carries ``started_at`` and no
-``ended_at``; a refused packet also carries ``refused_at``, a later reading of
-the same clock. Nothing reads these fields back: the deadline and the clock
-stop stay on the monotonic clock, so a wall-clock jump changes no stop, state,
-outcome or round count.
+Every round record this module writes carries wall-clock stamps, taken from
+the local zone and spelled as ISO 8601 at second precision with a numeric
+offset. ``started_at`` is taken once, when ``loop()`` is entered, before the
+packet is loaded; each written round record carries its own ``started_at`` at
+the top of its round and an ``ended_at`` taken when that record is written,
+inside the job window and in order across rounds. ``loop()`` has no finish to
+write: it holds the rubric and the runner but no emitter that can record a
+finish cleanly, so a finish raises ``CustodyNotDone``, files neither
+``summary.json`` nor ``escalation.json``, and the ``ended_at`` of the halt
+rides the exception rather than a file. A packet refusal is not a finish: it
+raises ``ValueError`` and writes ``escalation.json`` with ``started_at`` and
+``refused_at``, a later reading of the same clock, and no ``ended_at``.
+Nothing reads these fields back: the deadline and the clock stop stay on the
+monotonic clock, so a wall-clock jump changes no stop, state, outcome or round
+count.
 """
 from __future__ import annotations
 
@@ -24,6 +29,7 @@ import shutil
 import time
 from datetime import datetime as _datetime
 from datetime import timezone
+from typing import NoReturn
 
 from kit import conductor_software
 from kit.conductor_run import _run, run
@@ -102,12 +108,61 @@ class datetime(_datetime):
     """
 
 
-def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
-    """Run the rounds the packet names and return the summary record.
+class CustodyNotDone(Exception):
+    """A finish the emitter cannot record cleanly. Exit 0 is the only done.
+
+    ``loop()`` raises this instead of returning a summary: it holds no emitter
+    that can write a custody record for a finish, so a finish is not-done and
+    files neither ``summary.json`` nor ``escalation.json``. ``exit_code`` is 1,
+    2 or 3 and is never 0: 1 the work was accepted and the record a done finish
+    needs cannot be written; 2 the work was rejected, below the floor; 3 every
+    stop a human must see. It is not a ``ValueError``: a packet refusal stays
+    one, because a refusal is not a finish.
+
+    ``halt`` carries what the record would have said — the stop, its terminal
+    state and outcome, the stamps, the rounds, the cap, the best round, the
+    spend, the separation gaps and the hashes. Nothing writes it: a written
+    file is not a substitute for a return this module no longer binds.
+    """
+
+    def __init__(self, halt, exit_code):
+        super().__init__(
+            "%s is not done (%s / %s) after %s of cap %s rounds, best round %s, "
+            "cost %s; no summary and no escalation are filed"
+            % (
+                halt["stop"], halt["terminal_state"], halt["outcome"],
+                halt["rounds"], halt["cap"], halt["best_round"], halt["cost"],
+            )
+        )
+        self.halt = halt
+        self.stop = halt["stop"]
+        self.exit_code = exit_code
+
+
+def _exit_code(stop) -> int:
+    """1, 2 or 3 for a finish this instance cannot record. Never 0.
+
+    1 — the work was accepted, and the custody record a done finish needs
+    cannot be written. 2 — the work was rejected, below the floor. 3 — a human
+    must see the finish: every other stop. The exit code names what a caller
+    would have had to route on; it is not a state and it is not a verdict.
+    """
+    if stop == ACCEPTED:
+        return 1
+    if stop == REJECTED:
+        return 2
+    return 3
+
+
+def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> NoReturn:
+    """Run the rounds the packet names, then refuse to call a finish done.
 
     ``packet`` is a path or a loaded dict. A refusal writes ``escalation.json``
-    and raises ``ValueError`` before any command runs. Every other end writes
-    ``summary.json`` and, unless the stop is accepted, ``escalation.json``.
+    and raises ``ValueError`` before any command runs; a refusal is not a
+    finish. Every other end raises ``CustodyNotDone``: no ``summary.json`` and
+    no ``escalation.json`` is written, because this module holds no emitter that
+    can record a finish cleanly and exit 0 is the only done. The exception
+    carries the stamps, the counts and the spend the record would have said.
     This function sends nothing and does not start another loop.
     """
     started_at = _stamp()
@@ -331,8 +386,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         stop = CAP_REACHED
     ended_at = _stamp()
     state, outcome = _STATES[stop]
-    summary_path = os.path.join(record_dir, "summary.json")
-    summary = {
+    raise CustodyNotDone({
         "terminal_state": state,
         "outcome": outcome,
         "stop": stop,
@@ -345,18 +399,9 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         "rounds_sha256": [_sha_file(path) for path in round_paths],
         "packet_sha256": packet_sha,
         "commit": conductor_software.record_field(commit),
-        "escalation": None,
         "started_at": started_at,
         "ended_at": ended_at,
-    }
-    if stop != ACCEPTED:
-        summary["escalation"] = os.path.join(record_dir, "escalation.json")
-    _dump(summary_path, summary)
-    if stop != ACCEPTED:
-        _dump(summary["escalation"], _escalation(
-            loaded, summary, record_dir, round_paths, best_round, by, packet_sha, summary_path,
-        ))
-    return summary
+    }, _exit_code(stop))
 
 
 def _stamp() -> str:
@@ -776,52 +821,6 @@ def _write_round(
         "started_at": started_at,
         "ended_at": ended_at,
     })
-
-
-def _escalation(packet, summary, record_dir, round_paths, best_round, by, packet_sha, summary_path):
-    kind = "other"
-    if summary["stop"] == CAP_REACHED:
-        kind = "cap_reached"
-    elif summary["stop"] == REJECTED:
-        kind = "below_floor"
-    best = None
-    if best_round is not None:
-        path = _editable_dir(record_dir, best_round)
-        best = {"round": best_round, "editable": path, "sha256": _tree_sha(path)}
-    tried = []
-    for path in round_paths:
-        body = json.load(open(path))
-        tried.append({
-            "round": body["round"],
-            "record": path,
-            "record_sha256": _sha_file(path),
-            "summary": summary_path,
-            "packet_sha256": packet_sha,
-            "editable": _editable_dir(record_dir, body["round"]),
-            "reading": body.get("reading"),
-            "pass_rule": body.get("pass_rule"),
-        })
-    return {
-        "terminal_state": summary["terminal_state"],
-        "outcome": summary["outcome"],
-        "stop": summary["stop"],
-        "by": by,
-        "escalation_kind": kind,
-        "route": packet["escalation"]["route"],
-        "human_seat": packet["human_seat"],
-        "holders": packet["escalation"]["holders"],
-        "best": best,
-        "tried": tried,
-        "question": None,
-        "diagnosis": None,
-        "why_unobservable": None,
-        "options": None,
-        "recommendation": None,
-        "proposed_packet": None,
-        "decision": None,
-        "packet_sha256": packet_sha,
-        "started_at": summary["started_at"],
-    }
 
 
 def _dump(path, body):
