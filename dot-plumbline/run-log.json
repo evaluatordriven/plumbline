@@ -1,0 +1,15 @@
+{
+  "note": "A row with event \"filed\" was copied from a surviving loop record. It is not a plumbline_job.py close. A row with event \"opened\" or \"closed\" is one the kit wrote.",
+  "runs": [
+    {
+      "job_id": "2026-11-05-loop-started-at-2",
+      "date": "2026-11-05",
+      "event": "filed",
+      "kit_close": false,
+      "stop": "accepted",
+      "code": "bd5d73c",
+      "merge": "cb746094636113f157281539ad54668f653f980b",
+      "packet_sha256": "9cb9ae27044bebfc5059644fedcc9d0510b2cbec4cc35bb81d24bb8d9ed03235"
+    }
+  ]
+}

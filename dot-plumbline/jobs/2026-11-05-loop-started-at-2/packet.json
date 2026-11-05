@@ -1,0 +1,152 @@
+{
+  "job_id": "2026-11-05-loop-started-at-2",
+  "job_name": "loop() records wall-clock started_at and ended_at",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "buyer": "Steve Moitozo II (S2)",
+  "specialist": "tests/test_loop_started_at.py",
+  "human_seat": "Steve Moitozo II (S2)",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "job_to_be_done": {
+    "statement": "loop() records a wall-clock started_at, taken by the loop itself, so a person can read when the job started.",
+    "desired_future": "A record says when the job started and when it ended. The time is measured, not estimated."
+  },
+  "artifact": {
+    "repo": "https://github.com/evaluatordriven/plumbline.git",
+    "base": "feat/loop-started-at @ aec85b1c70c7fb62effe950b9097224a40b7b5b6",
+    "test_cmd": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests",
+      "-p",
+      "test_loop_started_at.py"
+    ],
+    "frozen": [
+      "tests/test_loop_started_at.py"
+    ],
+    "editable": [
+      "kit/conductor_loop.py",
+      "AGENTS.md",
+      "CHANGELOG.md"
+    ],
+    "ignore": [
+      ".git",
+      "__pycache__"
+    ],
+    "deliverable": "kit/conductor_loop.py records the wall-clock stamps the frozen test requires"
+  },
+  "maker": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker"
+    ],
+    "handoff": "rule12",
+    "engine": "plumbline-maker profile deepseek-v4-flash, then Aider via route-maker",
+    "version": "deepseek-v4-flash",
+    "feedback_forms": [
+      "failing test output",
+      "findings JSON"
+    ],
+    "task_classes": [
+      {
+        "class": "generation",
+        "shown_by": "not recorded"
+      },
+      {
+        "class": "revision",
+        "shown_by": "not recorded"
+      }
+    ]
+  },
+  "evaluator": {
+    "name": "plumbline-eval",
+    "kind": "model",
+    "who": "plumbline-eval",
+    "model": {
+      "family": "glm",
+      "identifier": "z-ai/glm-5.3-flash",
+      "provider": "openrouter",
+      "base_url": "https://openrouter.ai/api/v1"
+    },
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "runs": 2,
+    "held_out": []
+  },
+  "standard_ref": {
+    "doc": "tests/test_loop_started_at.py",
+    "version": "40cb33a70fb1f6a14bc390a498b1a65b48422656eceee45603e2ea6b7d7e4776"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 4,
+    "cap_counts": "generations",
+    "budget": {
+      "amount": 7,
+      "unit": "USD",
+      "time_hours_lt": 2,
+      "note": "Owner, 2026-11-05, on the stopped job: amount 7 USD, time_hours_lt 2. Carried unchanged. The Architect did not set them. loop() reads time_hours_lt. The derived schema's closed budget shape cannot hold that key. The schema was not edited."
+    }
+  },
+  "k": 4,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "tests/test_loop_started_at.py",
+      "ref": "tests/test_loop_started_at.py",
+      "version": "40cb33a70fb1f6a14bc390a498b1a65b48422656eceee45603e2ea6b7d7e4776",
+      "hardness": "DOCUMENT",
+      "channel": "python3 -m unittest discover -s tests -p test_loop_started_at.py"
+    },
+    {
+      "source": "Owner roadmap, work item 1, rows S1-S12",
+      "ref": "/home/jarbis1/.hermes/cache/documents/doc_1f67dc990f0e_CONDUCTOR-ROADMAP-PLAN.md",
+      "version": "cfba0455d571a2a7f8ae24b44ea9e9ce014528762b3427fee5d5d8398e4111f4",
+      "hardness": "DOCUMENT",
+      "channel": "the frozen test, plus Evaluator inspection of the named rows"
+    }
+  ],
+  "escalation": {
+    "route": [
+      "Architect",
+      "Owner"
+    ],
+    "classes": [
+      "artifact_missed_standard",
+      "standard_moved",
+      "dimension_unauthorized",
+      "frame_at_fault"
+    ],
+    "holders": {
+      "architect": "plumbline-architect",
+      "orchestrator": [
+        {
+          "holder": "plumbline-loop",
+          "kind": "script",
+          "does": "rounds",
+          "tested": "kit-pin sha aec85b1c70c7fb62effe950b9097224a40b7b5b6; this turn did not re-run the interface script"
+        },
+        {
+          "holder": "plumbline-conductor",
+          "kind": "model",
+          "does": "escalations",
+          "tested": "Owner ruling 2026-11-04 item 1; plumbline-escalate qualification not recorded"
+        }
+      ]
+    }
+  },
+  "notes": "NOT RUNNABLE. ratified is false. The Architect did not ratify and did not run this file. While ratified is false the schema requires bounds, specialist, and standard_ref to be absent; they are present here so the Owner can set ratified true without retyping them. Until that act, this file does not validate and loop() refuses it. Written after seeing the stopped job's drafts: the work tree, round-01/editable, and aider-history/chat.md. That is disclosed, not hidden. It is not permission to start the job. Successor to job 2026-11-05-loop-started-at, packet sha256 d7e2bd96c6de8b23ce77508961672f95c6403a5684dc595bf9b58ba3e13bbba5, which stopped tampered. The bar did not move: tests/test_loop_started_at.py sha256 is still 40cb33a70fb1f6a14bc390a498b1a65b48422656eceee45603e2ea6b7d7e4776, measured this turn. The one packet change the Architect chose is artifact.test_cmd: the discover argv, because tests/run_all.py already uses discover, and because this turn measured python3 (Python 3.14.4, /home/jarbis1/env/bin/python3) failing the dotted argv at import and the discover argv loading the frozen file. The loop's interpreter is not recorded. ignore is unchanged. Do not add .aider.tags.cache.v4 unless the Owner chooses that option instead. Before a loop of this packet: restore kit/conductor_loop.py, AGENTS.md, and CHANGELOG.md to aec85b1c70c7fb62effe950b9097224a40b7b5b6 so round 1 is red; use a new record directory; and have run-aider remove the directory .aider.tags.cache.v4 before it returns. That script is outside this repo. The Architect did not edit it. job_id 2026-11-05-loop-started-at-2 is a label the Architect chose. Bounds are the Owner's 2026-11-05 values, carried, not reset. maker.task_classes.shown_by remains not recorded.\n\nRATIFIED. Owner 2026-11-05, relayed as \"Proceed\" after the Architect's frame-fix-new-job recommendation. The relay set only this field and appended this sentence. The Architect's text above is unchanged. The frame fix it names is done: kit/conductor_loop.py, AGENTS.md and CHANGELOG.md are restored to aec85b1, and run-aider now removes the directory .aider.tags.cache.v4 before it returns."
+}

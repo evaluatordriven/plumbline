@@ -1,0 +1,199 @@
+{
+  "best_round": 1,
+  "cost": 0.09745529700000001,
+  "evaluator": [
+    {
+      "exit": 0,
+      "output_sha256": "a73ca33f1e7447cef774b186259de5b2c2d4674a6443c8c54ab6f31c498fa3d1",
+      "parsed": {
+        "controls": {
+          "should_fail": "failed",
+          "should_pass": "passed"
+        },
+        "dimensions": [
+          {
+            "name": "s1_s2_summary_stamps_and_s8_keys_on_accept",
+            "observation": "Ran the frozen suite on the artifact (8/8 OK, exit 0). test_s1_s2 passed: on accept the summary carries exactly SUMMARY_KEYS including started_at and ended_at, no escalation.json written, started_at equals the first clock call spelled in the local zone, ended_at is a clock reading with started_at <= ended_at, the on-disk summary.json matches the returned summary, packet_sha256 stays the hash of the packet bytes, and the stamp does not appear in the packet raw.",
+            "score": 1
+          },
+          {
+            "name": "s3_round_stamps_fall_inside_the_job_window_in_order",
+            "observation": "test_s3 passed: a 2-round run (regenerate then accept) writes round records with exactly ROUND_KEYS, no refused_at, each round's started_at <= ended_at, each inside [summary started_at, summary ended_at], round 1 ended_at <= round 2 started_at (in order across rounds), and rounds_sha256 equals the per-file sha256 list including the new fields.",
+            "score": 1
+          },
+          {
+            "name": "s4_refusal_stamps_are_taken_before_load",
+            "observation": "test_s4 passed: with a wrapped _load the clock had already been called at least once before _load ran; no summary.json was written; the refusal escalation.json carries exactly REFUSAL_KEYS with started_at and refused_at and no ended_at; started_at equals the first clock call; refused_at is a later clock call, not a copy of started_at.",
+            "score": 1
+          },
+          {
+            "name": "s5_cap_floor_and_other_escalations_carry_the_summary_stamps",
+            "observation": "test_s5 (cap/floor) passed all three subtests: cap_reached, below_floor/rejected and maker-failed/other. In each, the summary carries exactly SUMMARY_KEYS with ended_at, the escalation.json carries exactly ESCALATION_KEYS with started_at equal to the summary's started_at, no refused_at and no ended_at on that file, summary started_at <= ended_at, and separation_gaps equal the two expected gap sentences.",
+            "score": 1
+          },
+          {
+            "name": "s5_clock_stop_with_no_rounds_still_stamps_the_summary",
+            "observation": "test_s5 (clock stop) passed: with a monotonic clock stopped after the first reading, the summary carries exactly SUMMARY_KEYS with started_at and ended_at, started_at <= ended_at, rounds = 0, no round-01.json written, and the escalation.json carries started_at equal to the summary's with no ended_at and no refused_at.",
+            "score": 1
+          },
+          {
+            "name": "s6_wall_clock_jump_does_not_change_stop_state_or_rounds",
+            "observation": "test_s6 passed: the _JumpClock (forward then backward jumps) produced exactly the same (stop, terminal_state, rounds) as the steady _SeqClock, namely (\"accepted\", \"accepted\", 1); the stamps are recorded but nothing reads them to choose a stop, state or round count, and the stamps are not clamped.",
+            "score": 1
+          },
+          {
+            "name": "s9_docstring_and_release_gate_row_name_what_is_recorded",
+            "observation": "test_s9 passed: the kit/conductor_loop.py module docstring names started_at and ended_at, and the AGENTS.md 'Release-gate building block' row names both stamps.",
+            "score": 1
+          },
+          {
+            "name": "s10_unreleased_added_names_the_stamps",
+            "observation": "test_s10 passed: the CHANGELOG.md Unreleased section's **Added** entry names started_at and ended_at.",
+            "score": 1
+          }
+        ],
+        "verdict": "accept",
+        "violations": []
+      }
+    },
+    {
+      "exit": 0,
+      "output_sha256": "ef538e0b36e16db8bfcaf0770603cb83e430f52cbc4e49db24d84a873f09656c",
+      "parsed": {
+        "controls": {
+          "should_fail": "failed",
+          "should_pass": "passed"
+        },
+        "dimensions": [
+          {
+            "name": "s1_s2_summary_stamps_and_s8_keys_on_accept",
+            "observation": "Ran the frozen suite (python3 -m unittest discover -s tests -p test_loop_started_at.py) against the artifact; this test passed (exit 0, 8 tests, OK). loop() takes started_at once at entry before _load (kit/conductor_loop.py:113), stamps ended_at when the summary is built (kit/conductor_loop.py:332), and the summary carries exactly SUMMARY_KEYS including started_at and ended_at; escalation.json is absent on accept; packet_sha256 matches the sorted-bytes hash of the packet dict.",
+            "score": 1
+          },
+          {
+            "name": "s3_round_stamps_fall_inside_the_job_window_in_order",
+            "observation": "Passed in my run. Each written round record carries exactly ROUND_KEYS (no refused_at) with started_at <= ended_at, both inside the summary's job window, and in order across rounds (previous ended <= next started); rounds_sha256 equals the file hashes of round-01.json and round-02.json including the new fields (_write_round at kit/conductor_loop.py:759-778).",
+            "score": 1
+          },
+          {
+            "name": "s4_refusal_stamps_are_taken_before_load",
+            "observation": "Passed in my run. With a load raising ValueError, at least one datetime.now call happened before _load ran (started_at is the first call, kit/conductor_loop.py:113), no summary.json was written, and the refusal record carries exactly REFUSAL_KEYS with stop 'packet refused', started_at equal to the first clock call, a distinct later refused_at, and no ended_at.",
+            "score": 1
+          },
+          {
+            "name": "s5_cap_floor_and_other_escalations_carry_the_summary_stamps",
+            "observation": "Passed in my run for cap_reached, below_floor and maker-failed stops: each summary carries exactly SUMMARY_KEYS with started_at <= ended_at, the escalation body carries exactly ESCALATION_KEYS with started_at equal to the summary's, no ended_at and no refused_at, and separation_gaps are [GAP_GATE, GAP_ARCH] on every non-accept stop.",
+            "score": 1
+          },
+          {
+            "name": "s5_clock_stop_with_no_rounds_still_stamps_the_summary",
+            "observation": "Passed in my run: with time.monotonic stopping the job before round 1, the summary still carries started_at and ended_at (stop 'clock', rounds 0, no round-01.json), and the escalation body carries started_at equal to the summary's, no ended_at, no refused_at.",
+            "score": 1
+          },
+          {
+            "name": "s6_wall_clock_jump_does_not_change_stop_state_or_rounds",
+            "observation": "Passed in my run: a clock that jumps forward then back produces the same (stop, terminal_state, rounds) triple as the steady clock, ('accepted', 'accepted', 1); the wall-clock stamps do not gate any stop, state, outcome or round count (kit/conductor_loop.py:39-45, 148-152, 219-220).",
+            "score": 1
+          },
+          {
+            "name": "s9_docstring_and_release_gate_row_name_what_is_recorded",
+            "observation": "Passed in my run: kit/conductor_loop.py's module docstring names started_at and ended_at (lines 7-16), and the 'Release-gate building block' row in AGENTS.md names both fields.",
+            "score": 1
+          },
+          {
+            "name": "s10_unreleased_added_names_the_stamps",
+            "observation": "Passed in my run: CHANGELOG.md's Unreleased **Added** section names started_at and ended_at.",
+            "score": 1
+          }
+        ],
+        "verdict": "accept",
+        "violations": []
+      }
+    }
+  ],
+  "findings_sha256": "e811372e75902b99daeb249f66316e90f91d2a4a0142aebe18778b0c62cfe36f",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": "accepted",
+  "reading": {
+    "dimensions": [
+      {
+        "name": "s1_s2_summary_stamps_and_s8_keys_on_accept",
+        "observation": "Ran the frozen suite on the artifact (8/8 OK, exit 0). test_s1_s2 passed: on accept the summary carries exactly SUMMARY_KEYS including started_at and ended_at, no escalation.json written, started_at equals the first clock call spelled in the local zone, ended_at is a clock reading with started_at <= ended_at, the on-disk summary.json matches the returned summary, packet_sha256 stays the hash of the packet bytes, and the stamp does not appear in the packet raw.",
+        "score": 1
+      },
+      {
+        "name": "s3_round_stamps_fall_inside_the_job_window_in_order",
+        "observation": "test_s3 passed: a 2-round run (regenerate then accept) writes round records with exactly ROUND_KEYS, no refused_at, each round's started_at <= ended_at, each inside [summary started_at, summary ended_at], round 1 ended_at <= round 2 started_at (in order across rounds), and rounds_sha256 equals the per-file sha256 list including the new fields.",
+        "score": 1
+      },
+      {
+        "name": "s4_refusal_stamps_are_taken_before_load",
+        "observation": "test_s4 passed: with a wrapped _load the clock had already been called at least once before _load ran; no summary.json was written; the refusal escalation.json carries exactly REFUSAL_KEYS with started_at and refused_at and no ended_at; started_at equals the first clock call; refused_at is a later clock call, not a copy of started_at.",
+        "score": 1
+      },
+      {
+        "name": "s5_cap_floor_and_other_escalations_carry_the_summary_stamps",
+        "observation": "test_s5 (cap/floor) passed all three subtests: cap_reached, below_floor/rejected and maker-failed/other. In each, the summary carries exactly SUMMARY_KEYS with ended_at, the escalation.json carries exactly ESCALATION_KEYS with started_at equal to the summary's started_at, no refused_at and no ended_at on that file, summary started_at <= ended_at, and separation_gaps equal the two expected gap sentences.",
+        "score": 1
+      },
+      {
+        "name": "s5_clock_stop_with_no_rounds_still_stamps_the_summary",
+        "observation": "test_s5 (clock stop) passed: with a monotonic clock stopped after the first reading, the summary carries exactly SUMMARY_KEYS with started_at and ended_at, started_at <= ended_at, rounds = 0, no round-01.json written, and the escalation.json carries started_at equal to the summary's with no ended_at and no refused_at.",
+        "score": 1
+      },
+      {
+        "name": "s6_wall_clock_jump_does_not_change_stop_state_or_rounds",
+        "observation": "test_s6 passed: the _JumpClock (forward then backward jumps) produced exactly the same (stop, terminal_state, rounds) as the steady _SeqClock, namely (\"accepted\", \"accepted\", 1); the stamps are recorded but nothing reads them to choose a stop, state or round count, and the stamps are not clamped.",
+        "score": 1
+      },
+      {
+        "name": "s9_docstring_and_release_gate_row_name_what_is_recorded",
+        "observation": "test_s9 passed: the kit/conductor_loop.py module docstring names started_at and ended_at, and the AGENTS.md 'Release-gate building block' row names both stamps.",
+        "score": 1
+      },
+      {
+        "name": "s10_unreleased_added_names_the_stamps",
+        "observation": "test_s10 passed: the CHANGELOG.md Unreleased section's **Added** entry names started_at and ended_at.",
+        "score": 1
+      }
+    ],
+    "from": "evaluator",
+    "verdict": "accept",
+    "violations": []
+  },
+  "round": 1,
+  "run": {
+    "commit": "aec85b1c70c7fb62effe950b9097224a40b7b5b6",
+    "dispatched": true,
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [
+        "kit/__pycache__/conductor_loop.cpython-311.pyc"
+      ],
+      "rules": [
+        ".git",
+        "__pycache__"
+      ]
+    },
+    "maker": {
+      "exit": 0,
+      "output_sha256": "9134dcbc7e94f52352a1db32c002e334ad5d15379fcc9d1fa99531b2748dbe13"
+    },
+    "passed": true,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "50aa3f9e44b47a8bc5883cb126a6f84a34ee769be49bc10a165e62ab85780e04"
+    },
+    "rerun": {
+      "exit": 0,
+      "output_sha256": "b751936fa850aea24ee0bfebb027306ebc156879d472943ce941403d5b01d942"
+    }
+  },
+  "stop": "accepted",
+  "verdict_mismatch": false
+}

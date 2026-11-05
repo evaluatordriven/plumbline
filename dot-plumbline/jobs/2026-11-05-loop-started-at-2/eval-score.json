@@ -1,0 +1,50 @@
+{
+  "dimensions": [
+    {
+      "name": "s1_s2_summary_stamps_and_s8_keys_on_accept",
+      "score": 1,
+      "observation": "Ran the frozen suite (python3 -m unittest discover -s tests -p test_loop_started_at.py) against the artifact; this test passed (exit 0, 8 tests, OK). loop() takes started_at once at entry before _load (kit/conductor_loop.py:113), stamps ended_at when the summary is built (kit/conductor_loop.py:332), and the summary carries exactly SUMMARY_KEYS including started_at and ended_at; escalation.json is absent on accept; packet_sha256 matches the sorted-bytes hash of the packet dict."
+    },
+    {
+      "name": "s3_round_stamps_fall_inside_the_job_window_in_order",
+      "score": 1,
+      "observation": "Passed in my run. Each written round record carries exactly ROUND_KEYS (no refused_at) with started_at <= ended_at, both inside the summary's job window, and in order across rounds (previous ended <= next started); rounds_sha256 equals the file hashes of round-01.json and round-02.json including the new fields (_write_round at kit/conductor_loop.py:759-778)."
+    },
+    {
+      "name": "s4_refusal_stamps_are_taken_before_load",
+      "score": 1,
+      "observation": "Passed in my run. With a load raising ValueError, at least one datetime.now call happened before _load ran (started_at is the first call, kit/conductor_loop.py:113), no summary.json was written, and the refusal record carries exactly REFUSAL_KEYS with stop 'packet refused', started_at equal to the first clock call, a distinct later refused_at, and no ended_at."
+    },
+    {
+      "name": "s5_cap_floor_and_other_escalations_carry_the_summary_stamps",
+      "score": 1,
+      "observation": "Passed in my run for cap_reached, below_floor and maker-failed stops: each summary carries exactly SUMMARY_KEYS with started_at <= ended_at, the escalation body carries exactly ESCALATION_KEYS with started_at equal to the summary's, no ended_at and no refused_at, and separation_gaps are [GAP_GATE, GAP_ARCH] on every non-accept stop."
+    },
+    {
+      "name": "s5_clock_stop_with_no_rounds_still_stamps_the_summary",
+      "score": 1,
+      "observation": "Passed in my run: with time.monotonic stopping the job before round 1, the summary still carries started_at and ended_at (stop 'clock', rounds 0, no round-01.json), and the escalation body carries started_at equal to the summary's, no ended_at, no refused_at."
+    },
+    {
+      "name": "s6_wall_clock_jump_does_not_change_stop_state_or_rounds",
+      "score": 1,
+      "observation": "Passed in my run: a clock that jumps forward then back produces the same (stop, terminal_state, rounds) triple as the steady clock, ('accepted', 'accepted', 1); the wall-clock stamps do not gate any stop, state, outcome or round count (kit/conductor_loop.py:39-45, 148-152, 219-220)."
+    },
+    {
+      "name": "s9_docstring_and_release_gate_row_name_what_is_recorded",
+      "score": 1,
+      "observation": "Passed in my run: kit/conductor_loop.py's module docstring names started_at and ended_at (lines 7-16), and the 'Release-gate building block' row in AGENTS.md names both fields."
+    },
+    {
+      "name": "s10_unreleased_added_names_the_stamps",
+      "score": 1,
+      "observation": "Passed in my run: CHANGELOG.md's Unreleased **Added** section names started_at and ended_at."
+    }
+  ],
+  "violations": [],
+  "verdict": "accept",
+  "controls": {
+    "should_pass": "passed",
+    "should_fail": "failed"
+  }
+}
