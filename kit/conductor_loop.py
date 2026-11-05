@@ -3,6 +3,17 @@
 This is not the conductor. It dispatches one turn at a time by calling
 kit.conductor_run.run. It does not score, diagnose, or decide. It sends
 nothing and never restarts a stopped job. The conductor is still unbuilt.
+
+Every record this module writes carries wall-clock stamps, taken from the
+local zone and spelled as ISO 8601 at second precision with a numeric offset.
+``started_at`` is taken once, when ``loop()`` is entered, before the packet is
+loaded. ``ended_at`` is taken when the summary is built, so it appears on the
+summary only. Each written round record carries both, inside the job window
+and in order across rounds. An escalation carries ``started_at`` and no
+``ended_at``; a refused packet also carries ``refused_at``, a later reading of
+the same clock. Nothing reads these fields back: the deadline and the clock
+stop stay on the monotonic clock, so a wall-clock jump changes no stop, state,
+outcome or round count.
 """
 from __future__ import annotations
 
@@ -11,6 +22,8 @@ import json
 import os
 import shutil
 import time
+from datetime import datetime as _datetime
+from datetime import timezone
 
 from kit import conductor_software
 from kit.conductor_run import _run, run
@@ -80,6 +93,15 @@ _GAP_ARCH = (
 )
 
 
+class datetime(_datetime):
+    """The module's clock seam: tests replace ``datetime.now`` on this name.
+
+    ``datetime.datetime`` is an immutable C type, so ``now`` cannot be replaced
+    on it; a subclass of it can be, and answers exactly as the base class does
+    when it is not replaced.
+    """
+
+
 def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
     """Run the rounds the packet names and return the summary record.
 
@@ -88,12 +110,23 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     ``summary.json`` and, unless the stop is accepted, ``escalation.json``.
     This function sends nothing and does not start another loop.
     """
-    loaded, packet_sha = _load(packet)
+    started_at = _stamp()
+    try:
+        loaded, packet_sha = _load(packet)
+    except Exception as exc:
+        os.makedirs(record_dir, exist_ok=True)
+        _refuse(
+            record_dir,
+            packet if isinstance(packet, dict) else {},
+            ["packet could not be loaded: %s" % exc],
+            started_at,
+        )
+        raise
     root = os.path.realpath(cwd) if cwd is not None else os.path.realpath(os.getcwd())
     problems = _problems(loaded, record_dir, root, evaluator_fn)
     os.makedirs(record_dir, exist_ok=True)
     if problems:
-        _refuse(record_dir, loaded, problems, packet_sha, commit)
+        _refuse(record_dir, loaded, problems, started_at)
         raise ValueError("; ".join(problems))
 
     artifact = loaded["artifact"]
@@ -117,6 +150,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         if remaining <= 0:
             stop = CLOCK
             break
+        round_started_at = _stamp()
         if number > 1 and best_round is not None and best_round != number - 1:
             _restore(root, artifact["editable"], _editable_dir(record_dir, best_round))
         findings = {
@@ -138,6 +172,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
                 record_dir, number, None, None,
                 {"method": _HELD_METHOD, "result": "fail", "by": "loop()", "reason": str(exc)},
                 None, None, None, False, best_round, 0, stop,
+                round_started_at, _stamp(),
             )
             last = number
             round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
@@ -148,6 +183,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
             _write_round(
                 record_dir, number, None, None, {"method": _HELD_METHOD, "result": "fail", "by": "loop()"},
                 None, None, None, False, best_round, 0, stop,
+                round_started_at, _stamp(),
             )
             last = number
             round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
@@ -174,7 +210,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
             )
         except ValueError as exc:
             if number == 1:
-                _refuse(record_dir, loaded, [str(exc)], packet_sha, commit)
+                _refuse(record_dir, loaded, [str(exc)], started_at)
             raise
         editable_copy = _editable_dir(record_dir, number)
         _snapshot_editable(root, artifact["editable"], editable_copy)
@@ -281,6 +317,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         _write_round(
             record_dir, number, result, _sha_file(findings_path), held,
             evaluator_rows, reading, pass_rule, mismatch, best_round, round_cost, stop,
+            round_started_at, _stamp(),
         )
         last = number
         round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
@@ -292,6 +329,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
 
     if stop is None:
         stop = CAP_REACHED
+    ended_at = _stamp()
     state, outcome = _STATES[stop]
     summary_path = os.path.join(record_dir, "summary.json")
     summary = {
@@ -308,6 +346,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         "packet_sha256": packet_sha,
         "commit": conductor_software.record_field(commit),
         "escalation": None,
+        "started_at": started_at,
+        "ended_at": ended_at,
     }
     if stop != ACCEPTED:
         summary["escalation"] = os.path.join(record_dir, "escalation.json")
@@ -317,6 +357,11 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
             loaded, summary, record_dir, round_paths, best_round, by, packet_sha, summary_path,
         ))
     return summary
+
+
+def _stamp() -> str:
+    """Now, as every record this module writes spells it."""
+    return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
 
 
 def _load(packet):
@@ -444,16 +489,17 @@ def _holds_files(path) -> bool:
     return False
 
 
-def _refuse(record_dir, packet, problems, packet_sha, commit):
+def _refuse(record_dir, packet, problems, started_at):
+    escalation = packet.get("escalation") if isinstance(packet.get("escalation"), dict) else {}
     os.makedirs(record_dir, exist_ok=True)
     _dump(os.path.join(record_dir, "escalation.json"), {
         "terminal_state": "needs_owner",
         "outcome": "needs_owner",
         "stop": PACKET_REFUSED,
         "escalation_kind": "other",
-        "route": (packet.get("escalation") or {}).get("route"),
+        "route": escalation.get("route"),
         "human_seat": packet.get("human_seat"),
-        "holders": (packet.get("escalation") or {}).get("holders"),
+        "holders": escalation.get("holders"),
         "problems": problems,
         "question": None,
         "diagnosis": None,
@@ -462,6 +508,8 @@ def _refuse(record_dir, packet, problems, packet_sha, commit):
         "recommendation": None,
         "proposed_packet": None,
         "decision": None,
+        "started_at": started_at,
+        "refused_at": _stamp(),
     })
 
 
@@ -708,7 +756,10 @@ def _restore(root, editable, snap):
             shutil.copy2(saved, live)
 
 
-def _write_round(record_dir, number, result, findings_sha, held, evaluator_rows, reading, pass_rule, mismatch, best_round, cost, stop):
+def _write_round(
+    record_dir, number, result, findings_sha, held, evaluator_rows, reading, pass_rule, mismatch, best_round,
+    cost, stop, started_at, ended_at,
+):
     path = os.path.join(record_dir, "round-%02d.json" % number)
     _dump(path, {
         "round": number,
@@ -722,6 +773,8 @@ def _write_round(record_dir, number, result, findings_sha, held, evaluator_rows,
         "best_round": best_round,
         "cost": cost,
         "stop": stop,
+        "started_at": started_at,
+        "ended_at": ended_at,
     })
 
 
@@ -767,6 +820,7 @@ def _escalation(packet, summary, record_dir, round_paths, best_round, by, packet
         "proposed_packet": None,
         "decision": None,
         "packet_sha256": packet_sha,
+        "started_at": summary["started_at"],
     }
 
 
