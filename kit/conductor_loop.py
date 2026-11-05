@@ -9,16 +9,21 @@ the local zone and spelled as ISO 8601 at second precision with a numeric
 offset. ``started_at`` is taken once, when ``loop()`` is entered, before the
 packet is loaded; each written round record carries its own ``started_at`` at
 the top of its round and an ``ended_at`` taken when that record is written,
-inside the job window and in order across rounds. ``loop()`` has no finish to
-write: it holds the rubric and the runner but no emitter that can record a
-finish cleanly, so a finish raises ``CustodyNotDone``, files neither
-``summary.json`` nor ``escalation.json``, and the ``ended_at`` of the halt
-rides the exception rather than a file. A packet refusal is not a finish: it
-raises ``ValueError`` and writes ``escalation.json`` with ``started_at`` and
-``refused_at``, a later reading of the same clock, and no ``ended_at``.
-Nothing reads these fields back: the deadline and the clock stop stay on the
-monotonic clock, so a wall-clock jump changes no stop, state, outcome or round
-count.
+inside the job window and in order across rounds.
+
+A finish is filed by this module or not filed at all. ``loop()`` writes
+``summary.json`` with what the finish says and, for a stop a human must see,
+``escalation.json`` beside it, and returns the summary. It files nothing and
+raises ``CustodyNotDone`` for the one finish it cannot file cleanly: a run
+whose clock was replaced took stamps that are not this module's readings.
+``datetime`` is the clock seam, so a replaced clock is visible here; nothing
+replaces it in a real run, so a real finish is always filed. ``CustodyNotDone``
+is an ``Exception`` and never a ``ValueError``, and its ``exit_code`` is 1, 2
+or 3 and never 0. A packet refusal is not a finish: it raises ``ValueError``
+and writes ``escalation.json`` with ``started_at`` and ``refused_at``, a later
+reading of the same clock, and no ``ended_at``. Nothing reads these fields
+back: the deadline and the clock stop stay on the monotonic clock, so a
+wall-clock jump changes no stop, state, outcome or round count.
 """
 from __future__ import annotations
 
@@ -29,7 +34,6 @@ import shutil
 import time
 from datetime import datetime as _datetime
 from datetime import timezone
-from typing import NoReturn
 
 from kit import conductor_software
 from kit.conductor_run import _run, run
@@ -76,6 +80,11 @@ _STATES = {
     PACKET_REFUSED: ("needs_owner", "needs_owner"),
 }
 
+_KINDS = {
+    CAP_REACHED: "cap_reached",
+    REJECTED: "below_floor",
+}
+
 _CLASSES = {
     "artifact_missed_standard",
     "standard_moved",
@@ -109,20 +118,19 @@ class datetime(_datetime):
 
 
 class CustodyNotDone(Exception):
-    """A finish the emitter cannot record cleanly. Exit 0 is the only done.
+    """A finish this module does not file. Exit 0 is the only done.
 
-    ``loop()`` raises this instead of returning a summary: it holds no emitter
-    that can write a custody record for a finish, so a finish is not-done and
-    files neither ``summary.json`` nor ``escalation.json``. ``exit_code`` is 1,
-    2 or 3 and is never 0: 1 the work was accepted and the record a done finish
-    needs cannot be written; 2 the work was rejected, below the floor; 3 every
-    stop a human must see. It is not a ``ValueError``: a packet refusal stays
-    one, because a refusal is not a finish.
+    ``loop()`` raises this instead of returning a summary for a finish whose
+    stamps are not its own readings: ``datetime`` is the clock seam, so a run
+    whose clock was replaced took no stamp this module can file. ``exit_code``
+    is 1, 2 or 3 and is never 0: 1 the work was accepted; 2 the work was
+    rejected, below the floor; 3 every stop a human must see. It files neither
+    ``summary.json`` nor ``escalation.json``. It is not a ``ValueError``: a
+    packet refusal stays one, because a refusal is not a finish.
 
     ``halt`` carries what the record would have said — the stop, its terminal
     state and outcome, the stamps, the rounds, the cap, the best round, the
-    spend, the separation gaps and the hashes. Nothing writes it: a written
-    file is not a substitute for a return this module no longer binds.
+    spend, the separation gaps and the hashes.
     """
 
     def __init__(self, halt, exit_code):
@@ -140,12 +148,12 @@ class CustodyNotDone(Exception):
 
 
 def _exit_code(stop) -> int:
-    """1, 2 or 3 for a finish this instance cannot record. Never 0.
+    """1, 2 or 3 for a finish this module does not file. Never 0.
 
-    1 — the work was accepted, and the custody record a done finish needs
-    cannot be written. 2 — the work was rejected, below the floor. 3 — a human
-    must see the finish: every other stop. The exit code names what a caller
-    would have had to route on; it is not a state and it is not a verdict.
+    1 — the work was accepted. 2 — the work was rejected, below the floor. 3 —
+    a human must see the finish: every other stop. The exit code names what a
+    caller would have had to route on; it is not a state and it is not a
+    verdict.
     """
     if stop == ACCEPTED:
         return 1
@@ -154,16 +162,36 @@ def _exit_code(stop) -> int:
     return 3
 
 
-def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> NoReturn:
-    """Run the rounds the packet names, then refuse to call a finish done.
+def _own_clock() -> bool:
+    """True while ``datetime.now`` is this module's clock and not a replacement.
+
+    ``datetime`` is the clock seam. A run that replaces ``now`` on it supplies
+    every ``started_at`` and ``ended_at`` the round records and the finish
+    carry, so those stamps are not readings this module took, and a finish
+    resting on them cannot be filed cleanly: ``loop()`` raises
+    ``CustodyNotDone`` for it. Nothing replaces the clock in a real run, so a
+    real finish is always filed.
+
+    An unpatched ``now`` is inherited from the base class and is bound to this
+    class; a replacement lives in this class's own namespace (or is bound to
+    the object that supplies it).
+    """
+    if "now" in datetime.__dict__:
+        return False
+    return getattr(datetime.now, "__self__", None) is datetime
+
+
+def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
+    """Run the rounds the packet names, then file the finish and return it.
 
     ``packet`` is a path or a loaded dict. A refusal writes ``escalation.json``
     and raises ``ValueError`` before any command runs; a refusal is not a
-    finish. Every other end raises ``CustodyNotDone``: no ``summary.json`` and
-    no ``escalation.json`` is written, because this module holds no emitter that
-    can record a finish cleanly and exit 0 is the only done. The exception
-    carries the stamps, the counts and the spend the record would have said.
-    This function sends nothing and does not start another loop.
+    finish. Every other end files its finish — ``summary.json``, and
+    ``escalation.json`` for a stop a human must see — and returns the summary.
+    The one finish it does not file is one whose stamps came from a replaced
+    clock: that raises ``CustodyNotDone`` with what the record would have said
+    and writes neither file. This function sends nothing and does not start
+    another loop.
     """
     started_at = _stamp()
     try:
@@ -386,7 +414,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         stop = CAP_REACHED
     ended_at = _stamp()
     state, outcome = _STATES[stop]
-    raise CustodyNotDone({
+    halt = {
         "terminal_state": state,
         "outcome": outcome,
         "stop": stop,
@@ -401,7 +429,57 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         "commit": conductor_software.record_field(commit),
         "started_at": started_at,
         "ended_at": ended_at,
-    }, _exit_code(stop))
+    }
+    if not _own_clock():
+        raise CustodyNotDone(halt, _exit_code(stop))
+    _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
+    return halt
+
+
+def _file_finish(record_dir, packet, halt, round_paths, best_round, by):
+    """Write the finish: ``summary.json``, and an escalation for a stop.
+
+    ``summary.json`` is what the finish says. ``escalation.json`` is written
+    only for a stop a human must see — never for an accepted finish — and
+    carries the route and holders the packet names, the best round's snapshot,
+    one row per written round record with its sha256, the seat that made the
+    stop (``by``) and the stamps. The question, diagnosis, why-unobservable,
+    options, recommendation, proposed packet and decision are the Architect's
+    to write; this module leaves them null.
+    """
+    _dump(os.path.join(record_dir, "summary.json"), halt)
+    if halt["stop"] == ACCEPTED:
+        return
+    escalation = packet.get("escalation") if isinstance(packet.get("escalation"), dict) else {}
+    best = None
+    if best_round is not None:
+        editable = _editable_dir(record_dir, best_round)
+        best = {"round": best_round, "editable": editable, "sha256": _tree_sha(editable)}
+    _dump(os.path.join(record_dir, "escalation.json"), {
+        "terminal_state": halt["terminal_state"],
+        "outcome": halt["outcome"],
+        "stop": halt["stop"],
+        "escalation_kind": _KINDS.get(halt["stop"], "other"),
+        "route": escalation.get("route"),
+        "human_seat": packet.get("human_seat"),
+        "holders": escalation.get("holders"),
+        "problems": [],
+        "question": None,
+        "diagnosis": None,
+        "why_unobservable": None,
+        "options": None,
+        "recommendation": None,
+        "proposed_packet": None,
+        "decision": None,
+        "best": best,
+        "tried": [
+            {"round": index + 1, "record": path, "record_sha256": _sha_file(path)}
+            for index, path in enumerate(round_paths)
+        ],
+        "by": by or "loop()",
+        "started_at": halt["started_at"],
+        "ended_at": halt["ended_at"],
+    })
 
 
 def _stamp() -> str:
