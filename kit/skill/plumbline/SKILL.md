@@ -51,7 +51,7 @@ pass only where `jsonschema` is importable, and it now names which one produced 
 
 ## Every seat gets what it is entitled to, and nothing more
 
-**Every seat in an E-DI loop must be provided everything it is entitled to for making its best contribution to the job — and nothing more.** The list: clear instructions, essential context, necessary computing resources, appropriate tooling, adequate tokens, ample time, and the full scope of agency vested in that seat. Entitlement is the ceiling as well as the floor. Do not hand a seat another seat's material, another seat's agency, held-out, or a diagnosis it was not vested to make. (Owner ruling 2026-11-06, every E-DI loop; the fuller statement and the story behind it are in `AGENTS.md` → the instance layer, and in `docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md`.)
+**Every seat in an E-DI loop must be provided everything it is entitled to for making its best contribution to the job — and nothing more.** The list: clear instructions, essential context, necessary computing resources, appropriate tooling, adequate tokens, ample time, and the full scope of agency vested in that seat. Entitlement is the ceiling as well as the floor. Do not hand a seat another seat's material, another seat's agency, held-out, or a diagnosis it was not vested to make. The information bound is Contracts §4.2, C39: findings reach the Maker and the Architect with every known defect and its measurement, and only held-out material is withheld. Tokens, time, and tooling are the packet's bounds, not C39. (Owner ruling 2026-11-06, every E-DI loop; the fuller statement and the story behind it are in `AGENTS.md` → the instance layer, and in `docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md`.)
 
 What that means when you are routing a job:
 
