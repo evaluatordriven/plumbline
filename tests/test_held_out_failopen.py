@@ -42,6 +42,7 @@ import stat
 import sys
 import unittest
 from tempfile import TemporaryDirectory
+from unittest import mock
 
 from kit import conductor_loop
 from kit.conductor_loop import _held_out, loop
@@ -286,6 +287,14 @@ class HeldOutPrettyJsonUnit(unittest.TestCase):
 class HeldOutLoop(unittest.TestCase):
     """K5, K6, K10 and G1: loop() records the fail-closed stop, method and result (Contracts §4.2), and stops
     false positives."""
+
+    def setUp(self):
+        patcher = mock.patch.object(
+            conductor_loop, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def test_missing_held_out_path_at_start_dispatches_nothing(self):
         with TemporaryDirectory() as tmp, TemporaryDirectory() as held, TemporaryDirectory() as logs, \

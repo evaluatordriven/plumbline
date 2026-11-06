@@ -6,7 +6,9 @@ import sys
 import tempfile
 import unittest
 from tempfile import TemporaryDirectory
+from unittest import mock
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 from kit.conductor_run import run
 
@@ -181,6 +183,14 @@ class PacketRefusalTests(unittest.TestCase):
 
 
 class LoopTests(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def _low(self, calls, score=0.5, violations=None, verdict="regenerate"):
         def fn(record, cwd):
             calls.append(record["round"])

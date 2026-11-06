@@ -22,11 +22,21 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 
 
 class TestConductorAlign(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_budget_unmeasured_when_evaluator_script_writes_no_cost(self):
         with tempfile.TemporaryDirectory() as tmp:
             cwd = Path(tmp) / "cwd"

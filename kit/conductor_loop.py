@@ -24,6 +24,17 @@ and writes ``escalation.json`` with ``started_at`` and ``refused_at``, a later
 reading of the same clock, and no ``ended_at``. Nothing reads these fields
 back: the deadline and the clock stop stay on the monotonic clock, so a
 wall-clock jump changes no stop, state, outcome or round count.
+
+A finish also has to ship a custody record. ``loop()`` calls
+``emit_custody_for_finish(record_dir, summary)`` once, after the round records
+and a ``packet.json`` describing the finish exist and before ``summary.json``
+or ``escalation.json`` is written. The seam runs ``kit/emit_custody.py`` against
+``record_dir`` and returns the emitter's exit code; 0 means the record at
+``record_dir/custody/record.custody.json`` was written and names no hard gap.
+Any other code is not a done finish: ``loop()`` raises ``CustodyNotDone`` with
+that code and writes neither ``summary.json`` nor ``escalation.json``. A packet
+refusal is not a finish: the seam is not called and no custody record is
+written.
 """
 from __future__ import annotations
 
@@ -31,6 +42,8 @@ import hashlib
 import json
 import os
 import shutil
+import subprocess
+import sys
 import time
 from datetime import datetime as _datetime
 from datetime import timezone
@@ -121,12 +134,12 @@ class CustodyNotDone(Exception):
     """A finish this module does not file. Exit 0 is the only done.
 
     ``loop()`` raises this instead of returning a summary for a finish whose
-    stamps are not its own readings: ``datetime`` is the clock seam, so a run
-    whose clock was replaced took no stamp this module can file. ``exit_code``
-    is 1, 2 or 3 and is never 0: 1 the work was accepted; 2 the work was
-    rejected, below the floor; 3 every stop a human must see. It files neither
-    ``summary.json`` nor ``escalation.json``. It is not a ``ValueError``: a
-    packet refusal stays one, because a refusal is not a finish.
+    stamps are not its own readings, or whose custody record the emitter could
+    not write cleanly. ``exit_code`` is 1, 2 or 3 and is never 0: 1 the work was
+    accepted; 2 the work was rejected, below the floor; 3 every stop a human
+    must see. It files neither ``summary.json`` nor ``escalation.json``. It is
+    not a ``ValueError``: a packet refusal stays one, because a refusal is not a
+    finish.
 
     ``halt`` carries what the record would have said — the stop, its terminal
     state and outcome, the stamps, the rounds, the cap, the best round, the
@@ -181,17 +194,88 @@ def _own_clock() -> bool:
     return getattr(datetime.now, "__self__", None) is datetime
 
 
+def emit_custody_for_finish(record_dir, summary):
+    """Run ``kit/emit_custody.py`` against ``record_dir``; return its exit code.
+
+    This is the seam ``loop()`` uses to ship a custody record on a finish. It
+    calls the emitter, not the close command; the emitter reads the job
+    directory on disk — ``packet.json`` and the round records ``loop()`` has
+    written — and writes ``custody/record.custody.json`` at the path the close
+    command uses. Exit 0 is the only done: the record was written and names no
+    hard gap. Any other exit code is not a done finish.
+
+    ``summary`` is carried for the caller's convenience; it is not forwarded.
+    The seam's result is exactly what the same command produces on the same
+    directory, so a twin run of the emitter side-by-side matches it.
+    """
+    emitter = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emit_custody.py")
+    proc = subprocess.run(
+        [sys.executable, emitter, "--job-dir", str(record_dir)],
+        capture_output=True,
+        text=True,
+    )
+    return proc.returncode
+
+
+def _custody_packet(packet, halt):
+    """The ``packet.json`` a finish leaves for the emitter to read.
+
+    The emitter reads the finish out of the job directory, so before the seam is
+    called this module records what the finish says. Because the emitter never
+    sees ``summary.json`` (that file is written only after a clean record), the
+    finish has to be reachable from ``packet.json`` alone: its fields are
+    written at the top level in the same snake_case the round records and the
+    escalation use, again in the camelCase the record's gap vocabulary uses
+    (``startedAt``, ``endedAt``), and nested under ``finish``/``summary`` so a
+    reader that expects the summary as an object finds it. The ratified packet's
+    own fields are kept alongside so the record's subject can be drawn from
+    them.
+    """
+    descriptor = dict(packet) if isinstance(packet, dict) else {}
+    finish = {
+        "terminal_state": halt["terminal_state"],
+        "outcome": halt["outcome"],
+        "stop": halt["stop"],
+        "rounds": halt["rounds"],
+        "cap": halt["cap"],
+        "accepted_round": halt["accepted_round"],
+        "best_round": halt["best_round"],
+        "cost": halt["cost"],
+        "separation_gaps": halt["separation_gaps"],
+        "started_at": halt["started_at"],
+        "ended_at": halt["ended_at"],
+        "packet_sha256": halt["packet_sha256"],
+        "rounds_sha256": halt["rounds_sha256"],
+        "commit": halt["commit"],
+    }
+    descriptor.update(finish)
+    descriptor.update({
+        "terminalState": halt["terminal_state"],
+        "startedAt": halt["started_at"],
+        "endedAt": halt["ended_at"],
+        "packetSha256": halt["packet_sha256"],
+        "roundsSha256": halt["rounds_sha256"],
+        "bestRound": halt["best_round"],
+        "acceptedRound": halt["accepted_round"],
+        "finish": dict(finish),
+        "summary": dict(finish),
+    })
+    return descriptor
+
+
 def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
     """Run the rounds the packet names, then file the finish and return it.
 
     ``packet`` is a path or a loaded dict. A refusal writes ``escalation.json``
     and raises ``ValueError`` before any command runs; a refusal is not a
-    finish. Every other end files its finish — ``summary.json``, and
-    ``escalation.json`` for a stop a human must see — and returns the summary.
-    The one finish it does not file is one whose stamps came from a replaced
-    clock: that raises ``CustodyNotDone`` with what the record would have said
-    and writes neither file. This function sends nothing and does not start
-    another loop.
+    finish. Every other end calls ``emit_custody_for_finish`` once, after the
+    round records and a ``packet.json`` describing the finish exist, and only if
+    that seam returns 0 does it file its finish — ``summary.json``, and
+    ``escalation.json`` for a stop a human must see — and return the summary.
+    If the seam returns 1, 2 or 3, or the finish's stamps came from a replaced
+    clock, it raises ``CustodyNotDone`` with what the record would have said and
+    writes neither file. This function sends nothing and does not start another
+    loop.
     """
     started_at = _stamp()
     try:
@@ -432,6 +516,10 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     }
     if not _own_clock():
         raise CustodyNotDone(halt, _exit_code(stop))
+    _dump(os.path.join(record_dir, "packet.json"), _custody_packet(loaded, halt))
+    code = emit_custody_for_finish(record_dir, halt)
+    if code != 0:
+        raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)
     _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
     return halt
 

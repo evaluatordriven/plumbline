@@ -4,7 +4,9 @@ import os
 import sys
 import unittest
 from tempfile import TemporaryDirectory
+from unittest import mock
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 
 PY = sys.executable
@@ -99,6 +101,14 @@ def _pin(tmp):
 
 
 class Commit4Tests(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_restore_removes_the_file_the_best_round_lacked(self):
         with TemporaryDirectory() as tmp, TemporaryDirectory() as rec, TemporaryDirectory() as side:
             _pin(tmp)
