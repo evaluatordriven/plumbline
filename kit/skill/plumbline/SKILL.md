@@ -49,6 +49,18 @@ Corpus resolution, in order, then it refuses rather than guesses:
 pass only where `jsonschema` is importable, and it now names which one produced the result —
 `OK (schema-verified)` or `OK (structural only)`. The kit refuses to certify on the structural-only path.
 
+## Every seat gets what it needs
+
+**Every seat in an E-DI loop must be provided everything it is entitled to for making its best contribution to the job** — clear instructions, essential context, necessary computing resources, appropriate tooling, adequate tokens, ample time, and the full scope of agency vested in that seat. (Owner ruling 2026-11-06, every E-DI loop; the fuller statement and the story behind it are in `AGENTS.md` → the instance layer, and in `docs/PLUMBLINE-ORCHESTRATOR-FIELD-GUIDE.md`.)
+
+What that means when you are routing a job:
+
+- **Architect** — the failure record of that job: every prior stop, the red text, the Maker's reply if one exists, plus the tree, bars, packet and doctrine pin. Not your diagnosis of the fix.
+- **Maker** — the red, the rule-12 handoff, and an editable set that includes the file the bar actually fails in.
+- **Evaluator** — the frozen standard and the turn. Never held-out material, never the Maker's model.
+
+A brief made short rather than complete is a choke. The seat answers honestly against a partial surface, and the answer is useless.
+
 ## Traps that cost this instance a day each
 
 - **The host calls a plugin tool as `handler(args_dict, **kwargs)`** — the whole argument dict positionally. A
