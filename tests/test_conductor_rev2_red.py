@@ -10,11 +10,21 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 
 
 class TestConductorRev2Red(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_round1_record_holds_the_gate_reading(self):
         with tempfile.TemporaryDirectory() as raw:
             root = Path(raw)

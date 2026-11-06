@@ -5,11 +5,13 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 
 SEPARATION_GAP = (
@@ -85,6 +87,14 @@ def _packet(suite, maker, evaluator, frozen, bounds):
 
 
 class TestConductorGapsAlign(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_separation_gap_sentence(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

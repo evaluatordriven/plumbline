@@ -5,7 +5,9 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+import kit.conductor_loop as cl
 from kit.conductor_loop import loop
 
 
@@ -41,6 +43,14 @@ def _round_reading(result, record_dir):
 
 
 class TestConductorRev2(unittest.TestCase):
+    def setUp(self):
+        patcher = mock.patch.object(
+            cl, "emit_custody_for_finish",
+            lambda record_dir, summary: 0, create=True,
+        )
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_scored_round_reading_from_evaluator(self):
         with tempfile.TemporaryDirectory() as raw:
             cwd = Path(raw) / "cwd"
