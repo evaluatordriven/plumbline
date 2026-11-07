@@ -328,12 +328,310 @@ def events_log(job: Path, ref: H.Refusals) -> dict:
     return out
 
 
+def round_records(job: Path) -> list[tuple[int, Path, dict]]:
+    """The round records loop() wrote, in round order: (number, path, record)."""
+    out = []
+    for path in job.glob("round-*.json"):
+        m = re.fullmatch(r"round-(\d+)\.json", path.name)
+        if not m:
+            continue
+        try:
+            body = load(path)
+        except Exception:
+            continue
+        if isinstance(body, dict):
+            out.append((int(m.group(1)), path, body))
+    out.sort(key=lambda row: row[0])
+    return out
+
+
+def is_loop_finish(packet: dict, job: Path) -> bool:
+    """True for a job loop() filed: its packet carries the finish, or it wrote round records."""
+    return isinstance(packet.get("finish"), dict) or bool(round_records(job))
+
+
+def _packet_blocks(packet: dict) -> list[dict]:
+    """packet.json itself, then the finish/summary objects loop() nests the stamps under."""
+    blocks = [packet]
+    for key in ("finish", "summary"):
+        if isinstance(packet.get(key), dict):
+            blocks.append(packet[key])
+    return blocks
+
+
+def _first_stamp(packet: dict, names: tuple) -> str | None:
+    for block in _packet_blocks(packet):
+        for name in names:
+            value = block.get(name)
+            if isinstance(value, str) and value.strip():
+                return value
+    return None
+
+
+def _instant_text(value) -> str | None:
+    """The instant `value` names, spelled as the custody schema's timestamp (UTC, ...Z)."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    text = value.strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return H.iso(parsed.astimezone(timezone.utc))
+
+
+def _editable_files(job: Path, number: int | None = None) -> list[tuple[str, Path]]:
+    """Every file under round-NN/editable/, as (job-relative path, path)."""
+    if number is not None:
+        bases = [job / ("round-%02d" % number) / "editable"]
+    else:
+        bases = sorted(path / "editable" for path in job.glob("round-*") if path.is_dir())
+    found = []
+    for base in bases:
+        if not base.is_dir():
+            continue
+        for path in sorted(base.rglob("*")):
+            if path.is_file():
+                found.append((path.relative_to(job).as_posix(), path))
+    found.sort(key=lambda row: row[0])
+    return found
+
+
+def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: datetime,
+                 expect: str | None, allow_hand: bool = False) -> tuple[dict, Gaps, list[str]]:
+    """A custody/v1 record for a finish loop() filed, from the files loop() wrote.
+
+    loop() writes packet.json (the finish's stamps and the ratified packet's own
+    fields) and one round-NN.json per round — each evaluator run with its
+    `parsed` reading, the round's `reading` and pass rule — plus that round's
+    snapshot under round-NN/editable/. Those files are the sources this record
+    reads. A fact they do not hold — a frozen bar, an approval, a maker's name,
+    an instrument pin, a control, a retention, a disposition — is left null and
+    named in x-plumbline.gaps with `hard: false`: the run did not hold it, so it
+    is not a hard gap, and nothing is invented to fill it.
+    """
+    xp: dict = {"job_id": packet.get("job_id") or job.name, "sources": {}}
+    rev = H.revision(HERE, job, expect or os.environ.get("PLUMBLINE_EXPECT_REVISION") or None, ref)
+    rounds = round_records(job)
+    packet_path = job / "packet.json"
+
+    # ---- the finish's own stamps, exactly as packet.json holds them ----
+    started_raw = _first_stamp(packet, ("started_at", "startedAt"))
+    ended_raw = _first_stamp(packet, ("ended_at", "endedAt", "producedAt"))
+    started = _instant_text(started_raw)
+    produced = _instant_text(ended_raw)
+    if started is None:
+        gaps.add("startedAt", "packet.json holds no start instant for this finish", False)
+    if produced is None:
+        gaps.add("producedAt", "packet.json holds no end instant for this finish", False)
+    for field, raw, key in (("startedAt", started_raw, "started_at"),
+                            ("producedAt", ended_raw, "ended_at")):
+        if raw:
+            n = line_in(packet_path, raw, key)
+            if n:
+                xp["sources"][field] = f"packet.json:{n}"
+
+    # ---- subject: the artifact files the run wrote, under round-NN/editable/ ----
+    best = packet.get("accepted_round")
+    if not isinstance(best, int):
+        best = packet.get("best_round")
+    files = _editable_files(job, best if isinstance(best, int) else None) or _editable_files(job)
+    subject = [{"name": rel, "digest": {"sha256": file_digest(path)}} for rel, path in files]
+    if not subject:
+        gaps.add("subject", "the run wrote no editable artifact file to name", False)
+
+    # ---- facts the run did not hold: named, not hard, nothing invented ----
+    bar = {"digest": None, "frozenAt": None, "author": None, "dimensions": [], "approvals": [],
+           "publishedAt": None, "groundTruth": [], "dissent": []}
+    for field, reason in (
+        ("bar.digest", "the run wrote no frozen bar file, and its packet names none"),
+        ("bar.frozenAt", "the run wrote no freeze time"),
+        ("bar.author", "the run wrote no bar author"),
+        ("bar.dimensions", "the run wrote no bar dimension"),
+        ("bar.approvals", "the run recorded no approval"),
+    ):
+        gaps.add(field, reason, False)
+
+    maker = {"name": None, "kind": None, "version": None, "method": None, "model": None}
+    for key, reason in (
+        ("name", "the packet's maker block names no name"),
+        ("kind", "the packet's maker block names no kind"),
+        ("version", "the packet's maker block names no version"),
+        ("method", "the run wrote no maker method file"),
+    ):
+        gaps.add("maker." + key, reason, False)
+
+    instrument = {"rubric": None, "runner": None}
+    for key, reason in (
+        ("rubric", "the run wrote no rubric file and pinned no rubric digest"),
+        ("runner", "the run wrote no runner file and pinned no runner digest"),
+    ):
+        gaps.add("instrument." + key, reason, False)
+
+    # ---- evaluators: what the packet's evaluator block says the run dispatched ----
+    evaluator = packet.get("evaluator") if isinstance(packet.get("evaluator"), dict) else {}
+    kind = evaluator.get("kind") if evaluator.get("kind") in ("person", "model", "script") else None
+    name = evaluator.get("name") if isinstance(evaluator.get("name"), str) and evaluator.get("name") else None
+    ev_id = evaluator.get("id") if isinstance(evaluator.get("id"), str) and evaluator.get("id") else (name or "evaluator")
+    if name is None:
+        gaps.add("evaluators[0].name", "the packet's evaluator block names no name", False)
+    if kind is None:
+        gaps.add("evaluators[0].kind", "the packet's evaluator block names no kind", False)
+    evaluators = [{"id": ev_id, "name": name or ev_id, "kind": kind, "model": None, "script": None}]
+
+    # ---- checks: what each round's evaluator read ----
+    def reading_of(row: dict) -> dict:
+        return row.get("reading") if isinstance(row.get("reading"), dict) else {}
+
+    def dims_of(row: dict) -> list[dict]:
+        found = [d for d in reading_of(row).get("dimensions") or [] if isinstance(d, dict)]
+        if found:
+            return found
+        out = []
+        for run in row.get("evaluator") or []:
+            parsed = run.get("parsed") if isinstance(run, dict) else None
+            if isinstance(parsed, dict):
+                out.extend(d for d in parsed.get("dimensions") or [] if isinstance(d, dict))
+        return out
+
+    checks = []
+    for number, path, row in rounds:
+        at_raw = row.get("ended_at")
+        at = _instant_text(at_raw)
+        at_line = line_in(path, at_raw, "ended_at") if isinstance(at_raw, str) else None
+        reading = reading_of(row)
+        for dimension in dims_of(row):
+            score = dimension.get("score")
+            x = {"round": number, "record": path.name, "pass_rule": row.get("pass_rule"),
+                 "verdict": reading.get("verdict"), "stop": row.get("stop"),
+                 "observation": dimension.get("observation")}
+            if at_line:
+                x["at_source"] = f"{path.name}:{at_line}"
+            checks.append({
+                "dimension": dimension.get("name"),
+                "evaluator": ev_id,
+                "run": number,
+                "batch": None,
+                "at": at,
+                "outcome": None,
+                "score": score if isinstance(score, (int, float)) and not isinstance(score, bool) else None,
+                "failureCondition": None,
+                "evidence": None,
+                "unobserved": None,
+                "x-plumbline": x,
+            })
+    if checks:
+        for field, reason in (
+            ("checks.batch", "the run's round records name no batch"),
+            ("checks.failureCondition", "the packet declares no per-dimension failure condition"),
+            ("checks.outcome", "the run's round records carry a score, not a custody outcome per dimension"),
+            ("checks.evidence", "the run wrote no evaluator evidence file"),
+        ):
+            gaps.add(field, reason, False)
+    else:
+        gaps.add("checks", "the run's round records carry no evaluator reading", False)
+
+    # ---- violations: what each round's evaluator filed ----
+    violations = []
+    for number, path, row in rounds:
+        for item in reading_of(row).get("violations") or []:
+            if isinstance(item, dict):
+                violations.append({
+                    "dimension": item.get("dimension"),
+                    "description": item.get("observation") or item.get("description") or "",
+                    "x-plumbline": {"locator": item.get("class"), "id": item.get("id"),
+                                    "round": number, "record": path.name},
+                })
+
+    gaps.add("controls", "the run's round records carry no control case", False)
+    gaps.add("external", "the run wrote no harness log, so no CL1-15 evidence exists", False)
+    gaps.add("retention", "the run recorded no retention location", False)
+
+    disposition = {"state": None, "by": None, "at": None, "acknowledgesUnobserved": []}
+    gaps.add("disposition.state", "the packet holds no disposition_state", False)
+    gaps.add("disposition.by", "the run named no approver", False)
+    gaps.add("disposition.at", "the run recorded no disposition time", False)
+
+    separation = [s for s in packet.get("separation_gaps") or [] if isinstance(s, str)] \
+        if isinstance(packet.get("separation_gaps"), list) else []
+
+    verdict = None
+    for _, _, row in rounds:
+        found = reading_of(row).get("verdict")
+        if found in VERDICTS:
+            verdict = found
+    xp["terminal_state"] = packet.get("terminal_state")
+    if packet.get("outcome") is not None:
+        xp["outcome"] = packet.get("outcome")
+    xp["verdict"] = verdict
+    if packet.get("stop") is not None:
+        xp["stop"] = packet.get("stop")
+    xp["round_count"] = len(rounds)
+    xp["rounds"] = [{"round": number, "record": path.name, "sha256": file_digest(path)}
+                    for number, path, _ in rounds]
+    xp["evaluator_runs"] = [
+        {"round": number, "exit": run.get("exit"), "output_sha256": run.get("output_sha256")}
+        for number, _, row in rounds for run in (row.get("evaluator") or []) if isinstance(run, dict)
+    ]
+    spend = 0.0
+    for _, _, row in rounds:
+        cost = row.get("cost")
+        if isinstance(cost, (int, float)) and not isinstance(cost, bool):
+            spend += float(cost)
+    xp["spend"] = {"rounds_cost_usd": round(spend, 6), "source": "round-*.json cost"}
+
+    level = packet.get("levelClaimed")
+    if level not in ("CL1", "CL2", "CL3", "baseline"):
+        level = "CL1"
+    pred = {
+        "specVersion": SPEC_VERSION,
+        "levelClaimed": level,
+        "bar": bar,
+        "maker": maker,
+        "startedAt": started,
+        "producedAt": produced,
+        "instrument": instrument,
+        "evaluators": evaluators,
+        "checks": checks,
+        "controls": [],
+        "disagreements": [],
+        "violations": violations,
+        "separationGaps": separation,
+        "retention": None,
+        "external": [],
+        "disposition": disposition,
+    }
+    if xp.get("terminal_state") not in TERMINALS:
+        gaps.add("x-plumbline.terminal_state", f"packet terminal_state is {xp.get('terminal_state')!r}")
+    xp["schema"] = "plumbline/x-plumbline/v1"
+    xp["emitter"] = {"name": "kit/emit_custody.py", "kit_revision": (rev.get("commit") or "")[:7] or None,
+                     "commit": rev.get("commit"), "tree": rev.get("tree"), "dirty": rev.get("dirty"),
+                     "statedRevision": rev.get("stated")}
+    xp["time_tolerance_s"] = H.TOLERANCE_S
+    xp["times"] = {"startedAt": "packet.json started_at", "producedAt": "packet.json ended_at"}
+    xp["hand_times"] = []
+    xp["timeSources"] = time_sources(pred, xp)
+    xp["time_sources"] = dict(xp["timeSources"])
+    check_order(pred, packet, {}, now, ref)
+    xp["emittedAt"] = H.iso(now)
+    xp["gaps"] = gaps.rows
+    pred["x-plumbline"] = xp
+    return ({"_type": STATEMENT, "subject": subject, "predicateType": PREDICATE_TYPE, "predicate": pred},
+            gaps, [])
+
+
 def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
           expect: str | None = None, allow_hand: bool = False) -> tuple[dict, Gaps, list[str]]:
     gaps, notes = Gaps(), []
     ref = ref if ref is not None else H.Refusals()
     now = now or datetime.now(timezone.utc).replace(microsecond=0)
     packet = load(job / "packet.json")
+    if is_loop_finish(packet, job):
+        return build_finish(job, packet, gaps, ref, now, expect, allow_hand)
     have_inputs = inputs_path.is_file()
     ci = load(inputs_path) if have_inputs else None
     if ci is None:
