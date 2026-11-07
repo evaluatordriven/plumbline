@@ -509,6 +509,8 @@ def revision(here: Path, job: Path, expect: str | None, ref: Refusals) -> dict:
         p = ent[3:]
         if p.startswith("dot-plumbline/") or (job_rel and (p == job_rel or p.startswith(job_rel + "/"))):
             continue                                  # job state, not the emitter's code
+        if "__pycache__/" in p or p.endswith(".pyc"):
+            continue                                  # a bytecode cache is not a change to the code
         dirty.append(ent[:2].strip() + " " + p)
     if dirty:
         ref.add("revision", f"the emitter's tree is dirty at {commit[:12]} ({len(dirty)} change(s) outside "
