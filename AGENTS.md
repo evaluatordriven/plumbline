@@ -420,3 +420,9 @@ instruments can coexist in one job.
   watch them fail). A guard nobody has seen fail is a guard nobody knows works.
 - **Headless runs cannot prompt.** An approval gate inside a cron run hangs until timeout. Human gates must be
   queues (delivered to a Telegram topic), never blocking prompts.
+- **A bar that shells out to the emitter is green only on a COMMITTED tree.** The emitter refuses a dirty tree,
+  because a record must name code that exists as a commit, so a Maker's uncommitted work makes its own bar
+  unmeasurable and the failures read as capability failures. The loop commits the Maker's output before
+  measuring, and no bar is judged red until the tree is clean. A bar may not write into the tree it measures —
+  fixtures go to temp directories. Measured 2026-11-08 (job `evaluator-harness-log`): two failures looked like
+  capability gaps and were the dirty tree; the fix was a commit, not code.
