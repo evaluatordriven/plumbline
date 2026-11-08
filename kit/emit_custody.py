@@ -551,10 +551,43 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
     gaps.add("external", "the run wrote no harness log, so no CL1-15 evidence exists", False)
     gaps.add("retention", "the run recorded no retention location", False)
 
-    disposition = {"state": None, "by": None, "at": None, "acknowledgesUnobserved": []}
-    gaps.add("disposition.state", "the packet holds no disposition_state", False)
-    gaps.add("disposition.by", "the run named no approver", False)
-    gaps.add("disposition.at", "the run recorded no disposition time", False)
+    # ---- disposition: the packet's state, beside the live ledger event that names who decided and when ----
+    # A job loop() filed is still a job the Owner disposed of. disposition.state is the packet's
+    # `disposition_state` (never inferred from the verdict here), and the latest `dispose` line in
+    # inputs/custody-events.jsonl is the source of the approver and the time. A packet state the ledger
+    # contradicts is refused (both directions); a disposition never given gets no approver and no invented time.
+    lines = ledger_lines(job)
+    state = None
+    for block in _packet_blocks(packet):
+        if block.get("disposition_state") in DISPOSITIONS:
+            state = block["disposition_state"]
+            break
+    if state is None:
+        gaps.add("disposition.state",
+                 "the packet holds no valid disposition_state: the close has not recorded one", False)
+    live = None
+    for _, event in lines:
+        if event.get("event") == "dispose":
+            live = event                      # the latest dispose line wins
+    live_state = live.get("state") if live else None
+    if state and live_state and live_state != state:
+        ref.add("disposition", f"disposition.state: the packet says {state!r} but {LEDGER_REL}:{live['_line']} "
+                               f"logged {live_state!r}; the packet and the ledger must agree")
+    by = at = None
+    if state and state != "not_yet_given":
+        if live is not None:
+            by = live.get("by")
+            at = live.get("decided_at") or live.get("at")
+            if by:
+                xp["sources"]["disposition.by"] = f"{LEDGER_REL}:{live['_line']}"
+            if at:
+                xp["sources"]["disposition.at"] = f"{LEDGER_REL}:{live['_line']}"
+        if not by:
+            gaps.add("disposition.by", "the run's ledger names no approver", False)
+        if not at:
+            gaps.add("disposition.at", "the run's ledger records no disposition time", False)
+    disposition = {"state": state, "by": by, "at": ts(at, "disposition.at", gaps) if at else None,
+                   "acknowledgesUnobserved": []}
 
     separation = [s for s in packet.get("separation_gaps") or [] if isinstance(s, str)] \
         if isinstance(packet.get("separation_gaps"), list) else []
