@@ -27,11 +27,16 @@ Labels this seat chose:
   network and no model call. The stub's first action records the ledger
   bytes it already saw, so a same-second stamp cannot pretend the freeze
   preceded dispatch.
-- A freeze that cannot be written: the planted bar is absent, so the tool's
-  freeze branch has no file to stamp. loop() must raise before the maker
-  command runs and must not invoke kit/emit_custody.py. This seat does not
-  choose the exception class. Falling through to the emitter is the hand
-  time this clause forbids.
+- A caller with no custody inputs and no convention bar: loop() proceeds
+  without freezing anything. Nothing is frozen and nothing is written for the
+  bar. The Maker command runs and the finish seam runs normally. Owner
+  instruction 2026-11-08, binding this job.
+- A custody-bearing job (inputs/custody.json present) that names no bar and
+  has no convention bar still fails closed, because the presence of custody
+  inputs removes the skip path.
+- A planted bar that cannot be read, or a freeze command that the ledger
+  tool refuses, still fails closed before the Maker command runs.
+  loop() must raise and must not invoke kit/emit_custody.py.
 
 Fixture bounds below are not this job's bounds. This seat chose them so
 loop() can be entered. They are not another bar's bounds.
@@ -223,6 +228,33 @@ def _sentinel_maker(record_dir):
     return [PY, "-c", "open(%r, 'w').write('ran\\n')" % sentinel], sentinel
 
 
+def _proceeding_maker(record_dir, work):
+    """A maker that runs, writes a sentinel, and also produces the artifact."""
+    sentinel = os.path.join(record_dir, "maker-ran")
+    w_path = os.path.join(work, "src", "w.txt")
+    return [PY, "-c", "open(%r, 'w').write('ran\\n'); open(%r, 'w').write('yes\\n')" % (sentinel, w_path)], sentinel
+
+
+STANDARD_MOVED = {
+    "locator": "standard_moved",
+    "dimension": "loop()/freeze_bar behaviour when no bar is present",
+    "test": "tests/test_loop_freeze.py::LoopFreezeTests::test_unwritable_freeze_fails_closed",
+    "old_assertion": (
+        "exc is not None and not os.path.exists(sentinel) and no emit_custody.py call "
+        "and no custody/record.custody.json"
+    ),
+    "new_assertion": (
+        "not isinstance(exc, RuntimeError) and os.path.exists(sentinel) and no freeze event in "
+        "inputs/custody-events.jsonl and no bar file copied into the job directory"
+    ),
+    "ruling": (
+        "Owner instruction 2026-11-08: a caller with no custody inputs and no bar "
+        "proceeds; nothing is frozen; nothing is written."
+    ),
+    "moved_at": "2026-11-08",
+}
+
+
 def _call_loop(packet, record, work):
     try:
         loop(
@@ -308,41 +340,37 @@ class LoopFreezeTests(unittest.TestCase):
                     % (got.get("at"), calls[0].raw.get("sent_at")),
                 )
 
-    def test_unwritable_freeze_fails_closed(self):
+    def test_no_custody_inputs_and_no_bar_proceeds_without_freeze(self):
+        """Owner instruction 2026-11-08: a caller with no custody inputs and no
+        bar proceeds; nothing is frozen; nothing is written for the bar."""
         with TemporaryDirectory() as work, TemporaryDirectory() as record:
             _prepare(work)
             self.assertFalse(os.path.isfile(os.path.join(work, BAR_REL)))
-            maker, sentinel = _sentinel_maker(record)
-            emit_calls = []
-            real_run = cl.subprocess.run
-
-            def _run(*args, **kwargs):
-                argv = args[0] if args else kwargs.get("args")
-                emit_calls.append(argv)
-                return real_run(*args, **kwargs)
-
-            with mock.patch.object(cl.subprocess, "run", _run):
-                exc = _call_loop(_packet(work, maker), record, work)
-            emitted = [
-                argv for argv in emit_calls
-                if isinstance(argv, (list, tuple)) and any(
-                    isinstance(part, str) and part.endswith("emit_custody.py") for part in argv
-                )
-            ]
-            self.assertTrue(
-                exc is not None and not os.path.exists(sentinel) and emitted == [],
-                "freeze could not be written and loop() did not fail closed "
-                "(no freeze event; the run fell through): raised=%s maker_ran=%s emit_calls=%s"
-                % (
-                    type(exc).__name__ if exc else None,
-                    os.path.exists(sentinel),
-                    len(emitted),
-                ),
+            self.assertFalse(os.path.isfile(os.path.join(record, "inputs", "custody.json")))
+            maker, sentinel = _proceeding_maker(record, work)
+            exc = _call_loop(_packet(work, maker), record, work)
+            # If loop raised at the freeze seam it would be RuntimeError;
+            # proceeding past freeze_bar is what this clause tests.
+            self.assertNotIsInstance(
+                exc,
+                RuntimeError,
+                "loop() raised %s at the freeze seam for a caller with no custody inputs and no bar; it should proceed"
+                % (type(exc).__name__ if exc else None,),
             )
-            record_path = os.path.join(record, "custody", "record.custody.json")
+            self.assertTrue(
+                os.path.isfile(sentinel),
+                "maker did not run; loop() failed closed instead of proceeding",
+            )
+            events_path = os.path.join(record, LEDGER_REL)
+            freezes = _freezes(_events(events_path))
+            self.assertEqual(
+                freezes,
+                [],
+                "freeze event was written when no custody inputs were prepared; nothing should be frozen",
+            )
             self.assertFalse(
-                os.path.isfile(record_path),
-                "fell through to a custody record instead of failing closed",
+                os.path.isfile(os.path.join(record, BAR_REL)),
+                "bar file was copied into the job directory when no custody inputs were prepared; nothing should be written",
             )
 
 
