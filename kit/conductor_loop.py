@@ -25,6 +25,15 @@ reading of the same clock, and no ``ended_at``. Nothing reads these fields
 back: the deadline and the clock stop stay on the monotonic clock, so a
 wall-clock jump changes no stop, state, outcome or round count.
 
+Before any Maker turn, ``loop()`` freezes the bar in the ledger. It does so
+right after the packet is loaded and validated and before the first Maker
+dispatch: it copies ``<cwd>/custody/bar.md`` into the job directory unchanged
+and runs ``kit/custody_ledger.py freeze`` against the job directory, so the
+tool stamps its own clock and appends the event to
+``inputs/custody-events.jsonl``. ``loop()`` types no ``frozenAt`` value. If the
+bar cannot be read, or the tool refuses, ``loop()`` raises before the Maker
+command runs and never calls the emitter.
+
 A finish also has to ship a custody record. ``loop()`` calls
 ``emit_custody_for_finish(record_dir, summary)`` once, after the round records
 and a ``packet.json`` describing the finish exist and before ``summary.json``
@@ -263,6 +272,35 @@ def _custody_packet(packet, halt):
     return descriptor
 
 
+def freeze_bar(record_dir, root):
+    """Freeze the bar in the ledger, live, before the Maker is dispatched.
+
+    The bar is ``<cwd>/custody/bar.md``. The ledger tool names a bar relative to
+    the job directory, so the bar's bytes are copied there unchanged and the
+    tool is pointed at that copy. The tool stamps the freeze from its own clock
+    and appends the event to ``inputs/custody-events.jsonl``; this module types
+    no time. If the bar cannot be read, or the tool refuses, this raises before
+    the Maker command runs: no Maker call and no ``emit_custody.py`` run.
+    """
+    source = os.path.join(root, "custody", "bar.md")
+    if not os.path.isfile(source):
+        raise RuntimeError("no bar file at %s; cannot freeze before dispatch" % source)
+    job = os.path.abspath(str(record_dir))
+    rel = "custody/bar.md"
+    dest = os.path.join(job, rel)
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    shutil.copyfile(source, dest)
+    ledger = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custody_ledger.py")
+    proc = subprocess.run(
+        [sys.executable, ledger, "freeze", "--job-dir", job, "--bar", rel],
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "").strip() or "exit %s" % proc.returncode
+        raise RuntimeError("the bar could not be frozen in %s: %s" % (job, detail))
+
+
 def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
     """Run the rounds the packet names, then file the finish and return it.
 
@@ -295,6 +333,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     if problems:
         _refuse(record_dir, loaded, problems, started_at)
         raise ValueError("; ".join(problems))
+
+    freeze_bar(record_dir, root)
 
     artifact = loaded["artifact"]
     bounds = loaded["bounds"]
