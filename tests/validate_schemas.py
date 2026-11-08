@@ -375,6 +375,7 @@ elif edi_corpus.not_run("corpus.battery-equality", REQUIRE_CORPUS, edi_corpus.NO
 # fail and pin the emitter's refusals. None needs the corpus, a network, or a credential.
 import shutil, tempfile, zipfile, copy, hashlib, time
 from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 
 S = "custody"
 CPIN = PIN.get("custody") or {}
@@ -432,9 +433,72 @@ def emit(job, out, tree=None, extra=(), allow_hand=True):
     return run_py(args)
 
 
-def job_copy(name, overlay=None):
+def _server_instant(e):
+    """The instant a call's own response carried: its `created` epoch, else its Date header. Same precedence as
+    kit/custody_history.py (Call.at: received_at, then created, then the header), so stamping the logger's times
+    onto the value the reader already derived moves nothing in the fixture's timeline."""
+    created = (e.get("response") or {}).get("created")
+    if isinstance(created, (int, float)) and not isinstance(created, bool):
+        return datetime.fromtimestamp(created, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    hdrs = e.get("response_headers") or e.get("headers") or (e.get("response") or {}).get("headers") or {}
+    date = hdrs.get("Date") or hdrs.get("date")
+    if isinstance(date, str) and date:
+        try:
+            parsed = parsedate_to_datetime(date)
+        except (TypeError, ValueError):
+            return None
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return None
+
+
+def _stamp_logger_times(path):
+    """Write the logger's own sent_at/received_at into every call of one harness log that carries neither,
+    preserving the file's format (JSON list, single object, or JSONL). A call that already carries them is
+    left exactly as it is: the emitter only reads its inputs, and so does this."""
+    text = path.read_text(encoding="utf-8")
+    try:
+        doc = json.loads(text)
+    except ValueError:
+        doc = None
+    array, single = isinstance(doc, list), isinstance(doc, dict)
+    items = doc if array else ([doc] if single else [json.loads(ln) for ln in text.splitlines() if ln.strip()])
+    for e in items:
+        if isinstance(e, dict) and not e.get("sent_at") and not e.get("received_at"):
+            at = _server_instant(e)
+            if at:
+                e["sent_at"] = e["received_at"] = at
+    if array:
+        path.write_text(json.dumps(items, indent=2) + "\n", encoding="utf-8")
+    elif single:
+        path.write_text(json.dumps(items[0], indent=2) + "\n", encoding="utf-8")
+    else:
+        path.write_text("".join(json.dumps(e) + "\n" for e in items), encoding="utf-8")
+
+
+def logger_stamped(name):
+    """A copy of the job-rejected fixture whose harness logs carry the logger's own sent_at and received_at on
+    every call -- the entry shape the frozen bar asserts (tests/test_evaluator_harness_log.py D1-D3: sent_at,
+    received_at, request.url, response.model). The fixture's logs carry server times only, so a MODEL evaluator's
+    check times have no logged source and the emitter REFUSES the record (D6/D7); every case that needs a WRITTEN
+    record runs on a copy built here."""
     d = TMP / name
     shutil.copytree(FIX, d)
+    for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):
+        _stamp_logger_times(lg)
+    return d
+
+
+LOGGED = logger_stamped("fixture-logged")
+
+
+def job_copy(name, overlay=None):
+    """A throwaway copy of the job-rejected fixture, WITH the logger's own times in its harness logs (LOGGED):
+    a record can only be written from a log the emitter can honestly read. The cases that assert a refusal
+    depending on the fixture's server-times-only log drive FIX directly (T2, T2b, T2d, T7b/E3)."""
+    d = TMP / name
+    shutil.copytree(LOGGED, d)
     if overlay:
         shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
     return d
@@ -500,11 +564,21 @@ t = tree_copy("vendored-edited")
 rc, out = run_py([str(t / "tools" / "build_schemas.py"), "--custody", "--check"], cwd=t)
 res((f"{S} · an edited vendored custody schema is reported (exit 1)", rc == 1, f"exit {rc}"))
 
-# the emitter on the synthetic fixture
+# The fixture's own logs carry server times only, so a MODEL evaluator's check times have no logged source and
+# the record is REFUSED (D6/D7, tests/test_evaluator_harness_log.py). Asserted here, positively, before any
+# record is read: the refusal must not pass by the absence of an exception.
+o_ref = TMP / "fixture-refused.json"
+rc, out = emit(FIX, o_ref)
+res((f"{S} · a model evaluator whose harness log carries no logger times is refused, naming the log "
+     f"(exit 3, [time], nothing written)",
+     rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),
+     f"exit {rc}: {out.strip()[-140:]}"))
+
+# the emitter on the synthetic fixture, every call carrying the logger's own sent_at/received_at
 rec_path = TMP / "fixture.custody.json"
-rc, out = emit(FIX, rec_path)
+rc, out = emit(LOGGED, rec_path)
 rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file() else {}
-res((f"{S} · fixture job emits with no gap (exit 0)", rc == 0, out.strip()[-90:]))
+res((f"{S} · fixture job with logger-stamped harness logs emits with no gap (exit 0)", rc == 0, out.strip()[-90:]))
 check(S, "emitted record is valid against the PINNED custody schema", True, rec, V_CUST)
 check(S, "emitted record is valid against the derived Plumbline custody schema", True, rec, V_CREC)
 bad = copy.deepcopy(rec); bad["predicate"]["verdict"] = "reject"
@@ -729,7 +803,7 @@ head = subprocess.run(["git", "-C", str(SNAP), "rev-parse", "HEAD", "HEAD^{tree}
 res((f"{S} · the record names the emitter's commit and tree, clean", rec.get("predicate", {}).get("x-plumbline", {}).get("emitter", {})
      .get("commit") == head[0] and rec["predicate"]["x-plumbline"]["emitter"].get("tree") == head[1]
      and rec["predicate"]["x-plumbline"]["emitter"].get("dirty") is False, "emitter revision not recorded"))
-rc, out = emit(FIX, TMP / "exp-tree.json", extra=("--expect-revision", head[1][:12]))
+rc, out = emit(LOGGED, TMP / "exp-tree.json", extra=("--expect-revision", head[1][:12]))
 res((f"{S} · a stated revision matching the emitter's tree is accepted (survives git am)", rc == 0, out.strip()[-80:]))
 refused("a stated revision the emitter is not at", FIX, "revision", "exp-bad.json", extra=("--expect-revision", "deadbeef0"))
 dirty = TMP / "tree-dirty"; shutil.copytree(SNAP, dirty)
@@ -739,7 +813,7 @@ nogit = TMP / "tree-nogit"; shutil.copytree(SNAP / "kit", nogit / "kit")
 refused("an emitter outside any git checkout", FIX, "revision", "nogit.json", tree=nogit)
 
 zp = TMP / "bundle.zip"
-rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX), "--record", str(rec_path), "--out", str(zp)])
+rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(LOGGED), "--record", str(rec_path), "--out", str(zp)])
 ok, why = rc == 0 and zp.is_file(), out.strip()[-80:]
 if ok:
     with zipfile.ZipFile(zp) as z:
@@ -748,7 +822,7 @@ if ok:
         need = {"record.custody.json", "bar/bar.md", "files/artifact.md", "evidence/pass-a-D2.txt", "evidence/harness-eval-a.log"}
         ok = not bad_rows and need <= set(z.namelist())
         why = f"bad rows {bad_rows}" if bad_rows else f"missing {need - set(z.namelist())}"
-    rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX), "--record", str(rec_path), "--out", str(TMP / "b2.zip")])
+    rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(LOGGED), "--record", str(rec_path), "--out", str(TMP / "b2.zip")])
     ok = ok and (TMP / "b2.zip").read_bytes() == zp.read_bytes()
 res((f"{S} · stranger bundle: manifest sha256s match, required files present, packing is deterministic", ok, why))
 
@@ -783,7 +857,7 @@ res((f"{S} · T2d a later hand line overrides an earlier tool line (ledger-hand,
      rc == 3 and "ledger-hand" in out and "bar.approvals[" in out, f"exit {rc}: {out.strip()[-140:]}"))
 
 o = TMP / "t3-allow.json"
-rc, out = emit(FIX, o, allow_hand=True)
+rc, out = emit(LOGGED, o, allow_hand=True)
 rx = json.loads(o.read_text())["predicate"]["x-plumbline"] if o.is_file() else {}
 ht = rx.get("hand_times") or []
 by_field = {e.get("field"): e for e in ht}
@@ -1044,8 +1118,8 @@ def verify_record(rec, job, co):
 
 VCO = _stand_in_checkout("verify-checkout")
 rt_rec = TMP / "roundtrip.custody.json"
-rc, out = emit(FIX, rt_rec, allow_hand=True)
-vrc, vout = verify_record(rt_rec, FIX, VCO)
+rc, out = emit(LOGGED, rt_rec, allow_hand=True)
+vrc, vout = verify_record(rt_rec, LOGGED, VCO)
 rt_xp = json.loads(rt_rec.read_text())["predicate"]["x-plumbline"] if rt_rec.is_file() else {}
 res((f"{S} · V1/V3/T2 a job emitted with --allow-hand-times verifies with exit 0 "
      f"(no flag-without-source, no shadow)",
