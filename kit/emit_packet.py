@@ -101,6 +101,13 @@ def cl1_source_gaps(p: dict) -> list[str]:
             if not approved:
                 gaps.append(f"CL1 record missing the {role} in bar.approvals — the {role} must approve and be "
                             f"named (a bar.approvals entry with role {role!r} and by)")
+        # bar.approvals[].at — the packet is written before the approve act, so a typed time here is a hand
+        # time. The ledger stamps it later (custody_ledger.py approve); the packet must leave it absent.
+        for i, a in enumerate(approvals):
+            if isinstance(a, dict) and not blank(a.get("at")):
+                gaps.append(f"CL1 record carries a hand-typed bar.approvals[{i}].at — an approval time is not "
+                            f"written in the packet; it is stamped by the ledger's approve act "
+                            f"(custody_ledger.py approve), so the packet must leave it absent")
 
     # controls — the Evaluator's batch plan, carrying both expectations that make a record readable.
     controls = p.get("controls")
@@ -119,6 +126,12 @@ def cl1_source_gaps(p: dict) -> list[str]:
     if not isinstance(disp, dict) or blank(disp.get("by")):
         gaps.append("CL1 record missing disposition.by — custody/v1 requires (state, by, at, "
                     "acknowledgesUnobserved); even state 'not_yet_given' names by, the human seat that disposes")
+    # disposition.at — likewise written before the dispose act; a typed time has no act behind it. The ledger
+    # stamps it when disposal happens (custody_ledger.py dispose), so the packet must leave it absent.
+    if isinstance(disp, dict) and not blank(disp.get("at")):
+        gaps.append("CL1 record carries a hand-typed disposition.at — a disposition time is not written in the "
+                    "packet; it is stamped by the ledger's dispose act (custody_ledger.py dispose), so the packet "
+                    "must leave it absent")
     return gaps
 
 
