@@ -454,9 +454,14 @@ def _server_instant(e):
 
 
 def _stamp_logger_times(path):
-    """Write the logger's own sent_at/received_at into every call of one harness log that carries neither,
-    preserving the file's format (JSON list, single object, or JSONL). A call that already carries them is
-    left exactly as it is: the emitter only reads its inputs, and so does this."""
+    """WRITE the logger's own sent_at/received_at into every call of ONE COPY of a harness log that carries
+    neither, preserving the file's format (JSON list, single object, or JSONL).
+
+    This function WRITES. It is never called on the fixture itself (FIX), only on a copy made by
+    logger_stamped(): the cases that exist to test what the emitter does with a call the logger did NOT stamp
+    (E2, T7b/E3, the 59-second tolerance) must keep an unstamped log, so they run on FIX or on job_copy_raw().
+    A call that already carries both times is left exactly as it is.
+    """
     text = path.read_text(encoding="utf-8")
     try:
         doc = json.loads(text)
@@ -496,9 +501,26 @@ LOGGED = logger_stamped("fixture-logged")
 def job_copy(name, overlay=None):
     """A throwaway copy of the job-rejected fixture, WITH the logger's own times in its harness logs (LOGGED):
     a record can only be written from a log the emitter can honestly read. The cases that assert a refusal
-    depending on the fixture's server-times-only log drive FIX directly (T2, T2b, T2d, T7b/E3)."""
+    depending on the fixture's server-times-only log drive FIX directly (T2, T2b, T2d, T7b/E3), or
+    job_copy_raw() when they need a copy of their own.
+    """
     d = TMP / name
     shutil.copytree(LOGGED, d)
+    if overlay:
+        shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
+    return d
+
+
+def job_copy_raw(name, overlay=None):
+    """A throwaway copy of the job-rejected fixture WITHOUT stamping its harness logs.
+
+    For the cases that exist to test an UNSTAMPED call: E2 under --allow-hand-times, T7b/E3 naming every call
+    the logger did not stamp, and the 59-second hand-time tolerance. Handing one of those a job_copy() (stamped)
+    would delete the condition under test and the check would pass or fail for the wrong reason, so they take
+    this copy instead. Unknown keywords raise: a case that needs unstamped calls cannot silently drift here.
+    """
+    d = TMP / name
+    shutil.copytree(FIX, d)
     if overlay:
         shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
     return d
@@ -663,10 +685,10 @@ j = job_copy("keep-old", "agent-approval"); keep = TMP / "keep-old.json"; keep.w
 rc, _ = emit(j, keep)
 res((f"{S} · a refusal leaves an existing record byte-for-byte as it was", rc == 3 and keep.read_text() == "OLD RECORD\n", f"exit {rc}"))
 
-j = job_copy("tol-61")
+j = job_copy_raw("tol-61")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:04Z"))
 refused("a hand time 61 s off its harness call (tolerance 60 s)", j, "time")
-j = job_copy("tol-59")
+j = job_copy_raw("tol-59")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:02Z"))
 rc, out = emit(j, TMP / "tol59.json")
 rt = json.loads((TMP / "tol59.json").read_text())["predicate"] if rc == 0 else {}
@@ -1038,7 +1060,7 @@ except Exception as exc:
          False, f"{type(exc).__name__}: {exc}"[:160]))
 
 # E2: a typed pass time is a hand time even when a harness call is linked
-j = job_copy("t2-pass-at")
+j = job_copy_raw("t2-pass-at")
 c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
 c["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"
 (j / "inputs" / "custody.json").write_text(json.dumps(c, indent=2) + "\n", encoding="utf-8")
