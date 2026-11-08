@@ -514,13 +514,26 @@ def job_copy(name, overlay=None):
 def job_copy_raw(name, overlay=None):
     """A throwaway copy of the job-rejected fixture WITHOUT stamping its harness logs.
 
-    For the cases that exist to test an UNSTAMPED call: E2 under --allow-hand-times, T7b/E3 naming every call
-    the logger did not stamp, and the 59-second hand-time tolerance. Handing one of those a job_copy() (stamped)
-    would delete the condition under test and the check would pass or fail for the wrong reason, so they take
-    this copy instead. Unknown keywords raise: a case that needs unstamped calls cannot silently drift here.
+    For the cases that exist to test an UNSTAMPED call: T7b/E3 naming every call the logger did not stamp, and
+    the hand-time tolerance refusals. Handing one of those a job_copy() (stamped) would delete the condition
+    under test, so they take this copy. A case that needs unstamped calls cannot silently drift here.
     """
     d = TMP / name
     shutil.copytree(FIX, d)
+    if overlay:
+        shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
+    return d
+
+
+def job_copy_logged(name, overlay=None):
+    """A throwaway copy whose harness logs carry the logger's own sent_at/received_at on EVERY call, for the
+    cases that must EMIT a record while still exercising a hand time or the tolerance window. E3/T7b does not use
+    this: naming the calls the logger did not stamp is the whole of that check, so it stays on job_copy_raw().
+    """
+    d = TMP / name
+    shutil.copytree(FIX, d)
+    for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):
+        _stamp_logger_times(lg)
     if overlay:
         shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
     return d
@@ -688,7 +701,7 @@ res((f"{S} · a refusal leaves an existing record byte-for-byte as it was", rc =
 j = job_copy_raw("tol-61")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:04Z"))
 refused("a hand time 61 s off its harness call (tolerance 60 s)", j, "time")
-j = job_copy_raw("tol-59")
+j = job_copy_logged("tol-59")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:02Z"))
 rc, out = emit(j, TMP / "tol59.json")
 rt = json.loads((TMP / "tol59.json").read_text())["predicate"] if rc == 0 else {}
@@ -1060,7 +1073,7 @@ except Exception as exc:
          False, f"{type(exc).__name__}: {exc}"[:160]))
 
 # E2: a typed pass time is a hand time even when a harness call is linked
-j = job_copy_raw("t2-pass-at")
+j = job_copy_logged("t2-pass-at")
 c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
 c["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"
 (j / "inputs" / "custody.json").write_text(json.dumps(c, indent=2) + "\n", encoding="utf-8")
