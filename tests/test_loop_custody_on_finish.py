@@ -145,6 +145,7 @@ def _suite(work):
 def _job(tmp):
     _write(tmp, "tests/t.py", "pin\n")
     _write(tmp, "src/w.txt", "no\n")
+    _write(tmp, os.path.join("custody", "bar.md"), "bar\n")
     return os.path.join(tmp, "src", "w.txt")
 
 
