@@ -2,4 +2,4 @@
 {"event": "approve", "role": "buyer", "at": "2026-10-20T10:05:00Z", "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24", "writer": "tool"}
 {"event": "approve", "role": "specialist", "at": "2026-10-20T10:10:00Z", "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24", "writer": "tool"}
 {"event": "pin", "seat": "maker", "via": "openrouter.ai", "provider": "DeepInfra", "slug": "deepinfra/fp8", "host": "api.deepinfra.com", "at": "2026-10-20T10:55:00Z", "writer": "tool"}
-{"event": "dispose", "at": "2026-10-20T13:00:00Z", "writer": "tool", "state": "given", "by": "Steve Moitozo II"}
+{"event": "dispose", "at": "2026-10-20T13:00:00Z", "writer": "tool", "state": "given", "by": "Fixture Buyer"}
