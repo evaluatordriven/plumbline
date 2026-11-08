@@ -81,6 +81,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import custody_history as H                      # noqa: E402
+import evaluator_harness_log as harness_log      # noqa: E402
 
 SPEC_VERSION = "0.9.6"
 STATEMENT = "https://in-toto.io/Statement/v1"
@@ -681,6 +682,9 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
         xp["verdict"] = ci.get("verdict")          # a readings job files no §5 record (kit/plumbline_job.py)
         if xp["verdict"] is None:
             gaps.add("x-plumbline.verdict", "no §5 record in the job and no verdict in the custody inputs", False)
+        # A job with no §5 record still declares its passes in the custody inputs. Build the record's checks from
+        # those passes, so their times can come FROM the harness log (D4) instead of being left unrecorded.
+        passes_src = [{"pass_id": pid} for pid in (ci.get("passes") or {})]
     xp["disposition_source"] = "packet.json disposition_state"
     xp["packet"] = {"name": "packet.json", "sha256": file_digest(job / "packet.json")}
 
@@ -834,13 +838,14 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
             instrument[key] = None
 
     # ---- evaluators ----
-    evs, ev_calls, ev_ep = [], {}, {}
+    evs, ev_calls, ev_ep, ev_entries = [], {}, {}, {}
     for i, e in enumerate(ci.get("evaluators") or []):
         e_model = {k: v for k, v in (e.get("model") or {}).items() if k != "endpoint"}
         eh = {}
         if e.get("kind") == "model":
             eh = evaluator_history(job, ev_dir, ci, e, ref, pin_for(ci, ev_log, str(e.get("id")), ref), gaps, hand)
             ev_calls[e.get("id")], ev_ep[e.get("id")] = eh.get("calls", {}), eh.get("endpoint")
+            ev_entries[e.get("id")] = eh.get("entries") or {}
             if eh.get("endpoint"):
                 e_model["endpoint"] = eh["endpoint"]
         ev = {"id": e.get("id"), "name": e.get("name"), "kind": e.get("kind"),
@@ -916,8 +921,11 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
         # cross-checked against the call below.
         if f.get("at"):
             mark(f"passes.{pid}.at", rel_inputs, line_in(inputs_path, f.get("at"), "at"), "inputs-no-ledger")
-        call = link_call(ev_calls, f.get("evaluator"), f.get("call"),
-                         "eval_artifact" if n_passes == 1 else None, f"passes.{pid}", ref)
+        ev_map = ev_calls.get(f.get("evaluator")) or {}
+        linkable = (f.get("call") in ev_map) if f.get("call") else bool(ev_map)
+        call = (link_call(ev_calls, f.get("evaluator"), f.get("call"),
+                          "eval_artifact" if n_passes == 1 else None, f"passes.{pid}", ref)
+                if linkable else None)
         at_v, ep_v, xc = f.get("at"), f.get("endpoint"), {}
         if call is not None:
             H.cross_check(ref, f"passes.{pid}.at", f.get("at"), call.at, f"harness log {call.label}")
@@ -932,6 +940,13 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
             n = line_in(inputs_path, f.get("at"), "at")
             if n:
                 xc = {"at_source": f"{rel_inputs}:{n}"}
+        # The check's time comes FROM the harness log: the module named the entry (`<log>:<line>`), so a reader
+        # can find the call the time was read from, whether or not the per-call reader linked it.
+        entry = (ev_entries.get(f.get("evaluator")) or {}).get(f.get("call"))
+        if entry is not None:
+            at_v = H.iso(entry.received_at)
+            xc["at_source"] = entry.source
+            xc.setdefault("call", entry.name)
         for dim in dims_read:
             c = {"dimension": dim, "evaluator": f.get("evaluator"), "run": f.get("run", 1),
                  "batch": f.get("batch"), "at": ts(at_v, f"checks[{pid}/{dim}].at", gaps),
@@ -1349,13 +1364,22 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
                         f"external entry for it); {'not found: ' + repr(rel) if rel else 'none named'}, so its check "
                         f"times and endpoint have no source")
         return {}
+    # ONE reading of the log (kit/evaluator_harness_log.py) BEFORE any check time is linked to it: a malformed,
+    # partial or reversed entry is refused here, naming the entry, so the record never takes a check time from a
+    # log it cannot honestly read. The per-call reader below still supplies endpoints and routes.
+    try:
+        entries = harness_log.read(log)
+    except harness_log.HarnessLogError as exc:
+        ref.add("time", f"{who}: {exc}")
+        return {}
     # The emitter never writes its inputs (T7): the log is read as it is. Every call counts for T7b, not only the
     # call a check is linked to.
     log_calls = H.read_log(log, ref, who)
     flag_calls(log_calls, hand)
     calls = [c for c in log_calls if c.at]
     if not calls:
-        return {}
+        return {"entries": entries, "calls": {}, "endpoint": None,
+                "x": {"harness_log": log.name, "calls": []}}
     annotate(calls, who, (e.get("model") or {}).get("identifier"), ref, pin)
     check_pin_order(pin, calls, who, ref)
     first = min(calls, key=lambda c: c.at)
@@ -1372,7 +1396,7 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
     rx = routing_x(calls, pin, str(e.get("id")), gaps if gaps is not None else Gaps())
     if rx:
         x["routing"] = rx
-    return {"calls": named, "endpoint": first.endpoint, "x": x}
+    return {"calls": named, "endpoint": first.endpoint, "x": x, "entries": entries}
 
 
 def link_call(ev_calls: dict, ev_id, named, default, where: str, ref: H.Refusals):
