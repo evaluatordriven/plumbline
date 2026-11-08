@@ -63,6 +63,65 @@ def kind_note(p: dict) -> str:
             "brief's evaluator as {\"name\": ..., \"kind\": \"person\" | \"model\" | \"script\"}")
 
 
+def cl1_source_gaps(p: dict) -> list[str]:
+    """The three source facts a CL1 custody record needs, or the gaps that keep this packet from being one.
+
+    The claim read here is `proposed.level_claimed_for_own_record`: a baseline claim is not held to this bar.
+    A CL1 record needs bar.approvals from the Buyer and the Specialist (each naming who approved), controls from
+    the Evaluator's batch plan (at least one expecting conforms and one expecting does_not_conform), and
+    disposition.by from the human seat that disposes — custody/v1 requires (state, by, at, acknowledgesUnobserved),
+    so a CL1 record with state "not_yet_given" still carries by, naming the approver. These are sourced by the
+    Orchestrator from the approve events, the Specialist's bar and the Evaluator's plan; a packet missing them is
+    the packet template's defect, and the emitter's job is to refuse rather than let a later run source them.
+    """
+    proposed = p.get("proposed")
+    claimed = proposed.get("level_claimed_for_own_record") if isinstance(proposed, dict) else None
+    if claimed != "CL1":
+        return []
+    gaps: list[str] = []
+
+    # bar.approvals — the Buyer's and the Specialist's, each naming who approved.
+    bar = p.get("bar")
+    approvals = bar.get("approvals") if isinstance(bar, dict) else None
+    if not isinstance(approvals, list) or not approvals:
+        gaps.append("CL1 record missing bar.approvals — the Buyer's and the Specialist's approvals, each naming "
+                    "who approved (bar.approvals[].role and .by)")
+    else:
+        held: dict[str, str] = {}                 # by role, and by party name, so either spelling satisfies it
+        for a in approvals:
+            if not isinstance(a, dict) or blank(a.get("by")):
+                continue
+            role = a.get("role")
+            if isinstance(role, str) and role.strip():
+                held.setdefault(role.strip().lower(), a["by"])
+            held.setdefault(str(a["by"]).strip().lower(), a["by"])
+        for role in ("buyer", "specialist"):
+            seat_name = p.get(role)
+            approved = (role in held) or (isinstance(seat_name, str) and seat_name.strip().lower() in held)
+            if not approved:
+                gaps.append(f"CL1 record missing the {role} in bar.approvals — the {role} must approve and be "
+                            f"named (a bar.approvals entry with role {role!r} and by)")
+
+    # controls — the Evaluator's batch plan, carrying both expectations that make a record readable.
+    controls = p.get("controls")
+    expected = [c.get("expected") for c in controls if isinstance(c, dict)] if isinstance(controls, list) else []
+    if not expected:
+        gaps.append("CL1 record missing controls — the Evaluator's batch plan needs at least one control "
+                    "expecting conforms and one expecting does_not_conform")
+    else:
+        for want in ("conforms", "does_not_conform"):
+            if want not in expected:
+                gaps.append(f"CL1 record controls missing an expectation of {want} — at least one control must "
+                            f"expect conforms and one must expect does_not_conform")
+
+    # disposition.by — custody/v1 requires it; "not_yet_given" is a state, not an excuse to omit the source.
+    disp = p.get("disposition")
+    if not isinstance(disp, dict) or blank(disp.get("by")):
+        gaps.append("CL1 record missing disposition.by — custody/v1 requires (state, by, at, "
+                    "acknowledgesUnobserved); even state 'not_yet_given' names by, the human seat that disposes")
+    return gaps
+
+
 def refusals(p: dict, required: list[str]) -> list[str]:
     out = []
     for k in required:                                    # the law's own list, read from the corpus schema
@@ -147,6 +206,8 @@ def refusals(p: dict, required: list[str]) -> list[str]:
         out.append("Owner must not hold the Evaluator seat (§4)")
     elif mk and ev and mk.lower() == ev.lower():
         out.append(f"maker and evaluator are the same party ({ev!r}) — {INSTANCE_ADDED['maker_is_not_evaluator']}")
+    # A CL1 claim is a promise to carry its three sources; a template cannot defer them to the run that follows.
+    out.extend(cl1_source_gaps(p))
     return out
 
 
