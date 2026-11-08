@@ -1,0 +1,118 @@
+{
+  "job_id": "2026-11-07-loop-freeze",
+  "job_name": "loop() freezes the bar in the ledger before the Maker starts",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "buyer": "S2 (the Owner)",
+  "human_seat": "S2 (the Owner)",
+  "specialist": "Steve Moitozo II",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "job_to_be_done": {
+    "statement": "loop() freezes the custody bar in the ledger at the start, after it reads the packet and before it dispatches the Maker, so the freeze is a live event that precedes the Maker's first call. bar.frozenAt then has a live source and the emitter stops refusing on a hand time. kit/emit_custody.py, kit/custody_history.py and schemas/ are not touched. A run whose freeze cannot be written fails closed rather than falling through to emit a hand time."
+  },
+  "artifact": {
+    "repo": "https://github.com/evaluatordriven/plumbline.git",
+    "base": "cf283e71acb9381cb0785a285f78318f5d386d98",
+    "test_cmd": [
+      "python3",
+      "tests/test_loop_freeze.py"
+    ],
+    "editable": [
+      "kit/conductor_loop.py"
+    ],
+    "frozen": [
+      "kit/emit_custody.py",
+      "kit/custody_history.py",
+      "kit/custody_ledger.py",
+      "schemas/job-packet.schema.json",
+      "schemas/evaluator-record.schema.json",
+      "schemas/audit-record.schema.json",
+      "schemas/compliance-checklist.json",
+      "tools/pin.json",
+      "tools/build_schemas.py",
+      "tests/test_loop_freeze.py",
+      "tests/test_loop_custody_on_finish.py",
+      "tests/test_loop_custody_sources.py",
+      "tests/test_conductor_loop.py",
+      "tests/test_loop_started_at.py"
+    ],
+    "task_classes": {
+      "generation": false,
+      "revision": true,
+      "shown_by": "one completed run of loop() against a scratch job directory"
+    }
+  },
+  "ground_truth": [
+    {
+      "source": "tests/test_loop_freeze.py",
+      "version": "933144e932cf53d331d67e8c55cc130471f9fba786898a7743537e4f3659a918",
+      "hardness": "DOCUMENT",
+      "channel": "python3 tests/test_loop_freeze.py"
+    }
+  ],
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "standard_ref": {
+    "tests/test_loop_freeze.py": "933144e932cf53d331d67e8c55cc130471f9fba786898a7743537e4f3659a918"
+  },
+  "k": 4,
+  "x": 10,
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 4,
+    "cap_counts": "generations",
+    "budget": {
+      "amount": 7,
+      "unit": "USD",
+      "time_hours_lt": 2,
+      "note": "Owner bounds reused from the standing job. loop() reads time_hours_lt; the derived schema's closed budget shape cannot hold that key. The schema was not edited."
+    }
+  },
+  "escalation": {
+    "route": [
+      "Architect",
+      "Owner"
+    ],
+    "classes": [
+      "artifact_missed_standard",
+      "standard_moved",
+      "dimension_unauthorized",
+      "frame_at_fault"
+    ]
+  },
+  "maker": {
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+    "handoff": "rule12",
+    "engine": "aider",
+    "model": "deepseek/deepseek-v4-flash",
+    "edit_format": "diff"
+  },
+  "evaluator": {
+    "who": "plumbline-eval",
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "kind": "model",
+    "runs": 3,
+    "held_out": []
+  },
+  "feedback_forms": [
+    "violation with its measurement",
+    "pass-rule arithmetic"
+  ],
+  "readings_before_freeze": {
+    "reads": [
+      "the freeze branch of kit/custody_ledger.py and the shape of its event line",
+      "kit/conductor_loop.py's single subprocess call site and its dispatch order"
+    ],
+    "note": "both reads happened after the bar was frozen; they describe the tool the bar exercises, not the standard it is judged by"
+  }
+}

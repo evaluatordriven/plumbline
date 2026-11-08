@@ -25,6 +25,21 @@ reading of the same clock, and no ``ended_at``. Nothing reads these fields
 back: the deadline and the clock stop stay on the monotonic clock, so a
 wall-clock jump changes no stop, state, outcome or round count.
 
+Before any Maker turn, ``loop()`` freezes the bar in the ledger, but only when
+the job has signalled that it is custody-bearing. It does so right after the
+packet is loaded and validated and before the first Maker dispatch: the bar is
+``bar.file`` from ``<job>/inputs/custody.json``, read from the same relative
+path under the workspace, or, when nothing is declared, the convention file
+``<cwd>/custody/bar.md``. It copies that bar into the job directory unchanged
+and runs ``kit/custody_ledger.py freeze`` against the job directory, so the
+tool stamps its own clock and appends the event to
+``inputs/custody-events.jsonl``. ``loop()`` types no ``frozenAt`` value. A job
+that prepared neither signal is not refused: nothing is frozen. A
+custody-bearing job that names no bar and has no convention bar also fails
+closed, because the presence of ``inputs/custody.json`` removes the skip path.
+If a named or selected bar cannot be read, or the tool refuses, ``loop()``
+raises before the Maker command runs and never calls the emitter.
+
 A finish also has to ship a custody record. ``loop()`` calls
 ``emit_custody_for_finish(record_dir, summary)`` once, after the round records
 and a ``packet.json`` describing the finish exist and before ``summary.json``
@@ -263,6 +278,82 @@ def _custody_packet(packet, halt):
     return descriptor
 
 
+def freeze_bar(record_dir, root):
+    """Freeze the bar in the ledger, live, before the Maker is dispatched.
+
+    The bar is the one the job declares: ``bar.file`` in
+    ``record_dir/inputs/custody.json``, taken from the same relative path under
+    ``root``; when nothing is declared, the convention file
+    ``<root>/custody/bar.md``. The ledger tool names a bar relative to the job
+    directory, so the bar's bytes are copied there unchanged and the tool is
+    pointed at that copy. The tool stamps the freeze from its own clock and
+    appends the event to ``inputs/custody-events.jsonl``; this module types no
+    time.
+
+    A declared bar that cannot be read fails closed: this raises, naming the
+    declared path, before the Maker command runs — no Maker call and no
+    ``emit_custody.py`` run. A job is custody-bearing when
+    ``record_dir/inputs/custody.json`` exists or the convention bar exists. A
+    custody-bearing job that names no ``bar.file`` and has no convention bar
+    also fails closed: the presence of the custody inputs removes the skip
+    path, so it cannot lose its bar silently. A caller that prepared neither
+    signal is not refused: nothing is frozen and nothing is written.
+    """
+    job = os.path.abspath(str(record_dir))
+    declared = os.path.join(job, "inputs", "custody.json")
+    convention = os.path.join(root, "custody", "bar.md")
+    rel = _declared_bar(job)
+    if rel is None:
+        if not os.path.isfile(convention):
+            if os.path.isfile(declared):
+                raise RuntimeError(
+                    "job is custody-bearing but names no bar.file in %s and no convention bar "
+                    "exists at %s; cannot freeze before dispatch" % (declared, convention)
+                )
+            return
+        rel = "custody/bar.md"
+    source = os.path.join(root, rel)
+    if os.path.isabs(rel) or not os.path.isfile(source):
+        raise RuntimeError("no bar file at %s; cannot freeze before dispatch" % source)
+    dest = os.path.join(job, rel)
+    if not _inside(os.path.realpath(dest), os.path.realpath(job)):
+        raise RuntimeError("declared bar %s is outside the job directory; cannot freeze" % rel)
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    shutil.copyfile(source, dest)
+    ledger = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custody_ledger.py")
+    proc = subprocess.run(
+        [sys.executable, ledger, "freeze", "--job-dir", job, "--bar", rel],
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        detail = (proc.stderr or proc.stdout or "").strip() or "exit %s" % proc.returncode
+        raise RuntimeError("the bar could not be frozen in %s: %s" % (job, detail))
+
+
+def _declared_bar(job):
+    """``bar.file`` from ``<job>/inputs/custody.json``, or None if not declared.
+
+    A missing, unreadable or malformed file declares nothing, so the caller may
+    still fall back to the convention bar. A named bar is returned as written:
+    a path that cannot be read is then named in the failure, which is what the
+    fail-closed rule requires.
+    """
+    path = os.path.join(job, "inputs", "custody.json")
+    if not os.path.isfile(path):
+        return None
+    try:
+        with open(path, encoding="utf-8") as handle:
+            body = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    bar = body.get("bar") if isinstance(body, dict) else None
+    rel = bar.get("file") if isinstance(bar, dict) else None
+    if not isinstance(rel, str) or not rel.strip():
+        return None
+    return rel
+
+
 def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
     """Run the rounds the packet names, then file the finish and return it.
 
@@ -295,6 +386,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     if problems:
         _refuse(record_dir, loaded, problems, started_at)
         raise ValueError("; ".join(problems))
+
+    freeze_bar(record_dir, root)
 
     artifact = loaded["artifact"]
     bounds = loaded["bounds"]
