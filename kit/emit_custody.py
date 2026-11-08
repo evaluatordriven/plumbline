@@ -79,9 +79,20 @@ from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-import custody_history as H                      # noqa: E402
-import evaluator_harness_log as harness_log      # noqa: E402
+_KIT_DIR = Path(__file__).resolve().parent
+if __package__ in (None, ""):
+    # Run as a script (python3 kit/emit_custody.py): kit/ itself is the import root, as it always was.
+    if str(_KIT_DIR) not in sys.path:
+        sys.path.insert(0, str(_KIT_DIR))
+    import custody_history as H                      # noqa: E402
+    import evaluator_harness_log as harness_log      # noqa: E402
+else:
+    # Imported as kit.emit_custody (the suite, kit/plumbline_verify.py): import through the package, so every
+    # kit module sees ONE copy of each sibling. A bare import here would load a second copy under another name.
+    if str(_KIT_DIR.parent) not in sys.path:
+        sys.path.insert(0, str(_KIT_DIR.parent))
+    from kit import custody_history as H             # noqa: E402
+    from kit import evaluator_harness_log as harness_log  # noqa: E402
 
 SPEC_VERSION = "0.9.6"
 STATEMENT = "https://in-toto.io/Statement/v1"
