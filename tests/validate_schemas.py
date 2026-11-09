@@ -1122,12 +1122,14 @@ res((f"{S} · J14/A2 the refusal cites the EVALUATOR path, not only the maker's 
      f"listing harness-eval-a.log)",
      rc == 3 and "evaluator" in out and "harness-eval-a.log#" in out,
      f"exit {rc}: {out.strip()[-160:]}"))
-# A3 SPLIT into A3a (the refusal) and A3b (the emitted record). They assert on TWO DIFFERENT SURFACES and share
-# no artifact: the ruling this split encodes is "a test asserts where the value lives". The refusal text and the
-# emitted record are different places, and a bypassed emitter (the flag call deleted) shows up in the record as an
-# empty hand_times[] -- which the record assertion below catches -- never in the refusal, which no longer exists
-# once the switch is given. The call ids are READ FROM THE FIXTURE at write time, never a hardcoded count: the
-# fixture is the only thing that decides which calls its log carries.
+# A3 SPLIT into A3a (the refusal names every CALL) and A3b (the refusal names every FIELD on every call). They
+# assert on the SAME document -- the refusal text -- at two different resolutions, and share no artifact: the
+# ruling the split encodes is "a test asserts where the value lives". A3a answers WHICH CALLS were read; A3b
+# answers WHETHER the emitter's flag call ran at all -- a bypassed emitter (flag_calls made a no-op) still
+# refuses for the typed pass time, but the six evaluator `file#call.sent_at/.received_at` rows are ABSENT, so
+# A3b fails on its own field names while A3a may still pass. The call ids are READ FROM THE FIXTURE at write
+# time, never a hardcoded count: the fixture is the only thing that decides which calls its log carries.
+#
 _EVAL_LOG = FIX / "custody" / "evidence" / "harness-eval-a.log"
 _EVAL_CALLS = [e["call"] for e in json.loads(_EVAL_LOG.read_text(encoding="utf-8")) if isinstance(e, dict) and e.get("call")]
 
@@ -1166,25 +1168,31 @@ res((f"{S} · J14/A4 a genuine hand-entered time is still admitted under the swi
          == "--allow-hand-times",
      f"exit {rc}: hand_times={sorted(ht14)}"))
 
-# A3b -- ON THE EMITTED RECORD. Isolation (the Owner's condition, and it is a requirement): A3b performs its OWN
-# emit, into its OWN temp path, on its OWN raw copy, with its OWN --allow-hand-times switch. It does not read,
-# reuse or depend on any artifact the refusal path (A3a) produced -- A3a writes nothing by design, and this case
-# would not see it if it did. If A3a's emit path ever changes, this case is untouched: its inputs are its own copy
-# and its own switch. So a red A3b means a BYPASSED EMITTER (the flag call deleted => the six fields absent =>
-# hand_times[] empty), never a broken fixture chain: a chain break shows up as a missing record and is reported
-# as such, distinct from a record that was written with the fields absent.
-jb = job_copy_raw("j14-record")            # its own copy: unstamped harness logs, no reliance on A3a
-ob = TMP / "j14-record.json"               # its own output path
-rb, outb = emit(jb, ob, allow_hand=True)   # its own switch
-fb = ({e.get("field") for e in (json.loads(ob.read_text(encoding="utf-8"))["predicate"]["x-plumbline"].get("hand_times") or [])}
-      if ob.is_file() else set())
+# A3b -- ON THE REFUSAL'S PUBLISHED FIELD SET (re-seated, Job 14 turn 4). The property kept is "a deleted flag
+# call is detectable". The surface was the emitted record; that surface is WRONG under the Owner's ruling (B):
+# A1/A2 make an unsourced model-evaluator check time a REFUSAL even under --allow-hand-times, so a corrected
+# emitter writes NO record under the switch and a record assertion would go red on a CORRECT emitter. A bar wired
+# to the bug cannot be the bar. The refusal is the place the field set is actually published, and it is published
+# on BOTH emitters -- so this case drives the NO-SWITCH emit (the one refusal that exists regardless of the fix)
+# and asserts the six evaluator hand_time rows by FIELD NAME. Measured (probe, throwaways only):
+#   HEAD, flag present  -> exit 3, refusal names 6/6 of these fields   => PASSES
+#   HEAD, flag deleted  -> exit 3, refusal names 0/6 (typed pass only) => FAILS, on its own names
+#   CORRECTED, flag present (switch on or off) -> exit 3, 6/6          => PASSES (row 3: the contradiction is gone)
+# Isolation: A3b performs its OWN emit, its OWN temp path, its OWN raw copy, no switch. It does not read A3a's
+# output (A3a writes nothing by design). If A3a's assertion changes, this case is untouched.
+jb = job_copy_raw("j14-fieldset")          # its own copy: unstamped harness logs, no reliance on A3a
+ob = TMP / "j14-fieldset.json"             # its own output path
+rb, outb = emit(jb, ob, allow_hand=False)  # NO switch: the refusal that exists on both emitters
 # The six field names, built from the fixture's own call ids at write time: `file#call.sent_at` and `.received_at`.
 _EXPECT_FIELDS = [f"harness-eval-a.log#{c}.{f}" for c in _EVAL_CALLS for f in ("sent_at", "received_at")]
-res((f"{S} · J14/A3b the emitted record lists all six evaluator hand_times by field name "
+# Read only the [hand-time] rows, so a field name appearing elsewhere in the output cannot satisfy this.
+_HAND_ROWS = [ln for ln in outb.splitlines() if ln.strip().startswith("[hand-time]")]
+_MISSING = [f for f in _EXPECT_FIELDS if not any(f in ln for ln in _HAND_ROWS)]
+res((f"{S} · J14/A3b the refusal publishes all six evaluator hand_time fields by field name "
      f"({' + '.join(_EXPECT_FIELDS)}), not by length",
-     rb == 0 and ob.is_file() and all(name in fb for name in _EXPECT_FIELDS),
-     (f"exit {rb}: emitted with hand_times={sorted(fb)}" if ob.is_file()
-      else f"exit {rb}: no record written: {outb.strip()[-120:]}")))
+     rb == 3 and not ob.exists() and not _MISSING,
+     f"exit {rb}: refusal missing {_MISSING} of {_EXPECT_FIELDS}" if not ob.exists()
+     else f"exit {rb}: a record was WRITTEN without the switch (nothing published to read)"))
 
 # E1: a real disagreement between custody.json's disposition.at and the line's decided_at still refuses
 j = job_copy("dispose-mismatch")
