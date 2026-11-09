@@ -29,6 +29,12 @@ response `Date` header or its `created` epoch). The emitter REFUSES hand times b
 each hand time in `x-plumbline.hand_times[]` and records the allowance in `x-plumbline.allowances.hand_times`. The
 switch FLAGS hand times; it never verifies them, and it silences nothing else.
 
+The switch is about times TYPED into the custody inputs, never an unsourced one. A model evaluator's check time
+that exists only because its harness-log call carried no logger `sent_at`/`received_at`, so the reader fell back
+to a server `Date` header or a response `created` epoch, has no logger source at all; `--allow-hand-times` does
+not admit it. It is refused (exit 3, kind `time`, naming the log and EVERY unstamped call) exactly as a model
+evaluator with no harness log is refused.
+
 RELAYS ARE NOT APPROVALS. A `relay` ledger line is a report of something said elsewhere, never an approval. A
 buyer approval whose only evidence is a relay line (no `approve --role buyer` ledger line and no buyer entry in
 inputs/custody.json) is refused with kind `approval`, naming `buyer` (F1f): the record would otherwise count a
@@ -181,16 +187,23 @@ def call_cost(c) -> float:
     return 0.0
 
 
-def flag_calls(calls, hand: dict | None) -> None:
+def flag_calls(calls, hand: dict | None) -> list[dict]:
     """Every call of a harness log the emitter reads: a `.sent_at`/`.received_at` the logger did not stamp is a
     hand time (T7b), named with the server time's source and the file:line that carries it. Every call counts,
     not only the first and the last, and both fields (a log with no logger `sent_at` on its calls would otherwise
-    hide them). The log is never rewritten: a call the logger stamped adds nothing."""
+    hide them). The log is never rewritten: a call the logger stamped adds nothing.
+
+    Returns the entries it added: a caller that must REFUSE an unsourced check time (a model evaluator's time the
+    logger never stamped, which --allow-hand-times does not admit) has to name every call it read, not just the
+    first, so it needs the list and not only the side effect on `hand`."""
     if hand is None:
-        return
+        return []
+    added = []
     for c in calls:
         for e in c.hand_time_entries():
             hand[e["field"]] = e
+            added.append(e)
+    return added
 
 
 def ledger_array(lines: list[tuple[int, dict]], event: str) -> list[dict]:
@@ -850,13 +863,19 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
 
     # ---- evaluators ----
     evs, ev_calls, ev_ep, ev_entries = [], {}, {}, {}
+    # A model evaluator's check time that the logger never stamped -- the reader fell back to the response `Date`
+    # header or the response `created` epoch -- is NOT a hand-entered time, and --allow-hand-times must not admit
+    # it (Job 14). Collected here, refused at the assembly point below, naming every call the logger left unstamped.
+    ev_unsourced: list[tuple[str, dict]] = []
     for i, e in enumerate(ci.get("evaluators") or []):
         e_model = {k: v for k, v in (e.get("model") or {}).items() if k != "endpoint"}
         eh = {}
         if e.get("kind") == "model":
-            eh = evaluator_history(job, ev_dir, ci, e, ref, pin_for(ci, ev_log, str(e.get("id")), ref), gaps, hand)
+            eh = evaluator_history(job, ev_dir, ci, e, ref, pin_for(ci, ev_log, str(e.get("id")), ref), gaps, hand,
+                                   allow_hand=allow_hand)
             ev_calls[e.get("id")], ev_ep[e.get("id")] = eh.get("calls", {}), eh.get("endpoint")
             ev_entries[e.get("id")] = eh.get("entries") or {}
+            ev_unsourced += [(f"evaluator {e.get('id')}", en) for en in eh.get("unsourced") or []]
             if eh.get("endpoint"):
                 e_model["endpoint"] = eh["endpoint"]
         ev = {"id": e.get("id"), "name": e.get("name"), "kind": e.get("kind"),
@@ -1202,6 +1221,21 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
     if hand and allow_hand:
         xp["allowances"] = {"hand_times": {"switch": "--allow-hand-times", "writer": emitter_stamp(),
                                            "at": H.iso(now)}}
+        # The switch is about a value TYPED into the custody inputs with no ledger line behind it. It is not a
+        # licence for a model evaluator's check time the logger never stamped: that time exists only because the
+        # reader fell back to the response `Date` header or the response `created` epoch, and a record carrying it
+        # would report a check time with no logger source (the hollow record this program has shipped before).
+        # Refused with kind `time`, naming the log and EVERY call it did not stamp -- not aborted at the first --
+        # so the refusal cannot be satisfied by the abort-at-first-entry regression (Job 14;
+        # docs/custody-emission.md, Refusals: `[time]` is a check time with no logger source).
+        for who, entry in ev_unsourced:
+            basis = ("response Date header" if entry["source"] == "server-header"
+                     else "response created epoch")
+            ref.add("time", f"{who}: {entry['field']} carries no logger sent_at/received_at, so its time would be "
+                            f"the {basis} at {entry['file']}:{entry['line']} ({entry['source']}). "
+                            f"--allow-hand-times admits a time TYPED into the custody inputs with no ledger line "
+                            f"behind it; it does not admit a model evaluator's check time the logger never stamped "
+                            f"(custody CL1-15). Re-run the call so the logger records sent_at/received_at.")
     if hand and not allow_hand:
         for e in hand.values():
             ref.add("hand-time", f"{e['field']} {e['file']}:{e['line']} ({e['source']})")
@@ -1365,7 +1399,7 @@ def maker_history(job: Path, ev_dir: Path, ci: dict, m: dict, ref: H.Refusals, p
 
 
 def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusals, pin: dict | None = None,
-                      gaps: Gaps | None = None, hand: dict | None = None) -> dict:
+                      gaps: Gaps | None = None, hand: dict | None = None, allow_hand: bool = False) -> dict:
     who = f"evaluator {e.get('id')}"
     rel = e.get("harness_log") or next((x.get("evidence_file") for x in ci.get("external") or []
                                         if x.get("subject") == e.get("id")), None)
@@ -1396,7 +1430,10 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
     # The emitter never writes its inputs (T7): the log is read as it is. Every call counts for T7b, not only the
     # call a check is linked to.
     log_calls = H.read_log(log, ref, who)
-    flag_calls(log_calls, hand)
+    # Every call the logger did not stamp, returned so build() can refuse it under --allow-hand-times (Job 14).
+    # The refusal itself lives where the switch is decided: build() adds kind `time` for each of these entries,
+    # beside the no-switch `hand-time` refusal (T7b/E3). Keeping a second copy here would name each entry twice.
+    unsourced = flag_calls(log_calls, hand)
     calls = [c for c in log_calls if c.at]
     if not calls:
         return {"entries": entries, "calls": {}, "endpoint": None,
@@ -1417,7 +1454,8 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
     rx = routing_x(calls, pin, str(e.get("id")), gaps if gaps is not None else Gaps())
     if rx:
         x["routing"] = rx
-    return {"calls": named, "endpoint": first.endpoint, "x": x, "entries": entries}
+    return {"calls": named, "endpoint": first.endpoint, "x": x, "entries": entries,
+            "unsourced": unsourced}
 
 
 def link_call(ev_calls: dict, ev_id, named, default, where: str, ref: H.Refusals):
