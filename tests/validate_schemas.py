@@ -1122,12 +1122,28 @@ res((f"{S} · J14/A2 the refusal cites the EVALUATOR path, not only the maker's 
      f"listing harness-eval-a.log)",
      rc == 3 and "evaluator" in out and "harness-eval-a.log#" in out,
      f"exit {rc}: {out.strip()[-160:]}"))
-# A3: the naming E3 delivered, under the SAME fixture and the SAME switch A1 is refused under. Every call,
-# both fields, the log path and the call id -- the abort-at-the-first-entry behaviour would name one entry.
-res((f"{S} · J14/A3 E3's naming survives: every unstamped evaluator call is named (>= 3 harness-eval-a.log# "
-     f"entries, .sent_at, the file:line)",
-     rc == 3 and out.count("harness-eval-a.log#") >= 3 and ".sent_at" in out
-     and "harness-eval-a.log:" in out, f"exit {rc}: {out.strip()[-160:]}"))
+# A3 SPLIT into A3a (the refusal) and A3b (the emitted record). They assert on TWO DIFFERENT SURFACES and share
+# no artifact: the ruling this split encodes is "a test asserts where the value lives". The refusal text and the
+# emitted record are different places, and a bypassed emitter (the flag call deleted) shows up in the record as an
+# empty hand_times[] -- which the record assertion below catches -- never in the refusal, which no longer exists
+# once the switch is given. The call ids are READ FROM THE FIXTURE at write time, never a hardcoded count: the
+# fixture is the only thing that decides which calls its log carries.
+_EVAL_LOG = FIX / "custody" / "evidence" / "harness-eval-a.log"
+_EVAL_CALLS = [e["call"] for e in json.loads(_EVAL_LOG.read_text(encoding="utf-8")) if isinstance(e, dict) and e.get("call")]
+
+# A3a -- ON THE REFUSAL. A model evaluator whose harness log carries no logger stamps is refused WITH THE SWITCH
+# ABSENT, and the refusal names EVERY call the log carries, not the log aborted at its first entry. The surface
+# is the no-switch refusal text (the switch path publishes no refusal: under --allow-hand-times the record is
+# written, which is A3b's surface). Each id is asserted as its own `file#call` occurrence, so a refusal naming
+# one or two of them -- the abort-at-first-entry regression -- fails on the ids it dropped, never on a count.
+ja = job_copy_raw("j14-refusal")
+oa = TMP / "j14-refusal.json"
+ra, outa = emit(ja, oa, allow_hand=False)
+res((f"{S} · J14/A3a the no-switch refusal names EVERY evaluator call the log carries "
+     f"({' + '.join(_EVAL_CALLS)}), not the log at its first entry",
+     ra == 3 and not oa.exists()
+     and all(f"harness-eval-a.log#{c}" in outa for c in _EVAL_CALLS),
+     f"exit {ra}: named {[c for c in _EVAL_CALLS if f'harness-eval-a.log#{c}' not in outa]} of {_EVAL_CALLS}"))
 # A4: the switch still does what its name says. Stamp the evaluator's (and every other model seat's) harness
 # calls the way a logger does -- the job_copy_logged() stamp, the log's own response instant -- so the ONLY
 # unsourced time left is the typed pass time. The switch must admit it and list it with file and source. (What
@@ -1149,6 +1165,26 @@ res((f"{S} · J14/A4 a genuine hand-entered time is still admitted under the swi
      and ((r14b.get("x-plumbline") or {}).get("allowances") or {}).get("hand_times", {}).get("switch")
          == "--allow-hand-times",
      f"exit {rc}: hand_times={sorted(ht14)}"))
+
+# A3b -- ON THE EMITTED RECORD. Isolation (the Owner's condition, and it is a requirement): A3b performs its OWN
+# emit, into its OWN temp path, on its OWN raw copy, with its OWN --allow-hand-times switch. It does not read,
+# reuse or depend on any artifact the refusal path (A3a) produced -- A3a writes nothing by design, and this case
+# would not see it if it did. If A3a's emit path ever changes, this case is untouched: its inputs are its own copy
+# and its own switch. So a red A3b means a BYPASSED EMITTER (the flag call deleted => the six fields absent =>
+# hand_times[] empty), never a broken fixture chain: a chain break shows up as a missing record and is reported
+# as such, distinct from a record that was written with the fields absent.
+jb = job_copy_raw("j14-record")            # its own copy: unstamped harness logs, no reliance on A3a
+ob = TMP / "j14-record.json"               # its own output path
+rb, outb = emit(jb, ob, allow_hand=True)   # its own switch
+fb = ({e.get("field") for e in (json.loads(ob.read_text(encoding="utf-8"))["predicate"]["x-plumbline"].get("hand_times") or [])}
+      if ob.is_file() else set())
+# The six field names, built from the fixture's own call ids at write time: `file#call.sent_at` and `.received_at`.
+_EXPECT_FIELDS = [f"harness-eval-a.log#{c}.{f}" for c in _EVAL_CALLS for f in ("sent_at", "received_at")]
+res((f"{S} · J14/A3b the emitted record lists all six evaluator hand_times by field name "
+     f"({' + '.join(_EXPECT_FIELDS)}), not by length",
+     rb == 0 and ob.is_file() and all(name in fb for name in _EXPECT_FIELDS),
+     (f"exit {rb}: emitted with hand_times={sorted(fb)}" if ob.is_file()
+      else f"exit {rb}: no record written: {outb.strip()[-120:]}")))
 
 # E1: a real disagreement between custody.json's disposition.at and the line's decided_at still refuses
 j = job_copy("dispose-mismatch")
