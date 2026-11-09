@@ -1,0 +1,33 @@
+You are dispatched by the Orchestrator. This is not a chat.
+
+Job root: /home/jarbis1/tmp/plumbline-job31-cwd-5
+Artifact under test: /home/jarbis1/tmp/plumbline-job31-record-5/round-01/editable
+Turn file, with the gate's own numbers: /home/jarbis1/tmp/plumbline-job31-record-5/eval-turn.json
+Write the score JSON to: /home/jarbis1/tmp/plumbline-job31-record-5/eval-score.json
+Cost file, only if you measured a cost: /home/jarbis1/tmp/plumbline-job31-record-5/cost-01-eval-0.json
+
+Packet: /home/jarbis1/tmp/plumbline-job31/packet.json
+Test command, run this yourself before you score: python3 tests/test_validate_audit_root.py
+Frozen standard, read these files and no other bar:
+  schemas/job-packet.schema.json
+  schemas/evaluator-record.schema.json
+  schemas/audit-record.schema.json
+  schemas/compliance-checklist.json
+  schemas/custody-record.schema.json
+  tools/pin.json
+  tools/build_schemas.py
+  tools/edi_corpus.py
+  tests/validate_schemas.py
+  tests/validate_constitution.py
+  tests/validate_pin_prose.py
+  tests/run_all.py
+  tests/test_conductor_loop.py
+  tests/test_validate_audit_root.py
+
+
+The gate's numbers in the turn file are the Orchestrator's, not your measurement. Score the artifact as you find it.
+
+The score object must have dimensions (name, score, observation), violations (class is one of artifact_missed_standard, standard_moved, dimension_unauthorized, frame_at_fault), verdict (accept, regenerate, needs_owner, reject), and controls {"should_pass": "passed", "should_fail": "failed"}.
+Those two control values are exact tokens. Copy them. Do not explain them, do not write none, and do not describe the suite in their place. Any other string fails the instrument even when every dimension is 1.
+Dimension names are fixed by the frozen tests, not chosen by you. Use one dimension per test method in the frozen test file, named exactly the method name with the leading 'test_' removed, in file order. Every run of this job must produce the same dimension names; the Orchestrator compares runs by name, so a name you invent makes the two runs a split even when they agree.
+Do not edit the artifact. Do not invent a measurement. If you did not observe a dimension, do not score it.

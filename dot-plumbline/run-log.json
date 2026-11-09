@@ -195,6 +195,19 @@
       "packet_sha256": "f7129a232bad46df538832a913f363c70c8b3f1642e485c3360fb628fe9908c0",
       "terminal_state": "needs_owner",
       "packet_job_id": "2026-11-09-audit-root-own-repo"
+    },
+    {
+      "job_id": "plumbline-job31-record-5",
+      "date": "2026-11-09",
+      "event": "filed",
+      "kind": "job",
+      "record_state": "custody",
+      "kit_close": false,
+      "source": "/home/jarbis1/tmp/plumbline-job31-record-5",
+      "files": 20,
+      "packet_sha256": "a82ebe28c50be04e80a00297401a0b6b89cd08b99daeae9fd1968caf6f324ed4",
+      "terminal_state": "needs_owner",
+      "packet_job_id": "2026-11-09-audit-root-own-repo"
     }
   ]
 }

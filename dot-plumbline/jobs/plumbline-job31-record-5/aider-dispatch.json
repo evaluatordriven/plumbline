@@ -1,0 +1,13 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job31-record-5/aider-prompt.md",
+  "files": [
+    "tests/validate_audit.py"
+  ],
+  "read": [
+    "tests/test_validate_audit_root.py"
+  ],
+  "test_cmd": [
+    "python3",
+    "tests/test_validate_audit_root.py"
+  ]
+}

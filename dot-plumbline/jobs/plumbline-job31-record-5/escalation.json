@@ -1,0 +1,54 @@
+{
+  "best": {
+    "editable": "/home/jarbis1/tmp/plumbline-job31-record-5/round-01/editable",
+    "round": 1,
+    "sha256": "5ac764493e0411fc43b46ed63bc9167c30deb37c162bc57fe48a1eba2f9adb69"
+  },
+  "by": "loop()",
+  "decision": null,
+  "diagnosis": null,
+  "ended_at": "2026-11-09T22:33:38+00:00",
+  "escalation_kind": "other",
+  "holders": {
+    "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored this packet, its bar and its scope; does not ratify it and does not run the loop",
+    "not_holders": "The Architect does not hold the orchestrator seat here, and no holder above equals the Architect: holders.architect is 'Architect (Hermes plumbline-architect profile)', which is not an entry in holders.orchestrator.",
+    "orchestrator": [
+      {
+        "carries": "dispatch, the pass rule, the cap, the clock, the budget, the round records, the filing",
+        "does": "rounds",
+        "holder": "plumbline-conductor round runner",
+        "kind": "script",
+        "tested": "loop() of kit/conductor_loop.py at base 6793e53 has run to a filed finish under the kit's own end-to-end tests: tests/test_loop_freeze.py, tests/test_loop_custody_on_finish.py, tests/test_loop_custody_sources.py, tests/test_loop_started_at.py, tests/test_loop_filing.py, all named in artifact.frozen. Its refusals are the base's _problems(), read by the Architect before this packet was written. NOT yet shown by a run against this packet: loop() refuses this packet until the Owner sets ratified to true."
+      },
+      {
+        "carries": "the escalation record and the relay of the Owner's decision; the Architect writes the options and the recommendation",
+        "does": "escalations",
+        "holder": "escalation-delivery holder (the conductor profile's escalation route)",
+        "kind": "script",
+        "tested": "plumbline-escalate at the base: its refusals and its writer are exercised by tests/test_escalate.py; it writes escalation.json from loop()'s facts and relays the Owner's decision. It writes none of the content."
+      }
+    ]
+  },
+  "human_seat": "S2 (the Owner)",
+  "options": null,
+  "outcome": "no_observation",
+  "problems": [],
+  "proposed_packet": null,
+  "question": null,
+  "recommendation": null,
+  "route": [
+    "Architect",
+    "Owner"
+  ],
+  "started_at": "2026-11-09T22:23:27+00:00",
+  "stop": "evaluator failed",
+  "terminal_state": "needs_owner",
+  "tried": [
+    {
+      "record": "/home/jarbis1/tmp/plumbline-job31-record-5/round-01.json",
+      "record_sha256": "30e43648b73ddf85b23214401235eb9dff2f2f4cdcf513c1dae0e7a31085d8c5",
+      "round": 1
+    }
+  ],
+  "why_unobservable": null
+}

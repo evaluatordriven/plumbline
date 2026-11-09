@@ -1,0 +1,1167 @@
+TO LLM 2026-11-09T22:24:16
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Always use best practices when coding.
+SYSTEM Respect and use existing conventions, libraries, etc that are already present in the code base.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 
+SYSTEM 1. Decide if you need to propose *SEARCH/REPLACE* edits to any files that haven't been added to the chat. You can create new files without asking!
+SYSTEM 
+SYSTEM But if you need to propose edits to existing files not already added to the chat, you *MUST* tell the user their full path names and ask them to *add the files to the chat*.
+SYSTEM End your reply and wait for their approval.
+SYSTEM You can keep asking if you then decide you need to edit more files.
+SYSTEM 
+SYSTEM 2. Think step-by-step and explain the needed changes in a few short sentences.
+SYSTEM 
+SYSTEM 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM 
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM Keep in mind these details about the user's platform and environment:
+SYSTEM - Platform: Linux-7.0.0-38-generic-x86_64-with-glibc2.43
+SYSTEM - Shell: SHELL=/bin/bash
+SYSTEM - Language: English
+SYSTEM - Current date: 2026-11-09
+SYSTEM - The user is operating inside a git repository
+SYSTEM - The user's pre-commit runs this test command, don't suggest running them: python3 tests/test_validate_audit_root.py
+SYSTEM 
+SYSTEM 
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ```python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ```
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+SYSTEM The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER tests/test_validate_audit_root.py
+USER ```
+USER #!/usr/bin/env python3
+USER """Bar for JOB 31: tests/validate_audit.py resolves its audit root from the repo it is run in.
+USER 
+USER THE DEFECT, quoted from the base (commit 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35):
+USER 
+USER     tests/validate_audit.py:46
+USER         DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or REPO.parent).expanduser()
+USER     tests/validate_audit.py:113
+USER         homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+USER 
+USER With PLUMBLINE_AUDIT_ROOT unset, the search root is REPO.parent, and the suite globs
+USER <parent>/*/dot-plumbline/audits. A checkout that ships no dot-plumbline/audits/ of its own,
+USER sitting beside one that does, therefore reads the NEIGHBOUR's census and prints it as this
+USER tree's. Measured by the Architect on 2026-11-09 in a git archive of the base: beside a
+USER schema-valid neighbour it exits 0 and prints
+USER 
+USER     neighbour                1 record(s)
+USER     --- neighbour/2026-12-01-fixture.json ---
+USER       checked 1 record(s) from 1 home(s)
+USER     ALL AUDIT RECORDS CONSISTENT
+USER 
+USER That is the mis-measure, and it is NOT an exit code. A base run and a correct run both exit
+USER 0 and both print a clean summary. Every assertion below is on WHICH RECORD IS NAMED — the
+USER `--- <home>/<file> ---` section headers and the `checked N record(s) from M home(s)` coverage
+USER line — never on the exit code alone.
+USER 
+USER THE SPINE IS THE COMPARATIVE FORM (2026-11-09, third authoring of this bar)
+USER     The tree this bar lives in is now a clone with history, so `git archive BASE` in it
+USER     succeeds and yields a fixed subject. The bar therefore measures TWO subjects in one
+USER     room and asserts the DIFFERENCE between them:
+USER 
+USER       subject-base  a git archive of BASE (fixed bytes; the unfixed suite)  -> MUST name the neighbour
+USER       subject-work  a copy of the tree this bar lives in (the suite as it is now) -> MUST NOT name it
+USER 
+USER     The base naming the neighbour is the ONE RED this bar is built on: it proves both that
+USER     the defect is real and that the neighbour fixture is nameable. The work tree not naming
+USER     it is the fix. The bar is red at the base (subject-work == subject-base there, so it
+USER     names the neighbour) and green after the fix (subject-work differs). This is the form
+USER     the loop can actually use, because the work tree now carries the history `git archive`
+USER     needs.
+USER 
+USER     An earlier authoring built the subject only from the work tree, because a loop work
+USER     tree had no .git and `git archive BASE` exited 128 there. That shape had to be red on a
+USER     tree that was already fixed, or green on one that was not — it could not be an
+USER     instrument. It is gone.
+USER 
+USER THE SUBJECT DOES NOT MOVE (option C, ratified by the Owner)
+USER     PLUMBLINE_AUDIT_ROOT unset, in a checkout that ships no dot-plumbline/audits/ and sits
+USER     beside one that does:
+USER       - exit 0;
+USER       - nothing from the neighbour is named as checked — not in the discovered homes, not
+USER         in `checked N record(s) from M home(s)`;
+USER       - the suite is not silenced into reading nothing everywhere: a clean parent with its
+USER         own record still checks it, and an explicit PLUMBLINE_AUDIT_ROOT pointing at an
+USER         empty directory still exits 0.
+USER 
+USER THE CORPUS DECISION — REFUSE WHEN A CORPUS IS SUPPLIED BY AMBIENT ENVIRONMENT
+USER     Measured by the Architect on 2026-11-09: with EDI_CORPUS set in the environment to
+USER     /home/jarbis1/Jarbis-PARA/5_Devspace/edi, the base prints `corpus source: EDI_CORPUS`,
+USER     reads <that>@schemas/evaluator-record.schema.json and runs corpus.audit-equality — the
+USER     run is not corpus-free. With a bogus EDI_CORPUS it exits 2. So the result of the same
+USER     tree changes with an inherited variable, and that is not an instrument.
+USER 
+USER     The pin's vendored copy (schemas/vendor/e-di@<pin8>/) CANNOT be passed explicitly: it
+USER     holds evaluator-record.schema.json and fixtures/ but no schemas/job-packet.schema.json,
+USER     and tools/edi_corpus.py::_check refuses it as "not an E-DI corpus" (measured: exit 2).
+USER     So the only honest choice left is the other one: THE BAR REFUSES AN AMBIENT CORPUS.
+USER 
+USER     Concretely, every subject run here is built from a clean environment with EDI_CORPUS and
+USER     PLUMBLINE_REQUIRE_CORPUS REMOVED. Each run is therefore corpus-free by construction and
+USER     prints `SKIP[corpus] corpus.audit-equality`. The hostile test (5) plants a bogus
+USER     EDI_CORPUS and a bogus PLUMBLINE_AUDIT_ROOT in the ambient environment and shows the
+USER     bar's run does not read them — and shows the SAME planted environment, run against the
+USER     BASE, DOES name the decoy and read the corpus. That is what makes the hostile case able
+USER     to fail: it fails against a suite that reads the ambient value (the base), and passes
+USER     only for a suite that is run corpus-free.
+USER 
+USER FIXTURE NAMING. Generation is routed by filename date (validate_audit.py:61-66); only a name
+USER on or after 2026-09-29 validates against the live schema. The fixture here is named
+USER 2026-12-01-fixture.json so it is schema-valid under the live generation and a "not named"
+USER is about the root, never about a schema error.
+USER 
+USER Run:  python3 tests/test_validate_audit_root.py
+USER """
+USER from __future__ import annotations
+USER 
+USER import json
+USER import os
+USER import re
+USER import shutil
+USER import subprocess
+USER import sys
+USER import tempfile
+USER import unittest
+USER from pathlib import Path
+USER 
+USER PY = sys.executable
+USER REPO = Path(__file__).resolve().parent.parent
+USER SUITE = "tests/validate_audit.py"
+USER FIXTURE_NAME = "2026-12-01-fixture.json"
+USER 
+USER # The fixed base. Never the work tree's own HEAD: the subject must be the UNFIXED suite for
+USER # the comparative red to mean anything. Pointing this at HEAD would be green by construction.
+USER BASE = "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35"
+USER 
+USER # Variables that make a run depend on the caller's environment rather than on the tree.
+USER AMBIENT = ("PLUMBLINE_AUDIT_ROOT", "EDI_CORPUS", "PLUMBLINE_REQUIRE_CORPUS")
+USER 
+USER # A record schema-valid under the live (9999-12-31) generation the fixture name routes to.
+USER FIXTURE_RECORD = {
+USER     "passes": [{"pass_id": "p1", "kind": "scored", "status": "filed", "artifact": "pass-1.json"}],
+USER     "dimensions": [{
+USER         "name": "bar",
+USER         "score": 1,
+USER         "scale": "binary 0/1",
+USER         "anchor_note": "1 = the check passes",
+USER         "observation": "the reading this fixture stands for",
+USER         "observation_channel": "python3 tests/validate_audit.py",
+USER         "ground_truth_access": "blind_to_gt",
+USER     }],
+USER     "pass_rule": {"accept": 1, "dimension_floor": 1, "reject": 0, "cap": 2},
+USER     "violations": [],
+USER     "verdict": "accept",
+USER     "ground_truth_ref": "fixture",
+USER     "ground_truth_version": "0",
+USER     "ground_truth_hardness": "DOCUMENT",
+USER     "mandate_ref": {"doc": "fixture.md", "version": "0"},
+USER     "instrument_in_force": {"version": "0", "rubric_sha256": "0" * 64, "code_sha256": "0" * 64},
+USER     "evaluator_identity": "fixture-evaluator",
+USER     "channel_blind": True,
+USER     "ratified": True,
+USER     "instance_extensions": [
+USER         {"name": "artifact_ref", "label": "instance-specific", "value": "fixture"},
+USER         {"name": "method_note", "label": "instance-specific", "value": "fixture"},
+USER         {"name": "verdict_derivation", "label": "instance-specific", "value": "fixture"},
+USER     ],
+USER }
+USER 
+USER 
+USER # ----------------------------------------------------------------------------- subject builders
+USER 
+USER def _archive_subject(dest: Path) -> Path:
+USER     """`git archive BASE` in this tree, extracted into dest. One fixed subject.
+USER 
+USER     Raises RuntimeError naming BASE and the git stderr if the archive cannot be made — the
+USER     bar refuses to measure rather than silently substituting the work tree.
+USER     """
+USER     dest.mkdir(parents=True)
+USER     arch = subprocess.run(
+USER         ["git", "archive", BASE], cwd=str(REPO), capture_output=True,
+USER     )
+USER     if arch.returncode != 0:
+USER         raise RuntimeError(
+USER             "`git archive %s` failed in %s (rc=%d): %s" % (
+USER                 BASE, REPO, arch.returncode, arch.stderr.decode(errors="replace")[:400],
+USER             )
+USER         )
+USER     tar = subprocess.run(["tar", "-x", "-C", str(dest)], input=arch.stdout, capture_output=True)
+USER     if tar.returncode != 0:
+USER         raise RuntimeError("tar extraction of the base archive failed (rc=%d): %s"
+USER                            % (tar.returncode, tar.stderr.decode(errors="replace")[:400]))
+USER     return dest
+USER 
+USER 
+USER def _work_subject(dest: Path) -> Path:
+USER     """A copy of the tree this bar lives in — the suite as it is now, no .git, no bar.
+USER 
+USER     Nothing is archived, checked out or reverted. The suite goes in as it is.
+USER     """
+USER     shutil.copytree(
+USER         REPO, dest, symlinks=True,
+USER         ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc",
+USER                                       "test_validate_audit_root.py"),
+USER     )
+USER     return dest
+USER 
+USER 
+USER def _place_record(audits_dir: Path, name: str = FIXTURE_NAME, rec: dict | None = None) -> Path:
+USER     audits_dir.mkdir(parents=True, exist_ok=True)
+USER     path = audits_dir / name
+USER     path.write_text(json.dumps(rec or FIXTURE_RECORD), encoding="utf-8")
+USER     return path
+USER 
+USER 
+USER # ----------------------------------------------------------------------------- run helpers
+USER 
+USER def _clean_env() -> dict:
+USER     """The environment for a subject run: the caller's, minus every variable that leaks."""
+USER     return {k: v for k, v in os.environ.items() if k not in AMBIENT}
+USER 
+USER 
+USER def _run(subject: Path, override=None):
+USER     """Run the suite in `subject`.
+USER 
+USER     PLUMBLINE_AUDIT_ROOT and the corpus variables are REMOVED from the environment (the bar
+USER     refuses an ambient corpus); `override` sets the root explicitly.
+USER     """
+USER     env = _clean_env()
+USER     if override is not None:
+USER         env["PLUMBLINE_AUDIT_ROOT"] = str(override)
+USER     proc = subprocess.run(
+USER         [PY, SUITE], cwd=str(subject), env=env, capture_output=True, text=True, timeout=900,
+USER     )
+USER     return proc.returncode, proc.stdout + proc.stderr
+USER 
+USER 
+USER def _named_records(output: str) -> list:
+USER     """The records the run says it checked: the `--- <home>/<file> ---` section headers."""
+USER     return sorted(re.findall(r"^--- ([A-Za-z0-9_.@-]+)/([A-Za-z0-9_.-]+) ---$", output, re.M))
+USER 
+USER 
+USER def _named_homes(output: str) -> list:
+USER     """The homes the run says it discovered records in: the `<home> N record(s)` census lines."""
+USER     return re.findall(r"^\s+(\S+)\s+\d+ record\(s\)$", output, re.M)
+USER 
+USER 
+USER def _checked(output: str):
+USER     """The `checked N record(s) from M home(s)` coverage line, or None."""
+USER     m = re.search(r"checked (\d+) record\(s\) from (\d+) home\(s\)", output)
+USER     return (int(m.group(1)), int(m.group(2))) if m else None
+USER 
+USER 
+USER class ValidateAuditRootTest(unittest.TestCase):
+USER     """One room per test: a temp parent holding subject-base/ and subject-work/."""
+USER 
+USER     def setUp(self):
+USER         self._tmp = tempfile.TemporaryDirectory(prefix="job31-bar-")
+USER         self.tmp = Path(self._tmp.name)
+USER         self.parent = self.tmp / "parent"
+USER         self.parent.mkdir()
+USER 
+USER     def tearDown(self):
+USER         self._tmp.cleanup()
+USER 
+USER     def _subjects(self):
+USER         """The one fixed base subject and the work subject, built in this test's parent."""
+USER         base = _archive_subject(self.parent / "subject-base")
+USER         work = _work_subject(self.parent / "subject-work")
+USER         return base, work
+USER 
+USER     # ------------------------------------------------------------------ guards (kept in their own right)
+USER 
+USER     def test_0a_the_suite_is_present_in_both_subjects(self):
+USER         """Provenance guard: without the suite nothing below means anything; refuse by name."""
+USER         base, work = self._subjects()
+USER         for name, tree in (("subject-base", base), ("subject-work", work)):
+USER             self.assertTrue(
+USER                 (tree / SUITE).is_file(),
+USER                 "%s does not contain %s; the bar cannot measure a suite that is not there"
+USER                 % (name, SUITE),
+USER             )
+USER 
+USER     def test_0b_the_subjects_ship_no_audits_of_their_own(self):
+USER         """The option-C case requires a checkout with NO dot-plumbline/audits/ of its own."""
+USER         base, work = self._subjects()
+USER         for name, tree in (("subject-base", base), ("subject-work", work)):
+USER             self.assertFalse(
+USER                 (tree / "dot-plumbline" / "audits").is_dir(),
+USER                 "%s ships a dot-plumbline/audits/; checks 1-2 measure a checkout with none, "
+USER                 "so the neighbour case they describe does not arise in %s" % (name, name),
+USER             )
+USER 
+USER     def test_0c_the_neighbour_fixture_is_a_census_a_suite_can_read(self):
+USER         """Guard: the neighbour record IS named when the root is pointed at the parent that holds it.
+USER 
+USER         Turns a later 'not named' from a possible silence into a measured absence: if the
+USER         fixture cannot be named even under an explicit root, a suite that reads nothing
+USER         everywhere would pass checks 1-2 by accident.
+USER         """
+USER         base, work = self._subjects()
+USER         _place_record(self.parent / "neighbour" / "dot-plumbline" / "audits")
+USER 
+USER         code, out = _run(work, override=self.parent)
+USER 
+USER         self.assertIn(
+USER             ("neighbour", FIXTURE_NAME), _named_records(out),
+USER             "the neighbour fixture must be nameable when the root is pointed at the directory "
+USER             "that holds it; otherwise a later 'not named' proves only that the fixture was "
+USER             "never visible. named=%r\n%s" % (_named_records(out), out),
+USER         )
+USER         self.assertEqual(code, 0, "a schema-valid fixture under an explicit root must exit 0; "
+USER                                   "exited %d.\n%s" % (code, out))
+USER 
+USER     # ------------------------------------------------------------------ the spine (comparative)
+USER 
+USER     def test_1_the_base_names_the_neighbour_and_the_work_tree_does_not(self):
+USER         """THE SPINE. One room, two subjects, one assertion on the difference.
+USER 
+USER         subject-base (fixed bytes of BASE) MUST name the neighbour's record as checked — this
+USER         is the one red, and it proves the defect is real and the fixture nameable.
+USER         subject-work (the tree this bar lives in) MUST NOT name it — this is the fix.
+USER         """
+USER         base, work = self._subjects()
+USER         _place_record(self.parent / "neighbour" / "dot-plumbline" / "audits")
+USER 
+USER         base_code, base_out = _run(base, override=None)
+USER         work_code, work_out = _run(work, override=None)
+USER 
+USER         # (a) the red: the base reads the neighbour as this tree's.
+USER         self.assertIn(
+USER             ("neighbour", FIXTURE_NAME), _named_records(base_out),
+USER             "the base (git archive %s) must name the neighbour's record as checked; if it does "
+USER             "not, the room is not exercising the defect and the red below is vacuous. "
+USER             "named=%r rc=%d\n%s" % (BASE, _named_records(base_out), base_code, base_out),
+USER         )
+USER 
+USER         # (b) the fix: the work tree does not.
+USER         self.assertNotIn(
+USER             ("neighbour", FIXTURE_NAME), _named_records(work_out),
+USER             "the work tree's suite named the neighbour's record as checked by a checkout that "
+USER             "does not contain it; it read a sibling tree as this one. named=%r rc=%d\n%s"
+USER             % (_named_records(work_out), work_code, work_out),
+USER         )
+USER         self.assertNotIn(
+USER             "neighbour", _named_homes(work_out),
+USER             "the work tree's suite reported the neighbour's census as this tree's. homes=%r\n%s"
+USER             % (_named_homes(work_out), work_out),
+USER         )
+USER         checked = _checked(work_out)
+USER         if checked is not None:
+USER             self.assertEqual(
+USER                 checked, (0, 0),
+USER                 "a checkout with no records of its own must report checking none; reported "
+USER                 "%d record(s) from %d home(s).\n%s" % (checked[0], checked[1], work_out),
+USER             )
+USER 
+USER     def test_2_the_c_case_exits_zero_and_states_it_read_nothing(self):
+USER         """The C case on the work tree: no override, exit 0, and it says it read nothing.
+USER 
+USER         The exit code alone is green at the base; the naming half is check 1. Both are here
+USER         so the Owner's ruling is written down as the Owner wrote it.
+USER         """
+USER         _, work = self._subjects()
+USER         _place_record(self.parent / "neighbour" / "dot-plumbline" / "audits")
+USER 
+USER         code, out = _run(work, override=None)
+USER 
+USER         self.assertNotIn(
+USER             ("neighbour", FIXTURE_NAME), _named_records(out),
+USER             "the C case: with no override the neighbour's record must not be named as "
+USER             "checked.\n%s" % out,
+USER         )
+USER         self.assertEqual(
+USER             code, 0,
+USER             "the C case: a checkout with no audits of its own and no override must exit 0 "
+USER             "as an explicit empty root does; exited %d.\n%s" % (code, out),
+USER         )
+USER 
+USER     # ------------------------------------------------------------------ guards that the fix is not silence
+USER 
+USER     def test_3_the_override_still_works_on_the_work_tree(self):
+USER         """PLUMBLINE_AUDIT_ROOT=<empty dir> is honoured on the work tree: exit 0, nothing named."""
+USER         _, work = self._subjects()
+USER         _place_record(self.parent / "neighbour" / "dot-plumbline" / "audits")
+USER         empty = self.tmp / "empty-root"
+USER         empty.mkdir()
+USER 
+USER         code, out = _run(work, override=empty)
+USER 
+USER         self.assertEqual(code, 0, "an explicit empty root must exit 0; exited %d.\n%s" % (code, out))
+USER         self.assertEqual(
+USER             _named_records(out), [],
+USER             "an explicit empty root must name no record as checked and must not fall through "
+USER             "to the neighbour; named=%r\n%s" % (_named_records(out), out),
+USER         )
+USER 
+USER     def test_4_a_clean_parent_with_its_own_record_is_still_checked(self):
+USER         """Guard: the work tree has not been silenced into reading nothing everywhere.
+USER 
+USER         A checkout carrying its own dot-plumbline/audits/ with one record, in a parent with no
+USER         other checkout, must still check that record.
+USER         """
+USER         _, work = self._subjects()
+USER         _place_record(work / "dot-plumbline" / "audits")
+USER 
+USER         code, out = _run(work, override=None)
+USER 
+USER         self.assertIn(
+USER             ("subject-work", FIXTURE_NAME), _named_records(out),
+USER             "a checkout carrying its own record must still check it; named=%r\n%s"
+USER             % (_named_records(out), out),
+USER         )
+USER         self.assertIn(
+USER             "subject-work", _named_homes(out),
+USER             "the checkout's own census must be listed; homes=%r\n%s" % (_named_homes(out), out),
+USER         )
+USER         checked = _checked(out)
+USER         self.assertIsNotNone(
+USER             checked, "the run must state coverage; no 'checked N record(s)' line.\n%s" % out)
+USER         self.assertEqual(
+USER             checked, (1, 1),
+USER             "the checkout's own one record must be the one checked; stated %r.\n%s" % (checked, out))
+USER         self.assertEqual(code, 0, "checking its own valid record must exit 0; exited %d.\n%s"
+USER                                   % (code, out))
+USER 
+USER     # ------------------------------------------------------------------ the corpus defect, as a test
+USER 
+USER     def test_5_a_corpus_or_root_supplied_by_the_environment_is_not_silently_read(self):
+USER         """REFUSE-ON-AMBIENT, proven non-vacuous.
+USER 
+USER         The bar refuses a corpus supplied by ambient environment: it runs every subject with
+USER         EDI_CORPUS / PLUMBLINE_REQUIRE_CORPUS removed, so each run is corpus-free by
+USER         construction. This test proves three things:
+USER 
+USER           (a) the bar's own run of the work tree, with no ambient corpus and no ambient root,
+USER               prints SKIP[corpus] and does not name a home planted anywhere by the caller —
+USER               it is corpus-free and root-clean;
+USER           (b) the SAME junk planted in the ambient environment, run against the BASE without
+USER               the bar's scrub, DOES name the decoy home and read the ambient corpus — so the
+USER               hostile case can fail, and it fails for a suite that reads the ambient value.
+USER               A case that cannot fail is not a case;
+USER           (c) a bogus EDI_CORPUS is refused by name (exit 2, the value quoted), not read.
+USER         """
+USER         base, work = self._subjects()
+USER         _place_record(self.parent / "neighbour" / "dot-plumbline" / "audits")
+USER 
+USER         decoy_root = self.tmp / "decoy-audits"
+USER         _place_record(decoy_root / "decoy-home" / "dot-plumbline" / "audits",
+USER                       name="2026-12-01-decoy.json")
+USER         bogus_corpus = str(self.tmp / "no-such-corpus")
+USER 
+USER         # (a) the bar's ordinary run is corpus-free and does not see a caller-planted root.
+USER         _, work_out = _run(work, override=None)
+USER         self.assertNotIn(
+USER             "decoy-home", work_out,
+USER             "the work tree's run named a home that exists only under a caller's planted root; "
+USER             "the bar's clean environment is not reaching the subject.\n%s" % work_out,
+USER         )
+USER         self.assertNotIn(
+USER             "corpus source:", work_out,
+USER             "the work tree's run read a corpus; the bar must run corpus-free.\n%s" % work_out,
+USER         )
+USER         self.assertIn(
+USER             "SKIP[corpus]", work_out,
+USER             "a corpus-free run must say so with SKIP[corpus]; its absence means the corpus "
+USER             "gate was not exercised.\n%s" % work_out,
+USER         )
+USER 
+USER         # (b) non-vacuity: the same planted environment, without the bar's scrub, IS read.
+USER         env = _clean_env()
+USER         real = os.environ.get("EDI_CORPUS")
+USER         if real:
+USER             env["EDI_CORPUS"] = real
+USER         env["PLUMBLINE_AUDIT_ROOT"] = str(decoy_root)
+USER         proc = subprocess.run([PY, SUITE], cwd=str(base), env=env,
+USER                               capture_output=True, text=True, timeout=900)
+USER         base_planted = proc.stdout + proc.stderr
+USER         self.assertIn(
+USER             "decoy-home", base_planted,
+USER             "the base, run with a PLUMBLINE_AUDIT_ROOT planted in the environment, must name "
+USER             "the decoy home; if it does not, check (a) proves only that the decoy was never "
+USER             "visible. This is the non-vacuity of the hostile case.\n%s" % base_planted,
+USER         )
+USER         if real:
+USER             self.assertIn(
+USER                 "corpus source:", base_planted,
+USER                 "the base, run with the ambient EDI_CORPUS left in place, must read it; if it "
+USER                 "does not, the corpus half of the hostile case is vacuous.\n%s" % base_planted,
+USER             )
+USER 
+USER         # (c) a bogus corpus is refused by name, never read.
+USER         env = _clean_env()
+USER         env["EDI_CORPUS"] = bogus_corpus
+USER         proc = subprocess.run([PY, SUITE], cwd=str(work), env=env,
+USER                               capture_output=True, text=True, timeout=900)
+USER         refused = proc.stdout + proc.stderr
+USER         self.assertEqual(
+USER             proc.returncode, 2,
+USER             "a set EDI_CORPUS that is not a corpus must be a usage error (exit 2); exited %d.\n%s"
+USER             % (proc.returncode, refused),
+USER         )
+USER         self.assertIn(
+USER             bogus_corpus, refused,
+USER             "the refusal must name the offending value, not fall through silently.\n%s" % refused,
+USER         )
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER dot-plumbline/jobs/plumbline-harnesslog-record-1/custody/files/kit/evaluator_harness_log.py:
+USER ⋮
+USER │class HarnessLogError(Exception):
+USER ⋮
+USER │def parse_instant(value):
+USER ⋮
+USER │def read(path) -> dict:
+USER ⋮
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/derive.py:
+USER ⋮
+USER │def parse_iso(s) -> datetime | None:
+USER ⋮
+USER │def load_log(p: Path) -> list[dict]:
+USER ⋮
+USER │def reply_provider(c: dict) -> str | None:
+USER ⋮
+USER │def pin_match(name, pin: dict) -> bool:
+USER ⋮
+USER │def seat_endpoint(log: Path | None, ledger: list[dict], seat: str) -> dict:
+USER ⋮
+USER │def find_seat_log(ev_dirs: list[Path], seat: str, named: str | None = None) -> Path | None:
+USER ⋮
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/ncheck.py:
+USER ⋮
+USER │def resolve(job: Path, f: str) -> Path | None:
+USER ⋮
+USER 
+USER examples/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/lib.py:
+USER ⋮
+USER │def job_paths(job) -> dict:
+USER ⋮
+USER │def get(obj, path):
+USER ⋮
+USER 
+USER kit/conductor_software.py:
+USER ⋮
+USER │def resolve(path: str, cwd: str | None = None) -> str:
+USER ⋮
+USER │def record_red(exit_code, output: bytes | None) -> dict:
+USER ⋮
+USER 
+USER tools/edi_corpus.py:
+USER ⋮
+USER │class CorpusUsageError(Exception):
+USER ⋮
+USER │def require_corpus() -> bool:
+USER ⋮
+USER │def hermes_config_path() -> Path:
+USER ⋮
+USER │def resolve(explicit: str | None = None, need: tuple[str, ...] = (), hermes: bool = True) -> Corpus
+USER ⋮
+USER │def usage_exit(msg: str) -> "None":
+USER ⋮
+USER │def no_corpus_reason(hermes: bool = True) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER tests/validate_audit.py
+USER ```
+USER #!/usr/bin/env python3
+USER """Self-consistency: an audit is a §5 evaluator run, so the audit records must satisfy §5 —
+USER and Plumbline's own output must be checkable by the same algebra it enforces.
+USER 
+USER WHERE RECORDS LIVE (this changed on 2026-09-29 — see dot-plumbline/README.md)
+USER     A record travels with the artifact (Contracts §10.1), so records are NOT centralised here.
+USER     They are discovered under the convention: every repo may carry
+USER 
+USER         <repo>/dot-plumbline/audits/*.json
+USER 
+USER     That means: wsww's audits live in wsww's repo, Plumbline's audits of itself live in this repo's
+USER     dot-plumbline/audits/, and a program with no local checkout keeps its records in its Drive
+USER     project folder — which this script cannot read, so it says so rather than passing silently.
+USER     The search root is the directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT.
+USER 
+USER Four things are asserted, and each one can fail:
+USER 
+USER   1. GENERATION MAP. A filed record is judged against the schema generation in force on the day it
+USER      was filed. A record keeps the vocabulary it was written in (Contracts §12).
+USER   2. THE ALGEBRA IS RECOMPUTED, never trusted: every verdict re-derived from §3's pass rule.
+USER   3. THE LIVE SCHEMAS ARE THE CORPUS'S — the derived record schema must still be the corpus §5 shape.
+USER      It is checked against the VENDORED corpus schema (schemas/vendor/e-di@<pin8>/), so it runs with no
+USER      corpus. With a corpus (EDI_CORPUS), corpus.audit-equality also checks that the vendored schema is still
+USER      the corpus's bytes; with none it prints SKIP[corpus] (FAIL[corpus] and exit 1 under
+USER      PLUMBLINE_REQUIRE_CORPUS=1) and the rest of the checks still run.
+USER   4. COVERAGE IS STATED. How many records were checked, from which homes, and which programs were
+USER      NOT checked and why. A validator that silently checks nothing is worse than none.
+USER 
+USER Usage:  python3 tests/validate_audit.py      (EDI_CORPUS=<e-di checkout> adds corpus.audit-equality)
+USER """
+USER from __future__ import annotations
+USER 
+USER import json
+USER import os
+USER import re
+USER import sys
+USER from pathlib import Path
+USER 
+USER from jsonschema import Draft202012Validator
+USER 
+USER REPO = Path(__file__).resolve().parent.parent
+USER SHIP = REPO / "schemas"
+USER LEGACY = SHIP / "legacy"
+USER PIN = json.loads((REPO / "tools" / "pin.json").read_text(encoding="utf-8"))
+USER # Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override with $PLUMBLINE_AUDIT_ROOT.
+USER DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or REPO.parent).expanduser()
+USER 
+USER GENERATIONS = [
+USER     ("2026-09-20", LEGACY, "pre-observation vocabulary (evidence/evidence_channel, needs_human)"),
+USER     ("2026-09-29", LEGACY / "plumbline-s8-2026-09", "Plumbline §8 extension, pre-doctrine-alignment"),
+USER     ("9999-12-31", SHIP, "derived from the corpus pin (corpus §5 shape; audit fields in instance_extensions)"),
+USER ]
+USER 
+USER # Programs whose records live outside any local checkout. Named, so the gap is visible instead of
+USER # being counted as "nothing to check".
+USER DRIVE_ONLY = {
+USER     "eddie": "records kept in the program's project folder, not in a local checkout",
+USER }
+USER 
+USER 
+USER def generation_for(name: str):
+USER     date = name[:10]
+USER     for upper, path, note in GENERATIONS:
+USER         if date < upper:
+USER             return path, note
+USER     return SHIP, GENERATIONS[-1][2]
+USER 
+USER 
+USER def load(p: Path) -> dict:
+USER     return json.loads(p.read_text(encoding="utf-8"))
+USER 
+USER 
+USER fails = 0
+USER checked = 0
+USER unchecked: list[tuple[str, str]] = []
+USER 
+USER # --- 3. the live derived record schema still carries the corpus §5 requiredness ----
+USER # Check 3 reads the VENDORED corpus schema, so it needs no corpus. The corpus itself is resolved at run time
+USER # through the shared D-E resolver (tools/edi_corpus.py); a set EDI_CORPUS that is not a corpus exits 2 naming it.
+USER sys.path.insert(0, str(REPO / "tools"))
+USER import edi_corpus  # noqa: E402
+USER 
+USER _resolved, _required = edi_corpus.resolve_or_exit(None, ("schemas/evaluator-record.schema.json",), hermes=False)
+USER _vendored_record = SHIP / "vendor" / f"e-di@{PIN['commit'][:8]}" / "evaluator-record.schema.json"
+USER corpus_schema = load(_vendored_record)
+USER if _resolved:
+USER     _same = (_resolved.path / "schemas" / "evaluator-record.schema.json").read_bytes() == _vendored_record.read_bytes()
+USER     print(f"[{'ok' if _same else 'FAIL'}] vendored evaluator-record.schema.json is the corpus's bytes "
+USER           f"({_resolved.path}@schemas/evaluator-record.schema.json)")
+USER     if not _same:
+USER         fails += 1
+USER     edi_corpus.ran("corpus.audit-equality", _same)
+USER elif edi_corpus.not_run("corpus.audit-equality", _required, edi_corpus.NO_CORPUS_ENV):
+USER     fails += 1
+USER live_record = load(SHIP / "evaluator-record.schema.json")
+USER live_audit = load(SHIP / "audit-record.schema.json")
+USER Draft202012Validator.check_schema(live_audit)
+USER print("[ok] audit-record.schema.json (derived) is a valid draft 2020-12 schema")
+USER 
+USER for label, cond in (
+USER     ("live record schema requires exactly the corpus's §5 fields",
+USER      set(corpus_schema["required"]) == set(live_record["required"])),
+USER     ("live record schema is closed (additionalProperties: false), like the corpus's",
+USER      live_record.get("additionalProperties") is False and corpus_schema.get("additionalProperties") is False),
+USER ):
+USER     print(f"[{'ok' if cond else 'FAIL'}] {label}")
+USER     if not cond:
+USER         fails += 1
+USER ext_req = [c for c in live_audit.get("allOf", []) if "instance_extensions" in json.dumps(c)]
+USER print(f"[ok] audit schema requires {len(ext_req)} named instance_extensions entries")
+USER 
+USER # --- discover records under the convention ------------------------------------------
+USER homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+USER records = [(home.parent.parent.name, f) for home in homes for f in sorted(home.glob("*.json"))]
+USER 
+USER print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")
+USER for home in homes:
+USER     n = len(list(home.glob('*.json')))
+USER     print(f"  {home.parent.parent.name:<24} {n} record(s)")
+USER for name, why in DRIVE_ONLY.items():
+USER     unchecked.append((name, why))
+USER 
+USER if not records:
+USER     if not (REPO / "dot-plumbline" / "audits").is_dir():
+USER         # The public repository ships no audit records of its own (they stay in the private evidence archive),
+USER         # so there is nothing in reach to validate. Say so by name rather than pass silently; the schema checks
+USER         # above still ran. A checkout that HAS a dot-plumbline/audits/ and finds no records still fails below.
+USER         print("\nNO AUDIT RECORDS IN REACH — this checkout ships no dot-plumbline/audits/ and none was found under "
+USER               f"{DEVSPACE}; only the schema checks above ran.")
+USER         for name, why in unchecked:
+USER             print(f"  unchecked: {name} — {why}")
+USER         sys.exit(1 if fails else 0)
+USER     print("\nNO RECORDS FOUND — nothing was validated. This is a coverage failure, not a pass.")
+USER     for name, why in unchecked:
+USER         print(f"  unchecked: {name} — {why}")
+USER     sys.exit(1)
+USER 
+USER for program, path in records:
+USER     rec = load(path)
+USER     schema_dir, note = generation_for(path.name)
+USER     audit = Draft202012Validator(load(schema_dir / "audit-record.schema.json"))
+USER     strict = Draft202012Validator(load(schema_dir / "evaluator-record.schema.json"))
+USER     audit_s, strict_s = load(schema_dir / "audit-record.schema.json"), load(schema_dir / "evaluator-record.schema.json")
+USER     checked += 1
+USER 
+USER     print(f"\n--- {program}/{path.name} ---")
+USER     print(f"  generation: {schema_dir.relative_to(REPO)}  ({note})")
+USER 
+USER     # --- READINGS RECORDS: §5's schema does not describe this form -----------------------
+USER     # §5's record schema is titled "(scored)" and requires score:number per dimension; C29's
+USER     # readings form requires NEVER numbers. So a readings record is NOT validated against §5 —
+USER     # that would be checking it against a law that does not govern it. It is checked against
+USER     # what the readings form actually promises, and every claim is recomputed from the pass
+USER     # files rather than trusted from the record's own summary. A census whose passes cannot be
+USER     # re-derived is unverifiable, and unverifiable is reported, not passed.
+USER     if rec.get("record_kind") == "readings":
+USER         job_dir = REPO / "dot-plumbline" / "jobs" / rec.get("job_id", "")
+USER         pass_files = sorted(job_dir.glob("pass-*.json"))
+USER         print("  kind: readings — §5 describes the scored form only; checked against the readings form")
+USER         print(f"  declared exit: {rec.get('recommended_exit')} · passes declared: {rec.get('passes')}")
+USER         if not pass_files:
+USER             fails += 1
+USER             print("     *** NO PASS FILES — passes cannot be re-derived, so the census is UNVERIFIED ***")
+USER             continue
+USER         per_pass = {}
+USER         for pf in pass_files:
+USER             pd = json.loads(pf.read_text())
+USER             per_pass[pf.name] = {r["clause"]: r["reading"] for r in pd["readings"]}
+USER         ids = sorted({c for p in per_pass.values() for c in p})
+USER         legal = {"conforms", "does_not_conform", "unobserved"}
+USER         for name, p in per_pass.items():
+USER             miss = [c for c in ids if c not in p]
+USER             if miss:
+USER                 fails += 1
+USER                 print(f"     *** {name} does not cover every clause — missing {miss} ***")
+USER             bad = {c: v for c, v in p.items() if v not in legal}
+USER             if bad:
+USER                 fails += 1
+USER                 print(f"     *** {name} carries illegal readings: {bad} ***")
+USER         derived_nc, derived_flap = [], []
+USER         for c in ids:
+USER             vals = {per_pass[n][c] for n in per_pass if c in per_pass[n]}
+USER             if len(vals) == 1:
+USER                 if vals == {"does_not_conform"}:
+USER                     derived_nc.append(c)
+USER             else:
+USER                 derived_flap.append(c)
+USER         print(f"  recomputed from {len(pass_files)} pass file(s): {len(derived_nc)} stable "
+USER               f"non-conformance(s) {derived_nc}, {len(derived_flap)} flapped")
+USER         s = rec.get("summary", {})
+USER         if sorted(s.get("stable_non_conformances", [])) != sorted(derived_nc):
+USER             fails += 1
+USER             print(f"     *** SUMMARY MISMATCH: declared {s.get('stable_non_conformances')} vs "
+USER                   f"recomputed {derived_nc} ***")
+USER         else:
+USER             print("  declared summary matches the pass files")
+USER         if sorted(s.get("flapped_clauses", [])) != sorted(derived_flap):
+USER             fails += 1
+USER             print(f"     *** FLAP MISMATCH: declared {s.get('flapped_clauses')} vs recomputed "
+USER                   f"{derived_flap} ***")
+USER         overlap = set(s.get("stable_non_conformances", [])) & set(s.get("flapped_clauses", []))
+USER         if overlap:
+USER             fails += 1
+USER             print(f"     *** a clause is reported as BOTH a finding and flapping: {sorted(overlap)} ***")
+USER         if re.search(r'"score"\s*:', json.dumps(rec)):
+USER             fails += 1
+USER             print("     *** a `score` field is present — C29 forbids numbers in the readings form ***")
+USER         inst = rec.get("instrument", {})
+USER         if not inst.get("runner_identical_across_passes"):
+USER             fails += 1
+USER             print("     *** the runner differed across passes — same rubric, different runner is a "
+USER                   "different instrument (C30) ***")
+USER         if not inst.get("rubric_identical_across_passes"):
+USER             fails += 1
+USER             print("     *** the rubric differed across passes (C30) ***")
+USER         continue
+USER 
+USER     e_strict = list(strict.iter_errors(rec))
+USER     audit_only = set(audit_s.get("properties", {})) - set(strict_s.get("properties", {}))
+USER     extra, genuine = set(), []
+USER     for e in e_strict:
+USER         if e.validator == "additionalProperties":
+USER             found = set(re.findall(r"'([^']+)'", e.message))
+USER             if found and found <= audit_only:
+USER                 extra |= found
+USER                 continue
+USER         genuine.append(e)
+USER     print(f"  vs §5 evaluator-record (strict): {'valid' if not e_strict else f'{len(e_strict)} error(s)'}")
+USER     if extra:
+USER         print(f"     expected: audit-only fields {', '.join(sorted(extra))} -> this is WHY the extension exists")
+USER     for e in genuine:
+USER         fails += 1
+USER         print(f"     GENUINE §5 BREAK -> {'/'.join(str(p) for p in e.path) or '<root>'}: {e.message[:140]}")
+USER 
+USER     e_audit = list(audit.iter_errors(rec))
+USER     print(f"  vs audit-record (that generation): {'valid' if not e_audit else 'INVALID'}")
+USER     for e in e_audit[:6]:
+USER         fails += 1
+USER         print(f"     -> {'/'.join(str(p) for p in e.path) or '<root>'}: {e.message[:150]}")
+USER 
+USER     # --- 2. recompute the verdict from §3, never trust the declared one -------------
+USER     dims = [d["score"] for d in rec["dimensions"]]
+USER     pr = rec["pass_rule"]
+USER     mean, mn = sum(dims) / len(dims), min(dims)
+USER     if rec.get("unjudged_dimensions"):
+USER         derived = "needs_owner"
+USER     elif mean >= pr["accept"] and mn >= pr["dimension_floor"]:
+USER         derived = "accept"
+USER     elif mn < pr["reject"]:
+USER         derived = "reject"
+USER     elif rec["iteration"] >= pr["cap"]:
+USER         derived = "needs_owner"
+USER     else:
+USER         derived = "regenerate"
+USER     legacy_names = path.name < "2026-09-20"
+USER     against = derived.replace("needs_owner", "needs_human") if legacy_names else derived
+USER     print(f"  recomputed: mean={mean:.2f} min={mn} -> {derived}")
+USER     print(f"  declared:   {rec['verdict']}" + ("   (filed before the 2026-09-20 rename; compared as needs_human)" if legacy_names else ""))
+USER     if not against.startswith(rec["verdict"]):
+USER         fails += 1
+USER         print("  *** VERDICT MISMATCH ***")
+USER 
+USER # --- 4. coverage is stated -----------------------------------------------------------
+USER print(f"\n--- coverage ---")
+USER print(f"  checked {checked} record(s) from {len(homes)} home(s)")
+USER for name, why in unchecked:
+USER     print(f"  NOT CHECKED: {name} — {why}")
+USER print("  Plumbline's own dot-plumbline/audits/ holds the 2026-09-29 census — the first job to audit Plumbline itself.")
+USER print(f"\n{'ALL AUDIT RECORDS CONSISTENT' if fails == 0 else f'{fails} PROBLEM(S)'}")
+USER sys.exit(1 if fails else 0)
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER # JOB 31 — make `tests/validate_audit.py` measure the tree it is run in
+USER 
+USER ## What is being asked
+USER 
+USER `tests/validate_audit.py` must resolve the root it searches for audit records from the
+USER repository it is itself run in, instead of from the parent directory of that repository.
+USER `$PLUMBLINE_AUDIT_ROOT`, when it is set, must still name the root explicitly and win.
+USER 
+USER ## The spec is the failing tests
+USER 
+USER `tests/test_validate_audit_root.py` is the specification. It is frozen. Do not edit it, do
+USER not weaken it, do not add skips, do not change the test command. Read it in full before
+USER editing anything — its module docstring states the defect, the ratified option C, and why
+USER each assertion is on the *naming* of a record rather than on an exit code.
+USER 
+USER The red, as measured in the work tree right now:
+USER 
+USER     $ python3 tests/test_validate_audit_root.py
+USER     ...FF...
+USER     FAIL: test_1_the_base_names_the_neighbour_and_the_work_tree_does_not
+USER       AssertionError: ('neighbour', '2026-12-01-fixture.json') unexpectedly found in
+USER       [('neighbour', '2026-12-01-fixture.json')] : the work tree's suite named the
+USER       neighbour's record as checked by a checkout that does not contain it; it read a
+USER       sibling tree as this one. named=[('neighbour', '2026-12-01-fixture.json')] rc=0
+USER 
+USER     FAIL: test_2_the_c_case_exits_zero_and_states_it_read_nothing
+USER       AssertionError: ('neighbour', '2026-12-01-fixture.json') unexpectedly found in
+USER       [('neighbour', '2026-12-01-fixture.json')] : the C case: with no override the
+USER       neighbour's record must not be named as checked.
+USER 
+USER     Ran 8 tests in 3.057s
+USER     FAILED (failures=2)
+USER 
+USER All eight tests must pass, and the six that pass today must keep passing. In particular
+USER these guards are part of what you must not break:
+USER 
+USER - `test_0c` — a record under an explicit `$PLUMBLINE_AUDIT_ROOT` must still be discovered
+USER   and named, and exit 0.
+USER - `test_3` — an explicit empty `$PLUMBLINE_AUDIT_ROOT` must exit 0 and name no record.
+USER - `test_4` — a checkout carrying its own `dot-plumbline/audits/` with one record must still
+USER   check it, list it in the `<home> N record(s)` census, and report
+USER   `checked 1 record(s) from 1 home(s)`. The fix must not silence the suite into reading
+USER   nothing anywhere.
+USER - `test_5` — a run with no `EDI_CORPUS` in the environment must still print `SKIP[corpus]`,
+USER   a bogus `EDI_CORPUS` must still be refused with exit 2 and the offending value named, and
+USER   a caller-planted root must not be reached. Do not touch the corpus resolution.
+USER 
+USER ## Constraints
+USER 
+USER - **Editable set: `tests/validate_audit.py` only.** Nothing else. No file under `schemas/`,
+USER   no `tools/`, no other test file, no packet, no re-pin.
+USER - **Do-not-edit (frozen):** `schemas/job-packet.schema.json`,
+USER   `schemas/evaluator-record.schema.json`, `schemas/audit-record.schema.json`,
+USER   `schemas/compliance-checklist.json`, `schemas/custody-record.schema.json`,
+USER   `tools/pin.json`, `tools/build_schemas.py`, `tools/edi_corpus.py`,
+USER   `tests/validate_schemas.py`, `tests/validate_constitution.py`,
+USER   `tests/validate_pin_prose.py`, `tests/run_all.py`, `tests/test_conductor_loop.py`,
+USER   `tests/test_validate_audit_root.py`.
+USER - Do not change the grading logic beyond how the suite resolves its own root. The checks the
+USER   suite performs, the messages it prints for records it *does* check, and its exit codes for
+USER   those cases stay as they are.
+USER - The module docstring at `tests/validate_audit.py:14` states the intended behaviour
+USER   ("The search root is the directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT"). Keep
+USER   the docstring and the code in agreement; if the resolved behaviour is better described by
+USER   a different sentence, edit that sentence in this same file, and nothing else.
+USER - The suite must stay runnable as `python3 tests/validate_audit.py` from the repository
+USER   root, with no arguments and no environment variables.
+USER 
+USER ## How the attempt will be measured
+USER 
+USER The dispatch's test command is run in this work tree:
+USER 
+USER     python3 tests/test_validate_audit_root.py
+USER 
+USER The attempt is done when that command exits 0 with all eight tests passing, and the only
+USER file changed by this attempt is `tests/validate_audit.py`.
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ```python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ```
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+USER The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-11-09T22:24:57
+ASSISTANT I'll change the root resolution so that, with no override, the suite searches only the checkout it is run in, and keep `<root>/*/dot-plumbline/audits` discovery for an explicit `$PLUMBLINE_AUDIT_ROOT`. This satisfies option C (never read a sibling's census), while `test_0c`, `test_3`, and `test_4` keep the override and own-record paths working. Nothing else in the grading logic is touched.
+ASSISTANT 
+ASSISTANT tests/validate_audit.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     project folder — which this script cannot read, so it says so rather than passing silently.
+ASSISTANT     The search root is the directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT.
+ASSISTANT =======
+ASSISTANT     project folder — which this script cannot read, so it says so rather than passing silently.
+ASSISTANT     By default this script searches only THIS checkout's own dot-plumbline/audits/, so a sibling
+ASSISTANT     checkout that happens to sit beside it is never read as this tree's; $PLUMBLINE_AUDIT_ROOT
+ASSISTANT     names an explicit root whose immediate subdirectories are searched as checkouts.
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT tests/validate_audit.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT # Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override with $PLUMBLINE_AUDIT_ROOT.
+ASSISTANT DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or REPO.parent).expanduser()
+ASSISTANT =======
+ASSISTANT # With no override this checkout measures ITSELF (REPO/dot-plumbline/audits/), never REPO.parent, so a
+ASSISTANT # sibling that ships its own census is not read as this tree's. An explicit $PLUMBLINE_AUDIT_ROOT names a
+ASSISTANT # directory whose immediate children are searched as checkouts (<root>/*/dot-plumbline/audits).
+ASSISTANT _AUDIT_ROOT_OVERRIDE = os.environ.get("PLUMBLINE_AUDIT_ROOT")
+ASSISTANT DEVSPACE = Path(_AUDIT_ROOT_OVERRIDE).expanduser() if _AUDIT_ROOT_OVERRIDE else REPO
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT tests/validate_audit.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT # --- discover records under the convention ------------------------------------------
+ASSISTANT homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+ASSISTANT records = [(home.parent.parent.name, f) for home in homes for f in sorted(home.glob("*.json"))]
+ASSISTANT 
+ASSISTANT print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")
+ASSISTANT =======
+ASSISTANT # --- discover records under the convention ------------------------------------------
+ASSISTANT # No override: only this checkout's own dot-plumbline/audits/ is searched. Override: the immediate
+ASSISTANT # children of the named root are searched as checkouts.
+ASSISTANT if _AUDIT_ROOT_OVERRIDE:
+ASSISTANT     homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+ASSISTANT     scope = f"{DEVSPACE}/*/dot-plumbline/audits/"
+ASSISTANT else:
+ASSISTANT     own = REPO / "dot-plumbline" / "audits"
+ASSISTANT     homes = [own] if own.is_dir() else []
+ASSISTANT     scope = f"{REPO}/dot-plumbline/audits/"
+ASSISTANT records = [(home.parent.parent.name, f) for home in homes for f in sorted(home.glob("*.json"))]
+ASSISTANT 
+ASSISTANT print(f"\nhomes discovered under {scope} :")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```

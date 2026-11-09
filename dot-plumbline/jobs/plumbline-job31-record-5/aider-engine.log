@@ -1,0 +1,720 @@
+Warning: Input is not a terminal (fd=0).
+────────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Model: deepseek/deepseek-v4-flash with diff edit format, infinite output
+Git repo: .git with 1,225 files
+Warning: For large repos, consider using --subtree-only and .aiderignore
+See: https://aider.chat/docs/faq.html#can-i-use-aider-in-a-large-mono-repo
+Repo-map: using 512 tokens, auto refresh
+Added tests/validate_audit.py to the chat.
+Added tests/test_validate_audit_root.py to the chat (read-only).
+
+Initial repo scan can be slow in larger repos, but only happens once.
+Scanning repo:   0%|          | 0/1225 [00:00<?, ?it/s]Scanning repo:  14%|█▎        | 166/1225 [00:00<00:00, 1469.94it/s]Scanning repo:  29%|██▉       | 354/1225 [00:00<00:00, 1682.54it/s]Scanning repo:  52%|█████▏    | 633/1225 [00:00<00:00, 2158.85it/s]Scanning repo:  69%|██████▉   | 851/1225 [00:00<00:00, 1688.58it/s]Scanning repo:  84%|████████▍ | 1033/1225 [00:00<00:00, 822.95it/s]Scanning repo:  95%|█████████▌| 1169/1225 [00:01<00:00, 912.32it/s]Scanning repo: 100%|██████████| 1225/1225 [00:01<00:00, 868.14it/s]
+--------------------------------------------------------------------------------
+
+► THINKING                                                                      
+
+Let me understand the task.                                                     
+
+The current code:                                                               
+
+                                                                                
+ DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or                      
+ REPO.parent).expanduser()                                                      
+                                                                                
+
+The fix: when no PLUMBLINE_AUDIT_ROOT is set, the root should be the repository 
+itself (option C), not its parent.                                              
+
+But we need to consider what "resolve the root it searches for audit records    
+from the repository it is itself run in" means precisely. Let me look at the    
+tests carefully.                                                                
+
+Test 4: the work subject has its own dot-plumbline/audits/ with one record. It  
+must be discovered. With DEVSPACE = REPO, the glob is                           
+REPO.glob("*/dot-plumbline/audits") — that would match subdirectories of REPO,  
+not REPO/dot-plumbline/audits itself. Hmm. So the discovery pattern is          
+<root>/*/dot-plumbline/audits. If root = REPO, then REPO/*/dot-plumbline/audits 
+— the repo's own audits at REPO/dot-plumbline/audits would not be matched by *. 
+
+Wait, test 4 expects ('subject-work', FIXTURE_NAME) to be named. The home name  
+is home.parent.parent.name where home = <root>/<program>/dot-plumbline/audits.  
+So home.parent.parent = <root>/<program>, and .name = program = "subject-work". 
+For that to work with root=REPO, the pattern would need to be                   
+REPO.parent/*/dot-plumbline/audits where REPO.parent contains "subject-work".   
+Hmm wait.                                                                       
+
+Let's think about the test's setup. The test creates a temp parent, and inside  
+it creates subject-base and subject-work via copytree/archive. Then             
+_run(subject) runs the suite with cwd=subject. So REPO inside the suite =       
+subject dir (e.g. /tmp/.../parent/subject-work). REPO.parent = /tmp/.../parent. 
+And the neighbour fixture is at self.parent / "neighbour" / "dot-plumbline" /   
+"audits" = /tmp/.../parent/neighbour/dot-plumbline/audits.                      
+
+So with base behavior DEVSPACE = REPO.parent = parent, glob                     
+parent/*/dot-plumbline/audits finds parent/neighbour/dot-plumbline/audits →     
+home.parent.parent.name = "neighbour". That's the defect.                       
+
+For the fix, we need: the search root should be REPO itself, but then we need to
+discover the repo's own dot-plumbline/audits. With root = REPO and glob         
+<root>/*/dot-plumbline/audits, we'd match subdirs of REPO. That wouldn't match  
+REPO/dot-plumbline/audits.                                                      
+
+Hmm, but test 4 expects the record in work/dot-plumbline/audits to be           
+discovered, with home name "subject-work".                                      
+
+Wait — home name is home.parent.parent.name. If home =                          
+REPO/dot-plumbline/audits, then home.parent.parent = REPO.parent, whose .name = 
+"parent"... no, wait: home.parent = REPO, home.parent.parent = REPO.parent =    
+parent, .name = "parent". That's not "subject-work".                            
+
+Hmm. So how do we get home name "subject-work"? We need home to be              
+REPO.parent/subject-work/dot-plumbline/audits. That is                          
+REPO/dot-plumbline/audits. Then home.parent.parent = REPO.parent, name =        
+"parent". No.                                                                   
+
+Wait, actually: home = /tmp/xxx/parent/subject-work/dot-plumbline/audits.       
+home.parent = .../subject-work. home.parent.parent = .../parent. .name =        
+"parent". Hmm, so record naming would be "parent/2026-12-01-fixture.json". But  
+the test expects ("subject-work", FIXTURE_NAME).                                
+
+Hold on. Let me re-read the test:                                               
+
+                                                                                
+ def test_4_a_clean_parent_with_its_own_record_is_still_checked(self):          
+     _, work = self._subjects()                                                 
+     _place_record(work / "dot-plumbline" / "audits")                           
+     code, out = _run(work, override=None)                                      
+     self.assertIn(                                                             
+         ("subject-work", FIXTURE_NAME), _named_records(out),                   
+                                                                                
+
+_named_records regex: ^--- ([A-Za-z0-9_.@-]+)/([A-Za-z0-9_.-]+) ---$. The       
+printed header is --- {program}/{path.name} --- where program =                 
+home.parent.parent.name.                                                        
+
+So we need program = "subject-work" and path.name = fixture. program =          
+home.parent.parent.name. We need home.parent.parent.name == "subject-work".     
+home.parent.parent is the directory whose name is subject-work. The audits dir  
+is at work/dot-plumbline/audits = .../parent/subject-work/dot-plumbline/audits. 
+home.parent.parent = .../parent/subject-work? Let's compute: home =             
+.../parent/subject-work/dot-plumbline/audits. home.parent =                     
+.../parent/subject-work/dot-plumbline. home.parent.parent =                     
+.../parent/subject-work. .name = "subject-work".                                
+
+Yes! I made an arithmetic error. home.parent.parent is work, and work.name =    
+"subject-work". Good.                                                           
+
+So for the fix, home = <root>/<program>/dot-plumbline/audits, and program is the
+checkout name. So the root must be the parent of the checkout for the glob      
+<root>/*/dot-plumbline/audits to discover the checkout's own audits.            
+
+Hmm, but then root = REPO.parent = parent would find neighbour too. So how do we
+make it find only the repo itself?                                              
+
+The spec says: "resolve the root it searches for audit records from the         
+repository it is itself run in, instead of from the parent directory of that    
+repository." Hmm. That suggests root = REPO. But then discovery pattern must    
+change.                                                                         
+
+Let's reconsider. If root = REPO, then to discover REPO's own audits, the glob  
+should be REPO/dot-plumbline/audits directly, plus maybe                        
+<REPO>/*/dot-plumbline/audits? Actually maybe the search should be: the repo's  
+own audits dir. The "option C" spec in the test docstring: "PLUMBLINE_AUDIT_ROOT
+unset, in a checkout that ships no dot-plumbline/audits/ and sits beside one    
+that does: exit 0, nothing from neighbour named... a clean parent with its own  
+record still checks it".                                                        
+
+So the semantics: when no override, only the current checkout's own             
+dot-plumbline/audits/ is searched. When override is set, search                 
+<override>/*/dot-plumbline/audits (as before) — that's what test_0c and test_3  
+need.                                                                           
+
+Wait test_3: override = empty dir. Then nothing found under                     
+<empty>/*/dot-plumbline/audits, exit 0, names none. Good.                       
+
+test_0c: override = parent. Then <parent>/*/dot-plumbline/audits finds          
+neighbour. Good.                                                                
+
+test_4: no override, work has work/dot-plumbline/audits. We need it discovered  
+and named "subject-work". So when no override, we should search... hmm, home    
+needs to be work/dot-plumbline/audits, and program = home.parent.parent.name =  
+"subject-work". Good, that works with home = REPO/dot-plumbline/audits.         
+
+And home name should be listed in census: _named_homes regex ^\s+(\S+)\s+\d+    
+record\(s\)$, printed as {home.parent.parent.name} = "subject-work". Good.      
+
+And checked = (1, 1). checked counts records and len(homes) = 1. Good.          
+
+So the fix:                                                                     
+
+ • If PLUMBLINE_AUDIT_ROOT set: DEVSPACE = that, and discover                   
+   <DEVSPACE>/*/dot-plumbline/audits (existing behavior).                       
+ • If not set: only discover REPO's own dot-plumbline/audits.                   
+
+But careful: test_1 with work subject: no override, no own audits, neighbour    
+present → should name nothing, checked (0,0). With the above, homes would be [] 
+(if REPO/dot-plumbline/audits doesn't exist) → records empty. Then the if not   
+records: branch: if not (REPO / "dot-plumbline" / "audits").is_dir(): → prints  
+"NO AUDIT RECORDS IN REACH..." and sys.exit(1 if fails else 0) = exit 0. But the
+test expects checked (0,0) line possibly, and it's conditional (if checked is   
+not None). So it may be None, that's fine. Test_2 just checks not named and exit
+0. Good.                                                                        
+
+But wait — test_5(a) checks work_out contains "SKIP[corpus]". That's printed by 
+edi_corpus.not_run(...), which happens before the record discovery and sys.exit.
+Actually the sys.exit in the no-records branch occurs after all the             
+schema/corpus checks. Let me check: the corpus bock is near top, then homes     
+discovered, then if not records: block with sys.exit. So SKIP[corpus] is printed
+before exit. Good.                                                              
+
+Also test_5(a) asserts "corpus source:" not in work_out — fine, corpus-free.    
+
+Now, what about REPO itself when run normally from repo root (the actual repo)? 
+The real repo likely has its own dot-plumbline/audits/ (the test docstring says 
+Plumbline's own audits live in dot-plumbline/audits/). So no-override would find
+those. Good, "The search root is the directory holding this checkout" — hmm, but
+behavior changed.                                                               
+
+Hmm, let me reconsider. Maybe simpler: keep the glob pattern but define root    
+appropriately. But the test requires that when no override, the neighbour (a    
+sibling of REPO) is not found, yet REPO's own audits are. The only way with glob
+<root>/*/dot-plumbline/audits is if root is a directory whose only relevant     
+child is REPO himself... no.                                                    
+
+Actually, wait. Could we set DEVSPACE = REPO.parent but restrict homes to those 
+whose program name equals REPO.name? That'd be a hack. Better: change discovery 
+to include REPO's own audits when no override.                                  
+
+Let me design:                                                                  
+
+                                                                                
+ _override = os.environ.get("PLUMBLINE_AUDIT_ROOT")                             
+ DEVSPACE = Path(_override).expanduser() if _override else REPO                 
+                                                                                
+ def _discover_homes():                                                         
+     if _override:                                                              
+         return [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if  
+ p.is_dir()]                                                                    
+     own = REPO / "dot-plumbline" / "audits"                                    
+     return [own] if own.is_dir() else []                                       
+                                                                                
+
+But the print line homes discovered under                                       
+{DEVSPACE.name}/*/dot-plumbline/audits/ would be wrong when no override. The    
+test doesn't check that line. But let's be tidy. Test doesn't parse it. Could   
+adjust message.                                                                 
+
+However, the home naming: for own = REPO/dot-plumbline/audits, program =        
+home.parent.parent.name = REPO.name. In test_4 REPO = work, name "subject-work".
+Good. In real repo, REPO.name = repo dir name. Good.                            
+
+But in test_1, work has no own audits → homes empty, records empty. Then the if 
+not records branch checks (REPO/"dot-plumbline"/"audits").is_dir() → False, so  
+prints "NO AUDIT RECORDS IN REACH" and exits 0. checked line absent. Test_1's   
+checked check is optional. Good. But wait: test_1 also asserts                  
+_named_homes(work_out) doesn't include "neighbour". Since homes empty, the      
+census prints nothing. Good. Does the "NO AUDIT RECORDS IN REACH" line contain  
+"neighbour"? No. But test_1 doesn't check that string. Fine.                    
+
+Now test_0a/0b build subjects. 0b checks neither subject ships                  
+dot-plumbline/audits. Good.                                                     
+
+Now, importantly, does the base subject (git archive of BASE) still name        
+neighbour? The base suite code is the old one (root=REPO.parent) — unaffected by
+our edits since git archive BASE gives old file. Good.                          
+
+Now the docstring: line 14 "The search root is the directory holding this       
+checkout, or $PLUMBLINE_AUDIT_ROOT." We should update to reflect: with an       
+override, search <root>/*/dot-plumbline/audits; without, search this checkout's 
+own dot-plumbline/audits/.                                                      
+
+Let me look at the exact docstring lines:                                       
+
+                                                                                
+     That means: wsww's audits live in wsww's repo, Plumbline's audits of       
+ itself live in this repo's                                                     
+     dot-plumbline/audits/, and a program with no local checkout keeps its      
+ records in its Drive                                                           
+     project folder — which this script cannot read, so it says so rather than  
+ passing silently.                                                              
+     The search root is the directory holding this checkout, or                 
+ $PLUMBLINE_AUDIT_ROOT.                                                         
+                                                                                
+
+Change last sentence to: "By default only this checkout's own                   
+dot-plumbline/audits/ is searched; $PLUMBLINE_AUDIT_ROOT names a directory whose
+immediate children are searched as checkouts."                                  
+
+Now code changes. Current:                                                      
+
+                                                                                
+ REPO = Path(__file__).resolve().parent.parent                                  
+ SHIP = REPO / "schemas"                                                        
+ LEGACY = SHIP / "legacy"                                                       
+ PIN = json.loads((REPO / "tools" / "pin.json").read_text(encoding="utf-8"))    
+ # Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override    
+ with $PLUMBLINE_AUDIT_ROOT.                                                    
+ DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or                      
+ REPO.parent).expanduser()                                                      
+                                                                                
+
+Change to:                                                                      
+
+                                                                                
+ REPO = Path(__file__).resolve().parent.parent                                  
+ SHIP = REPO / "schemas"                                                        
+ LEGACY = SHIP / "legacy"                                                       
+ PIN = json.loads((REPO / "tools" / "pin.json").read_text(encoding="utf-8"))    
+ # By default only THIS checkout's dot-plumbline/audits/ is searched: a         
+ checkout measures itself, never                                                
+ # a sibling that happens to sit beside it. $PLUMBLINE_AUDIT_ROOT overrides the 
+ root explicitly, and then                                                      
+ # the immediate children of that directory are searched as checkouts           
+ (<root>/*/dot-plumbline/audits).                                               
+ _AUDIT_ROOT_OVERRIDE = os.environ.get("PLUMBLINE_AUDIT_ROOT")                  
+ DEVSPACE = Path(_AUDIT_ROOT_OVERRIDE).expanduser() if _AUDIT_ROOT_OVERRIDE     
+ else REPO                                                                      
+                                                                                
+
+Then discovery:                                                                 
+
+                                                                                
+ # --- discover records under the convention                                    
+ ------------------------------------------                                     
+ homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if         
+ p.is_dir()]                                                                    
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")   
+                                                                                
+
+Wait, but for the no-override case, home = REPO/dot-plumbline/audits,           
+home.parent.parent.name = REPO.name. Good.                                      
+
+Hmm, but if we search <root>/*/... when override, DEVSPACE=override. When no    
+override, we want only REPO's own. But also maybe we should search REPO's own   
+plus children? No — the whole point is to not read neighbours, and siblings are 
+outside REPO. Children of REPO like dot-plumbline are internal. Searching       
+REPO/*/dot-plumbline/audits would find REPO/dot-plumbline/audits? No:           
+REPO/*/dot-plumbline/audits requires a child X with X/dot-plumbline/audits.     
+dot-plumbline itself has no nested dot-plumbline. So it wouldn't match. So we   
+need explicit own-dir handling.                                                 
+
+Let me write:                                                                   
+
+                                                                                
+ if _AUDIT_ROOT_OVERRIDE:                                                       
+     homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if     
+ p.is_dir()]                                                                    
+ else:                                                                          
+     own = REPO / "dot-plumbline" / "audits"                                    
+     homes = [own] if own.is_dir() else []                                      
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ if _AUDIT_ROOT_OVERRIDE:                                                       
+     print(f"\nhomes discovered under {DEVSPACE}/*/dot-plumbline/audits/ :")    
+ else:                                                                          
+     print(f"\nhomes discovered under {DEVSPACE}/dot-plumbline/audits/ :")      
+                                                                                
+
+Hmm wait: for the override case, home.parent.parent.name gives the child name   
+(program), e.g. "neighbour". Good. For own case, home.parent.parent.name =      
+REPO.name = "subject-work". Good.                                               
+
+But there's a subtlety in test_4: it also checks _named_homes includes          
+"subject-work". That's printed as {home.parent.parent.name} = "subject-work".   
+Good.                                                                           
+
+Now the if not records: block:                                                  
+
+                                                                                
+ if not records:                                                                
+     if not (REPO / "dot-plumbline" / "audits").is_dir():                       
+         print("\nNO AUDIT RECORDS IN REACH ...")                               
+         ...                                                                    
+         sys.exit(1 if fails else 0)                                            
+     print("\nNO RECORDS FOUND — nothing was validated. This is a coverage      
+ failure, not a pass.")                                                         
+     ...                                                                        
+     sys.exit(1)                                                                
+                                                                                
+
+For test_1/test_2: no own audits dir, no records → first branch → exit 0. Names 
+none. Good.                                                                     
+
+For test_3: override = empty dir, REPO/dot-plumbline/audits doesn't exist →     
+first branch → exit 0. Good. And no records named. Good.                        
+
+For test_4: own audits exists with one record → records non-empty → proceeds,   
+checks it, prints header --- subject-work/2026-12-01-fixture.json ---. Good.    
+
+For test_0c: override=parent, neighbour has fixture → named. Good.              
+
+For test_5(a): work no own audits, override none → first branch exit 0,         
+SKIP[corpus] printed earlier. Let's verify order: corpus resolution block is    
+before discovery. edi_corpus.not_run prints SKIP[corpus]? Actually the print    
+occurs via not_run presumably. Let me check: in the corpus block, elif          
+edi_corpus.not_run(...). The function probably prints. In base it also prints.  
+The test asserts "SKIP[corpus]" in out. That's existing behavior, fine.         
+
+But wait: with no override, do we even reach corpus? Yes, corpus block is before
+discovery. Good.                                                                
+
+Now, one more: the message homes discovered under                               
+{DEVSPACE.name}/*/dot-plumbline/audits/. In test_1 output, DEVSPACE=REPO (work),
+DEVSPACE.name="subject-work". The message would be                              
+"subject-work/*/dot-plumbline/audits/". Test_1 checks _named_homes regex which  
+looks for lines like   X N record(s). The heading isn't matched. Fine. But also 
+test_1 asserts "neighbour" not in _named_homes(work_out). Fine.                 
+
+Now the "NO AUDIT RECORDS IN REACH" message includes f"{DEVSPACE}" in the       
+original: "none was found under {DEVSPACE}". Fine, no neighbour.                
+
+Hmm, but wait: does the real repo's own audits dir exist? For the dispatch test,
+only the test file matters. But we should keep normal run working: python3      
+tests/validate_audit.py from repo root with no env. If repo has                 
+dot-plumbline/audits/, it validates them. Good. If not, exits 0 with "NO AUDIT  
+RECORDS IN REACH". Fine.                                                        
+
+Let me double check test_4's expected checked (1,1). records has 1, len(homes)=1
+→ yes.                                                                          
+
+But careful: in test_4 home = REPO/dot-plumbline/audits; home.parent.parent.name
+= REPO.name. However _named_records regex first group [A-Za-z0-9_.@-]+ =        
+"subject-work" (has hyphen, allowed). Good.                                     
+
+Now also verify path.name matches [A-Za-z0-9_.-]+ = "2026-12-01-fixture.json".  
+Good.                                                                           
+
+Now, the DEVSPACE is also used only in discovery. Good.                         
+
+Also potential issue: print(f"\nhomes discovered under                          
+{DEVSPACE.name}/*/dot-plumbline/audits/ :") when no override but own dir exists 
+— we print something slightly off. Let's make it dynamic. Test doesn't check but
+tidy.                                                                           
+
+Let me now check test_5(b): base run with planted                               
+PLUMBLINE_AUDIT_ROOT=decoy_root, cwd=base, env is _clean_env() then sets        
+PLUMBLINE_AUDIT_ROOT. The base suite is old code: root=decoy_root, glob         
+decoy_root/*/dot-plumbline/audits → decoy-home. Should name decoy-home. Good.   
+Our edits don't affect base (git archive BASE).                                 
+
+Wait, but _clean_env() removes EDI_CORPUS; then test adds real EDI_CORPUS if    
+present. For base, "corpus source:" only if real set. That part conditional.    
+Fine.                                                                           
+
+Now, what about edi_corpus.resolve_or_exit — not touched.                       
+
+Let me also reconsider: does changing DEVSPACE to REPO break anything else in   
+the file? Search for DEVSPACE usages: only in discovery and messages. Let me    
+grep mentally: "DEVSPACE =", homes = ... DEVSPACE.glob, print(f"\nhomes         
+discovered under {DEVSPACE.name}..., and in the no-records message {DEVSPACE}.  
+That's it.                                                                      
+
+Now implement.                                                                  
+
+Docstring edit: The line "The search root is the directory holding this         
+checkout, or $PLUMBLINE_AUDIT_ROOT." Replace with something accurate.           
+
+Let me craft:                                                                   
+
+                                                                                
+     By default this script searches only THIS checkout's own                   
+ dot-plumbline/audits/; $PLUMBLINE_AUDIT_ROOT                                   
+     names an explicit root whose immediate subdirectories are searched as      
+ checkouts.                                                                     
+                                                                                
+
+Now code SEARCH/REPLACE.                                                        
+
+Block 1: docstring line.                                                        
+
+Block 2: DEVSPACE definition.                                                   
+
+Block 3: homes discovery.                                                       
+
+Let me write exact matches from provided file content.                          
+
+Docstring portion:                                                              
+
+                                                                                
+     project folder — which this script cannot read, so it says so rather than  
+ passing silently.                                                              
+     The search root is the directory holding this checkout, or                 
+ $PLUMBLINE_AUDIT_ROOT.                                                         
+                                                                                
+
+Replace second line.                                                            
+
+DEVSPACE portion:                                                               
+
+                                                                                
+ # Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override    
+ with $PLUMBLINE_AUDIT_ROOT.                                                    
+ DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or                      
+ REPO.parent).expanduser()                                                      
+                                                                                
+
+Discovery portion:                                                              
+
+                                                                                
+ # --- discover records under the convention                                    
+ ------------------------------------------                                     
+ homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if         
+ p.is_dir()]                                                                    
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")   
+                                                                                
+
+Now, careful: the heading line in docstring. Let me also double check whether   
+test_5(a) requires the work run to exit... test doesn't assert code there. It   
+asserts decoy-home not in output, no "corpus source:", SKIP[corpus] present.    
+Good.                                                                           
+
+But one concern: with no override and no own audits, the run exits 0 via the    
+first branch. But does it reach the "NO AUDIT RECORDS..." message which includes
+DEVSPACE? DEVSPACE=REPO path; contains "subject-work". Not an issue.            
+
+Another concern: test_1 asserts checked is None or (0,0). With first branch, no 
+coverage line printed at all, so None → skip. Good.                             
+
+Let me reconsider whether the fix should search REPO's own audits via glob      
+REPO/*/dot-plumbline/audits — no, as discussed it won't find                    
+REPO/dot-plumbline/audits.                                                      
+
+Hmm, wait. Actually maybe the intended fix is simpler: set DEVSPACE = REPO when 
+no override, and change glob to DEVSPACE.glob("dot-plumbline/audits") plus      
+*/...? Let me think about what "the repository it is run in" root means for     
+override semantics. With override, the test expects children searched. So       
+override semantics must stay <root>/*/dot-plumbline/audits. Without, only own.  
+Fine as I designed.                                                             
+
+Let me also ensure that when no override but REPO's parent contains neighbour,  
+nothing found. Yes, we never glob REPO.parent.                                  
+
+Now there's a subtle bug: in test_1, work subject is a copy; does copytree      
+ignore test_validate_audit_root.py but include tests/validate_audit.py. Yes. So 
+the work suite is our edited file (assuming edits applied). Good.               
+
+Wait—but the work subject copies REPO which is the actual repository root (the  
+outer one) at the time of test run. But the test's REPO (outer) is              
+Path(__file__).resolve().parent.parent = actual repo. _work_subject copies that 
+to subject-work. So the work suite = our edited validate_audit.py. Its REPO     
+resolves to subject-work. Good.                                                 
+
+Now, does the real repo have dot-plumbline/audits/? If it does, then in test_1's
+work copy, there would be subject-work/dot-plumbline/audits/ with records! But  
+test_0b asserts the subjects ship no dot-plumbline/audits/. Hmm, test_0b asserts
+False for (tree/"dot-plumbline"/"audits").is_dir(). If the real repo ships one, 
+test_0b would fail. Currently test_0b passes (per dispatch, 6 pass, 2 fail; 0b  
+presumably passes). So the repo does NOT ship dot-plumbline/audits. Good — so no
+own audits in work subject. Consistent.                                         
+
+Wait, but then in a normal run of the real repo, no override → own dir doesn't  
+exist → "NO AUDIT RECORDS IN REACH" exit 0. That matches the docstring nuance   
+about public repo shipping none.                                                
+
+But hold on — the docstring says "Plumbline's own audits of itself live in this 
+repo's dot-plumbline/audits/". And the coverage message says "Plumbline's own   
+dot-plumbline/audits/ holds the 2026-09-29 census". Contradiction with test_0b? 
+The test's REPO is the work tree the bar lives in, which apparently is a        
+clone/archive without that dir. Maybe the public/repo actually has it but       
+test_0b says otherwise... The dispatch states red is exactly two failures, so 0b
+passes, meaning no audits dir. Fine, not our concern.                           
+
+Hmm, but actually wait: if the repo DOES ship dot-plumbline/audits, test_0b     
+would fail and dispatch would show 3 failures. It shows 2. So fine.             
+
+Now implement blocks.                                                           
+
+Let me also consider: should I keep the variable name DEVSPACE? Yes, to minimize
+changes.                                                                        
+
+One more: the if not records: branch references (REPO / "dot-plumbline" /       
+"audits").is_dir(). With our own-search, if override is set to empty dir and    
+REPO happens to ship audits, then records empty (override search), but the      
+branch checks REPO's own dir — if it exists, it prints "NO RECORDS FOUND" and   
+exit 1! In test_3, REPO (work) has no audits → fine. In test_0c, records found. 
+In real usage with override pointing at empty dir while repo has audits, it'd   
+exit 1 — arguably a coverage failure is correct? Hmm, but override should mean  
+"search here", and if here is empty... Actually with override provided and      
+empty, arguably exit 0 with nothing (test_3). The branch first checks REPO's own
+dir; if repo has audits and override empty, it goes to "NO RECORDS FOUND" exit  
+1. That would be wrong relative to test_3 semantics only if repo ships audits — 
+but test_3 uses work subject with no audits. So passes.                         
+
+But to be robust and consistent, maybe adjust that branch to consider whether an
+override was given. Hmm. The constraints say don't change grading logic beyond  
+root resolution. The no-records branch is coverage logic. Changing it might be  
+okay but risky. Let's keep it as-is to minimize; the tests pass.                
+
+Actually, wait: consider real repo (no audits) with no override → first branch  
+exit 0. Fine.                                                                   
+
+Consider real repo with audits and no override → records found → normal. Fine.  
+
+Consider override given, search yields nothing, repo ships audits: exits 1 "NO  
+RECORDS FOUND". Is that acceptable? It's an explicit root override that yielded 
+nothing while repo has own records. Arguably coverage failure. Test_3 can't hit 
+this. I'll leave unchanged to honor "don't change grading logic beyond root     
+resolution". Hmm, but our change makes the condition                            
+(REPO/"dot-plumbline"/"audits").is_dir() less aligned. Eh, leaving.             
+
+Actually, wait. There's a subtle interaction: when no override and own audits   
+exists but contains no *.json (empty dir), records empty, branch sees dir exists
+→ "NO RECORDS FOUND" exit 1. That's existing behavior for the own case too.     
+Fine.                                                                           
+
+Now write blocks.                                                               
+
+Also consider updating the message print to be accurate; let's include it in    
+block 3.                                                                        
+
+Final block 3 REPLACE:                                                          
+
+                                                                                
+ # --- discover records under the convention                                    
+ ------------------------------------------                                     
+ # With no override this checkout measures ITSELF: only its own                 
+ dot-plumbline/audits/ is searched, so a                                        
+ # sibling checkout that happens to sit beside it is never read as this tree's. 
+ An explicit                                                                    
+ # $PLUMBLINE_AUDIT_ROOT names a directory whose immediate children are         
+ searched as checkouts.                                                         
+ if _AUDIT_ROOT_OVERRIDE:                                                       
+     homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if     
+ p.is_dir()]                                                                    
+     scope = f"{DEVSPACE}/*/dot-plumbline/audits/"                              
+ else:                                                                          
+     own = REPO / "dot-plumbline" / "audits"                                    
+     homes = [own] if own.is_dir() else []                                      
+     scope = f"{REPO}/dot-plumbline/audits/"                                    
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ print(f"\nhomes discovered under {scope} :")                                   
+                                                                                
+
+Wait: original prints {DEVSPACE.name} not full path. Now scope full path. Fine, 
+not tested. But maybe keep closer. Either fine.                                 
+
+Hmm, but test_1's _named_homes regex ^\s+(\S+)\s+\d+ record\(s\)$ — our heading 
+isn't that shape (no digit). Fine.                                              
+
+Now check: in test_0c, override=parent,                                         
+home=parent/neighbour/dot-plumbline/audits, home.parent.parent.name =           
+"neighbour" ✓. scope printed with full path fine.                               
+
+Let me double-check _AUDIT_ROOT_OVERRIDE is defined before use in block 3 — yes 
+defined early.                                                                  
+
+Now also ensure os still imported — yes.                                        
+
+Let me write the final answer with three blocks.                                
+
+Also maybe update the DEVSPACE comment. Good.                                   
+
+One more consideration: the docstring sentence mentions "The search root is the 
+directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT." Replace precisely.  
+
+Let me produce.                                                                 
+
+--------------------------------------------------------------------------------
+
+► ANSWER                                                                        
+
+I'll change the root resolution so that, with no override, the suite searches   
+only the checkout it is run in, and keep <root>/*/dot-plumbline/audits discovery
+for an explicit $PLUMBLINE_AUDIT_ROOT. This satisfies option C (never read a    
+sibling's census), while test_0c, test_3, and test_4 keep the override and      
+own-record paths working. Nothing else in the grading logic is touched.         
+
+tests/validate_audit.py                                                         
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+     project folder — which this script cannot read, so it says so rather than  
+ passing silently.                                                              
+     The search root is the directory holding this checkout, or                 
+ $PLUMBLINE_AUDIT_ROOT.                                                         
+ =======                                                                        
+     project folder — which this script cannot read, so it says so rather than  
+ passing silently.                                                              
+     By default this script searches only THIS checkout's own                   
+ dot-plumbline/audits/, so a sibling                                            
+     checkout that happens to sit beside it is never read as this tree's;       
+ $PLUMBLINE_AUDIT_ROOT                                                          
+     names an explicit root whose immediate subdirectories are searched as      
+ checkouts.                                                                     
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_audit.py                                                         
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ # Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override    
+ with $PLUMBLINE_AUDIT_ROOT.                                                    
+ DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or                      
+ REPO.parent).expanduser()                                                      
+ =======                                                                        
+ # With no override this checkout measures ITSELF (REPO/dot-plumbline/audits/), 
+ never REPO.parent, so a                                                        
+ # sibling that ships its own census is not read as this tree's. An explicit    
+ $PLUMBLINE_AUDIT_ROOT names a                                                  
+ # directory whose immediate children are searched as checkouts                 
+ (<root>/*/dot-plumbline/audits).                                               
+ _AUDIT_ROOT_OVERRIDE = os.environ.get("PLUMBLINE_AUDIT_ROOT")                  
+ DEVSPACE = Path(_AUDIT_ROOT_OVERRIDE).expanduser() if _AUDIT_ROOT_OVERRIDE     
+ else REPO                                                                      
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_audit.py                                                         
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ # --- discover records under the convention                                    
+ ------------------------------------------                                     
+ homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if         
+ p.is_dir()]                                                                    
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")   
+ =======                                                                        
+ # --- discover records under the convention                                    
+ ------------------------------------------                                     
+ # No override: only this checkout's own dot-plumbline/audits/ is searched.     
+ Override: the immediate                                                        
+ # children of the named root are searched as checkouts.                        
+ if _AUDIT_ROOT_OVERRIDE:                                                       
+     homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if     
+ p.is_dir()]                                                                    
+     scope = f"{DEVSPACE}/*/dot-plumbline/audits/"                              
+ else:                                                                          
+     own = REPO / "dot-plumbline" / "audits"                                    
+     homes = [own] if own.is_dir() else []                                      
+     scope = f"{REPO}/dot-plumbline/audits/"                                    
+ records = [(home.parent.parent.name, f) for home in homes for f in             
+ sorted(home.glob("*.json"))]                                                   
+                                                                                
+ print(f"\nhomes discovered under {scope} :")                                   
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+Tokens: 13k sent, 1.3k cache hit, 8.1k received. Cost: $0.01 message, $0.01 
+session.
+Applied edit to tests/validate_audit.py
+........
+----------------------------------------------------------------------
+Ran 8 tests in 3.029s
+
+OK
+run-aider: recorded cost 0.01 from aider session print

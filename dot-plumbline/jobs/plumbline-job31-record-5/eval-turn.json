@@ -1,0 +1,29 @@
+{
+  "artifact": "/home/jarbis1/tmp/plumbline-job31-record-5/round-01/editable",
+  "artifact_sha256": "5ac764493e0411fc43b46ed63bc9167c30deb37c162bc57fe48a1eba2f9adb69",
+  "gate": {
+    "awaited_engine": {
+      "reason": "engine exit record appeared",
+      "seconds": 49.052,
+      "waited": true
+    },
+    "commit": "7c46caa86435ffc0113d9ec2e818df6bb4da40e8",
+    "dispatched": true,
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "passed": true,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "ad14c22cfcf5c2783e9afa0b764eed3586dc926a526cbdca7558d5dec632bbb6"
+    },
+    "rerun": {
+      "exit": 0,
+      "output_sha256": "38e3c740e83245b315431736a129363c5e3f71c21dbcb451ea9d9355b02d9c60"
+    }
+  },
+  "round": 1
+}

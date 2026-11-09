@@ -1,0 +1,27 @@
+{
+  "accepted_round": null,
+  "best_round": 1,
+  "cap": 2,
+  "commit": "7c46caa86435ffc0113d9ec2e818df6bb4da40e8",
+  "cost": 0.01,
+  "ended_at": "2026-11-09T22:33:38+00:00",
+  "filing": {
+    "dest": "/home/jarbis1/plumbline-records/dot-plumbline/jobs/plumbline-job31-record-5",
+    "detail": "run-log: appended the filed row for plumbline-job31-record-5 (16 rows)\nfiled (job/custody): /home/jarbis1/plumbline-records/dot-plumbline/jobs/plumbline-job31-record-5  (20 files, packet sha256 a82ebe28c50b)",
+    "filed": true,
+    "state": "custody"
+  },
+  "outcome": "no_observation",
+  "packet_sha256": "7183099eb838a00d31a9ba20bb8995abe5c22697c4f55b9eff588be507479090",
+  "rounds": 1,
+  "rounds_sha256": [
+    "30e43648b73ddf85b23214401235eb9dff2f2f4cdcf513c1dae0e7a31085d8c5"
+  ],
+  "separation_gaps": [
+    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+  ],
+  "started_at": "2026-11-09T22:23:27+00:00",
+  "stop": "evaluator failed",
+  "terminal_state": "needs_owner"
+}

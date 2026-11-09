@@ -1,0 +1,210 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "round-01/editable/tests/validate_audit.py",
+      "digest": {
+        "sha256": "5bdd0c5dc480c4f5eb4755ca279f7b76d328d09f74e8fbe03a891fa08e5c206c"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": null,
+      "frozenAt": null,
+      "author": null,
+      "dimensions": [],
+      "approvals": [],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": null,
+      "kind": null,
+      "version": null,
+      "method": null,
+      "model": null
+    },
+    "startedAt": "2026-11-09T22:23:27Z",
+    "producedAt": "2026-11-09T22:33:38Z",
+    "instrument": {
+      "rubric": null,
+      "runner": null
+    },
+    "evaluators": [
+      {
+        "id": "plumbline-eval via route-eval",
+        "name": "plumbline-eval via route-eval",
+        "kind": "model",
+        "model": null,
+        "script": null
+      }
+    ],
+    "checks": [],
+    "controls": [],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts §4.2); Owner ratification required"
+    ],
+    "retention": null,
+    "external": [],
+    "disposition": {
+      "state": null,
+      "by": null,
+      "at": null,
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-11-09-audit-root-own-repo",
+      "sources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:92"
+      },
+      "terminal_state": "needs_owner",
+      "outcome": "no_observation",
+      "verdict": null,
+      "stop": "evaluator failed",
+      "round_count": 1,
+      "rounds": [
+        {
+          "round": 1,
+          "record": "round-01.json",
+          "sha256": "30e43648b73ddf85b23214401235eb9dff2f2f4cdcf513c1dae0e7a31085d8c5"
+        }
+      ],
+      "evaluator_runs": [
+        {
+          "round": 1,
+          "exit": 1,
+          "output_sha256": "786ce790026146106552eb1ba599d8d5824d888ea92ec9423200062ff8e3287d"
+        }
+      ],
+      "spend": {
+        "rounds_cost_usd": 0.01,
+        "source": "round-*.json cost"
+      },
+      "schema": "plumbline/x-plumbline/v1",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "7c46caa",
+        "commit": "7c46caa86435ffc0113d9ec2e818df6bb4da40e8",
+        "tree": "526431dd3ab8d24000674be5ef5e6d88d6a3337a",
+        "dirty": false,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "packet.json started_at",
+        "producedAt": "packet.json ended_at"
+      },
+      "hand_times": [],
+      "timeSources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:92"
+      },
+      "time_sources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:92"
+      },
+      "emittedAt": "2026-11-09T22:33:38Z",
+      "gaps": [
+        {
+          "field": "bar.digest",
+          "reason": "the run wrote no frozen bar file, and its packet names none",
+          "hard": false
+        },
+        {
+          "field": "bar.frozenAt",
+          "reason": "the run wrote no freeze time",
+          "hard": false
+        },
+        {
+          "field": "bar.author",
+          "reason": "the run wrote no bar author",
+          "hard": false
+        },
+        {
+          "field": "bar.dimensions",
+          "reason": "the run wrote no bar dimension",
+          "hard": false
+        },
+        {
+          "field": "bar.approvals",
+          "reason": "the run recorded no approval",
+          "hard": false
+        },
+        {
+          "field": "maker.name",
+          "reason": "the packet's maker block names no name",
+          "hard": false
+        },
+        {
+          "field": "maker.kind",
+          "reason": "the packet's maker block names no kind",
+          "hard": false
+        },
+        {
+          "field": "maker.version",
+          "reason": "the packet's maker block names no version",
+          "hard": false
+        },
+        {
+          "field": "maker.method",
+          "reason": "the run wrote no maker method file",
+          "hard": false
+        },
+        {
+          "field": "instrument.rubric",
+          "reason": "the run wrote no rubric file and pinned no rubric digest",
+          "hard": false
+        },
+        {
+          "field": "instrument.runner",
+          "reason": "the run wrote no runner file and pinned no runner digest",
+          "hard": false
+        },
+        {
+          "field": "checks",
+          "reason": "the run's round records carry no evaluator reading",
+          "hard": false
+        },
+        {
+          "field": "controls",
+          "reason": "the run's round records carry no control case",
+          "hard": false
+        },
+        {
+          "field": "external",
+          "reason": "the run wrote no harness log, so no CL1-15 evidence exists",
+          "hard": false
+        },
+        {
+          "field": "retention",
+          "reason": "the run recorded no retention location",
+          "hard": false
+        },
+        {
+          "field": "disposition.state",
+          "reason": "the packet holds no disposition_state",
+          "hard": false
+        },
+        {
+          "field": "disposition.by",
+          "reason": "the run named no approver",
+          "hard": false
+        },
+        {
+          "field": "disposition.at",
+          "reason": "the run recorded no disposition time",
+          "hard": false
+        }
+      ]
+    }
+  }
+}
