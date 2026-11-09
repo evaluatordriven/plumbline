@@ -1,0 +1,21 @@
+{
+  "accepted_round": null,
+  "best_round": null,
+  "cap": 2,
+  "commit": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35",
+  "cost": 0.0,
+  "ended_at": "2026-11-09T21:53:32+00:00",
+  "outcome": "no_artifact",
+  "packet_sha256": "b7a399ddfdd31701c3c03a77e29d2447b5cf09b9de4ecaa3fc873157ca9b79c5",
+  "rounds": 1,
+  "rounds_sha256": [
+    "e873fb842a16299580e02aa7c07e5fd75793fb66dc519b25ccc3725b3558fd8d"
+  ],
+  "separation_gaps": [
+    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+  ],
+  "started_at": "2026-11-09T21:52:05+00:00",
+  "stop": "no artifact",
+  "terminal_state": "needs_owner"
+}

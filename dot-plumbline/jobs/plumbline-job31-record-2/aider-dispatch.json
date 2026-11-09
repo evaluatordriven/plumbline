@@ -1,0 +1,26 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job31-record-2/aider-prompt.md",
+  "files": [
+    "tests/validate_audit.py"
+  ],
+  "read": [
+    "tests/test_validate_audit_root.py",
+    "schemas/job-packet.schema.json",
+    "schemas/evaluator-record.schema.json",
+    "schemas/audit-record.schema.json",
+    "schemas/compliance-checklist.json",
+    "schemas/custody-record.schema.json",
+    "tools/pin.json",
+    "tools/build_schemas.py",
+    "tools/edi_corpus.py",
+    "tests/validate_schemas.py",
+    "tests/validate_constitution.py",
+    "tests/validate_pin_prose.py",
+    "tests/run_all.py",
+    "tests/test_conductor_loop.py"
+  ],
+  "test_cmd": [
+    "python3",
+    "tests/test_validate_audit_root.py"
+  ]
+}

@@ -1,0 +1,1 @@
+run-aider: PLUMBLINE_MAKER_PROMPT_USD and PLUMBLINE_MAKER_COMPLETION_USD must both be set; refusing to start Aider (unset prices book every call at zero)

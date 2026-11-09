@@ -1,0 +1,74 @@
+JOB 31 — first red, as produced from the packet's test_cmd
+
+packet: /home/jarbis1/tmp/plumbline-job31/packet.json
+test_cmd: python3 tests/test_validate_audit_root.py
+cwd: /home/jarbis1/tmp/plumbline-job31-cwd
+date: 2026-11-09
+
+$ cd /home/jarbis1/tmp/plumbline-job31-cwd && python3 tests/test_validate_audit_root.py
+EEEE
+======================================================================
+ERROR: test_1_neighbour_beside_a_census_is_not_read_as_this_tree
+...
+  File "tests/test_validate_audit_root.py", line 117, in _archive_subject
+    blob = subprocess.run(
+  ...
+subprocess.CalledProcessError: Command '['git', 'archive', '6793e53ddc5071aa252be10f2c0fc18c5a5b0b35']' returned non-zero exit status 128.
+
+(identical traceback in all four tests)
+Ran 4 tests in 0.006s
+FAILED (errors=4)
+EXIT=1
+
+FOUR ERRORS, ZERO ASSERTIONS EXECUTED.
+
+Each test dies in _archive_subject() before it ever runs an assertion. So this exit 1 is
+NOT the bar's intended red. The bar tests nothing here; it cannot build its subject.
+
+Why:  git archive 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35 needs that commit object in
+this repo. It is not present.
+
+  $ git rev-list --all | wc -l
+  3
+  $ git for-each-ref --format='%(refname)'
+  refs/heads/master
+  $ git remote -v
+  (empty)
+  $ git cat-file -t 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35
+  fatal: git cat-file: could not get object info
+
+The tree holds the base as an IMPORTED SNAPSHOT, not as a reachable commit:
+
+  7be46e3 base: 6793e53 (git archive)
+  9d47fbf base: pin 6793e53 as an archive (bar excluded)
+  3f7a307 JOB31 bar: the audit root resolves from the repo the suite runs in
+
+The bar's fixture helper resolves a SHA that this checkout was never given. That is a
+property of the work tree handed to me, not of tests/validate_audit.py.
+
+WHAT THE FIX COULD NOT CHANGE (the part that IS mine to state):
+
+The base CONTENT is present and the defect is present, verified against the snapshot:
+
+  $ git show 9d47fbf:tests/validate_audit.py  (lines 41-46, 111-113)
+  REPO = Path(__file__).resolve().parent.parent
+  DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or REPO.parent).expanduser()
+  homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+
+Byte-identical to HEAD. So the defect the packet names at :46/:113 is live in the tree.
+But no edit to the editable path (tests/validate_audit.py) can make
+git archive 6793e53ddc... succeed: git archive is not called by validate_audit.py at all,
+it is called by the BAR (tests/test_validate_audit_root.py:117), which is frozen.
+
+I did NOT edit the frozen bar to work around this, and I did not hand-write an
+implementation that could not be measured. This is reported, not papered over:
+the bar cannot run in this work tree, so a fix here could not be shown green by it.
+
+STATUS: reported to the Orchestrator. No implementation written.
+The three known options are the Orchestrator's to choose, not mine:
+  (a) re-provision the work tree WITH the base commit object reachable
+      (e.g. a real clone/fetch of 6793e53 into this repo), then re-dispatch;
+  (b) author an amended bar whose fixture helper does not depend on that SHA
+      (that is the Architect's act — I do not change the bar);
+  (c) declare frame_at_fault / artifact_missed_standard.
+I did not pick one. That is not the Maker's call.

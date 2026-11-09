@@ -1,0 +1,41 @@
+{
+  "best_round": null,
+  "cost": 0.0,
+  "ended_at": "2026-11-09T21:58:43+00:00",
+  "evaluator": [],
+  "findings_sha256": "8f2c057684cf620c31ace7457c285cecd9ab36eead0e16f09e6aa63188ab0d74",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": null,
+  "reading": {},
+  "round": 1,
+  "run": {
+    "commit": "fcc3d5e5204d00c17ed13eb9432bd88b0ef61312",
+    "dispatched": true,
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "maker": {
+      "exit": 0,
+      "output_sha256": "70741db32bbfa1fc9f6b510a3ee3f7a76e6661032437e23c526c5bd6f104f58c"
+    },
+    "passed": false,
+    "reason": "no artifact",
+    "red": {
+      "exit": 1,
+      "output_sha256": "4c890b91ca6b26924dec5ac3e2597888db336b1071a9698ef18e5a22fe19c91c"
+    },
+    "rerun": {
+      "exit": 1,
+      "output_sha256": "4c890b91ca6b26924dec5ac3e2597888db336b1071a9698ef18e5a22fe19c91c"
+    }
+  },
+  "started_at": "2026-11-09T21:57:51+00:00",
+  "stop": "no artifact",
+  "verdict_mismatch": false
+}
