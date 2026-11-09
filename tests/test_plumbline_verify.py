@@ -32,6 +32,12 @@ ROOT = Path(__file__).resolve().parents[1]
 VERIFIER = ROOT / "kit" / "plumbline_verify.py"
 FIX = ROOT / "tests" / "fixtures" / "custody" / "verify"
 JOB_REJECTED = ROOT / "tests" / "fixtures" / "custody" / "job-rejected"
+# The same job with the logger's own sent_at/received_at on every evaluator call in harness-eval-a.log.
+# The shared fixture must keep those six times ABSENT: T7b/E3, J14/A1-A3a, the fixture-refused case and the
+# 61-second tolerance case all exist to test what the emitter does with a call the logger did NOT stamp, and
+# stamping the shared fixture deletes the condition under test. So a case that must EMIT a record from this job
+# without a genuine defect copies this sibling; a case that must see the refusal copies the raw one.
+JOB_REJECTED_LOGGED = ROOT / "tests" / "fixtures" / "custody" / "job-rejected-logged"
 sys.path.insert(0, str(ROOT / "kit"))
 import plumbline_job as J  # noqa: E402
 import plumbline_verify as V  # noqa: E402
@@ -163,9 +169,10 @@ def run_emit(job: Path, out: Path, tree: Path, allow_hand: bool = True):
     return subprocess.run(cmd, capture_output=True, text=True)
 
 
-def copy_job(tmp: Path, name: str = "job") -> Path:
+def copy_job(tmp: Path, name: str = "job", src: Path | None = None) -> Path:
+    """A copy of the shared job fixture (or the logger-stamped sibling, when `src` names it)."""
     dst = tmp / name
-    shutil.copytree(JOB_REJECTED, dst)
+    shutil.copytree(src or JOB_REJECTED, dst)
     return dst
 
 
@@ -447,7 +454,10 @@ class SpendWithoutSpendLineTests(unittest.TestCase):
 
     def test_cost_with_no_spend_line_verifies(self):
         tree = clean_emitter_tree(self.tmp)
-        job = copy_job(self.tmp)
+        # The logger-stamped sibling: a record can only be emitted from a job whose evaluator calls the logger
+        # stamped. The shared fixture's six unstamped times are the condition E3/J14 exist to observe, so this
+        # case borrows the stamped copy rather than the shared one. Nothing else about the job changes.
+        job = copy_job(self.tmp, src=JOB_REJECTED_LOGGED)
         log = job / "custody" / "evidence" / "harness-maker-fixture.log"
         self.assertTrue(log.is_file())
         set_generation_cost(log, 0.0012)
@@ -479,7 +489,9 @@ class TypedStartedProducedTests(unittest.TestCase):
 
     def test_typed_started_at_and_produced_at_are_hand_times(self):
         tree = clean_emitter_tree(self.tmp)
-        job = copy_job(self.tmp)
+        # Same sibling for the same reason: this case asserts what the switch does with a time TYPED into the
+        # inputs, so the job it emits from must carry no other defect. It still passes allow_hand=True explicitly.
+        job = copy_job(self.tmp, src=JOB_REJECTED_LOGGED)
         ci = json.loads((job / "inputs" / "custody.json").read_text(encoding="utf-8"))
         self.assertTrue(ci.get("startedAt") and ci.get("producedAt"))
         out = self.tmp / "rec.json"
