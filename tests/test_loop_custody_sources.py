@@ -50,7 +50,15 @@ PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438
 ESCALATE_BAR = "tests/test_escalate.py"
 ESCALATE_BAR_SHA = "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
 LOOP_PY = "kit/conductor_loop.py"
-LOOP_SHA = "e6b74046d26ca524302fc3d146a0d2758915b2690ccfa2930b344252a2243f5f"
+# Re-pinned 2026-11-09, deliberately, and the reason is the whole point of this pin existing.
+# loop() gained the last act of a job: `file_finish()` writes custody/status.json into the job folder and files
+# the folder into the instance's dot-plumbline, because `dot-plumbline/jobs` held two jobs while twenty-five had
+# run — filing was a sentence in a commit message and every dispatch wrote to /tmp. The seam this bar locks is
+# untouched: `emit_custody_for_finish` is still called once, loop()'s signature is still
+# (packet, record_dir, cwd, timeout_s, commit, evaluator_fn), a non-zero code is still CustodyNotDone, and the
+# record is still written by the emitter rather than by this module. What moved is what happens AFTER a clean
+# record. Previous value: e6b74046d26ca524302fc3d146a0d2758915b2690ccfa2930b344252a2243f5f
+LOOP_SHA = "b35c01c6f1f034f613add57ee7edfc07a797e800da73fdd39495392c5c250e49"
 SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
 SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
 INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")

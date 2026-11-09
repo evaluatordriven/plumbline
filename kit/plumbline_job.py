@@ -152,6 +152,8 @@ def write_status(job: Path, state: str, **extra) -> None:
     """
     import hashlib
     from datetime import datetime, timezone
+    job = Path(job)          # a str here used to die on `job / "custody"` — measured 2026-11-09 from loop()'s
+                              # finish path, where the record directory arrives as a string. Coerce, never guess.
     cdir = job / "custody"
     cdir.mkdir(parents=True, exist_ok=True)
     record = cdir / "record.custody.json"
@@ -368,6 +370,12 @@ def do_file(a) -> int:
         return 2
     if doc.get("job_id"):
         kind = "job"
+    elif "finish" in doc and doc.get("terminalState"):
+        # A finish descriptor IS a job. `_custody_packet()` starts from the ratified packet, and the corpus's
+        # packet schema has no `job_id` — that is a Plumbline instance field — so a real finish carries no job id
+        # and was filed as "unclassified" the first time loop() tried to file one (measured 2026-11-09). What a
+        # finish always carries is its terminal state; no dispatch packet has one.
+        kind = "job"
     elif {"artifact", "bounds", "job"} <= set(doc) or ("job" in doc and ("target" in doc or "maker_cmd" in doc)):
         kind = "run"
     else:
@@ -425,7 +433,7 @@ def do_file(a) -> int:
         extra["terminal_state"] = terminal
     if a.backfill:
         extra["unfiled_backfill"] = True
-    if kind == "job" and doc["job_id"] != dest.name:
+    if kind == "job" and doc.get("job_id") and doc["job_id"] != dest.name:
         extra["packet_job_id"] = doc["job_id"]
     drop_filed_rows(dest, a.run_log)
     log_row(dest, "filed", extra, a.run_log)
