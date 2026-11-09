@@ -1,0 +1,2 @@
+SYNTHETIC evaluator reading, pass-a, D2. Quote: "(section omitted)". The Risks section the brief names is empty. Score 4.
+Remedy: write the Risks section the brief names.
