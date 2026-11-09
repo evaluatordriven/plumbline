@@ -64,6 +64,11 @@ from datetime import datetime as _datetime
 from datetime import timezone
 
 from kit import conductor_software
+# emit_custody is imported on purpose: the snapshot writer lives there because that is where the
+# record's `x-plumbline` block is assembled (method, path, manifest, recover_command). A second copy
+# mechanism inside the loop would be two implementations of one law, so the loop calls the one writer
+# and then runs the emitter that reads what it wrote. Removing this import would fork the snapshot
+# contract; do not.
 from kit import emit_custody
 from kit.conductor_run import _run, run
 
