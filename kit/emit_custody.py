@@ -1129,6 +1129,20 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
     dsp = ci.get("disposition") or {}
     at = dsp.get("at")
     live = ev_log.get("dispose") if have_inputs else None
+    # The live `dispose` line is read to CHECK the record, never to supply its state: the Owner ruled the
+    # record's disposition.state is packet.disposition_state (docstring, lines 14-15), so the line's own `state`
+    # must agree with that value or the disagreement is refused by name. Silently dropping the line would hide
+    # that Plumbline's own live event log contradicts the record it is holding.
+    if live is not None and "state" in live and live.get("state") is not None:
+        line_state = live["state"]
+        if not (isinstance(line_state, str) and line_state in DISPOSITIONS):
+            gaps.add("disposition.state", f"the dispose line's state {line_state!r} is a shape the emitter does "
+                     f"not read (not a known disposition value), so it cannot be checked against the record's "
+                     f"{state!r} ({LEDGER_REL}:{live.get('_line')})")
+        elif state is not None and line_state != state:
+            gaps.add("disposition.state", f"the dispose line says {line_state!r} but the record would say "
+                     f"{state!r} (packet.json disposition_state); the line is not dropped "
+                     f"({LEDGER_REL}:{live.get('_line')})")
     # `dispose --decided-at T` writes T into custody.json (`disposition.at`) and keeps the tool clock in the
     # line's `at` (INTERFACE 1; kit/custody_ledger.py). The value to compare with — and the value the record's
     # disposition.at gets — is the line's decided_at; a line with no decided_at (the base form) uses `at`.
