@@ -114,6 +114,9 @@ class AcceptanceNoDeleteTests(unittest.TestCase):
         _write(tmp, "tests/t.py", "pin\n")
         _write(tmp, "keep.txt", "no\n")
         keep = os.path.join(tmp, "keep.txt")
+        # A file that exists BEFORE the run starts, inside an editable directory. The Maker never writes it; it is
+        # not the product of any round. This is the data-loss case: it must still be here after acceptance.
+        _write(tmp, "src/w.txt", "stay\n")
 
         def eval_fn(turn, cwd):
             r = turn["round"]
@@ -132,7 +135,6 @@ round = json.load(open(os.environ['PLUMBLINE_FINDINGS']))['round']
 open('keep.txt', 'w').write('yes\\n' + str(time.time()))
 if round == 2:
     os.makedirs('src', exist_ok=True)
-    open('src/w.txt', 'w').write('stay\\n')
     open('src/a.txt', 'w').write('r2\\n')
 """
         maker = [PY, "-c", maker_script]
@@ -144,8 +146,10 @@ if round == 2:
 
     def test_survival_untracked_file_in_editable_directory(self):
         # SURVIVAL
-        # src/w.txt is created in round 2 (a worse round) and must survive
-        # acceptance at round 3, restoring from round 1 which lacked src/.
+        # src/w.txt EXISTED BEFORE the run started and the Maker never wrote it. It must survive acceptance at
+        # round 3, which restores from round 1 -- a round in which the snapshot has no entry for it.
+        # The distinction this pins: restore may remove what THIS RUN created; it may never remove what was
+        # there before the run began.
         with TemporaryDirectory() as tmp, TemporaryDirectory() as rec:
             summary, _ = self._run(tmp, rec, ["keep.txt", "src"])
             self.assertEqual(summary["terminal_state"], "accepted")
