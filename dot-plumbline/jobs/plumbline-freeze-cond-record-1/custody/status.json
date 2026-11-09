@@ -6,9 +6,9 @@
   "record": "custody/record.custody.json",
   "record_present": false,
   "record_sha256": null,
-  "written_at": "2026-11-09T20:28:27Z",
+  "written_at": "2026-11-09T20:35:57Z",
   "written_by": "kit/plumbline_job.py",
   "terminal_state": null,
-  "filed_from": "/home/jarbis1/tmp/plumbline-freeze-cond-record-1",
-  "why": "state read from the filed folder itself at the moment of filing: a custody record is present only when the job had ended and the emitter wrote one."
+  "open_note": "superseded: the freeze-before-dispatch behaviour shipped in PR #17 and this run's dispatch and maker cost remain as evidence. It has no run file and never reached a terminal state.",
+  "why": "the job is open; `open_note` records which kind of open it is, because the state alone cannot distinguish them."
 }

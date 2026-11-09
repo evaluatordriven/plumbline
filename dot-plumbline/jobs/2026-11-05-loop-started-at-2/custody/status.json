@@ -6,8 +6,9 @@
   "record": "custody/record.custody.json",
   "record_present": false,
   "record_sha256": null,
-  "written_at": "2026-11-09T20:28:27Z",
+  "written_at": "2026-11-09T20:35:57Z",
   "written_by": "kit/plumbline_job.py",
   "terminal_state": null,
-  "why": "state read from the folder itself when the status file was introduced; the job had no record because it never reached a terminal state."
+  "open_note": "accepted by loop() on 2026-11-05 and deliberately left unclosed. Its round-01.json predates the \u00a75 run shape (pass_rule is the string 'accepted'), so no \u00a75 record can be written without fabricating one; the Owner declined to retrofit it on 2026-11-05 and that ruling stands.",
+  "why": "the job is open; `open_note` records which kind of open it is, because the state alone cannot distinguish them."
 }

@@ -6,8 +6,9 @@
   "record": "custody/record.custody.json",
   "record_present": false,
   "record_sha256": null,
-  "written_at": "2026-11-09T20:28:27Z",
+  "written_at": "2026-11-09T20:35:57Z",
   "written_by": "kit/plumbline_job.py",
   "terminal_state": null,
-  "why": "state read from the folder itself when the status file was introduced; the job had no record because it never reached a terminal state."
+  "open_note": "abandoned: the packet exists and nothing else does \u2014 no dispatch, no run, no maker cost. Opened and never worked; kept because deleting a packet destroys the only record that it was opened.",
+  "why": "the job is open; `open_note` records which kind of open it is, because the state alone cannot distinguish them."
 }

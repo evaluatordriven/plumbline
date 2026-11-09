@@ -165,7 +165,18 @@ def refusals(run: dict) -> list[str]:
     if run.get("verdict") == "regenerate" and not (run.get("violations") or []):
         out.append("verdict is `regenerate` with no violation — C36: an iteration that names nothing it is "
                    "tasked with is not an iteration. Name what the next iteration must change.")
-    floor = (run.get("pass_rule") or {}).get("dimension_floor")
+    pr = run.get("pass_rule")
+    if pr is not None and not isinstance(pr, dict):
+        # Measured 2026-11-09: `round-01.json` in four filed jobs carries `pass_rule: "accepted"` — the older
+        # run shape. `.get` on a string raised AttributeError, so a close died with a traceback where a named
+        # refusal belonged, and the failure looked like a Plumbline crash rather than a run the emitter cannot
+        # read. Refuse by name and keep reading the rest of the run.
+        out.append(f"run.pass_rule is {type(pr).__name__} ({pr!r}); the §5 run shape is an object carrying "
+                   f"`dimension_floor` and the thresholds. A bare value is an older run shape, and it cannot be "
+                   f"read as a pass rule — re-emit the run from the loop that produced it, or supply the floor.")
+        floor = None
+    else:
+        floor = (pr or {}).get("dimension_floor")
     named = {str(v.get("dimension")) for v in (run.get("violations") or []) if isinstance(v, dict)
              and not blank(v.get("dimension"))}
     if isinstance(floor, (int, float)):
