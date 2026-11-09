@@ -107,6 +107,32 @@ class DotPlumblineFiling(unittest.TestCase):
                 wrong.append(f"{r['job_id']}: row carries no usable record_state ({state!r})")
         self.assertFalse(wrong, f"record_state does not match the folder: {wrong}")
 
+    def test_every_job_folder_states_its_own_custody_status(self):
+        """A folder must say whether a record can exist — an absence cannot tell 'not yet' from 'missing'."""
+        missing, wrong = [], []
+        for name, path in folders().items():
+            if path.parent != JOBS:
+                continue
+            status = path / "custody" / "status.json"
+            if not status.is_file():
+                missing.append(name)
+                continue
+            doc = json.loads(status.read_text())
+            record = (path / "custody" / "record.custody.json").is_file()
+            if doc.get("not_a_record") is not True:
+                wrong.append(f"{name}: status does not declare `not_a_record: true`")
+            if doc.get("job") != name:
+                wrong.append(f"{name}: status names job {doc.get('job')!r}")
+            if doc.get("state") == "custody" and not record:
+                wrong.append(f"{name}: status says custody, no record file")
+            if doc.get("state") in {"open", "missing"} and record:
+                wrong.append(f"{name}: status says {doc.get('state')} but a record file is present")
+            if record and doc.get("record_sha256") != hashlib.sha256(
+                    (path / "custody" / "record.custody.json").read_bytes()).hexdigest():
+                wrong.append(f"{name}: status records a different record hash than the file on disk")
+        self.assertFalse(missing, f"job folders with no custody/status.json: {missing}")
+        self.assertFalse(wrong, f"custody/status.json disagrees with its folder: {wrong}")
+
     def test_a_filed_row_records_a_packet_hash_that_matches_the_filed_packet(self):
         have, mismatched = folders(), []
         for r in rows():

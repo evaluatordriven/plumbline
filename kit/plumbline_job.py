@@ -120,6 +120,56 @@ def run_verifier(job: Path, a, record: Path | None = None) -> tuple[int, str]:
     return rv.returncode, kind
 
 
+def drop_filed_rows(job: Path, override: str | None = None) -> None:
+    """Remove this job's earlier `filed` rows before writing a new one.
+
+    A re-filing is a correction, not a second event: measured 2026-11-09, re-filing seven jobs appended seven
+    duplicate rows and the guard caught it as "job_id named more than once". A row about a folder should
+    describe the folder as it stands; two rows describing one folder means a reader must pick.
+    """
+    path = Path(override).expanduser() if override else job.parent.parent / "run-log.json"
+    try:
+        doc = json.loads(path.read_text())
+    except Exception:
+        return
+    if not isinstance(doc, dict) or not isinstance(doc.get("runs"), list):
+        return
+    before = len(doc["runs"])
+    doc["runs"] = [r for r in doc["runs"]
+                   if not (isinstance(r, dict) and r.get("job_id") == job.name and r.get("event") == "filed")]
+    if len(doc["runs"]) != before:
+        path.write_text(json.dumps(doc, indent=2) + "\n")
+
+
+def write_status(job: Path, state: str, **extra) -> None:
+    """Write `custody/status.json` — the folder's own statement about whether a record can exist yet.
+
+    WHY A FILE AND NOT AN ABSENCE. Measured 2026-11-09: the Owner opened four filed job folders, found no
+    custody record, and nothing inside the folder said whether that was a defect or a job that had not ended.
+    An absence cannot tell "not yet" from "missing", and it is the folder a reader opens first — not the
+    run-log. So the folder states its own status, and `not_a_record: true` keeps it from being read as one: the
+    custody record is the corpus's artifact, and this is the instance's note about it.
+    """
+    import hashlib
+    from datetime import datetime, timezone
+    cdir = job / "custody"
+    cdir.mkdir(parents=True, exist_ok=True)
+    record = cdir / "record.custody.json"
+    doc = {
+        "schema": "plumbline-instance-custody-status-v1",
+        "not_a_record": True,
+        "job": job.name,
+        "state": state,
+        "record": "custody/record.custody.json",
+        "record_present": record.is_file(),
+        "record_sha256": hashlib.sha256(record.read_bytes()).hexdigest() if record.is_file() else None,
+        "written_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "written_by": "kit/plumbline_job.py",
+        **extra,
+    }
+    (cdir / "status.json").write_text(json.dumps(doc, indent=2) + "\n")
+
+
 def do_open(a) -> int:
     job = Path(a.job_dir).expanduser()
     if (job / "packet.json").is_file():
@@ -149,6 +199,10 @@ def do_open(a) -> int:
         shutil.copy(a.brief, dest)
     log_row(job, "opened", {"mode": packet_mode(job), "artifact": json.loads((job / "packet.json").read_text()).get("artifact")},
             a.run_log)
+    write_status(job, "open",
+                 why="the job has no terminal_state until it closes, and a custody record exists only for an "
+                     "ended job. This file says so inside the folder, so a reader does not have to infer it "
+                     "from a missing record.")
     print(f"\njob open: {job}")
     print(f"  packet.json  the terms, readable by the gate")
     print(f"  inputs/      the brief (kept, and skipped by the close — an input is not a term)")
@@ -261,6 +315,18 @@ def do_close(a) -> int:
                 return vc
         log_row(job, "closed", {"mode": doc.get("mode"), "outcome": doc.get("outcome"),
                                 "disposition_state": state}, a.run_log)
+        terminal = doc.get("terminal_state")
+        if (job / "custody" / "record.custody.json").is_file():
+            write_status(job, "custody", terminal_state=terminal,
+                         why="the job ended and its custody record was written; this file names it.")
+        elif terminal in TERMINALS:
+            write_status(job, "missing", terminal_state=terminal,
+                         why="the job reached a terminal state but the record was NOT written — re-emit with "
+                             "`plumbline_job.py custody`. This state is a defect, not a stage.")
+        else:
+            write_status(job, "open", terminal_state=terminal,
+                         why="the close left the packet without a terminal state, so no custody record can "
+                             "exist yet.")
         print(f"\njob closed: {job}")
         if doc.get("terminal_state") not in TERMINALS:
             print(f"  (no custody record: the packet's terminal_state is {doc.get('terminal_state')!r}, not terminal)")
@@ -341,6 +407,11 @@ def do_file(a) -> int:
     if dest.exists():
         shutil.rmtree(dest)
     shutil.copytree(src, dest, ignore=ignore)
+    if kind == "job":
+        write_status(dest, "custody" if has_record else ("missing" if terminal else "open"),
+                     terminal_state=terminal, filed_from=str(src),
+                     why="state read from the filed folder itself at the moment of filing: a custody record is "
+                         "present only when the job had ended and the emitter wrote one.")
     files = sorted(p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file())
     extra = {
         "kind": kind,
@@ -356,6 +427,7 @@ def do_file(a) -> int:
         extra["unfiled_backfill"] = True
     if kind == "job" and doc["job_id"] != dest.name:
         extra["packet_job_id"] = doc["job_id"]
+    drop_filed_rows(dest, a.run_log)
     log_row(dest, "filed", extra, a.run_log)
     print(f"filed ({kind}/{record_state}): {dest}  ({len(files)} files, "
           f"packet sha256 {extra['packet_sha256'][:12]})")
