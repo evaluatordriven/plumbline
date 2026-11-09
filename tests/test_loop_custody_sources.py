@@ -57,8 +57,10 @@ LOOP_PY = "kit/conductor_loop.py"
 # untouched: `emit_custody_for_finish` is still called once, loop()'s signature is still
 # (packet, record_dir, cwd, timeout_s, commit, evaluator_fn), a non-zero code is still CustodyNotDone, and the
 # record is still written by the emitter rather than by this module. What moved is what happens AFTER a clean
-# record. Previous value: e6b74046d26ca524302fc3d146a0d2758915b2690ccfa2930b344252a2243f5f
-LOOP_SHA = "b35c01c6f1f034f613add57ee7edfc07a797e800da73fdd39495392c5c250e49"
+# record. Previous values: e6b74046… (before PR #30), b35c01c6… (PR #30), now this — the loop now writes
+# the final summary into the filed COPY as well, because the copy was taken before the `filing` row existed and
+# could not say how it was filed (measured on Job 31's first close).
+LOOP_SHA = "b6761486ffc38be987b1e80ff52eb7c27ba81955c7d31838779bf317ddd10f91"
 SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
 SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
 INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")
