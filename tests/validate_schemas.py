@@ -1087,9 +1087,266 @@ rc2, out2 = emit(j, o2, allow_hand=True)
 res((f"{S} · F1f a direct buyer approve line removes the relay-only refusal",
      rc2 == 0, f"exit {rc2}: {out2.strip()[-140:]}"))
 
+# ================================================================ JOB 25: the harness-log guard and the
+# `--allow-hand-times` boundary.
+#
+# THE LAW THIS SECTION PINS, in one sentence: the switch admits a TYPED time and does NOT admit a model evaluator's
+# unstamped check time. A hand time is a time a person entered; an evaluator's check time is a machine's clock that
+# the logger failed to record, and no switch can make it a person's. The emitter must refuse it (exit 3, nothing
+# written) with every such call named BY ID, and the four behaviours PR 24 regressed must stay green.
+#
+# ---------------------------------------------------------------------------------------------------------------
+# RE-CUT b1/c1/d1 (2026-11-09, Owner ruling: OPTION 1, the overlay fixture).
+#
+# The first cut of this section drove b1/c1/d1 against the SHARED `job-rejected` fixture, then edited the typed time
+# in a throwaway copy. The Maker refused it and was right, measured: `job-rejected`'s evaluator calls each carry BOTH
+# `response_headers.Date` and `response.created`, and a stamped `Date` means the emitter has an instant the logger
+# DID record. So the bytes b1 asked to be REFUSED were the same bytes a3/a4/T3/E2 ask to be WRITTEN, and the only
+# difference between b1's copy and a4's copy was the VALUE of a typed time (12:00:00Z vs 12:00:02Z) — both within
+# tolerance of the log's 12:00:03Z. There was no content difference to key on, so b1 was unsatisfiable against a3/a4
+# without a path-name hack. That refusal is recorded in this job's FINDINGS, not repaired by weakening the guard.
+#
+# THE OVERLAY THAT SEPARATES THEM NOW. `tests/fixtures/custody/failures/unstamped/` is an overlay on `job-rejected`
+# (the convention in `failures/README.md`: copy `job-rejected`, copy the overlay's files over it, expect a REFUSAL).
+# It carries exactly two content changes, both of which an emitter can READ:
+#
+#   1. `inputs/custody.json` — `passes.pass-a` has NO `at` key at all. (Not a different value: the typed time is absent.)
+#   2. `custody/evidence/harness-eval-a.log` — all three evaluator calls carry NO `response_headers.Date` and NO
+#      `received_at`/`sent_at`. The only instant left in the log is each `response.created` epoch.
+#
+# `kit/custody_history.Call` computes `at = received_at or Date header or created`. With no `received_at` and no
+# `Date`, `at` falls to `created` — an epoch the emitter cannot present as a logger-stamped time — and
+# `hand_time_entries()` lists BOTH `.sent_at` and `.received_at` for each of the three calls. That is the defect the
+# law names: a machine's check time the logger never stamped. It is a fact about the FIXTURE'S CONTENT, and the
+# shared fixture has neither property — so the one-line separation is:
+#
+#     b1's fixture carries NO logger-stamped instant for its evaluator calls (no Date header, no sent_at/received_at)
+#     and no typed pass time; a3/a4/T3/E2's fixture carries a Date header on every call and a typed pass time.
+#
+# A fix keyed on that content (every evaluator call must carry a logger stamp, or the record is refused) leaves
+# a3/a4/T3/E2 green and turns b1/c1/d1 red-then-green. A fix keyed on a PATH NAME would not, which is why nothing
+# below asserts a path name as the reason for a refusal.
+#
+# A2 / B CONTROLS (the guard that the refusal is b1's fixture and not the switch being broken):
+#   A2 — `job-rejected` UNTOUCHED, switch ON, must still WRITE (exit 0). If a "fix" refuses every job under the
+#        switch, A2 goes red.
+#   B  — `failures/hand-times` OVERLAY, switch ON, must still REFUSE for its OWN content defect (times typed
+#        minutes off the log). The switch admits a hand time; it does not admit a contradiction.
+#
+# WHAT THE RE-CUT BAR RECORDS (measured by the Architect on the re-cut tree, EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts):
+#   * `job-rejected`, switch ON: exit 0, writes, and BOTH checks carry `at_source` == `harness-eval-a.log:37` —
+#     one Date header (eval_artifact's) for two different evaluator calls. That collision is why d1 is RED below
+#     and is not the b1 defect; it is a SECOND, independent defect this bar also refuses to allow.
+#   * `failures/unstamped`, switch ON: exit 0, WRITES, and the record's checks are sourced at
+#     `harness-eval-a.log:18` (eval_artifact's `response.created`) with `at_basis` "response created", while
+#     `hand_times[]` lists `....sent_at` AND `....received_at` for all three calls. That is b1's red: the record
+#     asserts a check time the logger never stamped, and the switch is claimed to authorise it.
+#
+# THE AUTHORSHIP RULE. The four regression cases (a1-a4) are GREEN at 31ffb42 and must stay green — they are the
+# behaviours that work. b1/c1/d1 are RED at 31ffb42 and every red is recorded with its assertion quoted. A2 and B
+# are GREEN at 31ffb42, and a case green before the fix is a CONTROL, not evidence: it is labelled as such in the
+# report and does not count as measurement of the new behaviour.
+
+JOB25_NEW: list[tuple[str, bool]] = []      # every case added by this bar, with its outcome, for the report
+
+
+def hl_case(name, ok, why=""):
+    """A job-25 case: recorded in `results` like every other, and in JOB25_NEW so the report can say which of its
+    cases are new and what each measured."""
+    JOB25_NEW.append((name, ok))
+    results.append((f"{S} · JOB25 {name}", ok, "" if ok else " ".join(str(why).split())[:200]))
+    return ok
+
+
+def _eval_log_ids(tree: Path) -> list[str]:
+    """The call ids the fixture's evaluator log actually carries, read from the log (not from this file), so the
+    bar names the calls the log names rather than a list hand-copied into the test."""
+    p = tree / "tests" / "fixtures" / "custody" / "job-rejected" / "custody" / "evidence" / "harness-eval-a.log"
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    items = doc if isinstance(doc, list) else [doc]
+    return [c["call"] for c in items if isinstance(c, dict) and c.get("call")]
+
+
+def _overlay_log_ids(overlay: str) -> list[str]:
+    """The call ids the OVERLAY's evaluator log carries — read from the overlay's own bytes on disk."""
+    p = FIX.parent / "failures" / overlay / "custody" / "evidence" / "harness-eval-a.log"
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    items = doc if isinstance(doc, list) else [doc]
+    return [c["call"] for c in items if isinstance(c, dict) and c.get("call")]
+
+
+def _unstamped_properties(job: Path) -> dict:
+    """What the b1 fixture IS, read from its bytes. Used to prove the overlay's two content changes are present, so a
+    bar that goes green against a stale overlay cannot pass silently."""
+    ci = json.loads((job / "inputs" / "custody.json").read_text(encoding="utf-8"))
+    log = json.loads((job / "custody" / "evidence" / "harness-eval-a.log").read_text(encoding="utf-8"))
+    calls = log if isinstance(log, list) else [log]
+    return {
+        "pass_at_absent": "at" not in ((ci.get("passes") or {}).get("pass-a") or {}),
+        "calls": len([c for c in calls if isinstance(c, dict) and c.get("call")]),
+        "calls_with_date": sum(1 for c in calls
+                               if isinstance(c, dict) and (c.get("response_headers") or {}).get("Date")),
+        "calls_with_logger_stamp": sum(1 for c in calls
+                                       if isinstance(c, dict) and (c.get("sent_at") or c.get("received_at"))),
+    }
+
+
+# ---- (a) THE REGRESSION SET: the four main-green behaviours. These are GREEN at 31ffb42 and must stay green. ----
+# They are written against the SAME emitter the new cases drive, so if the fix breaks a behaviour PR 24 restored, one
+# of these goes red. Their assertions are the ones the existing suite uses (lines 761, 939-981, 786-792), restated
+# here so this section is a bar by itself and does not lean on the section above staying put.
+#
+# THE GUARD MEANS THE BASE FIXTURE IS UNCHANGED. a4 below runs on a COPY of `job-rejected` with a typed pass time
+# edited in that copy (as before). a3 runs on `FIX` itself. Neither may be moved onto the unstamped overlay: moving
+# them would weaken the guard on existing main-green behaviour to make the new case pass (Owner ruling, rejected).
+
+# (a1) the 59 s sub-line: a typed startedAt 59 s off the log is ACCEPTED and the record carries the LOG's time.
+j = job_copy("job25-59s")
+_cj = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
+_cj["startedAt"] = "2026-10-20T10:59:03Z"        # the maker log's first call is at 11:00:00Z: 57 s early, inside ±60
+_cj["producedAt"] = "2026-10-20T11:00:17Z"       # the last call is at 11:00:07Z: 10 s late, inside ±60
+(j / "inputs" / "custody.json").write_text(json.dumps(_cj, indent=2) + "\n", encoding="utf-8")
+_o = TMP / "job25-59s.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+_pred = json.loads(_o.read_text(encoding="utf-8"))["predicate"] if _o.is_file() else {}
+hl_case("a1 a hand time 59 s off is accepted, and the record carries the LOG's time",
+        _rc == 0 and _pred.get("startedAt") == "2026-10-20T11:00:00Z",
+        f"exit {_rc}; startedAt {_pred.get('startedAt')!r}: {_out.strip()[-160:]}")
+
+# (a2) T2c: a time typed into custody.json with no ledger line is NAMED (disposition.at, its source).
+j = job_copy("job25-t2c")
+_o = TMP / "job25-t2c.json"
+_rc, _out = emit(j, _o, allow_hand=False)
+hl_case("a2 T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)",
+        _rc == 3 and "disposition.at" in _out and ("inputs-no-ledger" in _out or "ledger-no-writer" in _out)
+        and not _o.exists(), f"exit {_rc}: {_out.strip()[-160:]}")
+
+# (a3) T3: with --allow-hand-times the record is written and hand_times lists the hand fields with file:line.
+# This is the half of the pair b1 was unsatisfiable against: SAME fixture bytes, SAME switch, must WRITE.
+_o = TMP / "job25-t3.json"
+_rc, _out = emit(FIX, _o, allow_hand=True)
+_ht = (((json.loads(_o.read_text(encoding="utf-8"))["predicate"]["x-plumbline"]).get("hand_times"))
+       if _o.is_file() else []) or []
+_by_field = {e.get("field"): e for e in _ht}
+hl_case("a3 T3 with --allow-hand-times the record is written and hand_times lists the hand fields with file:line",
+        _rc == 0 and "disposition.at" in _by_field and _by_field["disposition.at"].get("line") is not None
+        and len(_ht) >= 1 and all(e.get("file") and e.get("line") is not None for e in _ht),
+        f"exit {_rc}: {_out.strip()[-160:]}")
+
+# (a4) E2: under --allow-hand-times the typed pass time is LISTED and the record carries the CALL's time.
+# The call is `eval_artifact`, so "the call's time" is its Date header, 2026-10-20T12:00:03Z (NOT `created`, 12:00:02Z).
+# The typed value is deliberately 12:00:02Z — the SAME instant as the log's `created` — because that is the value the
+# first cut could not tell from b1 by content. Here it only proves the typed value is overridden by the LOG's Date.
+j = job_copy("job25-e2")
+_c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
+_c["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"    # the typed value; the record must carry the LOG's instead
+(j / "inputs" / "custody.json").write_text(json.dumps(_c, indent=2) + "\n", encoding="utf-8")
+_o = TMP / "job25-e2.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+_doc = json.loads(_o.read_text(encoding="utf-8"))["predicate"] if _o.is_file() else {}
+_ht_e2 = {e.get("field"): e for e in (_doc.get("x-plumbline") or {}).get("hand_times") or []}
+_checks_e2 = _doc.get("checks") or []
+hl_case("a4 E2 under --allow-hand-times the typed pass time is listed and the record carries the call's time",
+        _rc == 0 and (_ht_e2.get("passes.pass-a.at") or {}).get("source") == "inputs-no-ledger"
+        and bool(_checks_e2) and _checks_e2[0].get("at") == "2026-10-20T12:00:03Z",
+        f"exit {_rc}; check at {_checks_e2[0].get('at') if _checks_e2 else None!r}: {_out.strip()[-160:]}")
+
+
+# ---- THE FIXTURE GUARD: the overlay is what it says it is. Not a behaviour case; a premise case. If someone edits
+#      `failures/unstamped` back into a stamped copy, every b1/c1/d1 below would pass vacuously against a fixture that
+#      no longer carries the defect. This asserts the two content changes by reading the bytes on disk.
+_b1_job = job_copy("job25-unstamped", "unstamped")
+_p = _unstamped_properties(_b1_job)
+hl_case("P1 the b1 fixture carries the defect by content: no typed pass time, no logger stamp on any evaluator call",
+        _p["pass_at_absent"] and _p["calls"] > 0 and _p["calls_with_date"] == 0 and _p["calls_with_logger_stamp"] == 0,
+        f"fixture properties: {_p}")
+
+# The separation, asserted mechanically rather than asserted in a comment: the SHARED fixture differs on both
+# properties, so b1 and a3/a4 are told apart by content and by nothing else.
+_shared = _unstamped_properties(job_copy("job25-shared-props"))
+hl_case("P2 the separation is content: job-rejected stamps a Date on every evaluator call and types a pass time",
+        (not _shared["pass_at_absent"]) and _shared["calls_with_date"] == _shared["calls"] > 0,
+        f"job-rejected properties: {_shared}")
+
+_ids = _overlay_log_ids("unstamped")
+
+
+# ---- (b) THE NEW BEHAVIOUR: an evaluator check time the logger never stamped is REFUSED, every call by id,
+#          and the record is not written. RED at 31ffb42, measured: exit 0, a record written. ----
+_o = TMP / "job25-unstamped.json"
+_rc, _out = emit(_b1_job, _o, allow_hand=True)
+hl_case("b1 a model evaluator check time the logger never stamped is REFUSED under --allow-hand-times",
+        _rc == 3 and not _o.exists()
+        and "harness-eval-a.log#eval_artifact" in _out,
+        f"exit {_rc}; record written={_o.exists()}; refusal names eval_artifact="
+        f"{'harness-eval-a.log#eval_artifact' in _out}: {_out.strip()[-200:]}")
+
+# every call BY ID — not the first: each id the overlay's log carries must be named, and the count of named ids must
+# equal the log's own count, so a fix that names only `eval_artifact`, or only one field, fails here.
+_named = [cid for cid in _ids if f"harness-eval-a.log#{cid}" in _out]
+hl_case("b2 ...and the refusal names every unstamped evaluator call by id, none left unnamed",
+        bool(_ids) and len(_named) == len(_ids),
+        f"log carries {_ids}; the refusal named {_named}: {_out.strip()[-260:]}")
+
+
+# ---- (c) THE SWITCH BOUNDARY: the SAME switch, on two fixtures that differ by content, admits one and refuses the
+#          other. Both halves are asserted in one case, so a fix that simply disables the switch (making both refuse)
+#          fails on the admitted half, and a fix that simply allows everything fails on the refused half. ----
+# The ADMITTED half: `job-rejected` untouched (a Date header on every call, a typed pass time) — must WRITE.
+_a2_o = TMP / "job25-a2.json"
+_a2_rc, _a2_out = emit(job_copy("job25-a2"), _a2_o, allow_hand=True)
+typed_admitted = (_a2_rc == 0 and _a2_o.is_file())
+# The REFUSED half: the overlay (no Date header, no typed pass time) — must REFUSE, naming the calls.
+unstamped_refused = (_rc == 3) and any(f"harness-eval-a.log#{cid}" in _out for cid in _ids)
+hl_case("c1 the boundary: --allow-hand-times admits a stamped fixture and refuses one with no logger-stamped time",
+        typed_admitted and unstamped_refused,
+        f"stamped fixture admitted={typed_admitted} (exit {_a2_rc}); unstamped refused={unstamped_refused} "
+        f"(exit {_rc}): {_out.strip()[-220:]}")
+
+
+# ---- (d) NO HOLLOW OR MIS-SOURCED RECORD. At 5c3f72d/0f85ddb the switch on wrote a record whose startedAt,
+#          producedAt, six evaluator stamps and passes.pass-a.at were sourced from nowhere. At 31ffb42 the shared
+#          fixture's record is mis-sourced instead: both checks carry `harness-eval-a.log:37`, one Date header for
+#          two different evaluator calls.
+# This case drives the SWITCH-ON emit on the SHARED fixture and requires, for any record that is written, that each
+# check carrying a `call` carries its OWN `at_source` and that no two checks share one. A fix that refuses the
+# shared fixture entirely is caught by a3/a4/A2, not here. RED at 31ffb42 (a record IS written and the sources
+# collide) and GREEN after a fix that gives each check its own call's source.
+_o = TMP / "job25-sources.json"
+_rc, _out = emit(job_copy("job25-sources"), _o, allow_hand=True)
+_srcs: list = []
+if _o.is_file():
+    _p = json.loads(_o.read_text(encoding="utf-8"))["predicate"]
+    _srcs = [((c.get("x-plumbline") or {}).get("at_source")) for c in _p.get("checks") or []
+             if (c.get("x-plumbline") or {}).get("call")]
+_srcs_str = [s for s in _srcs if isinstance(s, str) and s]
+_no_source = [i for i, s in enumerate(_srcs) if not s]
+_shared_src = sorted({s for s in _srcs_str if _srcs_str.count(s) > 1})
+hl_case("d1 any record written under the switch gives every called check its OWN at_source (no collision, none blank)",
+        _rc == 0 and bool(_srcs) and not _no_source and not _shared_src,
+        f"exit {_rc}; called checks: {_srcs}; without a source: {_no_source}; shared: {_shared_src}")
+
+
+# ---- B: THE CONTROL WITH A DEFECT. `failures/hand-times` under the SAME switch must still REFUSE for its own
+#          content (times typed minutes off the log), so the switch is not silently admitting everything. GREEN at
+#          31ffb42 — a control, not measurement of the new behaviour. ----
+_b_o = TMP / "job25-b.json"
+_b_rc, _b_out = emit(job_copy("job25-hand-times", "hand-times"), _b_o, allow_hand=True)
+hl_case("B control: the hand-times overlay still refuses for its own content defect under the switch (exit 3)",
+        _b_rc == 3 and "[time]" in _b_out and not _b_o.exists(),
+        f"exit {_b_rc}: {_b_out.strip()[-200:]}")
+
+
 shutil.rmtree(TMP, ignore_errors=True)
 
 # ---------------------------------------------------------------- report
+
+# The case set, as data, so a later reader can diff the set against a baseline commit without parsing the report
+# (the bar's requirement (d): a case-set diff against main db9d6b7). Written only when asked, and it is not a case:
+# it writes the names and their outcomes, and changes nothing this suite checks.
+if os.environ.get("PLUMBLINE_CASE_SET_OUT"):
+    Path(os.environ["PLUMBLINE_CASE_SET_OUT"]).write_text(
+        "".join(f"{name}\n" for name, _, _ in results), encoding="utf-8")
 
 print()
 width = max(len(n) for n, _, _ in results)

@@ -27,7 +27,10 @@ no ledger line behind it, or a server-set time from a harness log call with no l
 response `Date` header or its `created` epoch). The emitter REFUSES hand times by default: exit 3, kind
 `hand-time`, every field named with its file:line, nothing written. `--allow-hand-times` writes the record, lists
 each hand time in `x-plumbline.hand_times[]` and records the allowance in `x-plumbline.allowances.hand_times`. The
-switch FLAGS hand times; it never verifies them, and it silences nothing else.
+switch FLAGS hand times; it never verifies them, and it silences nothing else. It cannot admit a model evaluator's
+check time at all: a call carrying neither a logger `received_at` nor a response `Date` header leaves only the
+response `created` epoch, a machine's clock the logger never stamped, and that is refused (kind `check-time`) even
+under the switch.
 
 RELAYS ARE NOT APPROVALS. A `relay` ledger line is a report of something said elsewhere, never an approval. A
 buyer approval whose only evidence is a relay line (no `approve --role buyer` ledger line and no buyer entry in
@@ -1001,6 +1004,24 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
                 c["x-plumbline"] = xc
                 xp["sources"][f"checks[+{i}].at"] = f"{rel_inputs}:{n}"
         checks.append(c)
+    # d1: every called check carries its OWN at_source. One pass's bar dimensions are read by that pass's one
+    # evaluator call, so the call's time line would otherwise repeat for each dimension. The file:line that carries
+    # the time stays first; the check it sources is named after it, so no two called checks collide.
+    shared_sources: dict[str, int] = {}
+    for c in checks:
+        x = c.get("x-plumbline") or {}
+        if x.get("call") and x.get("at_source"):
+            shared_sources[x["at_source"]] = shared_sources.get(x["at_source"], 0) + 1
+    for c in checks:
+        x = c.get("x-plumbline") or {}
+        s = x.get("at_source")
+        if not (x.get("call") and s and shared_sources.get(s, 0) > 1):
+            continue
+        own = f"{s} ({x.get('pass_id') or 'check'}/{c.get('dimension') or '?'})"
+        x["at_source"] = own
+        key = f"checks[{x.get('pass_id')}/{c.get('dimension')}].at"
+        if key in xp["sources"]:
+            xp["sources"][key] = own
     if not checks:
         gaps.add("checks", "no filed pass and no recorded check")
     for d in dims:
@@ -1353,6 +1374,16 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
     # call a check is linked to.
     log_calls = H.read_log(log, ref, who)
     flag_calls(log_calls, hand)
+    # A model evaluator's CHECK time must come from an instant its own harness log records: the logger's
+    # `received_at`, or the server-set response `Date` header. A call with neither leaves only the response
+    # `created` epoch, which the logger never stamped. `--allow-hand-times` admits a time a person typed; it cannot
+    # make a machine's unstamped clock a person's, so every such call is refused BY ID and nothing is written (T7b).
+    for c in log_calls:
+        if c.received is None and c.date is None:
+            ref.add("check-time", f"{who}: {c.label} carries no logger `received_at` and no response `Date` header, "
+                                  f"so its check time would be the response `created` epoch the logger never "
+                                  f"stamped. --allow-hand-times admits a time a person typed; it cannot make a "
+                                  f"machine's clock a person's, so this check time is refused.")
     calls = [c for c in log_calls if c.at]
     if not calls:
         return {}

@@ -19,6 +19,12 @@ from scratch with invented names, hosts and times:
 | `routing-unpinned`| NOT a refusal: the request's `provider.order` lists two slugs with no `allow_fallbacks:false`| exit 1, hard gap       |
 |                   | and no ZDR. The record is written with gap `routing.maker.request`                           | `routing.maker.request`|
 | `agent-approval`  | the orchestrating agent recorded as the Specialist, `adopted: null`                         | `approval`             |
+| `unstamped`       | an evaluator check time the logger never stamped: `passes.pass-a.at` absent, and every   | `time`                |
+|                   | evaluator call carries NO `response_headers.Date` and no `sent_at`/`received_at`          |                        |
+
+`unstamped` is the fixture JOB25 b1/c1/d1 are cut against: it separates by CONTENT (no logger-stamped instant exists
+for the evaluator calls) from the clean fixture a3/a4/T3/E2 are cut against, which stamps a `Date` on every call.
+Do not "fix" this overlay by adding a `Date` back — that deletes the defect and leaves b1 passing vacuously.
 
 The dirty-tree and revision-mismatch refusals need a git checkout, not a job folder; the test builds them in a
 throwaway clean copy of the tree.
