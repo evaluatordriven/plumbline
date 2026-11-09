@@ -1,0 +1,5 @@
+{"event": "freeze", "at": "2026-10-20T10:00:00Z", "bar_file": "custody/bar.md", "bar_sha256": "dd899757a6d3fa2615812883ec4b6ead9ae88485d76f12ef927bde7a9c5a609c", "writer": "kit/custody_ledger.py@fixture000000"}
+{"event": "approve", "role": "buyer", "by": "Fixture Buyer", "at": "2026-10-20T10:05:00Z", "barDigest": "dd899757a6d3fa2615812883ec4b6ead9ae88485d76f12ef927bde7a9c5a609c", "writer": "kit/custody_ledger.py@fixture000000"}
+{"event": "approve", "role": "specialist", "by": "Fixture Specialist", "at": "2026-10-20T10:10:00Z", "barDigest": "dd899757a6d3fa2615812883ec4b6ead9ae88485d76f12ef927bde7a9c5a609c", "writer": "kit/custody_ledger.py@fixture000000"}
+{"event": "pin", "seat": "maker", "via": "openrouter.ai", "provider": "DeepInfra", "slug": "deepinfra/fp8", "host": "api.deepinfra.com", "at": "2026-10-20T10:55:00Z", "writer": "kit/custody_ledger.py@fixture000000"}
+{"event": "dispose", "by": "Fixture Buyer", "state": "given", "at": "2026-10-20T12:30:00Z", "writer": "kit/custody_ledger.py@fixture000000"}

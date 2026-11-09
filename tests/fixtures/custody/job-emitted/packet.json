@@ -1,0 +1,17 @@
+{
+  "job_id": "fixture-passed",
+  "note": "SYNTHETIC FIXTURE describing a job that PASSED — it is not a record of any real run",
+  "mode": "scored",
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "disposition_state": "given",
+  "maker": {
+    "engine": "fixture-maker",
+    "version": "0.0.1"
+  },
+  "buyer": "Fixture Buyer",
+  "specialist": "Fixture Specialist",
+  "close": {
+    "date": "2026-10-20T13:05:00Z"
+  }
+}

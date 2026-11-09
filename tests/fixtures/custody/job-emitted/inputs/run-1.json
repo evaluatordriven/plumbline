@@ -1,0 +1,5 @@
+{"job_id": "fixture-passed", "iteration": 1, "note": "SYNTHETIC FIXTURE (quotes only are read from here)",
+ "passes": [{"pass_id": "pass-a", "evidence": [
+   {"dimension": "correctness", "quote": "Revenue was 12.4 in Q3, as in the source table."},
+   {"dimension": "completeness", "quote": "## Risks\nRevenue concentration on one customer is noted and bounded."}]}],
+ "verdict": "accept"}

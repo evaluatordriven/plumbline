@@ -1,0 +1,40 @@
+{
+  "job_id": "fixture-passed",
+  "iteration": 1,
+  "passes": [
+    {
+      "pass_id": "pass-a",
+      "kind": "scored",
+      "status": "filed",
+      "artifact": "passes/pass-a.json"
+    }
+  ],
+  "dimensions": [
+    {
+      "name": "correctness",
+      "score": 10,
+      "scale": "1-10",
+      "observation": "every stated figure matches the source table"
+    },
+    {
+      "name": "completeness",
+      "score": 10,
+      "scale": "1-10",
+      "observation": "every section the brief names is present, Risks included"
+    }
+  ],
+  "pass_rule": {
+    "accept": 9.5,
+    "dimension_floor": 9.0,
+    "reject": 7.0,
+    "cap": 4
+  },
+  "violations": [],
+  "verdict": "accept",
+  "instrument_in_force": {
+    "version": "fixture",
+    "rubric_sha256": "0845e0d074b4afb4dfb413128b876b54b81b38627d56497552c8f52459b85ce2",
+    "code_sha256": "6fa8bca7f467a492ce3fb6369b71b5d2542993646e4356090b6ec44135729e5c"
+  },
+  "note": "SYNTHETIC FIXTURE: describes a job that passed; it is not a record of any real run"
+}
