@@ -32,6 +32,11 @@ ROOT = Path(__file__).resolve().parents[1]
 VERIFIER = ROOT / "kit" / "plumbline_verify.py"
 FIX = ROOT / "tests" / "fixtures" / "custody" / "verify"
 JOB_REJECTED = ROOT / "tests" / "fixtures" / "custody" / "job-rejected"
+JOB_EMITTED = ROOT / "tests" / "fixtures" / "custody" / "job-emitted"
+# The EMITTING fixture: the same job shape, but its model-seat calls carry the logger's own sent_at/received_at,
+# so the emitter will write a record for it under D6/D7. A check whose purpose is "a record is written" takes
+# this one; a check whose purpose is the refusal keeps JOB_REJECTED. (Job 8, 2026-11-09: one fixture cannot be
+# both, and the emit-path checks were reading the refusal fixture's unstamped log.)
 sys.path.insert(0, str(ROOT / "kit"))
 import plumbline_job as J  # noqa: E402
 import plumbline_verify as V  # noqa: E402
@@ -165,9 +170,9 @@ def run_emit(job: Path, out: Path, tree: Path, allow_hand: bool = True):
     return subprocess.run(cmd, capture_output=True, text=True)
 
 
-def copy_job(tmp: Path, name: str = "job") -> Path:
+def copy_job(tmp: Path, name: str = "job", fixture: Path = JOB_REJECTED) -> Path:
     dst = tmp / name
-    shutil.copytree(JOB_REJECTED, dst)
+    shutil.copytree(fixture, dst)
     return dst
 
 
@@ -449,7 +454,7 @@ class SpendWithoutSpendLineTests(unittest.TestCase):
 
     def test_cost_with_no_spend_line_verifies(self):
         tree = clean_emitter_tree(self.tmp)
-        job = copy_job(self.tmp)
+        job = copy_job(self.tmp, fixture=JOB_EMITTED)
         log = job / "custody" / "evidence" / "harness-maker-fixture.log"
         self.assertTrue(log.is_file())
         set_generation_cost(log, 0.0012)
@@ -481,7 +486,7 @@ class TypedStartedProducedTests(unittest.TestCase):
 
     def test_typed_started_at_and_produced_at_are_hand_times(self):
         tree = clean_emitter_tree(self.tmp)
-        job = copy_job(self.tmp)
+        job = copy_job(self.tmp, fixture=JOB_EMITTED)
         ci = json.loads((job / "inputs" / "custody.json").read_text(encoding="utf-8"))
         self.assertTrue(ci.get("startedAt") and ci.get("producedAt"))
         out = self.tmp / "rec.json"
