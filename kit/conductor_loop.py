@@ -64,6 +64,7 @@ from datetime import datetime as _datetime
 from datetime import timezone
 
 from kit import conductor_software
+from kit import emit_custody
 from kit.conductor_run import _run, run
 
 ACCEPTED = "accepted"
@@ -275,6 +276,8 @@ def _custody_packet(packet, halt):
         "finish": dict(finish),
         "summary": dict(finish),
     })
+    if halt["stop"] == ACCEPTED:
+        descriptor["snapshot"] = emit_custody.snapshot_marker()
     return descriptor
 
 
@@ -610,6 +613,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     if not _own_clock():
         raise CustodyNotDone(halt, _exit_code(stop))
     _dump(os.path.join(record_dir, "packet.json"), _custody_packet(loaded, halt))
+    if stop == ACCEPTED:
+        emit_custody.write_snapshot(record_dir)
     code = emit_custody_for_finish(record_dir, halt)
     if code != 0:
         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)

@@ -74,7 +74,7 @@ fallback and ZDR is a hard gap (exit 1), not a refusal: the record is still true
 Nothing is written on 2 or 3; an existing record is left as it was.
 """
 from __future__ import annotations
-import argparse, json, os, re, subprocess, sys
+import argparse, gzip, io, json, os, re, subprocess, sys, tarfile
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
 from pathlib import Path
@@ -93,6 +93,10 @@ OUTCOMES = ("conforms", "does_not_conform", "unobserved")
 HERE = Path(__file__).resolve().parent
 RFC = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?Z$")
 LEDGER_REL = "inputs/custody-events.jsonl"
+SNAPSHOT_REL = "custody/snapshot.tar.gz"
+SNAPSHOT_MANIFEST_REL = "custody/snapshot.manifest.json"
+SNAPSHOT_RECORD_REL = "custody/record.custody.json"
+SNAPSHOT_RECOVER = f"tar -xzf {SNAPSHOT_REL} -C recovered"
 
 
 class Gaps:
@@ -110,6 +114,72 @@ class Gaps:
 
 def file_digest(p: Path) -> str:
     return sha256(p.read_bytes()).hexdigest()
+
+
+def snapshot_members(job: Path, exclude: tuple[str, ...] = ()) -> list[tuple[str, bytes]]:
+    """Every regular file under ``job`` (job-relative, posix), except the snapshot's own files and the record."""
+    job = Path(job)
+    skip = {SNAPSHOT_REL, SNAPSHOT_MANIFEST_REL, SNAPSHOT_RECORD_REL, *exclude}
+    out: list[tuple[str, bytes]] = []
+    for path in job.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(job).as_posix()
+        if rel in skip:
+            continue
+        out.append((rel, path.read_bytes()))
+    out.sort(key=lambda row: row[0])
+    return out
+
+
+def snapshot_tar_gz(members: list[tuple[str, bytes]]) -> bytes:
+    """The archive bytes: deterministic, so a re-emission from the recovered tree hashes the same."""
+    buf = io.BytesIO()
+    with gzip.GzipFile(fileobj=buf, mode="wb", mtime=0) as gz:
+        with tarfile.open(fileobj=gz, mode="w", format=tarfile.GNU_FORMAT) as tar:
+            for rel, data in members:
+                info = tarfile.TarInfo(rel)
+                info.size = len(data)
+                info.mtime = 0
+                info.uid = 0
+                info.gid = 0
+                info.uname = ""
+                info.gname = ""
+                info.mode = 0o644
+                tar.addfile(info, io.BytesIO(data))
+    return buf.getvalue()
+
+
+def snapshot_manifest(members: list[tuple[str, bytes]]) -> dict:
+    return {"files": {rel: sha256(data).hexdigest() for rel, data in members}}
+
+
+def snapshot_marker() -> dict:
+    return {
+        "method": "tar.gz",
+        "path": SNAPSHOT_REL,
+        "manifest": SNAPSHOT_MANIFEST_REL,
+        "recover_command": SNAPSHOT_RECOVER,
+    }
+
+
+def write_snapshot(job) -> dict:
+    """Write the archive and its manifest into ``job``; the packet carries the marker, not the digest."""
+    job = Path(job)
+    members = snapshot_members(job)
+    archive = snapshot_tar_gz(members)
+    manifest = snapshot_manifest(members)
+    (job / SNAPSHOT_REL).parent.mkdir(parents=True, exist_ok=True)
+    (job / SNAPSHOT_REL).write_bytes(archive)
+    (job / SNAPSHOT_MANIFEST_REL).write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return {
+        "method": "tar.gz",
+        "sha256": sha256(archive).hexdigest(),
+        "path": SNAPSHOT_REL,
+        "manifest": SNAPSHOT_MANIFEST_REL,
+        "recover_command": SNAPSHOT_RECOVER,
+    }
 
 
 def emitter_stamp() -> str:
@@ -401,6 +471,60 @@ def _editable_files(job: Path, number: int | None = None) -> list[tuple[str, Pat
     return found
 
 
+def _snapshot_block(job: Path, packet: dict, ref: H.Refusals, gaps: Gaps) -> dict | None:
+    """The x-plumbline.snapshot block for an accepted finish.
+
+    loop() marks an accepted packet with a ``snapshot`` descriptor (method,
+    path, manifest, recover_command) but not its sha256: the archive contains
+    the packet, so the packet cannot carry the archive's digest. The digest is
+    read from the archive when it is present. When the job is the recovered
+    tree (there is no archive and no existing record), the archive is rebuilt
+    from the same files with the same deterministic encoder, so the digest is
+    the one acceptance took. A job that already has a record naming a snapshot
+    and has lost it refuses: a re-emission cannot vouch for bytes it cannot see.
+    """
+    marker = packet.get("snapshot")
+    if not isinstance(marker, dict):
+        return None
+    method = marker.get("method")
+    rel = marker.get("path")
+    manifest_rel = marker.get("manifest")
+    recover = marker.get("recover_command")
+    if method != "tar.gz" or not all(isinstance(v, str) and v for v in (rel, manifest_rel, recover)):
+        gaps.add("x-plumbline.snapshot", "the accepted packet's snapshot descriptor is malformed", False)
+        return None
+    archive = job / rel
+    manifest = job / manifest_rel
+    existing = job / SNAPSHOT_RECORD_REL
+    if existing.is_file():
+        try:
+            old = load(existing)
+        except Exception:
+            old = None
+        old_snap = (((old or {}).get("predicate") or {}).get("x-plumbline") or {}).get("snapshot") \
+            if isinstance(old, dict) else None
+        if isinstance(old_snap, dict) and (not archive.is_file() or not manifest.is_file()):
+            ref.add("snapshot", f"the accepted job's snapshot is missing: {rel} or {manifest_rel} is not in "
+                                f"{job}; the record cannot be re-emitted over a drifted, unsnapshotted job")
+            return None
+    if archive.is_file():
+        return {
+            "method": "tar.gz",
+            "sha256": file_digest(archive),
+            "path": rel,
+            "manifest": manifest_rel,
+            "recover_command": recover,
+        }
+    members = snapshot_members(job)
+    return {
+        "method": "tar.gz",
+        "sha256": sha256(snapshot_tar_gz(members)).hexdigest(),
+        "path": rel,
+        "manifest": manifest_rel,
+        "recover_command": recover,
+    }
+
+
 def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: datetime,
                  expect: str | None, allow_hand: bool = False) -> tuple[dict, Gaps, list[str]]:
     """A custody/v1 record for a finish loop() filed, from the files loop() wrote.
@@ -616,6 +740,10 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
     xp["hand_times"] = []
     xp["timeSources"] = time_sources(pred, xp)
     xp["time_sources"] = dict(xp["timeSources"])
+    if xp.get("terminal_state") == "accepted":
+        snap = _snapshot_block(job, packet, ref, gaps)
+        if snap:
+            xp["snapshot"] = snap
     check_order(pred, packet, {}, now, ref)
     xp["emittedAt"] = H.iso(now)
     xp["gaps"] = gaps.rows
