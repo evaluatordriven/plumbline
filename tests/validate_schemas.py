@@ -1087,9 +1087,173 @@ rc2, out2 = emit(j, o2, allow_hand=True)
 res((f"{S} · F1f a direct buyer approve line removes the relay-only refusal",
      rc2 == 0, f"exit {rc2}: {out2.strip()[-140:]}"))
 
+# ================================================================ JOB 25: the harness-log guard and the
+# `--allow-hand-times` boundary.
+#
+# THE LAW THIS SECTION PINS, in one sentence: the switch admits a TYPED time and does NOT admit a model evaluator's
+# unstamped check time. A hand time is a time a person entered; an evaluator's check time is a machine's clock that
+# the logger failed to record, and no switch can make it a person's. The emitter must refuse it (exit 3, nothing
+# written) with every such call named BY ID, and the four behaviours PR 24 regressed must stay green.
+#
+# WHAT `db9d6b7` DOES TODAY, measured before this section was written (see the red-first record): with
+# `--allow-hand-times` it writes the record, lists `harness-eval-a.log#eval_artifact.sent_at`/`.received_at` (and
+# the same for `eval_k1`, `eval_k2`) in `x-plumbline.hand_times[]`, and sources BOTH checks at `harness-eval-a.log:37`
+# — the `eval_artifact` response `Date` header — so two checks carry one instant and neither carries its own call.
+#
+# THE INSTANT SOURCES, stated once, because a case that asks for the wrong one is unsatisfiable (and one bar died
+# on exactly that): the fixture's three evaluator calls carry NO `sent_at`/`received_at`. Each carries
+# `response.created` and a `Date` header ONE SECOND apart:
+#     eval_artifact  created 12:00:02Z  Date 12:00:03Z
+#     eval_k1        created 12:01:01Z  Date 12:01:02Z
+#     eval_k2        created 12:02:04Z  Date 12:02:05Z
+# `kit/custody_history.Call` reads `at = received_at or Date header or created` and `started = sent_at or created or
+# Date header`. A MODEL EVALUATOR'S LINKED CHECK TIME IS `call.at`, i.e. its `Date` header — so every check-time case
+# below reads the Date header (12:00:03Z for `eval_artifact`), and the only case that reads `created` is the one
+# that asserts the hand-time listing names it (`response-created`), which is what `hand_time_entries()` writes.
+#
+# THE AUTHORSHIP RULE. Every case added here was run at `db9d6b7` BEFORE the fix existed. The four regression cases
+# are green there (they must be — they are the behaviours that work); every new case is RED there, and the red is
+# recorded in this job's own file. A new case that came green at `db9d6b7` would be measuring nothing.
+
+JOB25_NEW: list[tuple[str, bool]] = []      # every case added by this bar, with its outcome, for the report
+
+
+def hl_case(name, ok, why=""):
+    """A job-25 case: recorded in `results` like every other, and in JOB25_NEW so the report can say which of its
+    cases are new and what each measured."""
+    JOB25_NEW.append((name, ok))
+    results.append((f"{S} · JOB25 {name}", ok, "" if ok else " ".join(str(why).split())[:200]))
+    return ok
+
+
+def _eval_log_ids(tree: Path) -> list[str]:
+    """The call ids the fixture's evaluator log actually carries, read from the log (not from this file), so the
+    bar names the calls the log names rather than a list hand-copied into the test."""
+    p = tree / "tests" / "fixtures" / "custody" / "job-rejected" / "custody" / "evidence" / "harness-eval-a.log"
+    doc = json.loads(p.read_text(encoding="utf-8"))
+    items = doc if isinstance(doc, list) else [doc]
+    return [c["call"] for c in items if isinstance(c, dict) and c.get("call")]
+
+
+# ---- (a) THE REGRESSION SET: the four main-green behaviours. These are GREEN at db9d6b7 and must stay green. ----
+# They are written against the SAME emitter the new cases drive, so if the fix breaks a behaviour PR 24 restored, one
+# of these goes red. Their assertions are the ones the existing suite uses (lines 761, 939-981, 786-792), restated
+# here so this section is a bar by itself and does not lean on the section above staying put.
+
+# (a1) the 59 s sub-line: a typed startedAt 59 s off the log is ACCEPTED and the record carries the LOG's time.
+j = job_copy("job25-59s")
+_cj = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
+_cj["startedAt"] = "2026-10-20T10:59:03Z"        # the maker log's first call is at 11:00:00Z: 57 s early, inside ±60
+_cj["producedAt"] = "2026-10-20T11:00:17Z"       # the last call is at 11:00:07Z: 10 s late, inside ±60
+(j / "inputs" / "custody.json").write_text(json.dumps(_cj, indent=2) + "\n", encoding="utf-8")
+_o = TMP / "job25-59s.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+_pred = json.loads(_o.read_text(encoding="utf-8"))["predicate"] if _o.is_file() else {}
+hl_case("a1 a hand time 59 s off is accepted, and the record carries the LOG's time",
+        _rc == 0 and _pred.get("startedAt") == "2026-10-20T11:00:00Z",
+        f"exit {_rc}; startedAt {_pred.get('startedAt')!r}: {_out.strip()[-160:]}")
+
+# (a2) T2c: a time typed into custody.json with no ledger line is NAMED (disposition.at, its source).
+j = job_copy("job25-t2c")
+_o = TMP / "job25-t2c.json"
+_rc, _out = emit(j, _o, allow_hand=False)
+hl_case("a2 T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)",
+        _rc == 3 and "disposition.at" in _out and ("inputs-no-ledger" in _out or "ledger-no-writer" in _out)
+        and not _o.exists(), f"exit {_rc}: {_out.strip()[-160:]}")
+
+# (a3) T3: with --allow-hand-times the record is written and hand_times lists the hand fields with file:line.
+_o = TMP / "job25-t3.json"
+_rc, _out = emit(FIX, _o, allow_hand=True)
+_ht = (((json.loads(_o.read_text(encoding="utf-8"))["predicate"]["x-plumbline"]).get("hand_times"))
+       if _o.is_file() else []) or []
+_by_field = {e.get("field"): e for e in _ht}
+hl_case("a3 T3 with --allow-hand-times the record is written and hand_times lists the hand fields with file:line",
+        _rc == 0 and "disposition.at" in _by_field and _by_field["disposition.at"].get("line") is not None
+        and len(_ht) >= 1 and all(e.get("file") and e.get("line") is not None for e in _ht),
+        f"exit {_rc}: {_out.strip()[-160:]}")
+
+# (a4) E2: under --allow-hand-times the typed pass time is LISTED and the record carries the CALL's time.
+# The call is `eval_artifact`, so "the call's time" is its Date header, 2026-10-20T12:00:03Z (NOT `created`, 12:00:02Z).
+j = job_copy("job25-e2")
+_c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
+_c["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"    # the typed value; the record must carry the LOG's instead
+(j / "inputs" / "custody.json").write_text(json.dumps(_c, indent=2) + "\n", encoding="utf-8")
+_o = TMP / "job25-e2.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+_doc = json.loads(_o.read_text(encoding="utf-8"))["predicate"] if _o.is_file() else {}
+_ht_e2 = {e.get("field"): e for e in (_doc.get("x-plumbline") or {}).get("hand_times") or []}
+_checks_e2 = _doc.get("checks") or []
+hl_case("a4 E2 under --allow-hand-times the typed pass time is listed and the record carries the call's time",
+        _rc == 0 and (_ht_e2.get("passes.pass-a.at") or {}).get("source") == "inputs-no-ledger"
+        and bool(_checks_e2) and _checks_e2[0].get("at") == "2026-10-20T12:00:03Z",
+        f"exit {_rc}; check at {_checks_e2[0].get('at') if _checks_e2 else None!r}: {_out.strip()[-160:]}")
+
+
+# ---- (b) THE NEW BEHAVIOUR: an evaluator check time the logger never stamped is REFUSED, every call by id,
+#          and the record is not written. This is RED at db9d6b7: today it exits 0 and writes (measured). ----
+_ids = _eval_log_ids(SNAP) if (SNAP / "tests").is_dir() else [c["call"] for c in json.loads(
+    (FIX / "custody" / "evidence" / "harness-eval-a.log").read_text(encoding="utf-8"))]
+
+j = job_copy("job25-unstamped")
+_o = TMP / "job25-unstamped.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+hl_case("b1 an evaluator check time the logger never stamped is REFUSED under --allow-hand-times (exit != 0, nothing written)",
+        _rc != 0 and not _o.exists(), f"exit {_rc}; record written={_o.exists()}")
+# every call BY ID — not the first: each id the log carries must be named, and the count of named ids must equal the
+# log's own count, so a fix that names only `eval_artifact`, or only one field, fails here.
+_named = [cid for cid in _ids if f"harness-eval-a.log#{cid}" in _out]
+hl_case("b2 ...and names EVERY such call BY ID (not only the first)",
+        bool(_ids) and len(_named) == len(_ids),
+        f"log carries {_ids}; the refusal named {_named}: {_out.strip()[-260:]}")
+
+
+# ---- (c) THE SWITCH BOUNDARY: the switch admits a TYPED time and does not admit an unstamped model check time.
+#          Both halves are asserted in one case so a fix that simply disables the switch (making both refuse) fails. ----
+# The TYPED half: a typed value with no harness call behind it (disposition.at) is admitted under the switch —
+# case (a3) already proves the record writes, and this asserts the specific typed field is LISTED as a hand time.
+typed_admitted = "_by_field" in dir() and "disposition.at" in _by_field
+# The UNSTAMPED half: the same run (same switch, same fixture) must refuse for the evaluator log's calls.
+unstamped_refused = (_rc != 0) and any(f"harness-eval-a.log#{cid}" in _out for cid in _ids)
+hl_case("c1 the boundary: --allow-hand-times admits a typed time and does NOT admit an unstamped evaluator check time",
+        typed_admitted and unstamped_refused,
+        f"typed admitted={typed_admitted}; unstamped refused={unstamped_refused}: {_out.strip()[-260:]}")
+
+
+# ---- (d) NO HOLLOW OR MIS-SOURCED RECORD. At 5c3f72d/0f85ddb the switch on wrote a record whose startedAt,
+#          producedAt, six evaluator stamps and passes.pass-a.at were sourced from nowhere. At db9d6b7 the record
+#          IT writes is mis-sourced instead: both checks — `pass-a` on `eval_artifact` and `pass-a` on nothing else —
+#          carry `harness-eval-a.log:37`, one Date header for two different evaluator calls.
+# This case drives the SWITCH-ON emit and requires, for any record that is written, that each check carrying a
+# `call` carries its OWN `at_source`, and that no two checks share one `at_source`. A fix that refuses the unstamped
+# log therefore passes it vacuously (nothing written) — which is honest: the record's defect is gone because the
+# record is gone. What it forbids is the other repair: writing a record whose instants are sourced from the wrong
+# call. So it is RED at db9d6b7 (a record IS written there, and the sources collide) and GREEN after.
+j = job_copy("job25-sources")
+_o = TMP / "job25-sources.json"
+_rc, _out = emit(j, _o, allow_hand=True)
+_srcs: list = []
+if _o.is_file():
+    _p = json.loads(_o.read_text(encoding="utf-8"))["predicate"]
+    _srcs = [((c.get("x-plumbline") or {}).get("at_source")) for c in _p.get("checks") or []
+             if (c.get("x-plumbline") or {}).get("call")]
+_srcs_str = [s for s in _srcs if isinstance(s, str) and s]
+_no_source = [i for i, s in enumerate(_srcs) if not s]
+_shared = sorted({s for s in _srcs_str if _srcs_str.count(s) > 1})
+hl_case("d1 any record written under the switch gives every called check its OWN at_source (no collision, none blank)",
+        not _no_source and not _shared,
+        f"called checks: {_srcs}; without a source: {_no_source}; shared: {_shared} (written: {_o.exists()}, exit {_rc})")
+
+
 shutil.rmtree(TMP, ignore_errors=True)
 
 # ---------------------------------------------------------------- report
+
+# The case set, as data, so a later reader can diff the set against a baseline commit without parsing the report
+# (the bar's requirement (d): a case-set diff against main db9d6b7). Written only when asked, and it is not a case:
+# it writes the names and their outcomes, and changes nothing this suite checks.
+if os.environ.get("PLUMBLINE_CASE_SET_OUT"):
+    Path(os.environ["PLUMBLINE_CASE_SET_OUT"]).write_text(
+        "".join(f"{name}\n" for name, _, _ in results), encoding="utf-8")
 
 print()
 width = max(len(n) for n, _, _ in results)
