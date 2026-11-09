@@ -1,0 +1,168 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "note": "SYNTHETIC FIXTURE — invented facts for tests only",
+  "levelClaimed": "CL1",
+  "orchestrator": {
+    "name": "Fixture Orchestrator",
+    "kind": "agent",
+    "aliases": [
+      "fixture-cos"
+    ]
+  },
+  "bar": {
+    "file": "custody/bar.md",
+    "frozenAt": "2026-10-20T10:00:00Z",
+    "author": "Fixture Buyer",
+    "publishedAt": null,
+    "groundTruth": [],
+    "dissent": [],
+    "dimensions": [
+      {
+        "id": "D1",
+        "plumbline_dimension": "correctness",
+        "criterion": "every stated figure matches the source table",
+        "scale": {
+          "anchors": {
+            "1": "figures wrong",
+            "10": "every figure matches"
+          },
+          "threshold": 9,
+          "floor": 1
+        },
+        "failureCondition": "any figure differs from the source table"
+      },
+      {
+        "id": "D2",
+        "plumbline_dimension": "completeness",
+        "criterion": "every section the brief names is present",
+        "scale": {
+          "anchors": {
+            "1": "sections missing",
+            "10": "every section present"
+          },
+          "threshold": 9,
+          "floor": 1
+        },
+        "failureCondition": "a section the brief names is absent or empty"
+      }
+    ],
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Fixture Buyer",
+        "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+        "at": "2026-10-20T10:05:00Z",
+        "adopted": null,
+        "kind": "person"
+      },
+      {
+        "role": "specialist",
+        "by": "Fixture Specialist",
+        "barDigest": "e5ec9f4c418d8a2ad7d1d9ac9eeeaaae390281e59082928781453c1601befc24",
+        "at": "2026-10-20T10:10:00Z",
+        "adopted": null,
+        "kind": "person"
+      }
+    ]
+  },
+  "maker": {
+    "name": "fixture-maker",
+    "kind": "model",
+    "version": "0.0.1",
+    "method_file": "custody/method.md",
+    "model": {
+      "family": "maker",
+      "identifier": "maker-1",
+      "readOnly": false
+    },
+    "harness_log": "harness-maker-fixture.log"
+  },
+  "routing": {
+    "maker": {
+      "via": "openrouter.ai",
+      "provider": "DeepInfra",
+      "slug": "deepinfra/fp8",
+      "host": "api.deepinfra.com",
+      "declaredAt": "2026-10-20T10:55:00Z"
+    }
+  },
+  "startedAt": "2026-10-20T11:00:00Z",
+  "producedAt": "2026-10-20T11:00:00Z",
+  "evaluators": [
+    {
+      "id": "eval-a",
+      "name": "Example evaluator",
+      "kind": "model",
+      "model": {
+        "family": "example",
+        "identifier": "example-1",
+        "endpoint": "api.example.com",
+        "readOnly": true
+      },
+      "harness_log": "harness-eval-a.log"
+    }
+  ],
+  "passes": {
+    "pass-a": {
+      "evaluator": "eval-a",
+      "run": 1,
+      "batch": "b1",
+      "at": "2026-10-20T12:00:00Z",
+      "evidence": {
+        "D1": "pass-a-D1.txt",
+        "D2": "pass-a-D2.txt"
+      },
+      "call": "eval_artifact"
+    }
+  },
+  "controls": [
+    {
+      "id": "K1",
+      "batch": "b1",
+      "evaluator": "eval-a",
+      "case_file": "custody/controls/K1-clean.md",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/control-K1.txt",
+      "call": "eval_k1"
+    },
+    {
+      "id": "K2",
+      "batch": "b1",
+      "evaluator": "eval-a",
+      "case_file": "custody/controls/K2-planted.md",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "dimension": "D2",
+      "evidence_file": "custody/evidence/control-K2.txt",
+      "call": "eval_k2"
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "eval-a",
+      "evidence_file": "harness-eval-a.log",
+      "readBy": "Fixture Specialist"
+    }
+  ],
+  "retention": {
+    "location": "tests/fixtures/custody/job-rejected (synthetic; not retained anywhere)",
+    "public": false
+  },
+  "disposition": {
+    "state": "given",
+    "by": "Fixture Buyer",
+    "at": "2026-10-20T13:00:00Z",
+    "acknowledgesUnobserved": []
+  },
+  "violations": {
+    "V1": {
+      "dimension": "D2",
+      "remedy": {
+        "text": "write the Risks section the brief names.",
+        "evidence_file": "pass-a-D2.txt"
+      }
+    }
+  }
+}
