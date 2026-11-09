@@ -407,8 +407,15 @@ def _oracle_emitter(repo, keep):
     keep.append(root)
     kit = os.path.join(root.name, "kit")
     os.makedirs(kit)
-    for name in ("emit_custody.py", "custody_history.py"):
-        shutil.copy2(os.path.join(repo, "kit", name), os.path.join(kit, name))
+    # Copy the WHOLE kit directory, not a typed list of modules. A test that copies a subset of the implementation
+    # silently stops covering the module it forgot: measured 2026-11-09 in the sibling harness
+    # (tests/test_plumbline_verify.py), a typed list of three modules missed the emitter's fourth sibling and the
+    # copied tree exited 1 where the test expected 3. Derived from the directory, the list cannot go stale.
+    for name in sorted(os.listdir(os.path.join(repo, "kit"))):
+        src = os.path.join(repo, "kit", name)
+        if name == "__pycache__" or name.endswith(".pyc") or not os.path.isfile(src):
+            continue
+        shutil.copy2(src, os.path.join(kit, name))
     init = _git(root.name, ["init"])
     if init.returncode != 0:
         raise RuntimeError(init.stderr or init.stdout)
