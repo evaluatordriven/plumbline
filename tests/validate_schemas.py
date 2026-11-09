@@ -381,6 +381,9 @@ S = "custody"
 CPIN = PIN.get("custody") or {}
 TMP = Path(tempfile.mkdtemp(prefix="plumbline-custody-"))
 FIX = REPO / "tests" / "fixtures" / "custody" / "job-rejected"
+# The emit-path cases run on a SEPARATE committed fixture whose harness logs already carry the logger's own
+# sent_at/received_at on every call (D6/D7). The refusal cases stay on FIX, whose logs carry server times only.
+FIX_EMITTED = REPO / "tests" / "fixtures" / "custody" / "job-emitted"
 
 
 def res(row):
@@ -433,90 +436,14 @@ def emit(job, out, tree=None, extra=(), allow_hand=True):
     return run_py(args)
 
 
-def _server_instant(e):
-    """The instant a call's own response carried: its `created` epoch, else its Date header. Same precedence as
-    kit/custody_history.py (Call.at: received_at, then created, then the header), so stamping the logger's times
-    onto the value the reader already derived moves nothing in the fixture's timeline."""
-    created = (e.get("response") or {}).get("created")
-    if isinstance(created, (int, float)) and not isinstance(created, bool):
-        return datetime.fromtimestamp(created, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    hdrs = e.get("response_headers") or e.get("headers") or (e.get("response") or {}).get("headers") or {}
-    date = hdrs.get("Date") or hdrs.get("date")
-    if isinstance(date, str) and date:
-        try:
-            parsed = parsedate_to_datetime(date)
-        except (TypeError, ValueError):
-            return None
-        if parsed.tzinfo is None:
-            parsed = parsed.replace(tzinfo=timezone.utc)
-        return parsed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return None
-
-
-def _stamp_logger_times(path):
-    """WRITE the logger's own sent_at/received_at into every call of ONE COPY of a harness log that carries
-    neither, preserving the file's format (JSON list, single object, or JSONL).
-
-    This function WRITES. It is never called on the fixture itself (FIX), only on a copy made by
-    logger_stamped(): the cases that exist to test what the emitter does with a call the logger did NOT stamp
-    (E2, T7b/E3, the 59-second tolerance) must keep an unstamped log, so they run on FIX or on job_copy_raw().
-    A call that already carries both times is left exactly as it is.
-    """
-    text = path.read_text(encoding="utf-8")
-    try:
-        doc = json.loads(text)
-    except ValueError:
-        doc = None
-    array, single = isinstance(doc, list), isinstance(doc, dict)
-    items = doc if array else ([doc] if single else [json.loads(ln) for ln in text.splitlines() if ln.strip()])
-    for e in items:
-        if isinstance(e, dict) and not e.get("sent_at") and not e.get("received_at"):
-            at = _server_instant(e)
-            if at:
-                e["sent_at"] = e["received_at"] = at
-    if array:
-        path.write_text(json.dumps(items, indent=2) + "\n", encoding="utf-8")
-    elif single:
-        path.write_text(json.dumps(items[0], indent=2) + "\n", encoding="utf-8")
-    else:
-        path.write_text("".join(json.dumps(e) + "\n" for e in items), encoding="utf-8")
-
-
-def logger_stamped(name):
-    """A copy of the job-rejected fixture whose harness logs carry the logger's own sent_at and received_at on
-    every call -- the entry shape the frozen bar asserts (tests/test_evaluator_harness_log.py D1-D3: sent_at,
-    received_at, request.url, response.model). The fixture's logs carry server times only, so a MODEL evaluator's
-    check times have no logged source and the emitter REFUSES the record (D6/D7); every case that needs a WRITTEN
-    record runs on a copy built here."""
-    d = TMP / name
-    shutil.copytree(FIX, d)
-    for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):
-        _stamp_logger_times(lg)
-    return d
-
-
-LOGGED = logger_stamped("fixture-logged")
 
 
 def job_copy(name, overlay=None):
-    """A throwaway copy of the job-rejected fixture, WITH the logger's own times in its harness logs (LOGGED):
-    a record can only be written from a log the emitter can honestly read. The cases that assert a refusal
-    depending on the fixture's server-times-only log drive FIX directly (T2, T2b, T2d, T7b/E3), or
-    job_copy_raw() when they need a copy of their own.
-    """
-    d = TMP / name
-    shutil.copytree(LOGGED, d)
-    if overlay:
-        shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
-    return d
+    """A throwaway copy of the committed job-rejected fixture.
 
-
-def job_copy_raw(name, overlay=None):
-    """A throwaway copy of the job-rejected fixture WITHOUT stamping its harness logs.
-
-    For the cases that exist to test an UNSTAMPED call: T7b/E3 naming every call the logger did not stamp, and
-    the hand-time tolerance refusals. Handing one of those a job_copy() (stamped) would delete the condition
-    under test, so they take this copy. A case that needs unstamped calls cannot silently drift here.
+    The refusal cases that depend on an UNSTAMPED harness call run on this copy: job-rejected's logs carry
+    server times only, so the emitter refuses a model evaluator whose check times have no logged source
+    (D6/D7). A copy is needed because the cases mutate packet.json, custody.json, or the ledger.
     """
     d = TMP / name
     shutil.copytree(FIX, d)
@@ -525,18 +452,22 @@ def job_copy_raw(name, overlay=None):
     return d
 
 
-def job_copy_logged(name, overlay=None):
-    """A throwaway copy whose harness logs carry the logger's own sent_at/received_at on EVERY call, for the
-    cases that must EMIT a record while still exercising a hand time or the tolerance window. E3/T7b does not use
-    this: naming the calls the logger did not stamp is the whole of that check, so it stays on job_copy_raw().
+def emitted_copy(name, overlay=None):
+    """A throwaway copy of the committed job-emitted fixture.
+
+    job-emitted's harness logs carry the logger's own sent_at/received_at on EVERY call, so a model evaluator's
+    check times have a logged source and a record can be written. The emit-path cases run here; the checks that
+    must REFUSE an unstamped call stay on job_copy() (job-rejected). No stamping happens at run time: the two
+    committed directories make the stamped-vs-raw difference visible in `ls` and in git diff.
     """
     d = TMP / name
-    shutil.copytree(FIX, d)
-    for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):
-        _stamp_logger_times(lg)
+    shutil.copytree(FIX_EMITTED, d)
     if overlay:
         shutil.copytree(FIX.parent / "failures" / overlay, d, dirs_exist_ok=True)
     return d
+
+
+
 
 
 def append_text(path, text):
@@ -609,9 +540,9 @@ res((f"{S} · a model evaluator whose harness log carries no logger times is ref
      rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),
      f"exit {rc}: {out.strip()[-140:]}"))
 
-# the emitter on the synthetic fixture, every call carrying the logger's own sent_at/received_at
+# the emitter on the committed emit fixture, every call carrying the logger's own sent_at/received_at
 rec_path = TMP / "fixture.custody.json"
-rc, out = emit(LOGGED, rec_path)
+rc, out = emit(FIX_EMITTED, rec_path)
 rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file() else {}
 res((f"{S} · fixture job with logger-stamped harness logs emits with no gap (exit 0)", rc == 0, out.strip()[-90:]))
 check(S, "emitted record is valid against the PINNED custody schema", True, rec, V_CUST)
@@ -626,7 +557,7 @@ res((f"{S} · record carries no file the fixture lacks: every digest is a file's
                 rec.get("predicate", {}).get("bar", {}).get("digest", {}).get("sha256")
                 == hashlib.sha256((FIX / "custody" / "bar.md").read_bytes()).hexdigest(), "bar digest is not bar.md's"))
 
-j = job_copy("given")
+j = emitted_copy("given")
 p = json.loads((j / "packet.json").read_text()); p["disposition_state"] = "given"
 (j / "packet.json").write_text(json.dumps(p))
 rc, out = emit(j, TMP / "given.json")
@@ -635,7 +566,7 @@ res((f"{S} · disposition.state is the packet's, not the verdict's (reject + giv
                 r2.get("predicate", {}).get("disposition", {}).get("state") == "given"
                 and r2["predicate"]["x-plumbline"]["verdict"] == "reject", out.strip()[-80:]))
 
-j = job_copy("no-disposition")
+j = emitted_copy("no-disposition")
 p = json.loads((j / "packet.json").read_text()); p.pop("disposition_state")
 (j / "packet.json").write_text(json.dumps(p))
 rc, out = emit(j, TMP / "nodisp.json")
@@ -644,7 +575,7 @@ res((f"{S} · no recorded disposition is emitted as null and named, never guesse
                 rc == 1 and r3.get("predicate", {}).get("disposition", {}).get("state") is None
                 and any(g["field"] == "disposition.state" for g in r3["predicate"]["x-plumbline"]["gaps"]), f"exit {rc}"))
 
-j = job_copy("bad-remedy")
+j = emitted_copy("bad-remedy")
 c = json.loads((j / "inputs" / "custody.json").read_text()); c["violations"]["V1"]["remedy"]["text"] = "a remedy nobody wrote"
 (j / "inputs" / "custody.json").write_text(json.dumps(c))
 emit(j, TMP / "remedy.json")
@@ -652,7 +583,7 @@ r4 = json.loads((TMP / "remedy.json").read_text())
 res((f"{S} · a remedy not verbatim in evaluator evidence is dropped, not written",
                 "remedy" not in r4["predicate"]["violations"][0]["x-plumbline"], "remedy synthesised"))
 
-j = job_copy("no-violation-dimension")
+j = emitted_copy("no-violation-dimension")
 c = json.loads((j / "inputs" / "custody.json").read_text()); c["violations"]["V1"].pop("dimension")
 (j / "inputs" / "custody.json").write_text(json.dumps(c))
 rc, out = emit(j, TMP / "nodim.json")
@@ -661,7 +592,7 @@ res((f"{S} · a violation whose bar dimension nobody recorded is null and named,
      rc == 1 and r7["violations"][0]["dimension"] is None
      and any(g["field"] == "violations[V1].dimension" for g in r7["x-plumbline"]["gaps"]), f"exit {rc}"))
 
-j = job_copy("same-family")
+j = emitted_copy("same-family")
 c = json.loads((j / "inputs" / "custody.json").read_text())
 c["maker"]["model"] = dict(c["evaluators"][0]["model"], readOnly=False)
 c["maker"]["model"].pop("endpoint", None)
@@ -674,7 +605,7 @@ res((f"{S} · same model as maker is computed from identifiers and its family ga
                 r5["evaluators"][0].get("sameModelAsMaker") is True and any("shares model family" in s for s in r5["separationGaps"]),
                 "not computed"))
 
-j = job_copy("no-inputs")
+j = emitted_copy("no-inputs")
 (j / "inputs" / "custody.json").unlink()
 rc, out = emit(j, TMP / "noinputs.json")
 r6 = json.loads((TMP / "noinputs.json").read_text())["predicate"]
@@ -682,7 +613,7 @@ res((f"{S} · with no custody inputs the record is honest: nulls, named gaps, ex
                 rc == 1 and r6["bar"]["digest"] is None and r6["maker"]["method"] is None
                 and len(r6["x-plumbline"]["gaps"]) > 0, f"exit {rc}"))
 
-j = job_copy("open-job")
+j = emitted_copy("open-job")
 p = json.loads((j / "packet.json").read_text()); p.pop("terminal_state")
 (j / "packet.json").write_text(json.dumps(p))
 rc, out = emit(j, TMP / "open.json")
@@ -692,22 +623,22 @@ res((f"{S} · a job with no terminal state gets no custody record (exit 2)",
 # ---- history refusals (exit 3): a record that would misstate its own history is not written ----
 for ov, tag in (("hand-times", "time"), ("after-emit", "after-emit"), ("router-endpoint", "endpoint"),
                 ("agent-approval", "approval")):
-    refused(f"failure fixture {ov}", job_copy(f"fail-{ov}", ov), tag)
-out_ = refused("hand times typed after the maker call also break event order", job_copy("fail-order", "hand-times"), "order")
-j = job_copy("keep-old", "agent-approval"); keep = TMP / "keep-old.json"; keep.write_text("OLD RECORD\n")
+    refused(f"failure fixture {ov}", emitted_copy(f"fail-{ov}", ov), tag)
+out_ = refused("hand times typed after the maker call also break event order", emitted_copy("fail-order", "hand-times"), "order")
+j = emitted_copy("keep-old", "agent-approval"); keep = TMP / "keep-old.json"; keep.write_text("OLD RECORD\n")
 rc, _ = emit(j, keep)
 res((f"{S} · a refusal leaves an existing record byte-for-byte as it was", rc == 3 and keep.read_text() == "OLD RECORD\n", f"exit {rc}"))
 
-j = job_copy_raw("tol-61")
+j = job_copy("tol-61")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:04Z"))
 refused("a hand time 61 s off its harness call (tolerance 60 s)", j, "time")
-j = job_copy_logged("tol-59")
+j = emitted_copy("tol-59")
 ledger_edit(j, lambda c: c["passes"]["pass-a"].update(at="2026-10-20T12:01:02Z"))
 rc, out = emit(j, TMP / "tol59.json")
 rt = json.loads((TMP / "tol59.json").read_text())["predicate"] if rc == 0 else {}
 res((f"{S} · a hand time 59 s off is accepted, and the record carries the LOG's time", rc == 0 and
      rt["checks"][0]["at"] == "2026-10-20T12:00:03Z", f"exit {rc}: {out.strip()[-90:]}"))
-j = job_copy("vendor-host")
+j = emitted_copy("vendor-host")
 ledger_edit(j, lambda c: c["maker"]["model"].update(endpoint="api.maker.example"))
 o = refused("a hand vendor host when the log shows the routed upstream", j, "endpoint")
 res((f"{S} · the endpoint refusal names the upstream the log shows", "api.deepinfra.com" in o, o.strip()[-90:]))
@@ -720,25 +651,25 @@ res((f"{S} · matching pin: endpoint is the pinned host; aggregator, provider, s
      and (mxx.get("routing") or {}).get("request_ok") is True
      and mxx["routing"]["requests"][0]["provider"] == {"order": ["deepinfra/fp8"], "allow_fallbacks": False, "zdr": True},
      json.dumps(mxx)[:160]))
-o = refused("pinned provider, another provider served the call (fallback)", job_copy("pin-fb", "pin-fallback"), "endpoint")
+o = refused("pinned provider, another provider served the call (fallback)", emitted_copy("pin-fb", "pin-fallback"), "endpoint")
 res((f"{S} · the fallback refusal names who served it and the pin", "'Together'" in o and "fallback" in o
      and "'DeepInfra'" in o, o.strip()[-120:]))
-o = refused("pinned provider, the log does not say who served the call", job_copy("pin-miss", "pin-provider-missing"), "endpoint")
+o = refused("pinned provider, the log does not say who served the call", emitted_copy("pin-miss", "pin-provider-missing"), "endpoint")
 res((f"{S} · the missing-provider refusal says so", "does not say which provider served it" in o, o.strip()[-120:]))
-refused("a pin declared after the seat's first call", job_copy("pin-late", "pin-late"), "order")
-j = job_copy("pin-attempt")
+refused("a pin declared after the seat's first call", emitted_copy("pin-late", "pin-late"), "order")
+j = emitted_copy("pin-attempt")
 lg = j / "custody" / "evidence" / "harness-maker-fixture.log"; x = json.loads(lg.read_text())
 x["response"]["openrouter_metadata"] = {"attempts": [{"provider": "Together", "model": "fixture/maker-1", "status": 503},
                                                      {"provider": "DeepInfra", "model": "fixture/maker-1", "status": 200}]}
 lg.write_text(json.dumps(x))
 o = refused("served by the pin after another provider was tried", j, "endpoint")
 res((f"{S} · an attempted fallback is named", "fallback was attempted" in o, o.strip()[-120:]))
-j = job_copy("pin-none"); (j / "inputs" / "custody-events.jsonl").unlink(); ledger_edit(j, lambda c: c.pop("routing"))
+j = emitted_copy("pin-none"); (j / "inputs" / "custody-events.jsonl").unlink(); ledger_edit(j, lambda c: c.pop("routing"))
 o = refused("an aggregator call with no provider pin declared", j, "endpoint")
 res((f"{S} · no pin: the refusal says the emitter will not guess", "no provider pin was declared" in o, o.strip()[-120:]))
-j = job_copy("pin-unlogged"); (j / "inputs" / "custody-events.jsonl").unlink()
+j = emitted_copy("pin-unlogged"); (j / "inputs" / "custody-events.jsonl").unlink()
 refused("a pin typed into the inputs but never logged live", j, "endpoint")
-j = job_copy("pin-unpinned", "routing-unpinned")
+j = emitted_copy("pin-unpinned", "routing-unpinned")
 rc, out = emit(j, TMP / "unpinned.json")
 ru = json.loads((TMP / "unpinned.json").read_text()) if (TMP / "unpinned.json").is_file() else {}
 gp = [g for g in (ru.get("predicate") or {}).get("x-plumbline", {}).get("gaps", []) if g["field"] == "routing.maker.request"]
@@ -747,13 +678,13 @@ res((f"{S} · a request without no-fallback + ZDR is written with a HARD gap (ex
      and ru["predicate"]["maker"]["x-plumbline"]["routing"]["request_ok"] is False
      and ru["predicate"]["maker"]["model"]["endpoint"] == "api.deepinfra.com", f"exit {rc}: {out.strip()[-120:]}"))
 check(S, "the gapped routing record is still valid against the PINNED custody schema", True, ru, V_CUST)
-j = job_copy("pin-deny")
+j = emitted_copy("pin-deny")
 lg = j / "custody" / "evidence" / "harness-maker-fixture.log"; x = json.loads(lg.read_text())
 x["request"]["provider"] = {"order": ["deepinfra/fp8"], "allow_fallbacks": False, "data_collection": "deny"}
 lg.write_text(json.dumps(x))
 rc, out = emit(j, TMP / "pin-deny.json")
 res((f"{S} · data_collection deny in place of zdr is accepted (exit 0)", rc == 0, out.strip()[-90:]))
-j = job_copy("pin-nobody")
+j = emitted_copy("pin-nobody")
 lg = j / "custody" / "evidence" / "harness-maker-fixture.log"; x = json.loads(lg.read_text())
 x["request"] = {"url": x["request"]["url"], "model": x["request"]["model"]}
 lg.write_text(json.dumps(x))
@@ -764,10 +695,10 @@ res((f"{S} · a log without the request body: routing request unreadable is a ha
                      for g in rb["predicate"]["x-plumbline"]["gaps"]), f"exit {rc}"))
 LEDGER = SNAP / "kit" / "custody_ledger.py"
 pin_args = ["pin", "--seat", "maker", "--provider", "DeepInfra", "--slug", "deepinfra/fp8", "--host", "api.deepinfra.com"]
-j = job_copy("ledger-pin-late")
+j = emitted_copy("ledger-pin-late")
 rc, out = run_py([str(LEDGER), *pin_args[:1], "--job-dir", str(j), *pin_args[1:]])
 res((f"{S} · ledger pin is refused once the seat's log has a call (exit 3)", rc == 3 and "already records" in out, f"exit {rc}: {out.strip()[-90:]}"))
-j = job_copy("ledger-pin-ok"); (j / "custody" / "evidence" / "harness-maker-fixture.log").unlink()
+j = emitted_copy("ledger-pin-ok"); (j / "custody" / "evidence" / "harness-maker-fixture.log").unlink()
 (j / "inputs" / "custody-events.jsonl").unlink(); ledger_edit(j, lambda c: c.pop("routing"))
 rc, out = run_py([str(LEDGER), "pin", "--job-dir", str(j), *pin_args[1:]])
 evs = [json.loads(l) for l in (j / "inputs" / "custody-events.jsonl").read_text().splitlines()] if rc == 0 else []
@@ -778,51 +709,51 @@ res((f"{S} · ledger pin before the first call logs the pin live and in the inpu
 rc, out = run_py([str(LEDGER), "pin", "--job-dir", str(j), "--seat", "maker", "--provider", "X", "--slug", "x",
                   "--host", "openrouter.ai"])
 res((f"{S} · ledger pin refuses the aggregator's own host as the endpoint (exit 2)", rc == 2, f"exit {rc}"))
-j = job_copy("no-maker-log"); (j / "custody" / "evidence" / "harness-maker-fixture.log").unlink()
+j = emitted_copy("no-maker-log"); (j / "custody" / "evidence" / "harness-maker-fixture.log").unlink()
 refused("a model maker with no harness log", j, "time")
-j = job_copy("wrong-model")
+j = emitted_copy("wrong-model")
 ledger_edit(j, lambda c: c["evaluators"][0]["model"].update(identifier="other-1"))
 refused("a recorded model identifier the log's calls did not run", j, "model")
-j = job_copy("unlinked-control")
+j = emitted_copy("unlinked-control")
 ledger_edit(j, lambda c: c["controls"][0].update(call="eval_nope"))
 refused("a control linked to no call in the harness log", j, "time")
 
-j = job_copy("model-approver")
+j = emitted_copy("model-approver")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="fixture-maker"))
 refused("an approval by the maker model", j, "approval")
-j = job_copy("kind-model")
+j = emitted_copy("kind-model")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(kind="model"))
 refused("an approval marked kind: model", j, "approval")
-j = job_copy("no-orchestrator")
+j = emitted_copy("no-orchestrator")
 ledger_edit(j, lambda c: c.pop("orchestrator"))
 refused("approvals with no orchestrator named in the ledger", j, "approval")
-j = job_copy("orch-adopted")
+j = emitted_copy("orch-adopted")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="fixture-cos", kind="agent",
                                                            adopted={"document": "D", "version": "1"}))
 refused("the orchestrator, even marked agent with adopted set", j, "approval")
-j = job_copy("bot-unmarked")
+j = emitted_copy("bot-unmarked")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="Review Bot"))
 p = json.loads((j / "packet.json").read_text()); p["specialist"] = "Review Bot"; (j / "packet.json").write_text(json.dumps(p))
 refused("an agent-like approver not marked kind: agent", j, "approval")
-j = job_copy("agent-no-adopted")
+j = emitted_copy("agent-no-adopted")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="Review Bot", kind="agent"))
 p = json.loads((j / "packet.json").read_text()); p["specialist"] = "Review Bot"; (j / "packet.json").write_text(json.dumps(p))
 refused("an agent approval with adopted null", j, "approval")
-j = job_copy("agent-adopted")
+j = emitted_copy("agent-adopted")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="Review Bot", kind="agent",
                                                            adopted={"document": "Fixture Review Charter", "version": "1.0"}))
 p = json.loads((j / "packet.json").read_text()); p["specialist"] = "Review Bot"; (j / "packet.json").write_text(json.dumps(p))
 rc, out = emit(j, TMP / "agent-adopted.json")
 res((f"{S} · an agent approval marked kind: agent WITH adopted set is written (exit 0)", rc == 0, out.strip()[-90:]))
-j = job_copy("seat-mismatch")
+j = emitted_copy("seat-mismatch")
 ledger_edit(j, lambda c: c["bar"]["approvals"][1].update(by="Someone Else"))
 refused("an approver who is not the packet's named seat holder", j, "approval")
 
-j = job_copy("live-mismatch")
+j = emitted_copy("live-mismatch")
 append_text(j / "inputs" / "custody-events.jsonl", json.dumps(
     {"event": "approve", "role": "specialist", "by": "Fixture Specialist", "at": "2026-10-20T10:09:00Z"}) + "\n")
 refused("a ledger approval time that differs from the live event log", j, "time")
-j = job_copy("live-match")
+j = emitted_copy("live-match")
 append_text(j / "inputs" / "custody-events.jsonl", "".join(json.dumps(e) + "\n" for e in (
     {"event": "freeze", "at": "2026-10-20T10:00:00Z", "bar_sha256": hashlib.sha256((FIX / "custody" / "bar.md").read_bytes()).hexdigest()},
     {"event": "approve", "role": "specialist", "by": "Fixture Specialist", "at": "2026-10-20T10:10:00Z"})))
@@ -830,7 +761,7 @@ rc, out = emit(j, TMP / "live.json")
 rl = json.loads((TMP / "live.json").read_text())["predicate"] if rc == 0 else {}
 res((f"{S} · a ledger that matches the live event log is written and says so", rc == 0 and
      rl["bar"]["approvals"][1]["x-plumbline"]["time_source"].startswith("logged live"), f"exit {rc}: {out.strip()[-80:]}"))
-j = job_copy("bar-moved")
+j = emitted_copy("bar-moved")
 append_text(j / "inputs" / "custody-events.jsonl", json.dumps({"event": "freeze", "at": "2026-10-20T10:00:00Z", "bar_sha256": "0" * 64}) + "\n")
 refused("a bar that changed after its logged freeze", j, "order")
 
@@ -838,7 +769,7 @@ head = subprocess.run(["git", "-C", str(SNAP), "rev-parse", "HEAD", "HEAD^{tree}
 res((f"{S} · the record names the emitter's commit and tree, clean", rec.get("predicate", {}).get("x-plumbline", {}).get("emitter", {})
      .get("commit") == head[0] and rec["predicate"]["x-plumbline"]["emitter"].get("tree") == head[1]
      and rec["predicate"]["x-plumbline"]["emitter"].get("dirty") is False, "emitter revision not recorded"))
-rc, out = emit(LOGGED, TMP / "exp-tree.json", extra=("--expect-revision", head[1][:12]))
+rc, out = emit(FIX_EMITTED, TMP / "exp-tree.json", extra=("--expect-revision", head[1][:12]))
 res((f"{S} · a stated revision matching the emitter's tree is accepted (survives git am)", rc == 0, out.strip()[-80:]))
 refused("a stated revision the emitter is not at", FIX, "revision", "exp-bad.json", extra=("--expect-revision", "deadbeef0"))
 dirty = TMP / "tree-dirty"; shutil.copytree(SNAP, dirty)
@@ -848,7 +779,7 @@ nogit = TMP / "tree-nogit"; shutil.copytree(SNAP / "kit", nogit / "kit")
 refused("an emitter outside any git checkout", FIX, "revision", "nogit.json", tree=nogit)
 
 zp = TMP / "bundle.zip"
-rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(LOGGED), "--record", str(rec_path), "--out", str(zp)])
+rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX_EMITTED), "--record", str(rec_path), "--out", str(zp)])
 ok, why = rc == 0 and zp.is_file(), out.strip()[-80:]
 if ok:
     with zipfile.ZipFile(zp) as z:
@@ -857,7 +788,7 @@ if ok:
         need = {"record.custody.json", "bar/bar.md", "files/artifact.md", "evidence/pass-a-D2.txt", "evidence/harness-eval-a.log"}
         ok = not bad_rows and need <= set(z.namelist())
         why = f"bad rows {bad_rows}" if bad_rows else f"missing {need - set(z.namelist())}"
-    rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(LOGGED), "--record", str(rec_path), "--out", str(TMP / "b2.zip")])
+    rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX_EMITTED), "--record", str(rec_path), "--out", str(TMP / "b2.zip")])
     ok = ok and (TMP / "b2.zip").read_bytes() == zp.read_bytes()
 res((f"{S} · stranger bundle: manifest sha256s match, required files present, packing is deterministic", ok, why))
 
@@ -870,7 +801,7 @@ res((f"{S} · T2 hand times are refused by default: exit 3, [hand-time], REFUSED
 res((f"{S} · T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)",
      "disposition.at" in out and ("inputs-no-ledger" in out or "ledger-no-writer" in out), out.strip()[-140:]))
 
-j = job_copy("t2b-hand")
+j = emitted_copy("t2b-hand")
 append_text(j / "inputs" / "custody-events.jsonl", json.dumps(
     {"event": "approve", "role": "buyer", "by": "Fixture Buyer", "at": "2026-10-20T10:11:00Z",
      "writer": "hand"}) + "\n")
@@ -878,7 +809,7 @@ rc, out = emit(j, TMP / "t2b.json", allow_hand=False)
 res((f"{S} · T2b a ledger line with writer \"hand\" is a hand time (ledger-hand, named)",
      rc == 3 and "ledger-hand" in out and "bar.approvals[" in out, f"exit {rc}: {out.strip()[-140:]}"))
 
-j = job_copy("t2d-override")
+j = emitted_copy("t2d-override")
 cj = json.loads((j / "inputs" / "custody.json").read_text())
 spec_at = next((a.get("at") for a in cj["bar"]["approvals"] if a.get("role") == "specialist"),
                "2026-10-20T10:10:00Z")
@@ -892,7 +823,7 @@ res((f"{S} · T2d a later hand line overrides an earlier tool line (ledger-hand,
      rc == 3 and "ledger-hand" in out and "bar.approvals[" in out, f"exit {rc}: {out.strip()[-140:]}"))
 
 o = TMP / "t3-allow.json"
-rc, out = emit(LOGGED, o, allow_hand=True)
+rc, out = emit(FIX_EMITTED, o, allow_hand=True)
 rx = json.loads(o.read_text())["predicate"]["x-plumbline"] if o.is_file() else {}
 ht = rx.get("hand_times") or []
 by_field = {e.get("field"): e for e in ht}
@@ -904,11 +835,11 @@ res((f"{S} · T3 the allowance is recorded (switch, the emitter's writer, its to
      al.get("switch") == "--allow-hand-times" and str(al.get("writer", "")).startswith("kit/emit_custody.py@")
      and bool(al.get("at")), json.dumps(al)[:140]))
 res((f"{S} · T3 the switch silences nothing else: the repo overlay failures/hand-times still refuses (time)",
-     emit(job_copy("t3-contradiction", "hand-times"), TMP / "t3c.json", allow_hand=True)[0] == 3,
+     emit(emitted_copy("t3-contradiction", "hand-times"), TMP / "t3c.json", allow_hand=True)[0] == 3,
      "the contradiction overlay no longer refuses"))
 
 # ---- F1h: every F1 line is carried into x-plumbline with its file:line source ----
-j = job_copy("f1h")
+j = emitted_copy("f1h")
 append_text(j / "inputs" / "custody-events.jsonl", "".join(json.dumps(e) + "\n" for e in (
     {"event": "generation", "action": "open", "seat": "maker", "n": 1, "prompt_file": "p.md",
      "prompt_sha256": "a" * 64, "at": "2026-10-20T10:01:00Z", "writer": "kit/custody_ledger.py@abc123def456"},
@@ -937,7 +868,7 @@ res((f"{S} · F1h the emitter carries generations/evaluations/relays/amendments 
      ok, f"exit {rc}: {out.strip()[-140:]}"))
 
 # ---- X1: the inputs' own x-plumbline is deep-equal under .inputs and cannot shadow the emitter's keys ----
-j = job_copy("x1-inputs")
+j = emitted_copy("x1-inputs")
 c = json.loads((j / "inputs" / "custody.json").read_text())
 inp = {"note": "from inputs", "verdict": "JUNK", "gaps": ["JUNK"], "times": "JUNK",
        "hand_times": "JUNK", "nested": {"k": [1, 2, 3]}}
@@ -979,7 +910,7 @@ def stamp_log(path, at):
 def tool_built_job(name):
     """The fixture's static facts with every typed time removed, rebuilt only by kit/custody_ledger.py:
     freeze / approve / pin / generation / evaluation / dispose --decided-at (T4, F1b)."""
-    j = job_copy(name)
+    j = emitted_copy(name)
     cj = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
     roles = [(a.get("role"), a.get("by")) for a in (cj.get("bar") or {}).get("approvals") or []]
     dsp = cj.get("disposition") or {}
@@ -1073,7 +1004,7 @@ except Exception as exc:
          False, f"{type(exc).__name__}: {exc}"[:160]))
 
 # E2: a typed pass time is a hand time even when a harness call is linked
-j = job_copy_logged("t2-pass-at")
+j = emitted_copy("t2-pass-at")
 c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
 c["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"
 (j / "inputs" / "custody.json").write_text(json.dumps(c, indent=2) + "\n", encoding="utf-8")
@@ -1096,7 +1027,7 @@ res((f"{S} · T7b/E3 every evaluator call the logger did not stamp is named (har
      and ("server-header" in out or "response-created" in out), f"exit {rc}: {out.strip()[-160:]}"))
 
 # E1: a real disagreement between custody.json's disposition.at and the line's decided_at still refuses
-j = job_copy("dispose-mismatch")
+j = emitted_copy("dispose-mismatch")
 c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
 c.setdefault("disposition", {}).update({"at": "2026-10-20T12:30:00Z",
                                         "by": (c.get("disposition") or {}).get("by") or "Fixture Owner"})
@@ -1153,8 +1084,8 @@ def verify_record(rec, job, co):
 
 VCO = _stand_in_checkout("verify-checkout")
 rt_rec = TMP / "roundtrip.custody.json"
-rc, out = emit(LOGGED, rt_rec, allow_hand=True)
-vrc, vout = verify_record(rt_rec, LOGGED, VCO)
+rc, out = emit(FIX_EMITTED, rt_rec, allow_hand=True)
+vrc, vout = verify_record(rt_rec, FIX_EMITTED, VCO)
 rt_xp = json.loads(rt_rec.read_text())["predicate"]["x-plumbline"] if rt_rec.is_file() else {}
 res((f"{S} · V1/V3/T2 a job emitted with --allow-hand-times verifies with exit 0 "
      f"(no flag-without-source, no shadow)",
@@ -1167,7 +1098,7 @@ res((f"{S} · T3 every hand time the emitter flagged is in x-plumbline.hand_time
      json.dumps((rt_xp.get("hand_times") or [])[:2])[:160]))
 
 # ---- F1f: a relay is a report, never an approval (the emitter refuses a relay-only buyer approval) ----
-j = job_copy("f1f-relay")
+j = emitted_copy("f1f-relay")
 cj = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
 apps = (cj.get("bar") or {}).get("approvals") or []
 spec = next((a for a in apps if a.get("role") == "specialist"), None)
