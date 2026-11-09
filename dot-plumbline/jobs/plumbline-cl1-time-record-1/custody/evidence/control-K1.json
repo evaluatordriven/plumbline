@@ -1,0 +1,17 @@
+{
+  "id": "K1",
+  "batch": "b1",
+  "expected": "conforms",
+  "result": "conforms",
+  "tree": "/home/jarbis1/tmp/plumbline-packet-cl1",
+  "observed": {
+    "import": "ok",
+    "clean_gaps": [],
+    "typed_approval_at": [
+      "CL1 record carries a hand-typed bar.approvals[0].at"
+    ],
+    "typed_disposition_at": [
+      "CL1 record carries a hand-typed disposition.at"
+    ]
+  }
+}

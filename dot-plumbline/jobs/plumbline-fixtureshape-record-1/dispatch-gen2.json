@@ -1,0 +1,6 @@
+{
+  "files": ["tests/fixtures/custody/job-emitted/README.md"],
+  "read": ["tests/fixtures/custody/job-rejected/README.md", "tests/test_fixture_shape.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-fixtureshape-record-1/message-gen2.md"
+}

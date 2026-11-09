@@ -1,0 +1,1657 @@
+TO LLM 2026-11-08T13:40:41
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Always use best practices when coding.
+SYSTEM Respect and use existing conventions, libraries, etc that are already present in the code base.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 
+SYSTEM 1. Decide if you need to propose *SEARCH/REPLACE* edits to any files that haven't been added to the chat. You can create new files without asking!
+SYSTEM 
+SYSTEM But if you need to propose edits to existing files not already added to the chat, you *MUST* tell the user their full path names and ask them to *add the files to the chat*.
+SYSTEM End your reply and wait for their approval.
+SYSTEM You can keep asking if you then decide you need to edit more files.
+SYSTEM 
+SYSTEM 2. Think step-by-step and explain the needed changes in a few short sentences.
+SYSTEM 
+SYSTEM 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM 
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM Keep in mind these details about the user's platform and environment:
+SYSTEM - Platform: Linux-7.0.0-38-generic-x86_64-with-glibc2.43
+SYSTEM - Shell: SHELL=/bin/bash
+SYSTEM - Language: English
+SYSTEM - Current date: 2026-11-08
+SYSTEM - The user is operating inside a git repository
+SYSTEM 
+SYSTEM 
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ```python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ```
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+SYSTEM The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER tests/test_loop_freeze_conditional.py
+USER ```
+USER """Bar for the re-cut freeze job: freeze is conditional on custody intent.
+USER 
+USER Owner ruling for this job: loop() may freeze the custody bar only when the
+USER job has signalled that it is custody-bearing.  The signal is either
+USER (a) record_dir/inputs/custody.json naming bar.file, or
+USER (b) the convention file cwd/custody/bar.md existing.
+USER 
+USER If neither signal is present, freeze_bar() does nothing and loop() proceeds
+USER without a custody record.  This keeps ordinary loop tests from having to carry
+USER a bar they do not care about.
+USER 
+USER If a signal is present but the named file does not exist, freeze_bar() still
+USER fails closed: it raises RuntimeError before the Maker command runs, and no
+USER custody record is produced.
+USER 
+USER The existing tests/test_loop_freeze.py covers the convention-bar case and
+USER remains unchanged.  This file covers the declared-bar case and the skip cases.
+USER """
+USER from __future__ import annotations
+USER 
+USER import hashlib
+USER import json
+USER import os
+USER import sys
+USER import unittest
+USER from pathlib import Path
+USER from tempfile import TemporaryDirectory
+USER 
+USER PY = sys.executable
+USER ROOT = Path(__file__).resolve().parent.parent
+USER LEDGER_REL = "inputs/custody-events.jsonl"
+USER LEDGER_PY = "kit/custody_ledger.py"
+USER 
+USER sys.path.insert(0, str(ROOT))
+USER from kit.conductor_loop import freeze_bar  # noqa: E402
+USER import kit.conductor_loop as cl  # noqa: E402
+USER 
+USER 
+USER def _sha_file(path):
+USER     with open(path, "rb") as handle:
+USER         return hashlib.sha256(handle.read()).hexdigest()
+USER 
+USER 
+USER def _writer_stamp():
+USER     digest = _sha_file(ROOT / LEDGER_PY)[:12]
+USER     return f"kit/custody_ledger.py@{digest}"
+USER 
+USER 
+USER def _events(path):
+USER     if not os.path.isfile(path):
+USER         return []
+USER     out = []
+USER     with open(path, encoding="utf-8") as handle:
+USER         for line in handle:
+USER             if line.strip():
+USER                 try:
+USER                     out.append(json.loads(line))
+USER                 except ValueError:
+USER                     pass
+USER     return out
+USER 
+USER 
+USER def _freezes(events):
+USER     return [ev for ev in events if isinstance(ev, dict) and ev.get("event") == "freeze"]
+USER 
+USER 
+USER class ConditionalFreezeTests(unittest.TestCase):
+USER     def test_no_custody_inputs_and_no_convention_bar_skips_freeze(self):
+USER         """A plain loop() caller that prepares no custody inputs must not fail."""
+USER         with TemporaryDirectory() as work, TemporaryDirectory() as record:
+USER             freeze_bar(record, work)
+USER             self.assertFalse(os.path.exists(os.path.join(record, LEDGER_REL)))
+USER             self.assertFalse(os.path.exists(os.path.join(record, "inputs", "custody.json")))
+USER 
+USER     def test_declared_bar_file_is_frozen(self):
+USER         """bar.file in record_dir/inputs/custody.json is authoritative."""
+USER         bar_bytes = b"declared bar\n"
+USER         bar_rel = "bars/special.md"
+USER         bar_sha = hashlib.sha256(bar_bytes).hexdigest()
+USER 
+USER         with TemporaryDirectory() as work, TemporaryDirectory() as record:
+USER             # The source of the bar is in the workspace (cwd).
+USER             source = os.path.join(work, bar_rel)
+USER             os.makedirs(os.path.dirname(source), exist_ok=True)
+USER             with open(source, "wb") as handle:
+USER                 handle.write(bar_bytes)
+USER 
+USER             # The job declares the bar relative to the job directory.
+USER             inputs_dir = os.path.join(record, "inputs")
+USER             os.makedirs(inputs_dir, exist_ok=True)
+USER             with open(os.path.join(inputs_dir, "custody.json"), "w", encoding="utf-8") as handle:
+USER                 json.dump({"bar": {"file": bar_rel}}, handle)
+USER 
+USER             freeze_bar(record, work)
+USER 
+USER             # The bar was copied into the job directory and frozen.
+USER             dest = os.path.join(record, bar_rel)
+USER             self.assertTrue(os.path.isfile(dest), "declared bar was not copied into the job directory")
+USER             self.assertEqual(_sha_file(dest), bar_sha)
+USER 
+USER             events_path = os.path.join(record, LEDGER_REL)
+USER             freezes = _freezes(_events(events_path))
+USER             self.assertEqual(len(freezes), 1, "expected exactly one freeze event")
+USER             ev = freezes[0]
+USER             self.assertEqual(ev.get("bar_file"), bar_rel)
+USER             self.assertEqual(ev.get("bar_sha256"), bar_sha)
+USER             self.assertNotEqual(ev.get("writer"), "hand")
+USER             self.assertTrue(str(ev.get("writer", "")).startswith("kit/custody_ledger.py@"))
+USER 
+USER     def test_declared_bar_missing_fails_closed(self):
+USER         """A custody-bearing job with a missing declared bar must not dispatch."""
+USER         with TemporaryDirectory() as work, TemporaryDirectory() as record:
+USER             inputs_dir = os.path.join(record, "inputs")
+USER             os.makedirs(inputs_dir, exist_ok=True)
+USER             with open(os.path.join(inputs_dir, "custody.json"), "w", encoding="utf-8") as handle:
+USER                 json.dump({"bar": {"file": "missing.md"}}, handle)
+USER 
+USER             with self.assertRaises(RuntimeError) as caught:
+USER                 freeze_bar(record, work)
+USER             self.assertIn("missing.md", str(caught.exception))
+USER             self.assertFalse(os.path.exists(os.path.join(record, LEDGER_REL)))
+USER 
+USER     def test_convention_bar_still_freezes(self):
+USER         """When no bar.file is declared, cwd/custody/bar.md is the fallback."""
+USER         bar_bytes = b"convention bar\n"
+USER         bar_sha = hashlib.sha256(bar_bytes).hexdigest()
+USER 
+USER         with TemporaryDirectory() as work, TemporaryDirectory() as record:
+USER             source = os.path.join(work, "custody", "bar.md")
+USER             os.makedirs(os.path.dirname(source), exist_ok=True)
+USER             with open(source, "wb") as handle:
+USER                 handle.write(bar_bytes)
+USER 
+USER             freeze_bar(record, work)
+USER 
+USER             dest = os.path.join(record, "custody", "bar.md")
+USER             self.assertTrue(os.path.isfile(dest))
+USER             self.assertEqual(_sha_file(dest), bar_sha)
+USER 
+USER             freezes = _freezes(_events(os.path.join(record, LEDGER_REL)))
+USER             self.assertEqual(len(freezes), 1)
+USER             self.assertEqual(freezes[0].get("bar_file"), "custody/bar.md")
+USER             self.assertEqual(freezes[0].get("bar_sha256"), bar_sha)
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/derive.py:
+USER ⋮
+USER │def parse_iso(s) -> datetime | None:
+USER ⋮
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/ncheck.py:
+USER ⋮
+USER │def resolve(job: Path, f: str) -> Path | None:
+USER ⋮
+USER 
+USER examples/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/lib.py:
+USER ⋮
+USER │def hand_lines(res: dict) -> list:
+USER ⋮
+USER │def job_paths(job) -> dict:
+USER ⋮
+USER │def get(obj, path):
+USER ⋮
+USER 
+USER examples/subjects/2026-10-27-custody-emitter-gaps/kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER 
+USER examples/subjects/2026-10-28-custody-times-ledger-spend/kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER │def same_party(a, b) -> bool:
+USER ⋮
+USER 
+USER kit/conductor_software.py:
+USER ⋮
+USER │def resolve(path: str, cwd: str | None = None) -> str:
+USER ⋮
+USER │def record_red(exit_code, output: bytes | None) -> dict:
+USER ⋮
+USER │def refuse_editable(editable: list[str], frozen: list[str]) -> bool:
+USER ⋮
+USER 
+USER kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER 
+USER kit/emit_custody.py:
+USER ⋮
+USER │def hexdigest(v, field: str, gaps: Gaps) -> dict | None:
+USER ⋮
+USER 
+USER tools/build_schemas.py:
+USER ⋮
+USER │def sha256(path: Path) -> str:
+USER ⋮
+USER 
+USER tools/edi_corpus.py:
+USER ⋮
+USER │class CorpusUsageError(Exception):
+USER ⋮
+USER │def require_corpus() -> bool:
+USER ⋮
+USER │def hermes_config_path() -> Path:
+USER ⋮
+USER │def resolve(explicit: str | None = None, need: tuple[str, ...] = (), hermes: bool = True) -> Corpus
+USER ⋮
+USER │def usage_exit(msg: str) -> "None":
+USER ⋮
+USER │def no_corpus_reason(hermes: bool = True) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER kit/conductor_loop.py
+USER ```
+USER """The mechanical half of the Orchestrator: rounds, the pass rule, the record.
+USER 
+USER This is not the conductor. It dispatches one turn at a time by calling
+USER kit.conductor_run.run. It does not score, diagnose, or decide. It sends
+USER nothing and never restarts a stopped job. The conductor is still unbuilt.
+USER 
+USER Every round record this module writes carries wall-clock stamps, taken from
+USER the local zone and spelled as ISO 8601 at second precision with a numeric
+USER offset. ``started_at`` is taken once, when ``loop()`` is entered, before the
+USER packet is loaded; each written round record carries its own ``started_at`` at
+USER the top of its round and an ``ended_at`` taken when that record is written,
+USER inside the job window and in order across rounds.
+USER 
+USER A finish is filed by this module or not filed at all. ``loop()`` writes
+USER ``summary.json`` with what the finish says and, for a stop a human must see,
+USER ``escalation.json`` beside it, and returns the summary. It files nothing and
+USER raises ``CustodyNotDone`` for the one finish it cannot file cleanly: a run
+USER whose clock was replaced took stamps that are not this module's readings.
+USER ``datetime`` is the clock seam, so a replaced clock is visible here; nothing
+USER replaces it in a real run, so a real finish is always filed. ``CustodyNotDone``
+USER is an ``Exception`` and never a ``ValueError``, and its ``exit_code`` is 1, 2
+USER or 3 and never 0. A packet refusal is not a finish: it raises ``ValueError``
+USER and writes ``escalation.json`` with ``started_at`` and ``refused_at``, a later
+USER reading of the same clock, and no ``ended_at``. Nothing reads these fields
+USER back: the deadline and the clock stop stay on the monotonic clock, so a
+USER wall-clock jump changes no stop, state, outcome or round count.
+USER 
+USER Before any Maker turn, ``loop()`` freezes the bar in the ledger. It does so
+USER right after the packet is loaded and validated and before the first Maker
+USER dispatch: it copies ``<cwd>/custody/bar.md`` into the job directory unchanged
+USER and runs ``kit/custody_ledger.py freeze`` against the job directory, so the
+USER tool stamps its own clock and appends the event to
+USER ``inputs/custody-events.jsonl``. ``loop()`` types no ``frozenAt`` value. If the
+USER bar cannot be read, or the tool refuses, ``loop()`` raises before the Maker
+USER command runs and never calls the emitter.
+USER 
+USER A finish also has to ship a custody record. ``loop()`` calls
+USER ``emit_custody_for_finish(record_dir, summary)`` once, after the round records
+USER and a ``packet.json`` describing the finish exist and before ``summary.json``
+USER or ``escalation.json`` is written. The seam runs ``kit/emit_custody.py`` against
+USER ``record_dir`` and returns the emitter's exit code; 0 means the record at
+USER ``record_dir/custody/record.custody.json`` was written and names no hard gap.
+USER Any other code is not a done finish: ``loop()`` raises ``CustodyNotDone`` with
+USER that code and writes neither ``summary.json`` nor ``escalation.json``. A packet
+USER refusal is not a finish: the seam is not called and no custody record is
+USER written.
+USER """
+USER from __future__ import annotations
+USER 
+USER import hashlib
+USER import json
+USER import os
+USER import shutil
+USER import subprocess
+USER import sys
+USER import time
+USER from datetime import datetime as _datetime
+USER from datetime import timezone
+USER 
+USER from kit import conductor_software
+USER from kit.conductor_run import _run, run
+USER 
+USER ACCEPTED = "accepted"
+USER REJECTED = "rejected"
+USER NO_ARTIFACT = "no artifact"
+USER EVALUATOR_FAILED = "evaluator failed"
+USER NO_OBSERVATION = "no observation"
+USER INSTRUMENT_FAILED = "instrument failed"
+USER EVALUATOR_SPLIT = "evaluator split"
+USER CAP_REACHED = "cap reached"
+USER ESCALATION_CLASS = "escalation class"
+USER TAMPERED = "tampered"
+USER MAKER_FAILED = "maker failed"
+USER TIMEOUT_STOP = "timeout"
+USER CLOCK = "clock"
+USER BUDGET = "budget"
+USER BUDGET_UNMEASURED = "budget unmeasured"
+USER HELD_OUT = "held-out leak"
+USER HELD_OUT_UNREADABLE = "held-out unreadable"
+USER NOT_DISPATCHED = "not dispatched"
+USER PACKET_REFUSED = "packet refused"
+USER 
+USER _STATES = {
+USER     ACCEPTED: ("accepted", "accepted"),
+USER     REJECTED: ("rejected", "rejected"),
+USER     NO_ARTIFACT: ("needs_owner", "no_artifact"),
+USER     EVALUATOR_FAILED: ("needs_owner", "no_observation"),
+USER     NO_OBSERVATION: ("needs_owner", "no_observation"),
+USER     INSTRUMENT_FAILED: ("needs_owner", "no_observation"),
+USER     EVALUATOR_SPLIT: ("needs_owner", "no_observation"),
+USER     CAP_REACHED: ("needs_owner", "needs_owner"),
+USER     ESCALATION_CLASS: ("needs_owner", "needs_owner"),
+USER     TAMPERED: ("needs_owner", "needs_owner"),
+USER     MAKER_FAILED: ("needs_owner", "needs_owner"),
+USER     TIMEOUT_STOP: ("needs_owner", "needs_owner"),
+USER     CLOCK: ("needs_owner", "needs_owner"),
+USER     BUDGET: ("needs_owner", "needs_owner"),
+USER     BUDGET_UNMEASURED: ("needs_owner", "needs_owner"),
+USER     HELD_OUT: ("needs_owner", "needs_owner"),
+USER     HELD_OUT_UNREADABLE: ("needs_owner", "needs_owner"),
+USER     NOT_DISPATCHED: ("needs_owner", "needs_owner"),
+USER     PACKET_REFUSED: ("needs_owner", "needs_owner"),
+USER }
+USER 
+USER _KINDS = {
+USER     CAP_REACHED: "cap_reached",
+USER     REJECTED: "below_floor",
+USER }
+USER 
+USER _CLASSES = {
+USER     "artifact_missed_standard",
+USER     "standard_moved",
+USER     "dimension_unauthorized",
+USER     "frame_at_fault",
+USER }
+USER _VERDICTS = {"accept", "regenerate", "needs_owner", "reject"}
+USER _HELD_METHOD = (
+USER     "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, "
+USER     "undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the "
+USER     "findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read "
+USER     "fails the check"
+USER )
+USER _GAP_GATE = (
+USER     "The gate rerun is a script Evaluator reading held in the same module as "
+USER     "Orchestrator dispatch (DOCTRINE D3.holder, rule 5)."
+USER )
+USER _GAP_ARCH = (
+USER     "Architect proposed packet not recorded after seeing drafts "
+USER     "(D3.Architect vs Contracts §4.2); Owner ratification required"
+USER )
+USER 
+USER 
+USER class datetime(_datetime):
+USER     """The module's clock seam: tests replace ``datetime.now`` on this name.
+USER 
+USER     ``datetime.datetime`` is an immutable C type, so ``now`` cannot be replaced
+USER     on it; a subclass of it can be, and answers exactly as the base class does
+USER     when it is not replaced.
+USER     """
+USER 
+USER 
+USER class CustodyNotDone(Exception):
+USER     """A finish this module does not file. Exit 0 is the only done.
+USER 
+USER     ``loop()`` raises this instead of returning a summary for a finish whose
+USER     stamps are not its own readings, or whose custody record the emitter could
+USER     not write cleanly. ``exit_code`` is 1, 2 or 3 and is never 0: 1 the work was
+USER     accepted; 2 the work was rejected, below the floor; 3 every stop a human
+USER     must see. It files neither ``summary.json`` nor ``escalation.json``. It is
+USER     not a ``ValueError``: a packet refusal stays one, because a refusal is not a
+USER     finish.
+USER 
+USER     ``halt`` carries what the record would have said — the stop, its terminal
+USER     state and outcome, the stamps, the rounds, the cap, the best round, the
+USER     spend, the separation gaps and the hashes.
+USER     """
+USER 
+USER     def __init__(self, halt, exit_code):
+USER         super().__init__(
+USER             "%s is not done (%s / %s) after %s of cap %s rounds, best round %s, "
+USER             "cost %s; no summary and no escalation are filed"
+USER             % (
+USER                 halt["stop"], halt["terminal_state"], halt["outcome"],
+USER                 halt["rounds"], halt["cap"], halt["best_round"], halt["cost"],
+USER             )
+USER         )
+USER         self.halt = halt
+USER         self.stop = halt["stop"]
+USER         self.exit_code = exit_code
+USER 
+USER 
+USER def _exit_code(stop) -> int:
+USER     """1, 2 or 3 for a finish this module does not file. Never 0.
+USER 
+USER     1 — the work was accepted. 2 — the work was rejected, below the floor. 3 —
+USER     a human must see the finish: every other stop. The exit code names what a
+USER     caller would have had to route on; it is not a state and it is not a
+USER     verdict.
+USER     """
+USER     if stop == ACCEPTED:
+USER         return 1
+USER     if stop == REJECTED:
+USER         return 2
+USER     return 3
+USER 
+USER 
+USER def _own_clock() -> bool:
+USER     """True while ``datetime.now`` is this module's clock and not a replacement.
+USER 
+USER     ``datetime`` is the clock seam. A run that replaces ``now`` on it supplies
+USER     every ``started_at`` and ``ended_at`` the round records and the finish
+USER     carry, so those stamps are not readings this module took, and a finish
+USER     resting on them cannot be filed cleanly: ``loop()`` raises
+USER     ``CustodyNotDone`` for it. Nothing replaces the clock in a real run, so a
+USER     real finish is always filed.
+USER 
+USER     An unpatched ``now`` is inherited from the base class and is bound to this
+USER     class; a replacement lives in this class's own namespace (or is bound to
+USER     the object that supplies it).
+USER     """
+USER     if "now" in datetime.__dict__:
+USER         return False
+USER     return getattr(datetime.now, "__self__", None) is datetime
+USER 
+USER 
+USER def emit_custody_for_finish(record_dir, summary):
+USER     """Run ``kit/emit_custody.py`` against ``record_dir``; return its exit code.
+USER 
+USER     This is the seam ``loop()`` uses to ship a custody record on a finish. It
+USER     calls the emitter, not the close command; the emitter reads the job
+USER     directory on disk — ``packet.json`` and the round records ``loop()`` has
+USER     written — and writes ``custody/record.custody.json`` at the path the close
+USER     command uses. Exit 0 is the only done: the record was written and names no
+USER     hard gap. Any other exit code is not a done finish.
+USER 
+USER     ``summary`` is carried for the caller's convenience; it is not forwarded.
+USER     The seam's result is exactly what the same command produces on the same
+USER     directory, so a twin run of the emitter side-by-side matches it.
+USER     """
+USER     emitter = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emit_custody.py")
+USER     proc = subprocess.run(
+USER         [sys.executable, emitter, "--job-dir", str(record_dir)],
+USER         capture_output=True,
+USER         text=True,
+USER     )
+USER     return proc.returncode
+USER 
+USER 
+USER def _custody_packet(packet, halt):
+USER     """The ``packet.json`` a finish leaves for the emitter to read.
+USER 
+USER     The emitter reads the finish out of the job directory, so before the seam is
+USER     called this module records what the finish says. Because the emitter never
+USER     sees ``summary.json`` (that file is written only after a clean record), the
+USER     finish has to be reachable from ``packet.json`` alone: its fields are
+USER     written at the top level in the same snake_case the round records and the
+USER     escalation use, again in the camelCase the record's gap vocabulary uses
+USER     (``startedAt``, ``endedAt``), and nested under ``finish``/``summary`` so a
+USER     reader that expects the summary as an object finds it. The ratified packet's
+USER     own fields are kept alongside so the record's subject can be drawn from
+USER     them.
+USER     """
+USER     descriptor = dict(packet) if isinstance(packet, dict) else {}
+USER     finish = {
+USER         "terminal_state": halt["terminal_state"],
+USER         "outcome": halt["outcome"],
+USER         "stop": halt["stop"],
+USER         "rounds": halt["rounds"],
+USER         "cap": halt["cap"],
+USER         "accepted_round": halt["accepted_round"],
+USER         "best_round": halt["best_round"],
+USER         "cost": halt["cost"],
+USER         "separation_gaps": halt["separation_gaps"],
+USER         "started_at": halt["started_at"],
+USER         "ended_at": halt["ended_at"],
+USER         "packet_sha256": halt["packet_sha256"],
+USER         "rounds_sha256": halt["rounds_sha256"],
+USER         "commit": halt["commit"],
+USER     }
+USER     descriptor.update(finish)
+USER     descriptor.update({
+USER         "terminalState": halt["terminal_state"],
+USER         "startedAt": halt["started_at"],
+USER         "endedAt": halt["ended_at"],
+USER         "packetSha256": halt["packet_sha256"],
+USER         "roundsSha256": halt["rounds_sha256"],
+USER         "bestRound": halt["best_round"],
+USER         "acceptedRound": halt["accepted_round"],
+USER         "finish": dict(finish),
+USER         "summary": dict(finish),
+USER     })
+USER     return descriptor
+USER 
+USER 
+USER def freeze_bar(record_dir, root):
+USER     """Freeze the bar in the ledger, live, before the Maker is dispatched.
+USER 
+USER     The bar is ``<cwd>/custody/bar.md``. The ledger tool names a bar relative to
+USER     the job directory, so the bar's bytes are copied there unchanged and the
+USER     tool is pointed at that copy. The tool stamps the freeze from its own clock
+USER     and appends the event to ``inputs/custody-events.jsonl``; this module types
+USER     no time. If the bar cannot be read, or the tool refuses, this raises before
+USER     the Maker command runs: no Maker call and no ``emit_custody.py`` run.
+USER     """
+USER     source = os.path.join(root, "custody", "bar.md")
+USER     if not os.path.isfile(source):
+USER         raise RuntimeError("no bar file at %s; cannot freeze before dispatch" % source)
+USER     job = os.path.abspath(str(record_dir))
+USER     rel = "custody/bar.md"
+USER     dest = os.path.join(job, rel)
+USER     os.makedirs(os.path.dirname(dest), exist_ok=True)
+USER     shutil.copyfile(source, dest)
+USER     ledger = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custody_ledger.py")
+USER     proc = subprocess.run(
+USER         [sys.executable, ledger, "freeze", "--job-dir", job, "--bar", rel],
+USER         capture_output=True,
+USER         text=True,
+USER     )
+USER     if proc.returncode != 0:
+USER         detail = (proc.stderr or proc.stdout or "").strip() or "exit %s" % proc.returncode
+USER         raise RuntimeError("the bar could not be frozen in %s: %s" % (job, detail))
+USER 
+USER 
+USER def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_fn=None) -> dict:
+USER     """Run the rounds the packet names, then file the finish and return it.
+USER 
+USER     ``packet`` is a path or a loaded dict. A refusal writes ``escalation.json``
+USER     and raises ``ValueError`` before any command runs; a refusal is not a
+USER     finish. Every other end calls ``emit_custody_for_finish`` once, after the
+USER     round records and a ``packet.json`` describing the finish exist, and only if
+USER     that seam returns 0 does it file its finish — ``summary.json``, and
+USER     ``escalation.json`` for a stop a human must see — and return the summary.
+USER     If the seam returns 1, 2 or 3, or the finish's stamps came from a replaced
+USER     clock, it raises ``CustodyNotDone`` with what the record would have said and
+USER     writes neither file. This function sends nothing and does not start another
+USER     loop.
+USER     """
+USER     started_at = _stamp()
+USER     try:
+USER         loaded, packet_sha = _load(packet)
+USER     except Exception as exc:
+USER         os.makedirs(record_dir, exist_ok=True)
+USER         _refuse(
+USER             record_dir,
+USER             packet if isinstance(packet, dict) else {},
+USER             ["packet could not be loaded: %s" % exc],
+USER             started_at,
+USER         )
+USER         raise
+USER     root = os.path.realpath(cwd) if cwd is not None else os.path.realpath(os.getcwd())
+USER     problems = _problems(loaded, record_dir, root, evaluator_fn)
+USER     os.makedirs(record_dir, exist_ok=True)
+USER     if problems:
+USER         _refuse(record_dir, loaded, problems, started_at)
+USER         raise ValueError("; ".join(problems))
+USER 
+USER     freeze_bar(record_dir, root)
+USER 
+USER     artifact = loaded["artifact"]
+USER     bounds = loaded["bounds"]
+USER     budget = bounds["budget"]
+USER     cap = bounds["cap"]
+USER     deadline = time.monotonic() + float(budget["time_hours_lt"]) * 3600
+USER     spend = 0.0
+USER     best_round = None
+USER     best_scores = None
+USER     defects: list[dict] = []
+USER     solutions: list[dict] = []
+USER     round_paths: list[str] = []
+USER     stop = None
+USER     by = None
+USER     accepted_round = None
+USER     last = 0
+USER 
+USER     for number in range(1, cap + 1):
+USER         remaining = deadline - time.monotonic()
+USER         if remaining <= 0:
+USER             stop = CLOCK
+USER             break
+USER         round_started_at = _stamp()
+USER         if number > 1 and best_round is not None and best_round != number - 1:
+USER             _restore(root, artifact["editable"], _editable_dir(record_dir, best_round))
+USER         findings = {
+USER             "round": number,
+USER             "cap": cap,
+USER             "best": None if best_round is None else {
+USER                 "round": best_round,
+USER                 "editable": _editable_dir(record_dir, best_round),
+USER                 "sha256": _tree_sha(_editable_dir(record_dir, best_round)),
+USER             },
+USER             "defects": defects,
+USER             "solutions": solutions,
+USER         }
+USER         try:
+USER             leak = _held_out(json.dumps(findings), loaded["evaluator"].get("held_out") or [])
+USER         except OSError as exc:
+USER             stop = HELD_OUT_UNREADABLE
+USER             _write_round(
+USER                 record_dir, number, None, None,
+USER                 {"method": _HELD_METHOD, "result": "fail", "by": "loop()", "reason": str(exc)},
+USER                 None, None, None, False, best_round, 0, stop,
+USER                 round_started_at, _stamp(),
+USER             )
+USER             last = number
+USER             round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
+USER             break
+USER         findings_path = os.path.join(record_dir, "findings-%02d.json" % number)
+USER         if leak:
+USER             stop = HELD_OUT
+USER             _write_round(
+USER                 record_dir, number, None, None, {"method": _HELD_METHOD, "result": "fail", "by": "loop()"},
+USER                 None, None, None, False, best_round, 0, stop,
+USER                 round_started_at, _stamp(),
+USER             )
+USER             last = number
+USER             round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
+USER             break
+USER         _dump(findings_path, findings)
+USER         bound = remaining if timeout_s is None else min(timeout_s, remaining)
+USER         clock_cut = timeout_s is None or remaining <= timeout_s
+USER         cost_path = os.path.join(record_dir, "cost-%02d-maker.json" % number)
+USER         try:
+USER             result = run(
+USER                 artifact["test_cmd"],
+USER                 artifact["frozen"],
+USER                 artifact["editable"],
+USER                 loaded["maker"]["cmd"],
+USER                 commit=commit,
+USER                 cwd=root,
+USER                 timeout_s=bound,
+USER                 ignore=artifact.get("ignore") or [],
+USER                 require_red=(number == 1),
+USER                 maker_env={
+USER                     "PLUMBLINE_FINDINGS": findings_path,
+USER                     "PLUMBLINE_COST": cost_path,
+USER                 },
+USER             )
+USER         except ValueError as exc:
+USER             if number == 1:
+USER                 _refuse(record_dir, loaded, [str(exc)], started_at)
+USER             raise
+USER         editable_copy = _editable_dir(record_dir, number)
+USER         _snapshot_editable(root, artifact["editable"], editable_copy)
+USER         produced = result.get("reason") != NO_ARTIFACT
+USER         stop, by = _classify(result, clock_cut)
+USER         if stop is None and time.monotonic() >= deadline:
+USER             stop, by = CLOCK, None
+USER         maker_cost = _take_cost(cost_path)
+USER         round_cost = 0.0
+USER         if maker_cost is not None:
+USER             round_cost += maker_cost
+USER             spend += maker_cost
+USER         if stop is None and budget["amount"] > 0 and maker_cost is None:
+USER             stop = BUDGET_UNMEASURED
+USER         elif stop is None:
+USER             if budget["amount"] > 0 and spend >= budget["amount"]:
+USER                 stop = BUDGET
+USER             elif budget["amount"] == 0 and round_cost > 0:
+USER                 stop = BUDGET
+USER         reading = {}
+USER         evaluator_rows = []
+USER         pass_rule = None
+USER         mismatch = False
+USER         scores = None
+USER         if stop is None and result.get("rerun", {}).get("exit") != 0:
+USER             observation = "rerun exit %s sha256 %s" % (
+USER                 result["rerun"]["exit"], result["rerun"]["output_sha256"],
+USER             )
+USER             violation = {
+USER                 "id": "gate",
+USER                 "class": "artifact_missed_standard",
+USER                 "dimension": None,
+USER                 "observation": observation,
+USER             }
+USER             reading = {
+USER                 "from": "gate",
+USER                 "verdict": "regenerate",
+USER                 "dimensions": [],
+USER                 "violations": [violation],
+USER             }
+USER             pass_rule = "regenerate"
+USER             defects.append({
+USER                 "round": number,
+USER                 "id": "gate",
+USER                 "class": "artifact_missed_standard",
+USER                 "dimension": None,
+USER                 "observation": observation,
+USER             })
+USER         elif stop is None:
+USER             ev_stop, ev_by, evaluator_rows, scores, mismatch, fired, eval_costs, eval_missing = _evaluate(
+USER                 loaded, result, number, editable_copy, root, deadline, timeout_s, evaluator_fn, record_dir,
+USER             )
+USER             for one in eval_costs:
+USER                 round_cost += one
+USER                 spend += one
+USER             if ev_stop:
+USER                 stop, by = ev_stop, ev_by
+USER             elif budget["amount"] > 0 and eval_missing:
+USER                 stop = BUDGET_UNMEASURED
+USER             elif budget["amount"] > 0 and spend >= budget["amount"]:
+USER                 stop = BUDGET
+USER             elif budget["amount"] == 0 and round_cost > 0:
+USER                 stop = BUDGET
+USER             elif fired:
+USER                 stop = ESCALATION_CLASS
+USER             else:
+USER                 pass_rule = _pass_rule(scores, bounds)
+USER                 if pass_rule == ACCEPTED:
+USER                     stop = ACCEPTED
+USER                     accepted_round = number
+USER                 elif pass_rule == REJECTED:
+USER                     stop = REJECTED
+USER                 else:
+USER                     pass_rule = "regenerate"
+USER             parsed_rows = _parsed(evaluator_rows)
+USER             if parsed_rows:
+USER                 first = parsed_rows[0]
+USER                 reading = {
+USER                     "from": "evaluator",
+USER                     "verdict": first.get("verdict"),
+USER                     "dimensions": first.get("dimensions"),
+USER                     "violations": first.get("violations"),
+USER                 }
+USER             if scores:
+USER                 for parsed in parsed_rows:
+USER                     for item in parsed.get("violations") or []:
+USER                         defects.append({
+USER                             "round": number,
+USER                             "id": item.get("id"),
+USER                             "class": item.get("class"),
+USER                             "dimension": item.get("dimension"),
+USER                             "observation": item.get("observation"),
+USER                         })
+USER                         if item.get("remedy"):
+USER                             solutions.append({
+USER                                 "round": number, "id": item.get("id"), "remedy": item.get("remedy"),
+USER                             })
+USER         if produced and stop not in (NO_ARTIFACT, PACKET_REFUSED):
+USER             if best_round is None:
+USER                 best_round, best_scores = number, scores
+USER             elif scores and (best_scores is None or _better(scores, best_scores)):
+USER                 best_round, best_scores = number, scores
+USER         held = {"method": _HELD_METHOD, "result": "pass" if not leak else "fail", "by": "loop()"}
+USER         _write_round(
+USER             record_dir, number, result, _sha_file(findings_path), held,
+USER             evaluator_rows, reading, pass_rule, mismatch, best_round, round_cost, stop,
+USER             round_started_at, _stamp(),
+USER         )
+USER         last = number
+USER         round_paths.append(os.path.join(record_dir, "round-%02d.json" % number))
+USER         if stop:
+USER             break
+USER         if number == cap:
+USER             stop = CAP_REACHED
+USER             break
+USER 
+USER     if stop is None:
+USER         stop = CAP_REACHED
+USER     ended_at = _stamp()
+USER     state, outcome = _STATES[stop]
+USER     halt = {
+USER         "terminal_state": state,
+USER         "outcome": outcome,
+USER         "stop": stop,
+USER         "rounds": last,
+USER         "cap": cap,
+USER         "accepted_round": accepted_round,
+USER         "best_round": best_round,
+USER         "cost": spend,
+USER         "separation_gaps": [_GAP_GATE, _GAP_ARCH] if stop != ACCEPTED else [],
+USER         "rounds_sha256": [_sha_file(path) for path in round_paths],
+USER         "packet_sha256": packet_sha,
+USER         "commit": conductor_software.record_field(commit),
+USER         "started_at": started_at,
+USER         "ended_at": ended_at,
+USER     }
+USER     if not _own_clock():
+USER         raise CustodyNotDone(halt, _exit_code(stop))
+USER     _dump(os.path.join(record_dir, "packet.json"), _custody_packet(loaded, halt))
+USER     code = emit_custody_for_finish(record_dir, halt)
+USER     if code != 0:
+USER         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)
+USER     _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
+USER     return halt
+USER 
+USER 
+USER def _file_finish(record_dir, packet, halt, round_paths, best_round, by):
+USER     """Write the finish: ``summary.json``, and an escalation for a stop.
+USER 
+USER     ``summary.json`` is what the finish says. ``escalation.json`` is written
+USER     only for a stop a human must see — never for an accepted finish — and
+USER     carries the route and holders the packet names, the best round's snapshot,
+USER     one row per written round record with its sha256, the seat that made the
+USER     stop (``by``) and the stamps. The question, diagnosis, why-unobservable,
+USER     options, recommendation, proposed packet and decision are the Architect's
+USER     to write; this module leaves them null.
+USER     """
+USER     _dump(os.path.join(record_dir, "summary.json"), halt)
+USER     if halt["stop"] == ACCEPTED:
+USER         return
+USER     escalation = packet.get("escalation") if isinstance(packet.get("escalation"), dict) else {}
+USER     best = None
+USER     if best_round is not None:
+USER         editable = _editable_dir(record_dir, best_round)
+USER         best = {"round": best_round, "editable": editable, "sha256": _tree_sha(editable)}
+USER     _dump(os.path.join(record_dir, "escalation.json"), {
+USER         "terminal_state": halt["terminal_state"],
+USER         "outcome": halt["outcome"],
+USER         "stop": halt["stop"],
+USER         "escalation_kind": _KINDS.get(halt["stop"], "other"),
+USER         "route": escalation.get("route"),
+USER         "human_seat": packet.get("human_seat"),
+USER         "holders": escalation.get("holders"),
+USER         "problems": [],
+USER         "question": None,
+USER         "diagnosis": None,
+USER         "why_unobservable": None,
+USER         "options": None,
+USER         "recommendation": None,
+USER         "proposed_packet": None,
+USER         "decision": None,
+USER         "best": best,
+USER         "tried": [
+USER             {"round": index + 1, "record": path, "record_sha256": _sha_file(path)}
+USER             for index, path in enumerate(round_paths)
+USER         ],
+USER         "by": by or "loop()",
+USER         "started_at": halt["started_at"],
+USER         "ended_at": halt["ended_at"],
+USER     })
+USER 
+USER 
+USER def _stamp() -> str:
+USER     """Now, as every record this module writes spells it."""
+USER     return datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds")
+USER 
+USER 
+USER def _load(packet):
+USER     if isinstance(packet, (str, os.PathLike)):
+USER         raw = open(packet, "rb").read()
+USER         return json.loads(raw.decode("utf-8")), hashlib.sha256(raw).hexdigest()
+USER     raw = json.dumps(packet, sort_keys=True).encode("utf-8")
+USER     return packet, hashlib.sha256(raw).hexdigest()
+USER 
+USER 
+USER def _problems(packet, record_dir, root, evaluator_fn) -> list[str]:
+USER     problems = []
+USER     if packet.get("ratified") is not True:
+USER         problems.append("ratified is not true")
+USER     if packet.get("mode") != "scored":
+USER         problems.append("mode is not scored (%s)" % packet.get("mode"))
+USER     if not str(packet.get("human_seat") or "").strip():
+USER         problems.append("human_seat is blank")
+USER     artifact = packet.get("artifact") if isinstance(packet.get("artifact"), dict) else {}
+USER     maker = packet.get("maker") if isinstance(packet.get("maker"), dict) else {}
+USER     evaluator = packet.get("evaluator") if isinstance(packet.get("evaluator"), dict) else {}
+USER     bounds = packet.get("bounds") if isinstance(packet.get("bounds"), dict) else {}
+USER     budget = bounds.get("budget") if isinstance(bounds.get("budget"), dict) else {}
+USER     escalation = packet.get("escalation") if isinstance(packet.get("escalation"), dict) else {}
+USER     if not _strings(artifact.get("test_cmd")):
+USER         problems.append("artifact.test_cmd is not a non-empty list of strings")
+USER     if not _strings(artifact.get("frozen")):
+USER         problems.append("artifact.frozen is missing")
+USER     editable = artifact.get("editable")
+USER     if not isinstance(editable, list):
+USER         problems.append("artifact.editable is not a list")
+USER     else:
+USER         for rel in editable:
+USER             if not isinstance(rel, str) or not rel.strip():
+USER                 problems.append("artifact.editable has an entry that is not a non-empty string")
+USER                 continue
+USER             if os.path.isabs(rel):
+USER                 problems.append("artifact.editable entry is absolute: %s" % rel)
+USER                 continue
+USER             if not _inside(os.path.realpath(os.path.join(root, rel)), root):
+USER                 problems.append("artifact.editable entry resolves outside cwd: %s" % rel)
+USER     if not _strings(maker.get("cmd")):
+USER         problems.append("maker.cmd is not a non-empty list of strings")
+USER     if maker.get("handoff") != "rule12":
+USER         problems.append("maker.handoff is not rule12")
+USER     if evaluator_fn is None and not _strings(evaluator.get("cmd")):
+USER         problems.append("evaluator.cmd is not a non-empty list of strings")
+USER     runs = evaluator.get("runs")
+USER     if type(runs) is not int or runs < 2:
+USER         problems.append("evaluator.runs is not an int of at least 2")
+USER     for name in ("T_accept", "T_dim", "T_reject"):
+USER         if name not in bounds or not _number(bounds.get(name)):
+USER             problems.append("%s is not a number" % name)
+USER     cap = bounds.get("cap")
+USER     if type(cap) is not int or cap < 1:
+USER         problems.append("cap is not an int of at least 1")
+USER     if "cap_counts" in bounds and bounds.get("cap_counts") != "generations":
+USER         problems.append("cap_counts is not generations")
+USER     if not _number(budget.get("time_hours_lt")) or budget.get("time_hours_lt") <= 0:
+USER         problems.append("budget.time_hours_lt is not a positive number")
+USER     if not _number(budget.get("amount")) or budget.get("amount") < 0:
+USER         problems.append("budget.amount is not a number of 0 or more")
+USER     if escalation.get("route") != ["Architect", "Owner"]:
+USER         problems.append("escalation.route is not ['Architect', 'Owner']")
+USER     if not isinstance(escalation.get("classes"), list):
+USER         problems.append("escalation.classes is not a list")
+USER     holders = escalation.get("holders") if isinstance(escalation.get("holders"), dict) else {}
+USER     architect = str(holders.get("architect") or "")
+USER     if not architect.strip():
+USER         problems.append("holders.architect is blank")
+USER     orch = holders.get("orchestrator")
+USER     scripts = []
+USER     escalations = []
+USER     if isinstance(orch, list):
+USER         for index, item in enumerate(orch):
+USER             if not isinstance(item, dict):
+USER                 continue
+USER             if item.get("does") == "rounds" and item.get("kind") == "script":
+USER                 scripts.append(item)
+USER             if item.get("does") == "escalations":
+USER                 escalations.append(item)
+USER             if not str(item.get("tested") or "").strip():
+USER                 problems.append(
+USER                     "holders.orchestrator[%d] (%s) has no tested" % (index, item.get("does"))
+USER                 )
+USER     if len(scripts) != 1:
+USER         problems.append("holders.orchestrator has no script holder for rounds")
+USER     if len(escalations) != 1:
+USER         problems.append("holders.orchestrator has no escalations holder")
+USER     folded = architect.strip().casefold()
+USER     names = []
+USER     if isinstance(orch, list):
+USER         names = [str(item.get("holder") or "").strip().casefold() for item in orch if isinstance(item, dict)]
+USER     if folded and folded in names:
+USER         problems.append("holders.architect equals an orchestrator holder")
+USER     rec = conductor_software.resolve(record_dir, root)
+USER     if _inside(rec, root):
+USER         problems.append("record_dir resolves inside cwd")
+USER     if _holds_files(record_dir):
+USER         problems.append("record_dir already holds files")
+USER     return problems
+USER 
+USER 
+USER def _strings(value) -> bool:
+USER     return isinstance(value, list) and len(value) > 0 and all(isinstance(item, str) and item for item in value)
+USER 
+USER 
+USER def _number(value) -> bool:
+USER     return isinstance(value, (int, float)) and not isinstance(value, bool)
+USER 
+USER 
+USER def _inside(child, parent) -> bool:
+USER     try:
+USER         return os.path.commonpath([child, parent]) == parent
+USER     except ValueError:
+USER         return False
+USER 
+USER 
+USER def _holds_files(path) -> bool:
+USER     if not os.path.isdir(path):
+USER         return False
+USER     for _dir, _names, files in os.walk(path):
+USER         if files:
+USER             return True
+USER     return False
+USER 
+USER 
+USER def _refuse(record_dir, packet, problems, started_at):
+USER     escalation = packet.get("escalation") if isinstance(packet.get("escalation"), dict) else {}
+USER     os.makedirs(record_dir, exist_ok=True)
+USER     _dump(os.path.join(record_dir, "escalation.json"), {
+USER         "terminal_state": "needs_owner",
+USER         "outcome": "needs_owner",
+USER         "stop": PACKET_REFUSED,
+USER         "escalation_kind": "other",
+USER         "route": escalation.get("route"),
+USER         "human_seat": packet.get("human_seat"),
+USER         "holders": escalation.get("holders"),
+USER         "problems": problems,
+USER         "question": None,
+USER         "diagnosis": None,
+USER         "why_unobservable": None,
+USER         "options": None,
+USER         "recommendation": None,
+USER         "proposed_packet": None,
+USER         "decision": None,
+USER         "started_at": started_at,
+USER         "refused_at": _stamp(),
+USER     })
+USER 
+USER 
+USER def _classify(result, clock_cut):
+USER     if not result.get("dispatched"):
+USER         return NOT_DISPATCHED, None
+USER     if result.get("hashes_unchanged") is False or result.get("reason") == "edit outside editable":
+USER         return TAMPERED, "maker"
+USER     if result.get("reason") == MAKER_FAILED:
+USER         return MAKER_FAILED, None
+USER     if result.get("reason") == "timeout":
+USER         return (CLOCK if clock_cut else TIMEOUT_STOP), None
+USER     if result.get("reason") == NO_ARTIFACT:
+USER         return NO_ARTIFACT, None
+USER     return None, None
+USER 
+USER 
+USER def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, evaluator_fn, record_dir):
+USER     rows = []
+USER     costs = []
+USER     missing = False
+USER     ignore = packet["artifact"].get("ignore") or []
+USER     turn = {
+USER         "round": number,
+USER         "artifact": editable_copy,
+USER         "artifact_sha256": _tree_sha(editable_copy),
+USER         "gate": {key: value for key, value in result.items() if key != "maker"},
+USER     }
+USER     for index in range(packet["evaluator"]["runs"]):
+USER         left = deadline - time.monotonic()
+USER         if left <= 0:
+USER             return CLOCK, None, rows, None, False, None, costs, missing
+USER         bound = left if timeout_s is None else min(timeout_s, left)
+USER         before = conductor_software.snapshot(root)
+USER         cost_path = os.path.join(record_dir, "cost-%02d-eval-%d.json" % (number, index))
+USER         parsed = None
+USER         if evaluator_fn is not None:
+USER             try:
+USER                 parsed = evaluator_fn(turn, root)
+USER                 exit_code, output = 0, json.dumps(parsed).encode("utf-8")
+USER             except Exception:
+USER                 rows.append({"exit": "error", "output_sha256": conductor_software.NOT_RECORDED, "parsed": None})
+USER                 return EVALUATOR_FAILED, None, rows, None, False, None, costs, missing
+USER         else:
+USER             env = os.environ.copy()
+USER             env["PLUMBLINE_TURN"] = json.dumps(turn)
+USER             env["PLUMBLINE_COST"] = cost_path
+USER             exit_code, output = _run(packet["evaluator"]["cmd"], root, bound, env=env)
+USER             one = _take_cost(cost_path)
+USER             if one is None:
+USER                 missing = True
+USER             else:
+USER                 costs.append(one)
+USER         after = conductor_software.snapshot(root)
+USER         changed = [
+USER             path for path in conductor_software.changed_paths(before, after)
+USER             if not conductor_software.matches_ignore(os.path.relpath(path, root), ignore)
+USER         ]
+USER         if changed:
+USER             rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": parsed})
+USER             return TAMPERED, "evaluator", rows, None, False, None, costs, missing
+USER         if exit_code == conductor_software.TIMEOUT or exit_code != 0:
+USER             rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": None})
+USER             return EVALUATOR_FAILED, None, rows, None, False, None, costs, missing
+USER         if parsed is None:
+USER             try:
+USER                 parsed = json.loads(output.decode("utf-8"))
+USER             except (json.JSONDecodeError, UnicodeDecodeError):
+USER                 rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": None})
+USER                 return EVALUATOR_FAILED, None, rows, None, False, None, costs, missing
+USER         shape = _shape(parsed)
+USER         rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": parsed})
+USER         if shape:
+USER             return shape, None, rows, None, False, None, costs, missing
+USER     parsed_rows = _parsed(rows)
+USER     if _split(parsed_rows):
+USER         return EVALUATOR_SPLIT, None, rows, None, False, None, costs, missing
+USER     scores = {item["name"]: item["score"] for item in parsed_rows[0]["dimensions"]}
+USER     fired = _class_fired(parsed_rows, packet["escalation"]["classes"])
+USER     mismatch = _mismatch(parsed_rows[0].get("verdict"), scores, packet["bounds"], fired)
+USER     return None, None, rows, scores, mismatch, fired, costs, missing
+USER 
+USER 
+USER def _shape(parsed):
+USER     if not isinstance(parsed, dict):
+USER         return EVALUATOR_FAILED
+USER     dims = parsed.get("dimensions")
+USER     if not isinstance(dims, list) or not dims:
+USER         return EVALUATOR_FAILED
+USER     for item in dims:
+USER         if not isinstance(item, dict) or "name" not in item or not _number(item.get("score")):
+USER             return EVALUATOR_FAILED
+USER         if not str(item.get("observation") or "").strip():
+USER             return NO_OBSERVATION
+USER     controls = parsed.get("controls")
+USER     if not isinstance(controls, dict) or "should_pass" not in controls or "should_fail" not in controls:
+USER         return EVALUATOR_FAILED
+USER     if controls.get("should_pass") != "passed" or controls.get("should_fail") != "failed":
+USER         return INSTRUMENT_FAILED
+USER     if parsed.get("verdict") not in _VERDICTS:
+USER         return EVALUATOR_FAILED
+USER     violations = parsed.get("violations")
+USER     if not isinstance(violations, list):
+USER         return EVALUATOR_FAILED
+USER     for item in violations:
+USER         if not isinstance(item, dict) or item.get("class") not in _CLASSES:
+USER             return EVALUATOR_FAILED
+USER     return None
+USER 
+USER 
+USER def _parsed(rows):
+USER     return [row["parsed"] for row in rows if row.get("parsed")]
+USER 
+USER 
+USER def _split(rows) -> bool:
+USER     if len(rows) < 2:
+USER         return False
+USER     first = rows[0]
+USER     for other in rows[1:]:
+USER         if other.get("verdict") != first.get("verdict"):
+USER             return True
+USER         a = {item["name"]: item["score"] for item in first["dimensions"]}
+USER         b = {item["name"]: item["score"] for item in other["dimensions"]}
+USER         if a != b:
+USER             return True
+USER     return False
+USER 
+USER 
+USER def _class_fired(rows, classes) -> str | None:
+USER     listed = set(classes or [])
+USER     for row in rows:
+USER         for item in row.get("violations") or []:
+USER             if item.get("class") in listed:
+USER                 return item["class"]
+USER     return None
+USER 
+USER 
+USER def _pass_rule(scores, bounds):
+USER     values = list(scores.values())
+USER     mean = sum(values) / len(values)
+USER     low = min(values)
+USER     if mean >= bounds["T_accept"] and low >= bounds["T_dim"]:
+USER         return ACCEPTED
+USER     if low < bounds["T_reject"]:
+USER         return REJECTED
+USER     return "regenerate"
+USER 
+USER 
+USER def _mismatch(verdict, scores, bounds, fired) -> bool:
+USER     if fired:
+USER         return verdict != "needs_owner"
+USER     applied = _pass_rule(scores, bounds)
+USER     expected = {"accepted": "accept", "rejected": "reject", "regenerate": "regenerate"}[applied]
+USER     return verdict != expected
+USER 
+USER 
+USER def _better(new, old) -> bool:
+USER     if set(new) != set(old):
+USER         return False
+USER     improved = any(new[name] > old[name] for name in old)
+USER     worse = any(new[name] < old[name] for name in old)
+USER     return improved and not worse
+USER 
+USER 
+USER def _held_out(text, paths) -> bool:
+USER     """True if a held-out file's sha256 or one of its lines is in ``text``.
+USER 
+USER     A path that cannot be opened and read raises ``OSError`` naming the path
+USER     and the OS error: the check was not made, so it is neither "no leak" nor
+USER     a leak. A line with no alphanumeric character (``{``, ``},``) is not
+USER     evidence; every other line is, however short.
+USER     """
+USER     for path in paths:
+USER         try:
+USER             data = open(path, "rb").read()
+USER         except OSError as exc:
+USER             raise OSError("held-out path %s cannot be read: %s" % (path, exc)) from exc
+USER         if hashlib.sha256(data).hexdigest() in text:
+USER             return True
+USER         for line in data.decode("utf-8", "replace").splitlines():
+USER             if any(ch.isalnum() for ch in line) and line in text:
+USER                 return True
+USER     return False
+USER 
+USER 
+USER def _take_cost(path):
+USER     try:
+USER         body = json.load(open(path))
+USER     except (OSError, json.JSONDecodeError):
+USER         return None
+USER     amount = body.get("amount") if isinstance(body, dict) else None
+USER     if not _number(amount):
+USER         return None
+USER     return float(amount)
+USER 
+USER 
+USER def _editable_dir(record_dir, number):
+USER     return os.path.join(record_dir, "round-%02d" % number, "editable")
+USER 
+USER 
+USER def _snapshot_editable(root, editable, dest):
+USER     os.makedirs(dest, exist_ok=True)
+USER     for rel in editable:
+USER         if os.path.isabs(rel):
+USER             continue
+USER         src = os.path.join(root, rel)
+USER         if not os.path.lexists(src):
+USER             continue
+USER         if not _inside(os.path.realpath(src), root):
+USER             continue
+USER         target = os.path.join(dest, rel)
+USER         if os.path.isdir(src):
+USER             shutil.copytree(src, target, dirs_exist_ok=True, symlinks=True)
+USER         elif os.path.isfile(src):
+USER             parent = os.path.dirname(target)
+USER             if parent:
+USER                 os.makedirs(parent, exist_ok=True)
+USER             shutil.copy2(src, target)
+USER 
+USER 
+USER def _clear(path):
+USER     if os.path.islink(path) or os.path.isfile(path):
+USER         os.remove(path)
+USER     elif os.path.isdir(path):
+USER         shutil.rmtree(path)
+USER 
+USER 
+USER def _restore(root, editable, snap):
+USER     for rel in editable:
+USER         if os.path.isabs(rel):
+USER             continue
+USER         live = os.path.join(root, rel)
+USER         saved = os.path.join(snap, rel)
+USER         if not os.path.lexists(saved):
+USER             _clear(live)
+USER             continue
+USER         _clear(live)
+USER         if os.path.isdir(saved) and not os.path.islink(saved):
+USER             shutil.copytree(saved, live, symlinks=True)
+USER         elif os.path.isfile(saved):
+USER             parent = os.path.dirname(live)
+USER             if parent:
+USER                 os.makedirs(parent, exist_ok=True)
+USER             shutil.copy2(saved, live)
+USER 
+USER 
+USER def _write_round(
+USER     record_dir, number, result, findings_sha, held, evaluator_rows, reading, pass_rule, mismatch, best_round,
+USER     cost, stop, started_at, ended_at,
+USER ):
+USER     path = os.path.join(record_dir, "round-%02d.json" % number)
+USER     _dump(path, {
+USER         "round": number,
+USER         "run": result,
+USER         "findings_sha256": findings_sha or conductor_software.NOT_RECORDED,
+USER         "held_out": held,
+USER         "evaluator": evaluator_rows or [],
+USER         "reading": reading,
+USER         "pass_rule": pass_rule,
+USER         "verdict_mismatch": bool(mismatch),
+USER         "best_round": best_round,
+USER         "cost": cost,
+USER         "stop": stop,
+USER         "started_at": started_at,
+USER         "ended_at": ended_at,
+USER     })
+USER 
+USER 
+USER def _dump(path, body):
+USER     os.makedirs(os.path.dirname(path), exist_ok=True)
+USER     with open(path, "w", encoding="utf-8") as handle:
+USER         json.dump(body, handle, indent=2, sort_keys=True)
+USER         handle.write("\n")
+USER 
+USER 
+USER def _sha_file(path) -> str:
+USER     with open(path, "rb") as handle:
+USER         return hashlib.sha256(handle.read()).hexdigest()
+USER 
+USER 
+USER def _tree_sha(path) -> str:
+USER     digest = hashlib.sha256()
+USER     if not os.path.exists(path):
+USER         return digest.hexdigest()
+USER     for dirpath, dirnames, filenames in os.walk(path):
+USER         dirnames[:] = sorted(dirnames)
+USER         for name in sorted(filenames):
+USER             full = os.path.join(dirpath, name)
+USER             rel = os.path.relpath(full, path).replace(os.sep, "/")
+USER             digest.update(rel.encode("utf-8"))
+USER             with open(full, "rb") as handle:
+USER                 digest.update(handle.read())
+USER     return digest.hexdigest()
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER The frozen bar is tests/test_loop_freeze_conditional.py. Run it:
+USER 
+USER     python3 tests/test_loop_freeze_conditional.py
+USER 
+USER It is red: Ran 4 tests, FAILED (failures=1, errors=2).
+USER 
+USER   ERROR  test_no_custody_inputs_and_no_convention_bar_skips_freeze
+USER          freeze_bar(record, work) raises RuntimeError: no bar file at .../custody/bar.md;
+USER          cannot freeze before dispatch. A caller that prepares no custody inputs must not be refused.
+USER   ERROR  test_declared_bar_file_is_frozen
+USER          freeze_bar ignores record_dir/inputs/custody.json's bar.file and looks only at the
+USER          convention path.
+USER   FAIL   test_declared_bar_missing_fails_closed
+USER          AssertionError: 'missing.md' not found in 'no bar file at .../custody/bar.md; ...'
+USER          A declared bar that is missing must fail closed NAMING the declared path.
+USER   ok     test_convention_bar_still_freezes — the convention path already works and must keep working.
+USER 
+USER Your editable file is kit/conductor_loop.py — and only that file. The bar is your read-only
+USER reference: read it and implement what its tests demand. Plant nothing in it.
+USER 
+USER The rule the bar encodes: freeze_bar reads the declared bar from record_dir/inputs/custody.json's
+USER bar.file first, falls back to <cwd>/custody/bar.md, fails closed when a bar it was told about is
+USER missing, and skips the freeze entirely for a caller that prepared no custody inputs. The ledger
+USER still stamps the freeze; this function types no time.
+USER 
+USER Rule 12 applies: the red above is what the bar reports, and the bar is the standard.
+USER 
+USER Do not edit tests/, schemas/, tools/, kit/custody_ledger.py, or any other kit/ file.
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ```python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ```
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+USER The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-11-08T13:41:41
+ASSISTANT Reading the bar, the demanded behavior is entirely inside `freeze_bar`: pick `bar.file` from `record_dir/inputs/custody.json` first, fall back to `<cwd>/custody/bar.md`, raise (naming the declared path) when a declared bar is missing, and return silently when neither signal exists. I'll also update the two docstrings that describe the old unconditional convention-only freeze. `loop()`'s call site and the emitter seam stay untouched.
+ASSISTANT 
+ASSISTANT kit/conductor_loop.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT Before any Maker turn, ``loop()`` freezes the bar in the ledger. It does so
+ASSISTANT right after the packet is loaded and validated and before the first Maker
+ASSISTANT dispatch: it copies ``<cwd>/custody/bar.md`` into the job directory unchanged
+ASSISTANT and runs ``kit/custody_ledger.py freeze`` against the job directory, so the
+ASSISTANT tool stamps its own clock and appends the event to
+ASSISTANT ``inputs/custody-events.jsonl``. ``loop()`` types no ``frozenAt`` value. If the
+ASSISTANT bar cannot be read, or the tool refuses, ``loop()`` raises before the Maker
+ASSISTANT command runs and never calls the emitter.
+ASSISTANT =======
+ASSISTANT Before any Maker turn, ``loop()`` freezes the bar in the ledger, but only when
+ASSISTANT the job has signalled that it is custody-bearing. It does so right after the
+ASSISTANT packet is loaded and validated and before the first Maker dispatch: the bar is
+ASSISTANT ``bar.file`` from ``<job>/inputs/custody.json``, read from the same relative
+ASSISTANT path under the workspace, or, when nothing is declared, the convention file
+ASSISTANT ``<cwd>/custody/bar.md``. It copies that bar into the job directory unchanged
+ASSISTANT and runs ``kit/custody_ledger.py freeze`` against the job directory, so the
+ASSISTANT tool stamps its own clock and appends the event to
+ASSISTANT ``inputs/custody-events.jsonl``. ``loop()`` types no ``frozenAt`` value. A job
+ASSISTANT that prepared neither signal is not refused: nothing is frozen. If a declared
+ASSISTANT bar cannot be read, or the tool refuses, ``loop()`` raises before the Maker
+ASSISTANT command runs and never calls the emitter.
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT kit/conductor_loop.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def freeze_bar(record_dir, root):
+ASSISTANT     """Freeze the bar in the ledger, live, before the Maker is dispatched.
+ASSISTANT 
+ASSISTANT     The bar is ``<cwd>/custody/bar.md``. The ledger tool names a bar relative to
+ASSISTANT     the job directory, so the bar's bytes are copied there unchanged and the
+ASSISTANT     tool is pointed at that copy. The tool stamps the freeze from its own clock
+ASSISTANT     and appends the event to ``inputs/custody-events.jsonl``; this module types
+ASSISTANT     no time. If the bar cannot be read, or the tool refuses, this raises before
+ASSISTANT     the Maker command runs: no Maker call and no ``emit_custody.py`` run.
+ASSISTANT     """
+ASSISTANT     source = os.path.join(root, "custody", "bar.md")
+ASSISTANT     if not os.path.isfile(source):
+ASSISTANT         raise RuntimeError("no bar file at %s; cannot freeze before dispatch" % source)
+ASSISTANT     job = os.path.abspath(str(record_dir))
+ASSISTANT     rel = "custody/bar.md"
+ASSISTANT     dest = os.path.join(job, rel)
+ASSISTANT     os.makedirs(os.path.dirname(dest), exist_ok=True)
+ASSISTANT     shutil.copyfile(source, dest)
+ASSISTANT     ledger = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custody_ledger.py")
+ASSISTANT     proc = subprocess.run(
+ASSISTANT         [sys.executable, ledger, "freeze", "--job-dir", job, "--bar", rel],
+ASSISTANT         capture_output=True,
+ASSISTANT         text=True,
+ASSISTANT     )
+ASSISTANT     if proc.returncode != 0:
+ASSISTANT         detail = (proc.stderr or proc.stdout or "").strip() or "exit %s" % proc.returncode
+ASSISTANT         raise RuntimeError("the bar could not be frozen in %s: %s" % (job, detail))
+ASSISTANT =======
+ASSISTANT def freeze_bar(record_dir, root):
+ASSISTANT     """Freeze the bar in the ledger, live, before the Maker is dispatched.
+ASSISTANT 
+ASSISTANT     The bar is the one the job declares: ``bar.file`` in
+ASSISTANT     ``record_dir/inputs/custody.json``, taken from the same relative path under
+ASSISTANT     ``root``; when nothing is declared, the convention file
+ASSISTANT     ``<root>/custody/bar.md``. The ledger tool names a bar relative to the job
+ASSISTANT     directory, so the bar's bytes are copied there unchanged and the tool is
+ASSISTANT     pointed at that copy. The tool stamps the freeze from its own clock and
+ASSISTANT     appends the event to ``inputs/custody-events.jsonl``; this module types no
+ASSISTANT     time.
+ASSISTANT 
+ASSISTANT     A declared bar that cannot be read fails closed: this raises, naming the
+ASSISTANT     declared path, before the Maker command runs — no Maker call and no
+ASSISTANT     ``emit_custody.py`` run. A caller that prepared no custody inputs declares
+ASSISTANT     no bar and has no convention bar to freeze; it is not refused, nothing is
+ASSISTANT     frozen and nothing is written.
+ASSISTANT     """
+ASSISTANT     job = os.path.abspath(str(record_dir))
+ASSISTANT     rel = _declared_bar(job)
+ASSISTANT     if rel is None:
+ASSISTANT         if not os.path.isfile(os.path.join(root, "custody", "bar.md")):
+ASSISTANT             return
+ASSISTANT         rel = "custody/bar.md"
+ASSISTANT     source = os.path.join(root, rel)
+ASSISTANT     if os.path.isabs(rel) or not os.path.isfile(source):
+ASSISTANT         raise RuntimeError("no bar file at %s; cannot freeze before dispatch" % source)
+ASSISTANT     dest = os.path.join(job, rel)
+ASSISTANT     if not _inside(os.path.realpath(dest), os.path.realpath(job)):
+ASSISTANT         raise RuntimeError("declared bar %s is outside the job directory; cannot freeze" % rel)
+ASSISTANT     os.makedirs(os.path.dirname(dest), exist_ok=True)
+ASSISTANT     shutil.copyfile(source, dest)
+ASSISTANT     ledger = os.path.join(os.path.dirname(os.path.abspath(__file__)), "custody_ledger.py")
+ASSISTANT     proc = subprocess.run(
+ASSISTANT         [sys.executable, ledger, "freeze", "--job-dir", job, "--bar", rel],
+ASSISTANT         capture_output=True,
+ASSISTANT         text=True,
+ASSISTANT     )
+ASSISTANT     if proc.returncode != 0:
+ASSISTANT         detail = (proc.stderr or proc.stdout or "").strip() or "exit %s" % proc.returncode
+ASSISTANT         raise RuntimeError("the bar could not be frozen in %s: %s" % (job, detail))
+ASSISTANT 
+ASSISTANT 
+ASSISTANT def _declared_bar(job):
+ASSISTANT     """``bar.file`` from ``<job>/inputs/custody.json``, or None if not declared.
+ASSISTANT 
+ASSISTANT     A missing, unreadable or malformed file declares nothing, so the caller may
+ASSISTANT     still fall back to the convention bar. A named bar is returned as written:
+ASSISTANT     a path that cannot be read is then named in the failure, which is what the
+ASSISTANT     fail-closed rule requires.
+ASSISTANT     """
+ASSISTANT     path = os.path.join(job, "inputs", "custody.json")
+ASSISTANT     if not os.path.isfile(path):
+ASSISTANT         return None
+ASSISTANT     try:
+ASSISTANT         with open(path, encoding="utf-8") as handle:
+ASSISTANT             body = json.load(handle)
+ASSISTANT     except (OSError, ValueError):
+ASSISTANT         return None
+ASSISTANT     bar = body.get("bar") if isinstance(body, dict) else None
+ASSISTANT     rel = bar.get("file") if isinstance(bar, dict) else None
+ASSISTANT     if not isinstance(rel, str) or not rel.strip():
+ASSISTANT         return None
+ASSISTANT     return rel
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```

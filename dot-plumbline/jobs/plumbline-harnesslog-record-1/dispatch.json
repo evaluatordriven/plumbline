@@ -1,0 +1,6 @@
+{
+  "files": ["kit/evaluator_harness_log.py", "kit/emit_custody.py"],
+  "read": ["tests/test_evaluator_harness_log.py", "tools/edi/or_call.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-harnesslog-record-1/message.md"
+}

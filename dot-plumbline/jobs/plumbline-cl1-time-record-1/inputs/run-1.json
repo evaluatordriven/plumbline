@@ -1,0 +1,14 @@
+{
+  "iteration": 1,
+  "passes": [
+    {
+      "pass_id": "no_untimeable_times",
+      "evidence": [
+        {
+          "dimension": "no_untimeable_times",
+          "quote": "The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b\u2026, Ran 6 tests OK) passes after a 13-insertion, 0-deletion change to kit/emit_packet.py that reports typed bar.approvals[].at and disposition.at as gaps naming the ledger approve/dispose acts as the time source; "
+        }
+      ]
+    }
+  ]
+}

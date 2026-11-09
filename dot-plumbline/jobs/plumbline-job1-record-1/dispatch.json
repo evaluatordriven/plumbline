@@ -1,0 +1,1 @@
+{"message": "/home/jarbis1/tmp/plumbline-job1-record-1/message.md", "files": ["tests/test_loop_custody_on_finish.py", "tests/test_loop_custody_sources.py"], "read": ["tests/test_job1_fixture_pin.py"], "edit_format": "diff"}

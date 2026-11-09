@@ -1,0 +1,204 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "evidence_dir": "custody/evidence",
+  "subject": [
+    "kit/emit_custody.py",
+    "kit/evaluator_harness_log.py"
+  ],
+  "levelClaimed": "CL1",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "bar": {
+    "file": "tests/test_evaluator_harness_log.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "dimensions": [
+      {
+        "id": "evaluator_harness_log",
+        "criterion": "an evaluator call writes a harness log entry per call with sent/received times, model and endpoint; the custody record takes its check times from that log and names it; a missing, reversed, partial or unparseable log refuses and names the entry; a deterministic evaluator with no log is not refused",
+        "scale": {
+          "type": "pass_fail",
+          "threshold": 1
+        }
+      }
+    ],
+    "frozenAt": "2026-11-08T22:22:10Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T22:22:10Z",
+        "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T22:22:10Z",
+        "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5"
+      }
+    ]
+  },
+  "instrument": {
+    "rubric_file": "tests/test_evaluator_harness_log.py",
+    "runner_file": "custody/files/kit/emit_custody.py"
+  },
+  "maker": {
+    "role": "maker",
+    "name": "plumbline-maker",
+    "kind": "model",
+    "method": "aider, diff edit format, non-streaming",
+    "version": "aider via /home/jarbis1/.venvs/aider",
+    "method_file": "dispatch.json",
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek-flash",
+      "endpoint": "api.deepseek.com",
+      "readOnly": false
+    },
+    "harness_log": "evidence/harness-maker.log",
+    "call_count": 1,
+    "cost_usd": 0.0
+  },
+  "evaluators": [
+    {
+      "id": "evaluator",
+      "who": "plumbline-eval",
+      "name": "plumbline-eval",
+      "kind": "model",
+      "harness_log": "custody/evidence/harness-evaluator.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "endpoint": "api.z.ai",
+        "readOnly": true
+      },
+      "runs": 3
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "evaluator",
+      "evidence_file": "harness-evaluator.log"
+    }
+  ],
+  "retention": {
+    "where": "/home/jarbis1/tmp/plumbline-harnesslog-record-1"
+  },
+  "disposition": {
+    "state": "not_yet_given",
+    "by": "Steve Moitozo II"
+  },
+  "seats": {
+    "statement": "One party, Steve Moitozo II, holds three seats on this job: Owner, Specialist and Buyer. A multiple-hat situation, not a role merge (Contracts \u00a74 permits one party to hold several, recorded as such). The Owner's words: \"it's not a role merge, it's a multiple hat situation. I am Owner, Specialist, and Buyer.\"",
+    "bar_authored_by": "moonshotai/kimi-k2.7-code (OpenRouter)",
+    "judged_by": "plumbline-eval (the Evaluator)"
+  },
+  "size": "M",
+  "cap": {
+    "generations_used": 1,
+    "cap": 3
+  },
+  "loop_sha_unchanged": "f5e5434 (main) at cut; the job changes no loop code",
+  "x-plumbline": {
+    "known_condition": {
+      "statement": "A bar that shells out to the emitter is green only on a committed tree. A dirty tree makes the Maker's own work unmeasurable and the failures read as capability failures.",
+      "measured": "measured 2026-11-08 on this job: after the one-generation Maker run, D4 (record_check_time_comes_from_the_log) and D5 (record_names_the_log_path) reported red with 'the emitter's tree is dirty ... a record must name code that exists as a commit' -- not a capability failure. Committed, the same bar was 12/12.",
+      "recurrence": "This WILL recur on every emitter-facing job.",
+      "rule_for_the_next_job": "Before measuring any emitter-facing bar, make the tree clean: commit the Maker's work as an explicit Orchestrator commit whose message says so, or measure in a throwaway clone. Never report a dirty-tree refusal as a capability failure.",
+      "where_it_lives": "RECORD-LEVEL ONLY. It is NOT in the repo. AGENTS.md is a protected agent-instruction file and the write was refused without owner approval; schemas/instance-extensions.json holds no known-conditions block. Until the Owner approves an AGENTS.md edit, this record is the only home for the condition."
+    },
+    "orchestrator_commit": {
+      "sha": "efb36bb",
+      "what": "an Orchestrator commit of the MAKER's work, made to measure. The Orchestrator authored no code. The commit message says 'WIP: evaluator harness log, found by the Orchestrator on measuring a dirty tree' so no reader mistakes it for Maker authorship.",
+      "why": "the emitter refuses to write a record on a dirty tree, so the bar could not be measured uncommitted"
+    },
+    "maker_surface": {
+      "editable": [
+        "kit/emit_custody.py",
+        "kit/evaluator_harness_log.py"
+      ],
+      "files_in_dispatch": [
+        "kit/evaluator_harness_log.py",
+        "kit/emit_custody.py"
+      ],
+      "deployment_step_declared": true,
+      "deployment_step_files": [
+        "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+      ],
+      "deployment_step_performed": false,
+      "measured": "git diff: kit/emit_custody.py +29/-5 with 11 harness_log references; new kit/evaluator_harness_log.py 118 lines, HarnessLogError carrying the offending call, parse_instant, read(path), source(). No test file edited. tools/edi/or_call.py untouched -- it already wrote sent_at/received_at as a JSON list (or_call.py:553-559, 577; append_entry 255-271)."
+    },
+    "bar_limit": {
+      "pinned_by": "D12, in the bar's own words",
+      "statement": "that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right. Nothing here certifies the clock."
+    },
+    "closure_finding": {
+      "what_was_proven": "the harness-log capability itself: tests/test_evaluator_harness_log.py 12/12, frozen 46159f05..., approved twice in the Owner's name at 2026-11-08T22:22:10Z, three passes [1,1,1] on Z.AI, record 0a355bee... clean; and defect A, the sibling import in kit/emit_custody.py",
+      "what_was_not": "the repository suite cannot be made green by fixture attribution. Three conditions stack -- the harness-log refusal (D6/D7), the ledger-writer requirement (writer_source returns ledger-no-writer for an unattributed line), and job-rejected's own disposition shape -- and each fix exposed the next. Measured at close: 127/134 PASSED, 7 FAILED.",
+      "fixture_shape": "job-rejected cannot simultaneously serve the emitting cases and the refusal cases. It carries one harness-eval-a.log with an unstamped entry, one dispose line, and one ledger whose lines must declare a writer; those requirements pull in different directions for the same fixture.",
+      "pr_state": "PR 22 open and UNMERGED, branch feat/evaluator-harness-log at 09c2072. CI red 4/4 (test 3.11, 3.12, 3.13, corpus) at efb36bb; not re-read after later commits. Not merged because merging would ship a red suite.",
+      "why_needs_owner_not_rejected": "the work is good and the road is blocked by fixture archaeology. Rejected would say the artifact failed the standard; it passed the standard. The thing that failed is the repository's own test fixtures keeping up with a contract the Owner approved.",
+      "follow_ups_named_not_started": [
+        {
+          "name": "corpus re-pin",
+          "why": "the corpus on disk moved to 3ea9e3fc0f812e5b",
+          "failing_checks": [
+            "alignment \u00b7 the pin still matches the corpus on disk",
+            "alignment \u00b7 the vendored schemas and fixture battery are the corpus's bytes"
+          ]
+        },
+        {
+          "name": "job-rejected fixture shape",
+          "why": "split the fixture into fixtures that each represent a legal job, or separate the checks by what they measure"
+        },
+        {
+          "name": "emitter preflight + loop commit step",
+          "why": "a --check-revision preflight the bars call first, the refusal naming its remedy, and conductor_loop.py owning the commit of the Maker's output as a recorded step"
+        }
+      ]
+    }
+  },
+  "passes": {
+    "evaluator_harness_log#p1": {
+      "evaluator": "evaluator",
+      "call": "evaluator_harness_log#p1",
+      "run": 1,
+      "batch": "b1",
+      "failureCondition": {
+        "evaluator_harness_log": "a missing, reversed, partial or unparseable log is noted instead of refused, or the check times do not come from the log"
+      },
+      "evidence": {
+        "evaluator_harness_log": "verdict-evaluator_harness_log-p1.json"
+      }
+    }
+  },
+  "controls": [
+    {
+      "id": "K1",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/files/kit/evaluator_harness_log.py",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/verdict-evaluator_harness_log-p1.json",
+      "call": "evaluator_harness_log#p1"
+    },
+    {
+      "id": "K2",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/cases/K2-no-module.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/verdict-evaluator_harness_log-p1.json",
+      "call": "evaluator_harness_log#p1"
+    }
+  ]
+}

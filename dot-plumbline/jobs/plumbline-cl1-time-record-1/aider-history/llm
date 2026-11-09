@@ -1,0 +1,858 @@
+TO LLM 2026-11-08T03:52:08
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Always use best practices when coding.
+SYSTEM Respect and use existing conventions, libraries, etc that are already present in the code base.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 
+SYSTEM 1. Decide if you need to propose *SEARCH/REPLACE* edits to any files that haven't been added to the chat. You can create new files without asking!
+SYSTEM 
+SYSTEM But if you need to propose edits to existing files not already added to the chat, you *MUST* tell the user their full path names and ask them to *add the files to the chat*.
+SYSTEM End your reply and wait for their approval.
+SYSTEM You can keep asking if you then decide you need to edit more files.
+SYSTEM 
+SYSTEM 2. Think step-by-step and explain the needed changes in a few short sentences.
+SYSTEM 
+SYSTEM 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM 
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM Keep in mind these details about the user's platform and environment:
+SYSTEM - Platform: Linux-7.0.0-38-generic-x86_64-with-glibc2.43
+SYSTEM - Shell: SHELL=/bin/bash
+SYSTEM - Language: English
+SYSTEM - Current date: 2026-11-08
+SYSTEM - The user is operating inside a git repository
+SYSTEM 
+SYSTEM 
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ```python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ```
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+SYSTEM The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER tests/test_packet_cl1_time_source.py
+USER ```
+USER """Bar: no CL1 approval or disposition time in the packet that is not stamped by the ledger.
+USER 
+USER Owner ruling, binding this job:
+USER   "no approval time without the act that stamps it."
+USER 
+USER A CL1 custody record needs:
+USER   - bar.approvals[].at — the moment the Buyer or Specialist approved the bar.
+USER   - disposition.at    — the moment the Owner/human seat disposed of the record.
+USER 
+USER Both times come from a live custody_ledger.py event:
+USER   - `custody_ledger.py approve --role buyer|specialist` writes `at` when the approval happens.
+USER   - `custody_ledger.py dispose --by "..."` writes `at` when the disposition happens.
+USER 
+USER The packet is written BEFORE those acts.  Therefore the packet may describe an approval
+USER (role, by, optional barDigest) and a disposition (by, state), but it must not carry a
+USER literal `at`.  A typed `at` is a hand time, and the only source that can time it is the
+USER ledger that has not happened yet.
+USER 
+USER Where the check lives:
+USER   - kit/emit_packet.py, in the CL1 source gate.  This is the last place a typed time can
+USER     be stopped before it becomes part of the job's terms.
+USER   - custody_ledger.py already stamps `at` when it runs; it is the act, not a second checker.
+USER   - kit/emit_custody.py (via custody_history.py) already refuses hand times downstream;
+USER     this gate is the upstream backstop.
+USER 
+USER Rubric:
+USER   Dimension:  untimeable time fields in a CL1 packet (bar.approvals[].at and disposition.at)
+USER   Scale:      count of such fields present in the packet
+USER   Threshold:  0 — any typed time refuses the packet
+USER 
+USER Failing cases:
+USER   - A CL1 packet whose bar.approvals[0].at is a literal RFC 3339 UTC string.
+USER   - A CL1 packet whose disposition.at is a literal RFC 3339 UTC string.
+USER 
+USER Passing cases:
+USER   - A CL1 approval with role and by but no at (the ledger will stamp it later).
+USER   - A CL1 disposition with by and state but no at (the ledger will stamp it later).
+USER   - A baseline packet is not held to this bar, even if it carries literal times.
+USER 
+USER The ledger-stamped fixture is represented by an approval or disposition that leaves the
+USER `at` field absent from the packet; the real time arrives from inputs/custody-events.jsonl.
+USER """
+USER from __future__ import annotations
+USER 
+USER import json
+USER import subprocess
+USER import sys
+USER import tempfile
+USER import unittest
+USER from pathlib import Path
+USER 
+USER HERE = Path(__file__).resolve().parent
+USER REPO = HERE.parent
+USER sys.path.insert(0, str(REPO))
+USER 
+USER from kit.emit_packet import cl1_source_gaps  # noqa: E402
+USER 
+USER 
+USER def _min_valid_cl1() -> dict:
+USER     """A CL1 packet whose approvals and disposition leave the time for the ledger."""
+USER     return {
+USER         "job_id": "cl1-time-source",
+USER         "job_name": "Valid CL1 packet (time left to ledger)",
+USER         "entry": "A",
+USER         "instrument_profile": "full",
+USER         "mode": "scored",
+USER         "ratified": True,
+USER         "artifact": {"repo": "x", "paths": []},
+USER         "buyer": "Fixture Buyer",
+USER         "specialist": "Fixture Specialist",
+USER         "human_seat": "Fixture Owner",
+USER         "maker": {"name": "Fixture Maker"},
+USER         "evaluator": {"name": "Fixture Evaluator", "kind": "model"},
+USER         "standard_ref": {"doc": "x", "version": "v1"},
+USER         "mandate_ref": {"doc": "EDI-MANDATE.md", "version": "a48a4645"},
+USER         "bounds": {
+USER             "T_accept": 1,
+USER             "T_dim": 1,
+USER             "T_reject": 0,
+USER             "cap": 3,
+USER             "budget": {"amount": 10, "unit": "USD"},
+USER         },
+USER         "k": 3,
+USER         "x": 10,
+USER         "ground_truth": [{"source": "x", "version": "v1", "hardness": "INVARIANT"}],
+USER         "escalation": {"route": "Owner"},
+USER         "constitution_ref": "dot-plumbline/constitution.json",
+USER         "constitution_version": "0.1.0",
+USER         "proposed": {
+USER             "level_claimed_for_own_record": "CL1",
+USER             "drafted_by": "Fixture Architect",
+USER         },
+USER         "bar": {
+USER             "approvals": [
+USER                 {"role": "buyer", "by": "Fixture Buyer", "barDigest": "a" * 64},
+USER                 {"role": "specialist", "by": "Fixture Specialist", "barDigest": "a" * 64},
+USER             ]
+USER         },
+USER         "controls": [
+USER             {"id": "K1", "batch": "b1", "evaluator": "eval-a", "expected": "conforms"},
+USER             {"id": "K2", "batch": "b1", "evaluator": "eval-a", "expected": "does_not_conform"},
+USER         ],
+USER         "disposition": {"state": "not_yet_given", "by": "Fixture Owner"},
+USER     }
+USER 
+USER 
+USER class TestPacketCL1TimeSource(unittest.TestCase):
+USER     """CL1 packets must leave approval and disposition times to the ledger."""
+USER 
+USER     def _reasons(self, packet: dict) -> str:
+USER         return " ".join(cl1_source_gaps(packet)).lower()
+USER 
+USER     def test_cl1_typed_approval_at_is_refused(self):
+USER         """A hand-typed bar.approvals[].at has no ledger act behind it."""
+USER         packet = _min_valid_cl1()
+USER         packet["bar"]["approvals"][0]["at"] = "2026-11-08T02:00:00Z"
+USER         reasons = self._reasons(packet)
+USER         self.assertIn("bar.approvals[0].at", reasons)
+USER         self.assertIn("stamped", reasons.lower())
+USER 
+USER     def test_cl1_typed_disposition_at_is_refused(self):
+USER         """A hand-typed disposition.at has no dispose act behind it."""
+USER         packet = _min_valid_cl1()
+USER         packet["disposition"]["at"] = "2026-11-08T02:00:00Z"
+USER         reasons = self._reasons(packet)
+USER         self.assertIn("disposition.at", reasons)
+USER 
+USER     def test_cl1_approval_without_at_passes(self):
+USER         """The ledger-stamped shape: time absent in the packet, to be stamped by approve."""
+USER         packet = _min_valid_cl1()
+USER         reasons = self._reasons(packet)
+USER         self.assertNotIn("bar.approvals[0].at", reasons)
+USER         self.assertNotIn("bar.approvals[1].at", reasons)
+USER 
+USER     def test_cl1_disposition_without_at_passes(self):
+USER         """The ledger-stamped shape: time absent in the packet, to be stamped by dispose."""
+USER         packet = _min_valid_cl1()
+USER         reasons = self._reasons(packet)
+USER         self.assertNotIn("disposition.at", reasons)
+USER 
+USER     def test_baseline_level_ignores_typed_times(self):
+USER         """A baseline claim is not CL1, so this gate does not apply."""
+USER         packet = _min_valid_cl1()
+USER         packet["proposed"]["level_claimed_for_own_record"] = "baseline"
+USER         packet["bar"]["approvals"][0]["at"] = "2026-11-08T02:00:00Z"
+USER         packet["disposition"]["at"] = "2026-11-08T02:00:00Z"
+USER         gaps = cl1_source_gaps(packet)
+USER         self.assertEqual(gaps, [])
+USER 
+USER     def test_custody_ledger_approve_stamps_its_own_time(self):
+USER         """The ledger-stamped fixture: approve ignores any typed at and writes the tool clock.
+USER 
+USER         This proves the source-of-truth path the packet must defer to.
+USER         """
+USER         with tempfile.TemporaryDirectory() as td:
+USER             job = Path(td)
+USER             (job / "inputs").mkdir(parents=True, exist_ok=True)
+USER             bar = job / "custody" / "bar.md"
+USER             bar.parent.mkdir(parents=True, exist_ok=True)
+USER             bar.write_text("# bar\n", encoding="utf-8")
+USER             custody = {
+USER                 "custody_inputs": "plumbline/custody-inputs/v1",
+USER                 "orchestrator": {"name": "Fixture Orchestrator", "kind": "agent"},
+USER                 "bar": {"file": "custody/bar.md"},
+USER             }
+USER             (job / "inputs" / "custody.json").write_text(json.dumps(custody, indent=2), encoding="utf-8")
+USER 
+USER             before_freeze = subprocess.run(
+USER                 [sys.executable, str(REPO / "kit" / "custody_ledger.py"), "approve",
+USER                  "--job-dir", str(job), "--role", "buyer", "--by", "Fixture Buyer"],
+USER                 capture_output=True, text=True,
+USER             )
+USER             self.assertEqual(before_freeze.returncode, 2, "approve before freeze must be refused")
+USER 
+USER             freeze = subprocess.run(
+USER                 [sys.executable, str(REPO / "kit" / "custody_ledger.py"), "freeze",
+USER                  "--job-dir", str(job), "--bar", "custody/bar.md"],
+USER                 capture_output=True, text=True,
+USER             )
+USER             self.assertEqual(freeze.returncode, 0, freeze.stderr)
+USER 
+USER             approve = subprocess.run(
+USER                 [sys.executable, str(REPO / "kit" / "custody_ledger.py"), "approve",
+USER                  "--job-dir", str(job), "--role", "buyer", "--by", "Fixture Buyer"],
+USER                 capture_output=True, text=True,
+USER             )
+USER             self.assertEqual(approve.returncode, 0, approve.stderr)
+USER             events = (job / "inputs" / "custody-events.jsonl").read_text(encoding="utf-8").strip().splitlines()
+USER             approve_event = next((json.loads(e) for e in events if json.loads(e).get("event") == "approve"), {})
+USER             self.assertIn("at", approve_event)
+USER             self.assertRegex(approve_event["at"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/derive.py:
+USER ⋮
+USER │def parse_iso(s) -> datetime | None:
+USER ⋮
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/ncheck.py:
+USER ⋮
+USER │def resolve(job: Path, f: str) -> Path | None:
+USER ⋮
+USER 
+USER examples/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/lib.py:
+USER ⋮
+USER │def hand_lines(res: dict) -> list:
+USER ⋮
+USER │def job_paths(job) -> dict:
+USER ⋮
+USER │def get(obj, path):
+USER ⋮
+USER 
+USER examples/subjects/2026-10-27-custody-emitter-gaps/kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER 
+USER examples/subjects/2026-10-28-custody-times-ledger-spend/kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER 
+USER examples/subjects/2026-10-28-custody-times-ledger-spend/kit/emit_custody.py:
+USER ⋮
+USER │def hexdigest(v, field: str, gaps: Gaps) -> dict | None:
+USER ⋮
+USER 
+USER kit/conductor_software.py:
+USER ⋮
+USER │def resolve(path: str, cwd: str | None = None) -> str:
+USER ⋮
+USER │def record_red(exit_code, output: bytes | None) -> dict:
+USER ⋮
+USER │def refuse_editable(editable: list[str], frozen: list[str]) -> bool:
+USER ⋮
+USER 
+USER kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER │def same_party(a, b) -> bool:
+USER ⋮
+USER 
+USER tools/build_schemas.py:
+USER ⋮
+USER │def sha256(path: Path) -> str:
+USER ⋮
+USER 
+USER tools/edi_corpus.py:
+USER ⋮
+USER │class CorpusUsageError(Exception):
+USER ⋮
+USER │def require_corpus() -> bool:
+USER ⋮
+USER │def hermes_config_path() -> Path:
+USER ⋮
+USER │def resolve(explicit: str | None = None, need: tuple[str, ...] = (), hermes: bool = True) -> Corpus
+USER ⋮
+USER │def usage_exit(msg: str) -> "None":
+USER ⋮
+USER │def no_corpus_reason(hermes: bool = True) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER kit/emit_packet.py
+USER ```
+USER #!/usr/bin/env python3
+USER """Emit a job packet — the machine-readable terms of a job — or emit nothing.
+USER 
+USER WHY THIS EXISTS. A job closed `needs_owner` with its terms in `packet.md`: prose, so the gate could not read a
+USER single field of it, and every downstream check that depends on those terms was reduced to reading English. The
+USER kit's first cross-machine reading found exactly this on four consecutive jobs. The shape existed the whole time
+USER (a ratified packet validated `OK (schema-verified)`); what was missing was anything that PRINTS it.
+USER 
+USER THE RULE IT FOLLOWS. It does not carry its own copy of the law. It reads the corpus schema's `required` list
+USER at runtime and checks presence against THAT, then mirrors the cross-rules a schema cannot express (scored vs
+USER readings prohibitions, entry B's reads, seat separation, the terminal/outcome map) — each naming the gate's own
+USER reason. Then it runs the corpus gate on its own output. A packet the gate cannot read is not a job's terms.
+USER 
+USER IT ADDS ONLY KEYS THE LAW DECLARES. The machine-supplied facts (the doctrine pin, the constitution reference)
+USER are stamped only where the corpus schema already declares the property — never as an extra key, because an
+USER unknown key is how a packet comes to fail `additionalProperties: false` and how an instance invents law.
+USER 
+USER     emit_packet.py --brief brief.json --out-dir <job dir> [--corpus PATH] [--print-only]
+USER 
+USER brief.json — the Buyer's and Architect's terms, as fields rather than paragraphs. Every key is the corpus's
+USER own name; run with --print-only to see what the schema requires of you.
+USER """
+USER from __future__ import annotations
+USER import argparse, json, os, subprocess, sys
+USER from pathlib import Path
+USER 
+USER TERMINALS = {"accepted", "needs_owner", "rejected"}
+USER OUTCOMES = {"accepted", "census", "needs_owner", "rejected", "no_observation", "no_artifact"}
+USER OUTCOME_MAP = {"accepted": "accepted", "census": "accepted", "needs_owner": "needs_owner",
+USER                "rejected": "rejected", "no_observation": "needs_owner", "no_artifact": "needs_owner"}
+USER BOUND_KEYS = ("T_accept", "T_dim", "T_reject", "cap", "budget")
+USER # The gate itself checks Owner-is-not-Evaluator. Maker-never-grades-its-own-work is §4's rule and the gate does
+USER # not read it, so it is checked here and NAMED as this instance's addition rather than the corpus's.
+USER INSTANCE_ADDED = {"maker_is_not_evaluator": "§4.1/rule 10 — the Maker never grades its own work"}
+USER 
+USER 
+USER def blank(v) -> bool:
+USER     return v is None or (isinstance(v, str) and not v.strip()) or v in ({}, [])
+USER 
+USER 
+USER def seats(packet: dict) -> tuple[str, str]:
+USER     def name(v):
+USER         if isinstance(v, dict):
+USER             for k in ("name", "who", "seat", "holder"):
+USER                 if isinstance(v.get(k), str) and v[k].strip():
+USER                     return v[k].strip()
+USER             return ""
+USER         return v.strip() if isinstance(v, str) else ""
+USER     return name(packet.get("maker")), name(packet.get("evaluator"))
+USER 
+USER 
+USER KINDS = ("person", "model", "script")
+USER 
+USER 
+USER def kind_note(p: dict) -> str:
+USER     """Contracts §4 (v1.26.0): who holds the Evaluator seat is recorded with the job, as `evaluator.kind`.
+USER     Optional in the schema today, so its absence is a NOTE, never a refusal. The emitter does not guess it: only
+USER     the brief knows whether a person, a model or a script holds the seat."""
+USER     ev = p.get("evaluator")
+USER     if isinstance(ev, dict) and ev.get("kind") in KINDS:
+USER         return ""
+USER     return ("NOTE evaluator.kind not recorded — Contracts §4 records who holds the Evaluator seat; give the "
+USER             "brief's evaluator as {\"name\": ..., \"kind\": \"person\" | \"model\" | \"script\"}")
+USER 
+USER 
+USER def cl1_source_gaps(p: dict) -> list[str]:
+USER     """The three source facts a CL1 custody record needs, or the gaps that keep this packet from being one.
+USER 
+USER     The claim read here is `proposed.level_claimed_for_own_record`: a baseline claim is not held to this bar.
+USER     A CL1 record needs bar.approvals from the Buyer and the Specialist (each naming who approved), controls from
+USER     the Evaluator's batch plan (at least one expecting conforms and one expecting does_not_conform), and
+USER     disposition.by from the human seat that disposes — custody/v1 requires (state, by, at, acknowledgesUnobserved),
+USER     so a CL1 record with state "not_yet_given" still carries by, naming the approver. These are sourced by the
+USER     Orchestrator from the approve events, the Specialist's bar and the Evaluator's plan; a packet missing them is
+USER     the packet template's defect, and the emitter's job is to refuse rather than let a later run source them.
+USER     """
+USER     proposed = p.get("proposed")
+USER     claimed = proposed.get("level_claimed_for_own_record") if isinstance(proposed, dict) else None
+USER     if claimed != "CL1":
+USER         return []
+USER     gaps: list[str] = []
+USER 
+USER     # bar.approvals — the Buyer's and the Specialist's, each naming who approved.
+USER     bar = p.get("bar")
+USER     approvals = bar.get("approvals") if isinstance(bar, dict) else None
+USER     if not isinstance(approvals, list) or not approvals:
+USER         gaps.append("CL1 record missing bar.approvals — the Buyer's and the Specialist's approvals, each naming "
+USER                     "who approved (bar.approvals[].role and .by)")
+USER     else:
+USER         held: dict[str, str] = {}                 # by role, and by party name, so either spelling satisfies it
+USER         for a in approvals:
+USER             if not isinstance(a, dict) or blank(a.get("by")):
+USER                 continue
+USER             role = a.get("role")
+USER             if isinstance(role, str) and role.strip():
+USER                 held.setdefault(role.strip().lower(), a["by"])
+USER             held.setdefault(str(a["by"]).strip().lower(), a["by"])
+USER         for role in ("buyer", "specialist"):
+USER             seat_name = p.get(role)
+USER             approved = (role in held) or (isinstance(seat_name, str) and seat_name.strip().lower() in held)
+USER             if not approved:
+USER                 gaps.append(f"CL1 record missing the {role} in bar.approvals — the {role} must approve and be "
+USER                             f"named (a bar.approvals entry with role {role!r} and by)")
+USER 
+USER     # controls — the Evaluator's batch plan, carrying both expectations that make a record readable.
+USER     controls = p.get("controls")
+USER     expected = [c.get("expected") for c in controls if isinstance(c, dict)] if isinstance(controls, list) else []
+USER     if not expected:
+USER         gaps.append("CL1 record missing controls — the Evaluator's batch plan needs at least one control "
+USER                     "expecting conforms and one expecting does_not_conform")
+USER     else:
+USER         for want in ("conforms", "does_not_conform"):
+USER             if want not in expected:
+USER                 gaps.append(f"CL1 record controls missing an expectation of {want} — at least one control must "
+USER                             f"expect conforms and one must expect does_not_conform")
+USER 
+USER     # disposition.by — custody/v1 requires it; "not_yet_given" is a state, not an excuse to omit the source.
+USER     disp = p.get("disposition")
+USER     if not isinstance(disp, dict) or blank(disp.get("by")):
+USER         gaps.append("CL1 record missing disposition.by — custody/v1 requires (state, by, at, "
+USER                     "acknowledgesUnobserved); even state 'not_yet_given' names by, the human seat that disposes")
+USER     return gaps
+USER 
+USER 
+USER def refusals(p: dict, required: list[str]) -> list[str]:
+USER     out = []
+USER     for k in required:                                    # the law's own list, read from the corpus schema
+USER         if k not in p:
+USER             out.append(f"missing required: {k}")
+USER     if not blank(p.get("entry")) and p["entry"] not in ("A", "B"):
+USER         out.append(f"entry must be A|B, got {p['entry']!r}")
+USER     if not blank(p.get("instrument_profile")) and p["instrument_profile"] not in ("full", "mvi"):
+USER         out.append(f"instrument_profile must be full|mvi, got {p['instrument_profile']!r}")
+USER     mode = p.get("mode")
+USER     if not blank(mode) and mode not in ("scored", "readings"):
+USER         out.append(f"mode must be scored|readings, got {mode!r}")
+USER     if p.get("terminal_state") and p["terminal_state"] not in TERMINALS:
+USER         out.append(f"illegal terminal_state: {p['terminal_state']!r}")
+USER     if "outcome" in p and p["outcome"] not in OUTCOMES:
+USER         out.append(f"outcome must be one of the six: {p['outcome']!r}")
+USER     elif "outcome" in p and p.get("terminal_state") and OUTCOME_MAP[p["outcome"]] != p["terminal_state"]:
+USER         out.append(f"outcome {p['outcome']} requires terminal_state {OUTCOME_MAP[p['outcome']]}, "
+USER                    f"got {p['terminal_state']!r}")
+USER     if p.get("ratified") is False:
+USER         if p.get("terminal_state") == "accepted":
+USER             out.append("ratified:false cannot have terminal_state accepted — an unratified job can never be accepted")
+USER         for k in ("bounds", "specialist", "standard_ref"):
+USER             if k in p:
+USER                 out.append(f"ratified:false must not have top-level {k}")
+USER     else:
+USER         for k in ("human_seat", "standard_ref"):
+USER             if blank(p.get(k)):
+USER                 out.append(f"missing required: {k} — a ratified job names who holds the human seat and the "
+USER                            f"standard the work is measured against")
+USER     if p.get("entry") == "B" and blank(p.get("reads_before_freeze")):
+USER         out.append("entry B requires non-empty reads_before_freeze (C32) — which reads could reveal a defect, "
+USER                    "and the statement that they came after the rubric was frozen")
+USER     if mode == "readings":
+USER         for k in ("bounds", "specialist"):
+USER             if k in p:
+USER                 out.append(f"readings mode must not supply {k} — no thresholds means no floor to be below, "
+USER                            f"so a readings job may not reject")
+USER         if p.get("outcome") == "rejected" or p.get("terminal_state") == "rejected":
+USER             out.append("readings mode may not produce rejected")
+USER     if mode == "scored":
+USER         if blank(p.get("specialist")):
+USER             out.append("scored mode missing: specialist — mode:scored requires a Specialist named at the outset")
+USER         b = p.get("bounds")
+USER         if blank(b):
+USER             out.append("scored mode missing: bounds object")
+USER         elif isinstance(b, dict):
+USER             for k in BOUND_KEYS:
+USER                 if k not in b:
+USER                     out.append(f"scored bounds missing: {k}")
+USER         gt = p.get("ground_truth")
+USER         if blank(gt):
+USER             out.append("scored mode missing: ground_truth")
+USER         elif isinstance(gt, list):
+USER             for i, row in enumerate(gt):
+USER                 if not isinstance(row, dict):
+USER                     out.append(f"ground_truth[{i}] must be an object")
+USER                     continue
+USER                 for k in ("ref", "version", "hardness"):
+USER                     if blank(row.get(k)):
+USER                         out.append(f"ground_truth[{i}] missing: {k}")
+USER                 if row.get("hardness") not in (None, "") and row["hardness"] not in ("INVARIANT", "DOCUMENT", "PRIOR"):
+USER                     out.append(f"ground_truth[{i}] hardness must be INVARIANT|DOCUMENT|PRIOR")
+USER         m = p.get("mandate_ref")
+USER         if blank(m):
+USER             out.append("scored mode missing: mandate_ref")
+USER         elif isinstance(m, dict):
+USER             for k in ("doc", "version"):
+USER                 if blank(m.get(k)):
+USER                     out.append(f"mandate_ref missing: {k}")
+USER         if blank(p.get("escalation")):
+USER             out.append("scored mode missing: escalation — who is raised to, and on what")
+USER         # contracts/EDI-MANDATE.md §7 B.1.2: "material misalignment is found by iteration ≤ k, or within x% of budget", declared before the run.
+USER         # Declared AT OPEN, because a bound declared after the fact is not a bound — and O2's rate has no
+USER         # numerator without it. The corpus declares neither field, so this is Plumbline's own requirement.
+USER         for bound in ("k", "x"):
+USER             if p.get(bound) is None:
+USER                 out.append(f"scored mode missing: {bound} — B.1.2 declares k (the iteration bound) and x (the "
+USER                            f"budget tolerance) PER JOB, and a bound written after the run is not a bound")
+USER     mk, ev = seats(p)
+USER     if ev.strip().lower() == "owner":
+USER         out.append("Owner must not hold the Evaluator seat (§4)")
+USER     elif mk and ev and mk.lower() == ev.lower():
+USER         out.append(f"maker and evaluator are the same party ({ev!r}) — {INSTANCE_ADDED['maker_is_not_evaluator']}")
+USER     # A CL1 claim is a promise to carry its three sources; a template cannot defer them to the run that follows.
+USER     out.extend(cl1_source_gaps(p))
+USER     return out
+USER 
+USER 
+USER def main() -> int:
+USER     ap = argparse.ArgumentParser(description="Emit a job packet the gate can read, or emit nothing.")
+USER     ap.add_argument("--brief", required=True)
+USER     ap.add_argument("--out-dir", required=True)
+USER     ap.add_argument("--corpus")
+USER     ap.add_argument("--print-only", action="store_true")
+USER     a = ap.parse_args()
+USER 
+USER     corpus = a.corpus or os.environ.get("EDI_CORPUS") or ""
+USER     schema_path = Path(corpus) / "schemas" / "job-packet.schema.json" if corpus else None
+USER     if not corpus or not schema_path or not schema_path.is_file():
+USER         print(f"REFUSED: no corpus resolved (--corpus or $EDI_CORPUS). The emitter will not carry its own copy "
+USER               f"of the law: it reads the corpus schema's required list, then runs the corpus gate.")
+USER         return 2
+USER     schema = json.loads(schema_path.read_text())
+USER     required = list(schema.get("required", []))
+USER 
+USER     brief = json.loads(Path(a.brief).read_text())
+USER     out = Path(a.out_dir).expanduser()
+USER     if not out.is_dir():
+USER         print(f"REFUSED: --out-dir is not a job directory: {out}"); return 2
+USER 
+USER     packet = dict(brief)
+USER     # machine-supplied facts, stamped ONLY where the law already declares the property
+USER     declared = set((schema.get("properties") or {}).keys())
+USER     if "edi_pin" in declared and blank(packet.get("edi_pin")):
+USER         try:
+USER             rev = subprocess.run(["git", "-C", str(corpus), "rev-parse", "HEAD"], capture_output=True,
+USER                                  text=True, check=True).stdout.strip()
+USER             packet["edi_pin"] = rev
+USER         except Exception:
+USER             pass
+USER 
+USER     stops = refusals(packet, required)
+USER     if stops:
+USER         print(f"REFUSED — {len(stops)} reason(s) this brief cannot become a packet:")
+USER         for s in stops:
+USER             print(f"  - {s}")
+USER         print(f"\nthe law's required keys are: {', '.join(required)}")
+USER         print("nothing written. The terms of a job are the one thing a tool must not guess.")
+USER         return 1
+USER 
+USER     path = out / "packet.json"
+USER     note = kind_note(packet)
+USER     if note:
+USER         print(note)
+USER     if a.print_only:
+USER         print(f"would write {path} ({len(packet)} keys, all declared by the corpus schema)")
+USER         print(json.dumps(packet, indent=2)[:800]); return 0
+USER 
+USER     # THE GATE RUNS BEFORE THE FILE LANDS. A packet the gate rejected is not a job's terms, and leaving one on
+USER     # disk makes the next reader think the job declared something it did not. Measured 2026-10-05: the first cut
+USER     # wrote packet.json and then reported the gate's error, which is the wrong order for a record of terms.
+USER     gate = Path(corpus) / "tools" / "validate_job_packet.py"
+USER     staged = out / ".packet.json.staged"
+USER     staged.write_text(json.dumps(packet, indent=2) + "\n")
+USER     r = subprocess.run([sys.executable, str(gate), str(staged)], capture_output=True, text=True)
+USER     verdict = (r.stdout + r.stderr).strip()
+USER     if r.returncode != 0:
+USER         staged.unlink(missing_ok=True)
+USER         print("the corpus gate REJECTED this packet — nothing left behind:")
+USER         print("  " + verdict.replace("\n", "\n  "))
+USER         print("  fix the brief, not the gate.")
+USER         return r.returncode
+USER     staged.replace(path)
+USER     print(f"wrote {path.name}")
+USER     print("  " + verdict.replace("\n", "\n  "))
+USER     return 0
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     sys.exit(main())
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER The frozen bar is tests/test_packet_cl1_time_source.py. Run it:
+USER 
+USER     PYTHONPATH=. python3 tests/test_packet_cl1_time_source.py
+USER 
+USER It is red: Ran 6 tests, FAILED (failures=2). Two failures, both about a time that no act stamped:
+USER 
+USER   test_cl1_typed_disposition_at_is_refused
+USER       AssertionError: 'disposition.at' not found in ''
+USER 
+USER   and the sibling case for a typed bar.approvals[].at, which likewise produces no gap.
+USER 
+USER Your editable file is kit/emit_packet.py — and only that file. The bar is your read-only reference:
+USER read it and implement what its tests demand. Plant nothing in it.
+USER 
+USER The rule, in the bar's own words: a CL1 packet may carry role, by and barDigest on an approval, and
+USER by and state on a disposition, but NOT a typed `at`. Times come from inputs/custody-events.jsonl —
+USER the approve event for an approval, the dispose event for a disposition, each line stamped by its
+USER writer. A typed time must be reported as a gap.
+USER 
+USER Rule 12 applies: the red above is what the bar reports, and the bar is the standard.
+USER 
+USER Do not edit tests/, schemas/, tools/, or kit/custody_ledger.py.
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ```python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ```
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+USER The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-11-08T03:52:23
+ASSISTANT The bar wants a CL1 packet to leave both times absent, so `cl1_source_gaps()` must report any approval or disposition that carries a typed `at`. I’ll add those two checks inside the existing CL1 branch, naming the field and the ledger act that must stamp it.
+ASSISTANT 
+ASSISTANT kit/emit_packet.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT         for role in ("buyer", "specialist"):
+ASSISTANT             seat_name = p.get(role)
+ASSISTANT             approved = (role in held) or (isinstance(seat_name, str) and seat_name.strip().lower() in held)
+ASSISTANT             if not approved:
+ASSISTANT                 gaps.append(f"CL1 record missing the {role} in bar.approvals — the {role} must approve and be "
+ASSISTANT                             f"named (a bar.approvals entry with role {role!r} and by)")
+ASSISTANT 
+ASSISTANT     # controls — the Evaluator's batch plan, carrying both expectations that make a record readable.
+ASSISTANT =======
+ASSISTANT         for role in ("buyer", "specialist"):
+ASSISTANT             seat_name = p.get(role)
+ASSISTANT             approved = (role in held) or (isinstance(seat_name, str) and seat_name.strip().lower() in held)
+ASSISTANT             if not approved:
+ASSISTANT                 gaps.append(f"CL1 record missing the {role} in bar.approvals — the {role} must approve and be "
+ASSISTANT                             f"named (a bar.approvals entry with role {role!r} and by)")
+ASSISTANT         # bar.approvals[].at — the packet is written before the approve act, so a typed time here is a hand
+ASSISTANT         # time. The ledger stamps it later (custody_ledger.py approve); the packet must leave it absent.
+ASSISTANT         for i, a in enumerate(approvals):
+ASSISTANT             if isinstance(a, dict) and not blank(a.get("at")):
+ASSISTANT                 gaps.append(f"CL1 record carries a hand-typed bar.approvals[{i}].at — an approval time is not "
+ASSISTANT                             f"written in the packet; it is stamped by the ledger's approve act "
+ASSISTANT                             f"(custody_ledger.py approve), so the packet must leave it absent")
+ASSISTANT 
+ASSISTANT     # controls — the Evaluator's batch plan, carrying both expectations that make a record readable.
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT kit/emit_packet.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     # disposition.by — custody/v1 requires it; "not_yet_given" is a state, not an excuse to omit the source.
+ASSISTANT     disp = p.get("disposition")
+ASSISTANT     if not isinstance(disp, dict) or blank(disp.get("by")):
+ASSISTANT         gaps.append("CL1 record missing disposition.by — custody/v1 requires (state, by, at, "
+ASSISTANT                     "acknowledgesUnobserved); even state 'not_yet_given' names by, the human seat that disposes")
+ASSISTANT     return gaps
+ASSISTANT =======
+ASSISTANT     # disposition.by — custody/v1 requires it; "not_yet_given" is a state, not an excuse to omit the source.
+ASSISTANT     disp = p.get("disposition")
+ASSISTANT     if not isinstance(disp, dict) or blank(disp.get("by")):
+ASSISTANT         gaps.append("CL1 record missing disposition.by — custody/v1 requires (state, by, at, "
+ASSISTANT                     "acknowledgesUnobserved); even state 'not_yet_given' names by, the human seat that disposes")
+ASSISTANT     # disposition.at — likewise written before the dispose act; a typed time has no act behind it. The ledger
+ASSISTANT     # stamps it when disposal happens (custody_ledger.py dispose), so the packet must leave it absent.
+ASSISTANT     if isinstance(disp, dict) and not blank(disp.get("at")):
+ASSISTANT         gaps.append("CL1 record carries a hand-typed disposition.at — a disposition time is not written in the "
+ASSISTANT                     "packet; it is stamped by the ledger's dispose act (custody_ledger.py dispose), so the packet "
+ASSISTANT                     "must leave it absent")
+ASSISTANT     return gaps
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```

@@ -1,0 +1,3 @@
+K2 does_not_conform control: the pre-work tree had no kit/evaluator_harness_log.py, and the emitter
+emitted 'note external: no harness log (CL1-15) for model evaluator evaluator' while still writing the
+record. Measured on the frozen bar's first run: D4 and D8 red.

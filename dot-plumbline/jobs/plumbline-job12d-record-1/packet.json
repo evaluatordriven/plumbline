@@ -1,0 +1,30 @@
+{
+  "job": "2026-11-09-job14-allow-hand-times-boundary",
+  "target": "under --allow-hand-times an unsourced model-evaluator check time is refused, an unstamped call is still named, and the switch still admits genuine hand-entered times",
+  "work_tree": "/home/jarbis1/tmp/plumbline-job12d",
+  "bar_commit": "851a07de09f89e2984d7a84f571a451be1a9b06e",
+  "test_cmd": "EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py; python3 tests/test_evaluator_harness_log.py",
+  "artifact": {
+    "frozen": [
+      "tests/validate_schemas.py",
+      "tests/test_evaluator_harness_log.py"
+    ],
+    "editable": [
+      "kit/emit_custody.py",
+      "kit/custody_history.py"
+    ]
+  },
+  "maker_cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+  "evaluator_cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval",
+  "cap": 2,
+  "budget_usd": 0.20,
+  "no_op_rule": "a diff with no non-comment line change is not a generation and the cap is not charged",
+  "out_of_scope": [
+    "custody · a model evaluator whose harness log carries no logger times is refused, naming the log (exit 3, [time], nothing written)",
+    "custody · a hand time 59 s off is accepted, and the record carries the LOG's time",
+    "custody · T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)",
+    "custody · T3 with --allow-hand-times the record is written and hand_times lists the hand fields with file:line",
+    "custody · E2 under --allow-hand-times the typed pass time is listed and the record carries the call's time"
+  ],
+  "brief": "/home/jarbis1/tmp/plumbline-job12d-brief/MAKER-BRIEF-JOB14.md"
+}

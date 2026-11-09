@@ -1,0 +1,15 @@
+{
+  "job_id": "2026-11-08-cl1-time-source",
+  "bound_usd": 2.00,
+  "reserve_usd": 0.02,
+  "spend_ledger": "/home/jarbis1/tmp/plumbline-cl1-time-record-1/evidence/spend-ledger.jsonl",
+  "prices": [
+    {
+      "model": "z-ai/glm-5.3-flash",
+      "tag": "z-ai/fp8",
+      "prompt_usd_per_token": 0.00000015,
+      "completion_usd_per_token": 0.0000005,
+      "max_completion_tokens": 131072
+    }
+  ]
+}

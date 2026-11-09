@@ -1,0 +1,150 @@
+{
+  "job_id": "2026-11-08-seat-notice-drain",
+  "job_name": "a conductor turn announces whatever is waiting in the seat-notice mailbox",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "artifact": {
+    "repo": "plumbline",
+    "paths": [
+      "kit/seat_move_notice.py"
+    ]
+  },
+  "base": {
+    "ref": "d5f3f50",
+    "branch": "feat/seat-move-notices",
+    "note": "same branch as job 5; job 5 stays held and unmerged and this job does not merge it"
+  },
+  "seats": {
+    "statement": "One party, Steve Moitozo II, holds three seats on this job: Owner, Specialist and Buyer. Contracts \u00a74 permits one party to hold several seats, recorded as such. The Owner's words, verbatim: \"it's not a role merge, it's a multiple hat situation. I am Owner, Specialist, and Buyer.\"",
+    "owner": "Steve Moitozo II",
+    "buyer": "Steve Moitozo II",
+    "specialist": "Steve Moitozo II",
+    "holder_count": 1,
+    "statement_note_only": true
+  },
+  "buyer": "Steve Moitozo II",
+  "specialist": "Steve Moitozo II",
+  "human_seat": "Steve Moitozo II",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "maker": {
+    "name": "plumbline-maker",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+    "handoff": "rule12"
+  },
+  "evaluator": {
+    "name": "plumbline-eval",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "openrouter",
+    "runs": 3
+  },
+  "standard_ref": {
+    "doc": "tests/test_seat_move_notice_drain.py",
+    "version": "e143f8b6"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "a48a4645"
+  },
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "budget": {
+      "amount": 7,
+      "unit": "USD",
+      "time_hours_lt": 2
+    }
+  },
+  "k": 4,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "tests/test_seat_move_notice_drain.py",
+      "version": "e143f8b6",
+      "hardness": "INVARIANT",
+      "note": "the frozen bar is the ground truth: 7 tests over the turn-start drain"
+    }
+  ],
+  "escalation": {
+    "route": "Owner"
+  },
+  "proposed": {
+    "level_claimed_for_own_record": "CL1",
+    "drafted_by": "plumbline-conductor (Orchestrator), from the Architect's bar"
+  },
+  "bar": {
+    "file": "tests/test_seat_move_notice_drain.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "frozenAt": "2026-11-08T18:23:54Z",
+    "dimensions": [
+      {
+        "id": "drain_at_turn_start",
+        "criterion": "a queued notice is staged at turn start and announced in that turn; a failed turn leaves it recoverable rather than lost or duplicated; an empty mailbox changes nothing",
+        "scale": {
+          "type": "pass_fail",
+          "threshold": 1
+        }
+      }
+    ],
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z",
+        "barDigest": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z",
+        "barDigest": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      }
+    ]
+  },
+  "acceptance_run": {
+    "required": true,
+    "met": null,
+    "steps": "a. enqueue one real notice with a distinctive id and text through the shipped enqueue path; b. start a real conductor turn in session 20261106_173554_a10444 that goes through the drain; c. read state.db and confirm the notice is visible in the Bot Chat, mailbox empty and inflight clean afterwards; d. record the message row/id, its text, the turn time, and mailbox state before and after",
+    "rule": "a fixture is not a turn; if the notice does not arrive, that is the finding"
+  },
+  "disposition_state": "given",
+  "read": [
+    "tests/test_seat_move_notice_drain.py"
+  ],
+  "editable": [
+    "kit/seat_move_notice.py",
+    "deployment/plumbline-conductor/seat-move-notice.py",
+    "deployment/plumbline-conductor/README.md"
+  ],
+  "frozen": [
+    "tests/test_seat_move_notice_drain.py",
+    "tests/test_seat_move_notice.py",
+    "kit/conductor_loop.py",
+    "kit/emit_packet.py",
+    "kit/emit_custody.py",
+    "kit/custody_history.py",
+    "kit/custody_ledger.py",
+    "schemas/instance-extensions.json",
+    "tools/pin.json"
+  ],
+  "terminal_state": "accepted",
+  "outcome": "accepted"
+}

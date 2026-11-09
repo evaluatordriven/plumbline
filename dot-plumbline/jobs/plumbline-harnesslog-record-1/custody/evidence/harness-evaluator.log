@@ -1,0 +1,632 @@
+[
+  {
+    "call": "evaluator_harness_log#p1",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `evaluator_harness_log`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION evaluator_harness_log\n\nCLAIM: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. A missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEVIDENCE (gathered before this call; you have no tools here).\n\n1. FROZEN BAR tests/test_evaluator_harness_log.py, sha256 46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5, frozen 2026-11-08T22:22:10Z, approved twice in the Owner's name at 22:22:10Z. Ran 12 tests, OK, exit 0. The twelve checks:\n   D1 one call writes exactly one log entry with sent_at and received_at\n   D2 that entry names the model and the endpoint actually used\n   D3 sent_at <= received_at on a real answer\n   D4 the record's check time is sourced from the harness log\n   D5 the record names the log path\n   D6 a model evaluator with no harness log REFUSES\n   D7 the missing log does not degrade to a note that still writes the record\n   D8 received_at before sent_at refuses, naming the entry\n   D9 an entry missing received_at refuses, naming the entry\n   D10 an unparseable log refuses, never silently skipped\n   D11 a deterministic evaluator with no log is NOT refused\n   D12 the bar carries its own wall-clock caveat in the file\n\n2. MAKER: one generation, exit 0, within the editable set. kit/emit_custody.py +29/-5 (11 references to harness_log), and a new kit/evaluator_harness_log.py of 118 lines exporting a HarnessLogError that carries the offending `call`, parse_instant, a read(path) giving one reading of the log, and a source() for provenance. No test file edited. tools/edi/or_call.py untouched: it already wrote sent_at/received_at (or_call.py:553-559, 577) as a JSON list (append_entry, 255-271).\n\n3. THE ONE-PASS RED THE ORCHESTRATOR FOUND, disclosed and not counted as a Maker failure: after the Maker ran, D4 and D5 reported as failures. They were NOT capability failures. The emitter refuses to write a record on a dirty tree -- 'the emitter's tree is dirty at 3175d750d6e2 (2 change(s) ... M kit/emit_custody.py, ?? kit/evaluator_harness_log.py); a record must name code that exists as a commit'. The Maker's own uncommitted work made its result unmeasurable. The Orchestrator committed the Maker's work as efb36bb to measure, authoring no code. With the tree committed, the bar is 12/12.\n\n4. KNOWN CONDITION, now written into the instance layer: a bar that shells out to the emitter is green only on a committed tree; a dirty tree makes the Maker's own work unmeasurable and the failures read as capability failures.\n\n5. LIMIT THE BAR PINS ITSELF (D12), in its own words: that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right.\n\n6. DEPLOYMENT STEP: the profile-side route /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval is outside the worktree and unreachable by the Maker. The bar declares it a deployment step. It has NOT been performed yet. The in-repo half -- the module and the record that reads it -- is what this job delivers.\n\nDecide: does the artifact meet the frozen standard, on this evidence?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T22:27:03.720110Z",
+    "received_at": "2026-11-08T22:27:26.881300Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 22:27:04 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=1066",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794176823-8uuPqzCQs78uUhk2tECh",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;94f79b29-578f-4292-a72f-1d3e001023c4",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a57800bc7e2b260e-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794176823-8uuPqzCQs78uUhk2tECh",
+      "object": "chat.completion",
+      "created": 1794176823,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"All twelve frozen-bar checks pass (12/12, exit 0) once the Maker's work is committed as efb36bb — the lone red on D4/D5 was the emitter's own dirty-tree custody gate refusing to measure, not a capability gap — and the capability is real code, not fixture assertion: kit/evaluator_harness_log.py (118 lines) supplies read(path), source() provenance, and a HarnessLogError carrying the offending call for the refuse-and-name paths, kit/emit_custody.py wires 11 harness_log references into the record (D4/D5), or_call.py already wrote sent_at/received_at entries for model turns (D1–D3), the deterministic carve-out holds (D11), and both the wall-clock caveat (D12) and the out-of-worktree route deployment are declared limits outside the delivered in-repo scope.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. Missing, reversed, partial, or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nThe frozen bar: 12 tests, all pass (12/12 OK, exit 0), sha256 given, frozen timestamp, approved twice in Owner's name.\n\nEvidence:\n\n1. Frozen bar ran 12 tests, OK, exit 0. The twelve checks are enumerated D1-D12.\n\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py modified (+29/-5, 11 references to harness_log), new kit/evaluator_harness_log.py (118 lines) exporting HarnessLogError carrying offending `call`, parse_instant, read(path), source(). No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as JSON list.\n\n3. The one-pass red: after the Maker ran, D4 and D5 reported failures — NOT capability failures, but because the tree was dirty (Maker's uncommitted work made its own result unmeasurable, since the emitter refuses to write a record on a dirty tree). Orchestrator committed as efb36bb; with tree committed, bar is 12/12. This is disclosed, and the failure was environmental, not capability.\n\n4. Known condition documented.\n\n5. Bar's own pinned limit (D12): honesty about wall clock not proven — that's the bar's own declared scope limit, written into the bar itself (D12 says the bar carries its own wall-clock caveat in the file — and the test passed).\n\n6. Deployment step: profile-side route outside worktree, not performed. In-repo half is what the job delivers.\n\nKey question: does the artifact meet the frozen standard on this evidence?\n\nThe instruction to me: \"Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture.\"\n\nChecks:\n- Frozen bar: 12/12 passed, exit 0, after commit efb36bb. Yes.\n- Capability present in code, not merely asserted by a fixture: The Maker wrote kit/evaluator_harness_log.py (118 lines, HarnessLogError with offending call, parse_instant, read, source) and modified kit/emit_custody.py (+29/-5, 11 references to harness_log). The bar tests were not edited. The capability — reading the harness log, sourcing record times from it, refusing on missing/reversed/partial/unparseable logs while naming the offending entry, and not refusing deterministic evaluators — is implemented in the module and emitter, exercised by the bar. The evidence describes concrete code artifacts: error type carrying the offending `call` (which supports \"names the offending entry\" for D8/D9/D10), read(path), source() for provenance (D4/D5). or_call.py already wrote sent_at/received_at, so the log-writing side exists in real code (or_call.py:553-559, 577, append_entry 255-271).\n\nConcerns to weigh:\n\na) The one-pass red on D4/D5: was that a real capability failure initially? No — it was the emitter refusing to write a record on a dirty tree, which is itself the custody integrity behavior. The Maker's own uncommitted work made its result unmeasurable. This is disclosed as a known condition (#4). After commit, 12/12. Is this acceptable? The red was not a capability failure; the capability (record sourcing from log) was present but unmeasurable due to custody gate. The orchestrator committed, authoring no code. This seems like an environment/measurement issue, disclosed. The standard asks: every check passes AND capability present in code. Both hold post-commit. The red was disclosed and not counted as Maker failure. I think this doesn't block a 1, though I should note it in observation? The observation is one sentence — I should focus on what I measured.\n\nb) Deployment step not performed: the profile-side route is outside the worktree. The bar declares it a deployment step; the in-repo half is what the job delivers. Does the frozen bar include the deployment? The 12 checks don't mention the profile route. The bar is the frozen standard; it passed. The deployment step is outside the bar's scope. The claim is about the model evaluator's turn writing a harness log and the custody record taking times from it. Hmm — \"a model evaluator's turn writes a harness log.\" Does the delivered code make model evaluators write harness logs? or_call.py already writes sent_at/received_at (untouched, pre-existing). The Maker's job was the record side + module. The writing side pre-exists in real code (not a fixture). So capability present.\n\nWait — but does the harness log get written for model evaluator turns in the custody flow? The evidence says or_call.py already wrote sent_at/received_at as a JSON list. So the log-writing exists. The record now reads from it. D1-D3 test one call writes exactly one log entry with sent_at and received_at, names model and endpoint, sent_at <= received_at on a real answer — these pass, meaning the writing side works on real answers.\n\nc) Deterministic evaluator carve-out (D11): passes — not refused.\n\nd) D12 caveat: the bar pins its own limit; test passes. The claim as stated in the dimension doesn't overclaim wall-clock honesty — the claim says times come from the log, not that the clock is right. The claim matches the bar's scope.\n\ne) Is the capability \"merely asserted by a fixture\"? No — real modules with real code, 11 references in emitter, error type with offending entry, tests unedited. The bar is frozen (sha256 given, approved twice).\n\nf) The dirty-tree red: should I count D4/D5 as having failed at some point? The final state is 12/12. The standard is the frozen bar passing and capability present. The red is explained as measurement artifact (the emitter's own anti-dirty-tree custody gate). It's disclosed transparently. I don't see a basis to fail.\n\nOne more consideration: \"approved twice in the Owner's name at 22:22:10Z\" — same timestamp twice, slightly odd but the evidence states it as given; the bar is frozen and ran OK.\n\nAlso \"Ran 12 tests, OK, exit 0\" — the bar passed.\n\nSo: score 1.\n\nObservation (one sentence): Something like: \"All 12 frozen-bar checks pass post-commit efb36bb (the earlier D4/D5 red was the emitter's dirty-tree custody gate, not a capability gap), and the capability lives in real code — kit/evaluator_harness_log.py's HarnessLogError carrying the offending call, read() and source(), wired into emit_custody.py's record, on top of or_call.py's pre-existing sent_at/received_at log writes — with the bar's wall-clock caveat (D12) and out-of-worktree deployment step both declared outside the delivered scope.\"\n\nThat's long but one sentence. Should keep it to one sentence per the format. Let me tighten.\n\nThe JSON: {\"score\": 1, \"observation\": \"...\"}\n\nMust output ONLY the JSON object. No markdown fences? \"Answer with a single JSON object and nothing else.\" I'll output raw JSON.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. Missing, reversed, partial, or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nThe frozen bar: 12 tests, all pass (12/12 OK, exit 0), sha256 given, frozen timestamp, approved twice in Owner's name.\n\nEvidence:\n\n1. Frozen bar ran 12 tests, OK, exit 0. The twelve checks are enumerated D1-D12.\n\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py modified (+29/-5, 11 references to harness_log), new kit/evaluator_harness_log.py (118 lines) exporting HarnessLogError carrying offending `call`, parse_instant, read(path), source(). No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as JSON list.\n\n3. The one-pass red: after the Maker ran, D4 and D5 reported failures — NOT capability failures, but because the tree was dirty (Maker's uncommitted work made its own result unmeasurable, since the emitter refuses to write a record on a dirty tree). Orchestrator committed as efb36bb; with tree committed, bar is 12/12. This is disclosed, and the failure was environmental, not capability.\n\n4. Known condition documented.\n\n5. Bar's own pinned limit (D12): honesty about wall clock not proven — that's the bar's own declared scope limit, written into the bar itself (D12 says the bar carries its own wall-clock caveat in the file — and the test passed).\n\n6. Deployment step: profile-side route outside worktree, not performed. In-repo half is what the job delivers.\n\nKey question: does the artifact meet the frozen standard on this evidence?\n\nThe instruction to me: \"Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture.\"\n\nChecks:\n- Frozen bar: 12/12 passed, exit 0, after commit efb36bb. Yes.\n- Capability present in code, not merely asserted by a fixture: The Maker wrote kit/evaluator_harness_log.py (118 lines, HarnessLogError with offending call, parse_instant, read, source) and modified kit/emit_custody.py (+29/-5, 11 references to harness_log). The bar tests were not edited. The capability — reading the harness log, sourcing record times from it, refusing on missing/reversed/partial/unparseable logs while naming the offending entry, and not refusing deterministic evaluators — is implemented in the module and emitter, exercised by the bar. The evidence describes concrete code artifacts: error type carrying the offending `call` (which supports \"names the offending entry\" for D8/D9/D10), read(path), source() for provenance (D4/D5). or_call.py already wrote sent_at/received_at, so the log-writing side exists in real code (or_call.py:553-559, 577, append_entry 255-271).\n\nConcerns to weigh:\n\na) The one-pass red on D4/D5: was that a real capability failure initially? No — it was the emitter refusing to write a record on a dirty tree, which is itself the custody integrity behavior. The Maker's own uncommitted work made its result unmeasurable. This is disclosed as a known condition (#4). After commit, 12/12. Is this acceptable? The red was not a capability failure; the capability (record sourcing from log) was present but unmeasurable due to custody gate. The orchestrator committed, authoring no code. This seems like an environment/measurement issue, disclosed. The standard asks: every check passes AND capability present in code. Both hold post-commit. The red was disclosed and not counted as Maker failure. I think this doesn't block a 1, though I should note it in observation? The observation is one sentence — I should focus on what I measured.\n\nb) Deployment step not performed: the profile-side route is outside the worktree. The bar declares it a deployment step; the in-repo half is what the job delivers. Does the frozen bar include the deployment? The 12 checks don't mention the profile route. The bar is the frozen standard; it passed. The deployment step is outside the bar's scope. The claim is about the model evaluator's turn writing a harness log and the custody record taking times from it. Hmm — \"a model evaluator's turn writes a harness log.\" Does the delivered code make model evaluators write harness logs? or_call.py already writes sent_at/received_at (untouched, pre-existing). The Maker's job was the record side + module. The writing side pre-exists in real code (not a fixture). So capability present.\n\nWait — but does the harness log get written for model evaluator turns in the custody flow? The evidence says or_call.py already wrote sent_at/received_at as a JSON list. So the log-writing exists. The record now reads from it. D1-D3 test one call writes exactly one log entry with sent_at and received_at, names model and endpoint, sent_at <= received_at on a real answer — these pass, meaning the writing side works on real answers.\n\nc) Deterministic evaluator carve-out (D11): passes — not refused.\n\nd) D12 caveat: the bar pins its own limit; test passes. The claim as stated in the dimension doesn't overclaim wall-clock honesty — the claim says times come from the log, not that the clock is right. The claim matches the bar's scope.\n\ne) Is the capability \"merely asserted by a fixture\"? No — real modules with real code, 11 references in emitter, error type with offending entry, tests unedited. The bar is frozen (sha256 given, approved twice).\n\nf) The dirty-tree red: should I count D4/D5 as having failed at some point? The final state is 12/12. The standard is the frozen bar passing and capability present. The red is explained as measurement artifact (the emitter's own anti-dirty-tree custody gate). It's disclosed transparently. I don't see a basis to fail.\n\nOne more consideration: \"approved twice in the Owner's name at 22:22:10Z\" — same timestamp twice, slightly odd but the evidence states it as given; the bar is frozen and ran OK.\n\nAlso \"Ran 12 tests, OK, exit 0\" — the bar passed.\n\nSo: score 1.\n\nObservation (one sentence): Something like: \"All 12 frozen-bar checks pass post-commit efb36bb (the earlier D4/D5 red was the emitter's dirty-tree custody gate, not a capability gap), and the capability lives in real code — kit/evaluator_harness_log.py's HarnessLogError carrying the offending call, read() and source(), wired into emit_custody.py's record, on top of or_call.py's pre-existing sent_at/received_at log writes — with the bar's wall-clock caveat (D12) and out-of-worktree deployment step both declared outside the delivered scope.\"\n\nThat's long but one sentence. Should keep it to one sentence per the format. Let me tighten.\n\nThe JSON: {\"score\": 1, \"observation\": \"...\"}\n\nMust output ONLY the JSON object. No markdown fences? \"Answer with a single JSON object and nothing else.\" I'll output raw JSON.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 933,
+        "completion_tokens": 1797,
+        "total_tokens": 2730,
+        "cost": 0.00103845,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00103845,
+          "upstream_inference_prompt_cost": 0.00013995,
+          "upstream_inference_completions_cost": 0.0008985
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1602,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 22868
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T22:27:03.764Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 830,
+        "moderation_latency": null,
+        "generation_time": 22868,
+        "tokens_prompt": 907,
+        "tokens_completion": 1964,
+        "native_tokens_prompt": 933,
+        "native_tokens_completion": 1797,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1602,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00103845,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794176823-P3FXMRZ8FIf8zV3Jxxou",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794176823-8uuPqzCQs78uUhk2tECh",
+        "upstream_id": "2026110906270424eea734706a47db",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "2026110906270424eea734706a47db",
+            "is_byok": false,
+            "latency": 830,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00103845,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T22:27:32.465104Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "evaluator_harness_log#p2",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `evaluator_harness_log`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION evaluator_harness_log\n\nCLAIM: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. A missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEVIDENCE (gathered before this call; you have no tools here).\n\n1. FROZEN BAR tests/test_evaluator_harness_log.py, sha256 46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5, frozen 2026-11-08T22:22:10Z, approved twice in the Owner's name at 22:22:10Z. Ran 12 tests, OK, exit 0. The twelve checks:\n   D1 one call writes exactly one log entry with sent_at and received_at\n   D2 that entry names the model and the endpoint actually used\n   D3 sent_at <= received_at on a real answer\n   D4 the record's check time is sourced from the harness log\n   D5 the record names the log path\n   D6 a model evaluator with no harness log REFUSES\n   D7 the missing log does not degrade to a note that still writes the record\n   D8 received_at before sent_at refuses, naming the entry\n   D9 an entry missing received_at refuses, naming the entry\n   D10 an unparseable log refuses, never silently skipped\n   D11 a deterministic evaluator with no log is NOT refused\n   D12 the bar carries its own wall-clock caveat in the file\n\n2. MAKER: one generation, exit 0, within the editable set. kit/emit_custody.py +29/-5 (11 references to harness_log), and a new kit/evaluator_harness_log.py of 118 lines exporting a HarnessLogError that carries the offending `call`, parse_instant, a read(path) giving one reading of the log, and a source() for provenance. No test file edited. tools/edi/or_call.py untouched: it already wrote sent_at/received_at (or_call.py:553-559, 577) as a JSON list (append_entry, 255-271).\n\n3. THE ONE-PASS RED THE ORCHESTRATOR FOUND, disclosed and not counted as a Maker failure: after the Maker ran, D4 and D5 reported as failures. They were NOT capability failures. The emitter refuses to write a record on a dirty tree -- 'the emitter's tree is dirty at 3175d750d6e2 (2 change(s) ... M kit/emit_custody.py, ?? kit/evaluator_harness_log.py); a record must name code that exists as a commit'. The Maker's own uncommitted work made its result unmeasurable. The Orchestrator committed the Maker's work as efb36bb to measure, authoring no code. With the tree committed, the bar is 12/12.\n\n4. KNOWN CONDITION, now written into the instance layer: a bar that shells out to the emitter is green only on a committed tree; a dirty tree makes the Maker's own work unmeasurable and the failures read as capability failures.\n\n5. LIMIT THE BAR PINS ITSELF (D12), in its own words: that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right.\n\n6. DEPLOYMENT STEP: the profile-side route /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval is outside the worktree and unreachable by the Maker. The bar declares it a deployment step. It has NOT been performed yet. The in-repo half -- the module and the record that reads it -- is what this job delivers.\n\nDecide: does the artifact meet the frozen standard, on this evidence?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T22:27:32.653036Z",
+    "received_at": "2026-11-08T22:27:57.137990Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 22:27:33 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=889",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794176852-IfGoExRipTYPvPyrwun6",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;94f79b29-578f-4292-a72f-1d3e001023c4",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a57801715f32a658-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794176852-IfGoExRipTYPvPyrwun6",
+      "object": "chat.completion",
+      "created": 1794176852,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar passes 12/12 (exit 0) on committed efb36bb with the capability implemented in code — kit/evaluator_harness_log.py (HarnessLogError naming the offending call, single read(path), source()) plus 11 harness_log references in kit/emit_custody.py sourcing check times with refusals, and pre-existing log writing in untouched or_call.py — with no test edits, the initial D4/D5 red disclosed as the dirty-tree measurement condition rather than a capability failure, and the bar's own wall-clock caveat (D12) and out-of-scope deployment step preserved rather than papered over.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. Missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEvidence:\n1. Frozen bar with 12 checks (D1-D12), sha256 given, frozen timestamp, ran 12 tests OK, exit 0. The bar is frozen and approved twice.\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py +29/-5 with 11 references to harness_log, new kit/evaluator_harness_log.py of 118 lines exporting HarnessLogError with offending `call`, parse_instant, read(path), source(). No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as JSON list.\n3. The one-pass red: D4 and D5 failed initially, but NOT capability failures — the emitter refuses to write a record on a dirty tree. The Maker's own uncommitted work made its result unmeasurable. Orchestrator committed as efb36bb, then 12/12.\n4. Known condition documented: dirty tree makes Maker's work unmeasurable.\n5. The bar pins its own limit (D12): wall-clock honesty NOT proven.\n6. Deployment step: profile-side route outside worktree, not performed yet. In-repo half is what the job delivers.\n\nDecision: does the artifact meet the frozen standard?\n\nKey checks I need to do as the Plumbline Evaluator:\n- Every check in the frozen bar passes: 12/12 after commit, exit 0.\n- The capability is present in the code, not merely asserted by a fixture.\n\nLet me think about whether the capability is present in code:\n- kit/evaluator_harness_log.py: 118 lines, exports HarnessLogError carrying offending `call`, parse_instant, read(path) giving one reading, source() for provenance. This is real code implementing log parsing/refusal logic.\n- kit/emit_custody.py: +29/-5, 11 references to harness_log — the custody record reads the log for check times, refuses on missing/reversed/partial/unparseable, names offending entry.\n- tools/edi/or_call.py untouched: it already wrote sent_at/received_at as a JSON list. So the harness log writing already existed in or_call.py (lines 553-559, 577, append_entry 255-271). D1-D3 tests would exercise that.\n\nWait — does the \"model evaluator's turn writes a harness log\" part exist in code? The claim says the model evaluator's turn writes a harness log. The evidence says or_call.py already wrote sent_at/received_at as a JSON list (append_entry, 255-271). So that capability pre-exists in code. The new code makes the custody record source its check times from that log with refusals. So the capability chain: or_call.py writes log (pre-existing), evaluator_harness_log.py parses/validates, emit_custody.py uses it for record check times with refusals.\n\nThe tests: D1-D12 all pass (12 tests, OK, exit 0). The bar is frozen and approved.\n\nD11: deterministic evaluator with no log is NOT refused — this is a distinction check; presumably the code distinguishes model evaluators from deterministic ones. The Maker's code must implement this since D11 passes. The bar tests it.\n\nD6: model evaluator with no harness log REFUSES. D7: missing log does not degrade to a note that still writes the record. D8: received_at before sent_at refuses naming the entry. D9: entry missing received_at refuses naming the entry. D10: unparseable log refuses, never silently skipped.\n\nAll pass.\n\nThe one-pass red: D4 and D5 failed not due to capability but due to the dirty-tree condition. The Orchestrator committed the Maker's work as efb36bb (authoring no code) and then 12/12. Is this acceptable? The red was disclosed and not counted as a Maker failure. The final state: bar passes 12/12 on committed tree. The known condition (#4) is now written into the instance layer. This seems like a legitimate environmental/measurement artifact, not a capability failure. The code exists and works; the initial red was the emitter's own integrity check (refusing to write a record naming code that doesn't exist as a commit).\n\nHmm, wait — is there a concern that the Orchestrator committing the Maker's work is \"authoring no code\" but is that a violation? The orchestrator committed to measure. That's a mechanical act, not authoring. The disclosed reason is sound: the emitter requires a clean tree to attest that the record names code that exists as a commit. This is consistent with provenance discipline.\n\nD12: the bar carries its own wall-clock caveat — the limit is pinned, honesty about limits. This is good.\n\nD6 deployment step: profile-side route outside worktree hasn't been performed. The bar declares it a deployment step. The in-repo half is what the job delivers. Is this a problem? The frozen bar includes it as a deployment step, i.e., the bar itself declares it out of scope for the Maker. The frozen bar's 12 checks all pass without it. So the frozen standard is met on the in-repo half. The deployment step is future work, declared. The claim is about the record and the log, which are in-repo.\n\nHmm, but should I refuse because the deployment step hasn't been performed? The frozen bar is the standard. The bar ran 12/12. The deployment step is declared by the bar itself as separate. As the evaluator, I check the frozen bar's checks pass and capability is in code. The 12 checks pass. The deployment step is not one of the 12 checks (D1-D12 are all in-repo testable). So it doesn't block.\n\nOne more consideration: \"Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture.\"\n\n- Every check passes: 12/12, OK, exit 0, on committed tree efb36bb.\n- Capability in code: kit/evaluator_harness_log.py (118 lines, real parsing/refusal code), kit/emit_custody.py modifications (11 references), or_call.py pre-existing log writing. The tests are frozen (no test file edited by Maker — \"No test file edited\"), so the passing tests aren't self-serving fixtures. The capability is implemented in the module and emitter, not asserted by fixtures.\n\nThe one-pass red: does it count against? The orchestration disclosed it as a measurement artifact (dirty tree), not capability failure. The final measured state is 12/12. The known condition is documented in the instance layer. This is honest reporting. I think the artifact meets the standard.\n\nAlso check: did the Maker edit the test file? \"No test file edited.\" Good — the bar wasn't gamed.\n\nsha256 of the bar given; frozen timestamp 2026-11-08T22:22:10Z, approved twice in Owner's name at same time. Approved twice — that satisfies whatever dual-approval discipline. I can't verify the hash myself (no tools), but the evidence states it.\n\nOne potential wrinkle: the tests ran and passed — when? Presumably after the commit efb36bb. The evidence says \"With the tree committed, the bar is 12/12.\" So the passing run is on the committed state that includes the Maker's work. Good.\n\nAnother wrinkle: D1-D3 test that the model evaluator's turn writes a harness log — but the Maker didn't touch or_call.py because it already wrote sent_at/received_at. So D1-D3 pass on pre-existing code. That's fine; the capability exists in code.\n\nBut wait — does the frozen bar's D1 test target or_call.py's writer or something else? The bar is test_evaluator_harness_log.py. It presumably exercises the or_call harness writing and the custody record reading. Since 12/12 pass, all good.\n\nSo score 1.\n\nObservation: one sentence, what I measured. Something like: \"Frozen bar 12/12 (exit 0) on committed efb36bb with the capability implemented in kit/evaluator_harness_log.py and kit/emit_custody.py (log-sourced check times with refusals naming the entry, deterministic evaluators exempt), the initial D4/D5 red disclosed as the dirty-tree measurement condition, no test edits, and the bar's own wall-clock caveat and deployment-step split preserved.\"\n\nKeep it one sentence. JSON only.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. Missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEvidence:\n1. Frozen bar with 12 checks (D1-D12), sha256 given, frozen timestamp, ran 12 tests OK, exit 0. The bar is frozen and approved twice.\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py +29/-5 with 11 references to harness_log, new kit/evaluator_harness_log.py of 118 lines exporting HarnessLogError with offending `call`, parse_instant, read(path), source(). No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as JSON list.\n3. The one-pass red: D4 and D5 failed initially, but NOT capability failures — the emitter refuses to write a record on a dirty tree. The Maker's own uncommitted work made its result unmeasurable. Orchestrator committed as efb36bb, then 12/12.\n4. Known condition documented: dirty tree makes Maker's work unmeasurable.\n5. The bar pins its own limit (D12): wall-clock honesty NOT proven.\n6. Deployment step: profile-side route outside worktree, not performed yet. In-repo half is what the job delivers.\n\nDecision: does the artifact meet the frozen standard?\n\nKey checks I need to do as the Plumbline Evaluator:\n- Every check in the frozen bar passes: 12/12 after commit, exit 0.\n- The capability is present in the code, not merely asserted by a fixture.\n\nLet me think about whether the capability is present in code:\n- kit/evaluator_harness_log.py: 118 lines, exports HarnessLogError carrying offending `call`, parse_instant, read(path) giving one reading, source() for provenance. This is real code implementing log parsing/refusal logic.\n- kit/emit_custody.py: +29/-5, 11 references to harness_log — the custody record reads the log for check times, refuses on missing/reversed/partial/unparseable, names offending entry.\n- tools/edi/or_call.py untouched: it already wrote sent_at/received_at as a JSON list. So the harness log writing already existed in or_call.py (lines 553-559, 577, append_entry 255-271). D1-D3 tests would exercise that.\n\nWait — does the \"model evaluator's turn writes a harness log\" part exist in code? The claim says the model evaluator's turn writes a harness log. The evidence says or_call.py already wrote sent_at/received_at as a JSON list (append_entry, 255-271). So that capability pre-exists in code. The new code makes the custody record source its check times from that log with refusals. So the capability chain: or_call.py writes log (pre-existing), evaluator_harness_log.py parses/validates, emit_custody.py uses it for record check times with refusals.\n\nThe tests: D1-D12 all pass (12 tests, OK, exit 0). The bar is frozen and approved.\n\nD11: deterministic evaluator with no log is NOT refused — this is a distinction check; presumably the code distinguishes model evaluators from deterministic ones. The Maker's code must implement this since D11 passes. The bar tests it.\n\nD6: model evaluator with no harness log REFUSES. D7: missing log does not degrade to a note that still writes the record. D8: received_at before sent_at refuses naming the entry. D9: entry missing received_at refuses naming the entry. D10: unparseable log refuses, never silently skipped.\n\nAll pass.\n\nThe one-pass red: D4 and D5 failed not due to capability but due to the dirty-tree condition. The Orchestrator committed the Maker's work as efb36bb (authoring no code) and then 12/12. Is this acceptable? The red was disclosed and not counted as a Maker failure. The final state: bar passes 12/12 on committed tree. The known condition (#4) is now written into the instance layer. This seems like a legitimate environmental/measurement artifact, not a capability failure. The code exists and works; the initial red was the emitter's own integrity check (refusing to write a record naming code that doesn't exist as a commit).\n\nHmm, wait — is there a concern that the Orchestrator committing the Maker's work is \"authoring no code\" but is that a violation? The orchestrator committed to measure. That's a mechanical act, not authoring. The disclosed reason is sound: the emitter requires a clean tree to attest that the record names code that exists as a commit. This is consistent with provenance discipline.\n\nD12: the bar carries its own wall-clock caveat — the limit is pinned, honesty about limits. This is good.\n\nD6 deployment step: profile-side route outside worktree hasn't been performed. The bar declares it a deployment step. The in-repo half is what the job delivers. Is this a problem? The frozen bar includes it as a deployment step, i.e., the bar itself declares it out of scope for the Maker. The frozen bar's 12 checks all pass without it. So the frozen standard is met on the in-repo half. The deployment step is future work, declared. The claim is about the record and the log, which are in-repo.\n\nHmm, but should I refuse because the deployment step hasn't been performed? The frozen bar is the standard. The bar ran 12/12. The deployment step is declared by the bar itself as separate. As the evaluator, I check the frozen bar's checks pass and capability is in code. The 12 checks pass. The deployment step is not one of the 12 checks (D1-D12 are all in-repo testable). So it doesn't block.\n\nOne more consideration: \"Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture.\"\n\n- Every check passes: 12/12, OK, exit 0, on committed tree efb36bb.\n- Capability in code: kit/evaluator_harness_log.py (118 lines, real parsing/refusal code), kit/emit_custody.py modifications (11 references), or_call.py pre-existing log writing. The tests are frozen (no test file edited by Maker — \"No test file edited\"), so the passing tests aren't self-serving fixtures. The capability is implemented in the module and emitter, not asserted by fixtures.\n\nThe one-pass red: does it count against? The orchestration disclosed it as a measurement artifact (dirty tree), not capability failure. The final measured state is 12/12. The known condition is documented in the instance layer. This is honest reporting. I think the artifact meets the standard.\n\nAlso check: did the Maker edit the test file? \"No test file edited.\" Good — the bar wasn't gamed.\n\nsha256 of the bar given; frozen timestamp 2026-11-08T22:22:10Z, approved twice in Owner's name at same time. Approved twice — that satisfies whatever dual-approval discipline. I can't verify the hash myself (no tools), but the evidence states it.\n\nOne potential wrinkle: the tests ran and passed — when? Presumably after the commit efb36bb. The evidence says \"With the tree committed, the bar is 12/12.\" So the passing run is on the committed state that includes the Maker's work. Good.\n\nAnother wrinkle: D1-D3 test that the model evaluator's turn writes a harness log — but the Maker didn't touch or_call.py because it already wrote sent_at/received_at. So D1-D3 pass on pre-existing code. That's fine; the capability exists in code.\n\nBut wait — does the frozen bar's D1 test target or_call.py's writer or something else? The bar is test_evaluator_harness_log.py. It presumably exercises the or_call harness writing and the custody record reading. Since 12/12 pass, all good.\n\nSo score 1.\n\nObservation: one sentence, what I measured. Something like: \"Frozen bar 12/12 (exit 0) on committed efb36bb with the capability implemented in kit/evaluator_harness_log.py and kit/emit_custody.py (log-sourced check times with refusals naming the entry, deterministic evaluators exempt), the initial D4/D5 red disclosed as the dirty-tree measurement condition, no test edits, and the bar's own wall-clock caveat and deployment-step split preserved.\"\n\nKeep it one sentence. JSON only.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 933,
+        "completion_tokens": 2016,
+        "total_tokens": 2949,
+        "cost": 0.00104043,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 896,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00104043,
+          "upstream_inference_prompt_cost": 3.243e-05,
+          "upstream_inference_completions_cost": 0.001008
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1871,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 24352
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T22:27:32.7Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 832,
+        "moderation_latency": null,
+        "generation_time": 24352,
+        "tokens_prompt": 907,
+        "tokens_completion": 2184,
+        "native_tokens_prompt": 933,
+        "native_tokens_completion": 2016,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1871,
+        "native_tokens_cached": 896,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00104043,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794176852-iT816a2fbDjdEvPUlnnb",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794176852-IfGoExRipTYPvPyrwun6",
+        "upstream_id": "2026110906273230b0d7867867419f",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "2026110906273230b0d7867867419f",
+            "is_byok": false,
+            "latency": 832,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00104043,
+        "cache_discount": 0.00010752,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T22:28:07.800122Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "evaluator_harness_log#p3",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `evaluator_harness_log`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if every check in the frozen bar passes AND the capability it names is present in the code, not merely asserted by a fixture."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION evaluator_harness_log\n\nCLAIM: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. A missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEVIDENCE (gathered before this call; you have no tools here).\n\n1. FROZEN BAR tests/test_evaluator_harness_log.py, sha256 46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5, frozen 2026-11-08T22:22:10Z, approved twice in the Owner's name at 22:22:10Z. Ran 12 tests, OK, exit 0. The twelve checks:\n   D1 one call writes exactly one log entry with sent_at and received_at\n   D2 that entry names the model and the endpoint actually used\n   D3 sent_at <= received_at on a real answer\n   D4 the record's check time is sourced from the harness log\n   D5 the record names the log path\n   D6 a model evaluator with no harness log REFUSES\n   D7 the missing log does not degrade to a note that still writes the record\n   D8 received_at before sent_at refuses, naming the entry\n   D9 an entry missing received_at refuses, naming the entry\n   D10 an unparseable log refuses, never silently skipped\n   D11 a deterministic evaluator with no log is NOT refused\n   D12 the bar carries its own wall-clock caveat in the file\n\n2. MAKER: one generation, exit 0, within the editable set. kit/emit_custody.py +29/-5 (11 references to harness_log), and a new kit/evaluator_harness_log.py of 118 lines exporting a HarnessLogError that carries the offending `call`, parse_instant, a read(path) giving one reading of the log, and a source() for provenance. No test file edited. tools/edi/or_call.py untouched: it already wrote sent_at/received_at (or_call.py:553-559, 577) as a JSON list (append_entry, 255-271).\n\n3. THE ONE-PASS RED THE ORCHESTRATOR FOUND, disclosed and not counted as a Maker failure: after the Maker ran, D4 and D5 reported as failures. They were NOT capability failures. The emitter refuses to write a record on a dirty tree -- 'the emitter's tree is dirty at 3175d750d6e2 (2 change(s) ... M kit/emit_custody.py, ?? kit/evaluator_harness_log.py); a record must name code that exists as a commit'. The Maker's own uncommitted work made its result unmeasurable. The Orchestrator committed the Maker's work as efb36bb to measure, authoring no code. With the tree committed, the bar is 12/12.\n\n4. KNOWN CONDITION, now written into the instance layer: a bar that shells out to the emitter is green only on a committed tree; a dirty tree makes the Maker's own work unmeasurable and the failures read as capability failures.\n\n5. LIMIT THE BAR PINS ITSELF (D12), in its own words: that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right.\n\n6. DEPLOYMENT STEP: the profile-side route /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval is outside the worktree and unreachable by the Maker. The bar declares it a deployment step. It has NOT been performed yet. The in-repo half -- the module and the record that reads it -- is what this job delivers.\n\nDecide: does the artifact meet the frozen standard, on this evidence?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T22:28:07.997154Z",
+    "received_at": "2026-11-08T22:28:33.695907Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 22:28:09 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=1130",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794176888-OIBl6BlShKU31WScuiwV",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;94f79b29-578f-4292-a72f-1d3e001023c4",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a578024e3ab7f456-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794176888-OIBl6BlShKU31WScuiwV",
+      "object": "chat.completion",
+      "created": 1794176888,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar (sha256 46159f05…, 12 tests, OK, exit 0) passes 12/12 on committed work efb36bb, where the capability exists in real code — a new 118-line kit/evaluator_harness_log.py whose HarnessLogError carries the offending call, plus 11 harness_log references in emit_custody.py and pre-existing log-writing in or_call.py — while the sole red (D4/D5) was a disclosed dirty-tree measurement artifact resolved by committing rather than a capability gap, the unperformed profile-side route is a deployment step the bar itself declares outside the delivered in-repo scope, and D12 pins the wall-clock limit in the bar's own words.\"}",
+            "refusal": null,
+            "reasoning": "Let me work through this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. A missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEvidence:\n1. Frozen bar with 12 checks (D1-D12), sha256 given, frozen timestamp, ran 12 tests OK exit 0. The bar was \"approved twice in the Owner's name at 22:22:10Z\" — frozen timestamp same as approval, that seems consistent with the established pattern in prior turns.\n\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py +29/-5 with 11 references to harness_log, and a new kit/evaluator_harness_log.py of 118 lines exporting HarnessLogError carrying the offending `call`, parse_instant, a read(path), and a source() for provenance. No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as a JSON list (append_entry).\n\n3. The one-pass red: after the Maker ran, D4 and D5 reported failures. These were NOT capability failures — the emitter refuses to write a record on a dirty tree (\"a record must name code that exists as a commit\"). The Maker's own uncommitted work made its result unmeasurable. The Orchestrator committed the Maker's work as efb36bb to measure, authoring no code. With the tree committed, the bar is 12/12.\n\n4. Known condition written into the instance layer: a bar that shells out to the emitter is green only on a committed tree.\n\n5. Limit the bar pins itself (D12): honesty about wall clock not proven.\n\n6. Deployment step: profile-side route outside the worktree unreachable by the Maker. Declared a deployment step. NOT performed yet. The in-repo half — the module and the record that reads it — is what this job delivers.\n\nDecision: does the artifact meet the frozen standard on this evidence?\n\nKey considerations:\n\nThe frozen bar ran 12/12 OK, exit 0, on a committed tree. The capability is present in code: kit/evaluator_harness_log.py exists as a new module (118 lines), emit_custody.py has 11 references to harness_log, or_call.py already wrote the log entries. The refusal logic (D6-D10) and the deterministic-evaluator exemption (D11) are tested.\n\nThe one-pass red: D4 and D5 failed initially, but this was diagnosed as a measurement artifact — the dirty tree makes the emitter refuse, so the record isn't written, so D4/D5 (which check the record's contents) fail. The Orchestrator committed the work (authoring no code) and then the bar passed 12/12. This is disclosed, and the known condition is now written into the instance layer. Is this acceptable? The final measurement is 12/12 on a committed tree with the code as a commit. The initial red was an artifact of the measurement harness (emitter refuses on dirty tree), not a capability failure. The red was disclosed and not counted as a Maker failure. This seems like legitimate orchestration — the Maker's work needed to be committed to be measurable. The Orchestrator authored no code. So the final state: code exists as commit efb36bb, bar runs 12/12.\n\nWait — one thing to check: did the Orchestrator committing the Maker's work violate the \"no code authored by others\" rule? Committing is not authoring code. The evidence explicitly says \"authoring no code.\" Fine.\n\nD12: the bar carries its own wall-clock caveat. The evidence quotes it: \"that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right.\" That's the bar pinning its own limit — D12 passes by the bar's own terms. The caveat is disclosed in the evidence, so it's not being hidden.\n\nDeployment step (6): the profile-side route is outside the worktree, unreachable by the Maker. The bar declares it a deployment step. Not performed yet. The in-repo half is what this job delivers. Is this a blocker?\n\nHmm. This is similar to prior patterns: a deployment step outside the editable set declared by the bar itself. The frozen bar's 12 checks all run in-repo and pass 12/12. The bar itself declares the profile-side route a deployment step — meaning the bar doesn't test it, or tests only the in-repo half. The frozen standard is the 12 checks. If the frozen bar's checks are the standard and they all pass, then the artifact meets the frozen standard. The deployment step is outside what the bar measures and outside the Maker's reach. The evidence says \"The in-repo half — the module and the record that reads it — is what this job delivers.\" The bar apparently doesn't require the deployment to have happened for its 12 checks to pass.\n\nBut wait — should I score 0 because the deployment step hasn't been performed? The claim is about \"a model evaluator's turn writes a harness log\" — the actual writing of the log in a real evaluator turn would happen via the profile-side route. The in-repo code reads the log that or_call.py already writes (evidence 2: or_call.py already wrote sent_at/received_at as a JSON list, untouched). So actually the log-writing already exists in-repo (or_call.py:553-559, 577, append_entry 255-271). The new work is the reading/validation side plus the record sourcing. The profile-side route is presumably for wiring the actual model evaluator in the deployed profile — but or_call.py already writes the log. Hmm, actually the deployment step is about the profile-side route /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval. But the evidence says or_call.py untouched and \"it already wrote sent_at/received_at\". So the in-repo log-writing exists. The deployment step is separate.\n\nThe frozen bar is the standard. It ran 12/12. The bar itself declares the deployment step. The claim as tested by the bar: all 12 checks pass. The capability is present in code, not merely asserted by a fixture: the module exists (118 lines, real functions), emit_custody.py has 11 references, or_call.py already writes the log in real code.\n\nOne more check: \"capability present in code, not merely asserted by a fixture\" — the Maker didn't edit the test file. The bar is frozen (sha256). The Maker's changes are in the product code (kit/emit_custody.py +29/-5, new kit/evaluator_harness_log.py). or_call.py already wrote logs — pre-existing capability. So the capability is real code.\n\nPotential concerns:\n\n- The frozen timestamp 2026-11-08T22:22:10Z with approval twice in the Owner's name at the same timestamp — consistent with prior accepted patterns (\"frozen and approved in the same motion\").\n- The one-pass red: disclosed, diagnosed as measurement artifact, resolved by committing. The known condition is now written into the instance layer (evidence 4). This is the kind of thing that in prior judgments was acceptable when disclosed and when the red was an artifact, not a capability gap. The final state is 12/12.\n- Is committing the Maker's work \"the orchestrator authoring code\"? No. And without committing, the emitter refuses by design (records must name code that exists as a commit). This is the designed behavior.\n\n- D4/D5 failures initially: they read as capability failures but were actually \"record not written because tree dirty.\" The emitter's dirty-tree refusal is by design. So the diagnosis is coherent: the record couldn't exist, hence D4/D5 (which inspect the record) failed. Not a capability gap.\n\nScore: 1.\n\nObservation: one sentence measuring what I measured. Something like: \"The frozen bar passes 12/12 on committed tree efb36bb, where the new 118-line kit/evaluator_harness_log.py and the 11 harness_log references in emit_custody.py implement log-sourced check times with refusals naming the offending entry and the deterministic-evaluator exemption, the sole red being the disclosed dirty-tree measurement artifact now recorded as an instance-layer condition, and the bar-declared profile-side deployment step lies outside the delivered in-repo scope.\"\n\nThat's long; needs to be one sentence but can be a substantial one. Keep it accurate: mention 12/12, code presence, the disclosed red as measurement artifact, deployment step declared by bar.\n\nLet me draft: \"Frozen bar sha256 46159f05… passes 12/12 on committed work efb36bb, where the capability exists in code (new 118-line kit/evaluator_harness_log.py with HarnessLogError naming the offending call, 11 harness_log references in emit_custody.py, or_call.py already writing sent_at/received_at); the single red was a disclosed dirty-tree measurement artifact, not a capability failure, and the unperformed profile-side route is a deployment step the bar itself declares outside the delivered in-repo scope, with D12 pinning the wall-clock limit in the bar's own words.\"\n\nThat's one sentence. Good.\n\nJSON only: {\"score\": 1, \"observation\": \"...\"}",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me work through this carefully.\n\nThe dimension is `evaluator_harness_log`. The claim: a model evaluator's turn writes a harness log, and the custody record takes its evaluator check times FROM that log instead of refusing or going hollow. A missing, reversed, partial or unparseable log REFUSES the record and names the offending entry. A deterministic evaluator carrying no log is NOT refused.\n\nEvidence:\n1. Frozen bar with 12 checks (D1-D12), sha256 given, frozen timestamp, ran 12 tests OK exit 0. The bar was \"approved twice in the Owner's name at 22:22:10Z\" — frozen timestamp same as approval, that seems consistent with the established pattern in prior turns.\n\n2. Maker: one generation, exit 0, within editable set. kit/emit_custody.py +29/-5 with 11 references to harness_log, and a new kit/evaluator_harness_log.py of 118 lines exporting HarnessLogError carrying the offending `call`, parse_instant, a read(path), and a source() for provenance. No test file edited. tools/edi/or_call.py untouched — it already wrote sent_at/received_at as a JSON list (append_entry).\n\n3. The one-pass red: after the Maker ran, D4 and D5 reported failures. These were NOT capability failures — the emitter refuses to write a record on a dirty tree (\"a record must name code that exists as a commit\"). The Maker's own uncommitted work made its result unmeasurable. The Orchestrator committed the Maker's work as efb36bb to measure, authoring no code. With the tree committed, the bar is 12/12.\n\n4. Known condition written into the instance layer: a bar that shells out to the emitter is green only on a committed tree.\n\n5. Limit the bar pins itself (D12): honesty about wall clock not proven.\n\n6. Deployment step: profile-side route outside the worktree unreachable by the Maker. Declared a deployment step. NOT performed yet. The in-repo half — the module and the record that reads it — is what this job delivers.\n\nDecision: does the artifact meet the frozen standard on this evidence?\n\nKey considerations:\n\nThe frozen bar ran 12/12 OK, exit 0, on a committed tree. The capability is present in code: kit/evaluator_harness_log.py exists as a new module (118 lines), emit_custody.py has 11 references to harness_log, or_call.py already wrote the log entries. The refusal logic (D6-D10) and the deterministic-evaluator exemption (D11) are tested.\n\nThe one-pass red: D4 and D5 failed initially, but this was diagnosed as a measurement artifact — the dirty tree makes the emitter refuse, so the record isn't written, so D4/D5 (which check the record's contents) fail. The Orchestrator committed the work (authoring no code) and then the bar passed 12/12. This is disclosed, and the known condition is now written into the instance layer. Is this acceptable? The final measurement is 12/12 on a committed tree with the code as a commit. The initial red was an artifact of the measurement harness (emitter refuses on dirty tree), not a capability failure. The red was disclosed and not counted as a Maker failure. This seems like legitimate orchestration — the Maker's work needed to be committed to be measurable. The Orchestrator authored no code. So the final state: code exists as commit efb36bb, bar runs 12/12.\n\nWait — one thing to check: did the Orchestrator committing the Maker's work violate the \"no code authored by others\" rule? Committing is not authoring code. The evidence explicitly says \"authoring no code.\" Fine.\n\nD12: the bar carries its own wall-clock caveat. The evidence quotes it: \"that the times are honest about the wall clock is NOT proven. A harness log proves what the route recorded, not that the clock was right.\" That's the bar pinning its own limit — D12 passes by the bar's own terms. The caveat is disclosed in the evidence, so it's not being hidden.\n\nDeployment step (6): the profile-side route is outside the worktree, unreachable by the Maker. The bar declares it a deployment step. Not performed yet. The in-repo half is what this job delivers. Is this a blocker?\n\nHmm. This is similar to prior patterns: a deployment step outside the editable set declared by the bar itself. The frozen bar's 12 checks all run in-repo and pass 12/12. The bar itself declares the profile-side route a deployment step — meaning the bar doesn't test it, or tests only the in-repo half. The frozen standard is the 12 checks. If the frozen bar's checks are the standard and they all pass, then the artifact meets the frozen standard. The deployment step is outside what the bar measures and outside the Maker's reach. The evidence says \"The in-repo half — the module and the record that reads it — is what this job delivers.\" The bar apparently doesn't require the deployment to have happened for its 12 checks to pass.\n\nBut wait — should I score 0 because the deployment step hasn't been performed? The claim is about \"a model evaluator's turn writes a harness log\" — the actual writing of the log in a real evaluator turn would happen via the profile-side route. The in-repo code reads the log that or_call.py already writes (evidence 2: or_call.py already wrote sent_at/received_at as a JSON list, untouched). So actually the log-writing already exists in-repo (or_call.py:553-559, 577, append_entry 255-271). The new work is the reading/validation side plus the record sourcing. The profile-side route is presumably for wiring the actual model evaluator in the deployed profile — but or_call.py already writes the log. Hmm, actually the deployment step is about the profile-side route /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval. But the evidence says or_call.py untouched and \"it already wrote sent_at/received_at\". So the in-repo log-writing exists. The deployment step is separate.\n\nThe frozen bar is the standard. It ran 12/12. The bar itself declares the deployment step. The claim as tested by the bar: all 12 checks pass. The capability is present in code, not merely asserted by a fixture: the module exists (118 lines, real functions), emit_custody.py has 11 references, or_call.py already writes the log in real code.\n\nOne more check: \"capability present in code, not merely asserted by a fixture\" — the Maker didn't edit the test file. The bar is frozen (sha256). The Maker's changes are in the product code (kit/emit_custody.py +29/-5, new kit/evaluator_harness_log.py). or_call.py already wrote logs — pre-existing capability. So the capability is real code.\n\nPotential concerns:\n\n- The frozen timestamp 2026-11-08T22:22:10Z with approval twice in the Owner's name at the same timestamp — consistent with prior accepted patterns (\"frozen and approved in the same motion\").\n- The one-pass red: disclosed, diagnosed as measurement artifact, resolved by committing. The known condition is now written into the instance layer (evidence 4). This is the kind of thing that in prior judgments was acceptable when disclosed and when the red was an artifact, not a capability gap. The final state is 12/12.\n- Is committing the Maker's work \"the orchestrator authoring code\"? No. And without committing, the emitter refuses by design (records must name code that exists as a commit). This is the designed behavior.\n\n- D4/D5 failures initially: they read as capability failures but were actually \"record not written because tree dirty.\" The emitter's dirty-tree refusal is by design. So the diagnosis is coherent: the record couldn't exist, hence D4/D5 (which inspect the record) failed. Not a capability gap.\n\nScore: 1.\n\nObservation: one sentence measuring what I measured. Something like: \"The frozen bar passes 12/12 on committed tree efb36bb, where the new 118-line kit/evaluator_harness_log.py and the 11 harness_log references in emit_custody.py implement log-sourced check times with refusals naming the offending entry and the deterministic-evaluator exemption, the sole red being the disclosed dirty-tree measurement artifact now recorded as an instance-layer condition, and the bar-declared profile-side deployment step lies outside the delivered in-repo scope.\"\n\nThat's long; needs to be one sentence but can be a substantial one. Keep it accurate: mention 12/12, code presence, the disclosed red as measurement artifact, deployment step declared by bar.\n\nLet me draft: \"Frozen bar sha256 46159f05… passes 12/12 on committed work efb36bb, where the capability exists in code (new 118-line kit/evaluator_harness_log.py with HarnessLogError naming the offending call, 11 harness_log references in emit_custody.py, or_call.py already writing sent_at/received_at); the single red was a disclosed dirty-tree measurement artifact, not a capability failure, and the unperformed profile-side route is a deployment step the bar itself declares outside the delivered in-repo scope, with D12 pinning the wall-clock limit in the bar's own words.\"\n\nThat's one sentence. Good.\n\nJSON only: {\"score\": 1, \"observation\": \"...\"}",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 933,
+        "completion_tokens": 2180,
+        "total_tokens": 3113,
+        "cost": 0.00112243,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 896,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00112243,
+          "upstream_inference_prompt_cost": 3.243e-05,
+          "upstream_inference_completions_cost": 0.00109
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2015,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 25541
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T22:28:08.046Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1095,
+        "moderation_latency": null,
+        "generation_time": 25541,
+        "tokens_prompt": 907,
+        "tokens_completion": 2411,
+        "native_tokens_prompt": 933,
+        "native_tokens_completion": 2180,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 2015,
+        "native_tokens_cached": 896,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00112243,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794176888-ooY1h2smEoDgXvJk3EbZ",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794176888-OIBl6BlShKU31WScuiwV",
+        "upstream_id": "20261109062808d647724db37f4f96",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "20261109062808d647724db37f4f96",
+            "is_byok": false,
+            "latency": 1094,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00112243,
+        "cache_discount": 0.00010752,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T22:28:44.555295Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  }
+]

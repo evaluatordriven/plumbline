@@ -1,0 +1,20 @@
+The dispatch's `read` paths exist and the work tree is untouched. Done — handing back to the Orchestrator.
+
+Written (outside the work tree, as this route requires):
+
+  /home/jarbis1/tmp/plumbline-job25-record-1/aider-prompt.md
+  /home/jarbis1/tmp/plumbline-job25-record-1/aider-dispatch.json
+
+What I did:
+
+1. Read only the ratified packet at /home/jarbis1/tmp/plumbline-job25-record-1/packet.json and the findings. Test cmd: `EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py`; frozen `tests/validate_schemas.py`, `tests/fixtures/**`; editable `kit/emit_custody.py`, `kit/custody_history.py`.
+
+2. Ran the packet's test command myself in the work tree at f581787 (clean). Measured red: `140/144 PASSED — 4 FAILED` — JOB25 b1, b2, c1, d1. This matches the findings' four failures, though the tally figure in findings (137/141) is a different case count than the bar at this commit produces; the failing ids are the same four.
+
+3. This is a multi-file change with a frozen suite, so I wrote no implementation. The prompt names the four failing cases as the spec with their quoted assertions, marks the frozen paths as do-not-edit, and contains no solution.
+
+4. Two pre-existing files were present from an earlier generation and were stale: the prompt cited `137/141` and the old `job-rejected` fixture shape, and the dispatch read only `job-rejected`. I replaced both with the state I measured, and the dispatch's `read` list now also carries the two `failures/unstamped` files the failing cases actually drive (both verified to exist). `files` remains the two editable paths only; `message` is the prompt path; `test_cmd` is the packet's.
+
+I did not call Aider, did not edit the work tree, did not score, and did not declare a pass. No cost measured, so nothing written to the cost file.
+
+session_id: 20261109_193810_d16baa

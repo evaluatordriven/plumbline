@@ -1,0 +1,116 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "evidence_dir": "custody/evidence",
+  "subject": [
+    "tests/test_loop_custody_on_finish.py",
+    "tests/test_loop_custody_sources.py"
+  ],
+  "levelClaimed": "CL1",
+  "bar": {
+    "file": "tests/test_job1_fixture_pin.py",
+    "dimensions": [
+      {
+        "id": "fixture_pin_reproduced",
+        "criterion": "the fixtures plant the custody bar and the predecessor bytes reproduce the pin target",
+        "scale": {
+          "type": "pass_fail",
+          "threshold": 1
+        }
+      }
+    ],
+    "frozenAt": "2026-11-08T01:07:31Z",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)"
+  },
+  "instrument": {
+    "rubric_file": "custody/files/tests/test_job1_fixture_pin.py",
+    "runner_file": "custody/files/tests/test_loop_custody_on_finish.py"
+  },
+  "maker": {
+    "role": "maker",
+    "name": "plumbline-maker",
+    "kind": "model",
+    "method": "aider, diff edit format, non-streaming",
+    "version": "aider via /home/jarbis1/.venvs/aider",
+    "method_file": "dispatch.json",
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek-flash",
+      "endpoint": "api.deepseek.com",
+      "readOnly": false
+    },
+    "harness_log": "evidence/harness-maker.log",
+    "calls": [
+      "maker-1"
+    ],
+    "call_count": 1,
+    "cost_usd": 0.00911638
+  },
+  "evaluators": [
+    {
+      "id": "evaluator",
+      "who": "plumbline-eval",
+      "name": "plumbline-eval",
+      "kind": "model",
+      "harness_log": "custody/evidence/harness-evaluator.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "endpoint": "api.z.ai",
+        "readOnly": true
+      },
+      "runs": 3
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "evaluator",
+      "evidence_file": "harness-evaluator.log"
+    }
+  ],
+  "passes": {
+    "fixture_pin_reproduced": {
+      "evaluator": "evaluator",
+      "call": "fixture_pin_reproduced#p1",
+      "run": 1,
+      "batch": "b1",
+      "failureCondition": {
+        "fixture_pin_reproduced": "the fixtures do not plant the custody bar, or the predecessor bytes do not reproduce the named pin target"
+      },
+      "evidence": {
+        "fixture_pin_reproduced": "verdict-fixture_pin_reproduced-p1.json"
+      }
+    }
+  },
+  "retention": {
+    "where": "/home/jarbis1/tmp/plumbline-job1-record-1"
+  },
+  "seats": {
+    "bar_authored_by": "moonshotai/kimi-k2.7-code (OpenRouter)",
+    "judged_by": "plumbline-eval (the Evaluator)"
+  },
+  "routing": {
+    "evaluator": {
+      "via": "openrouter.ai",
+      "provider": "Z.AI",
+      "slug": "z-ai/fp8",
+      "host": "api.z.ai",
+      "declaredAt": "2026-11-08T01:10:51Z"
+    }
+  },
+  "disposition": {
+    "state": "given",
+    "by": "Steve Moitozo II",
+    "at": "2026-11-08T19:29:58Z"
+  },
+  "disposition_words": "Given. The work shipped in #16; the five gaps are the packet-template defect fixed in Jobs 3 and 4.",
+  "x-plumbline": {
+    "disposition_words": "Given. The work shipped in #16; the five gaps are the packet-template defect fixed in Jobs 3 and 4.",
+    "disposition_event": {
+      "at": "2026-11-08T19:29:58Z",
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "source": "inputs/custody-events.jsonl"
+    }
+  }
+}

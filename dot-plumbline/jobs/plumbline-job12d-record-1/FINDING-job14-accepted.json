@@ -1,0 +1,73 @@
+{
+  "job": "job14-allow-hand-times-boundary",
+  "opened": "2026-11-09",
+  "closed": "2026-11-09",
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "disposition_state": "not_yet_given",
+  "work_tree": "/home/jarbis1/tmp/plumbline-job12d",
+  "branch": "job12-on-0920",
+  "bar_commit": "851a07de09f89e2984d7a84f571a451be1a9b06e",
+  "fix_commit": "2c2c03b",
+  "target": "under --allow-hand-times an unsourced model-evaluator check time is refused, an unstamped call is still named, and the switch still admits genuine hand-entered times",
+
+  "verdict_basis": {
+    "statement": "The bar is met on its own cases. An accepted verdict requires the standard this job froze, not the whole repo green.",
+    "green_target_cases": ["J14/A1", "J14/A2", "J14/A3a", "J14/A3b", "J14/A4", "D13", "D14"],
+    "suite": "python3 -m pytest tests/test_evaluator_harness_log.py -q -> 15 passed in 1.09s",
+    "validate_schemas": "135/139 PASSED — 4 FAILED",
+    "reds_remaining_and_why_out_of_scope": {
+      "custody · a hand time 59 s off is accepted, and the record carries the LOG's time": "other job's territory; excluded by the brief; untouched by the diff",
+      "custody · T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)": "other job's territory; excluded by the brief; untouched by the diff",
+      "custody · T3 with --allow-hand-times the record is written and hand_times lists the hand fields with file:line": "other job's territory; excluded by the brief; untouched by the diff",
+      "custody · E2 under --allow-hand-times the typed pass time is listed and the record carries the call's time": "other job's territory; excluded by the brief; untouched by the diff"
+    }
+  },
+
+  "generation_account": {
+    "generation_1": {
+      "charged": true,
+      "diff": "kit/emit_custody.py, +45/-7 (52 changed lines, one file)",
+      "what_it_does": "flag_calls() returns the entries it added; build() accumulates them; under `if hand and allow_hand` each unsourced evaluator check time is refused with kind `time`, naming the log, the basis (response Date header / response created epoch) and file:line, for EVERY unstamped call; the no-switch `[hand-time]` branch is unchanged",
+      "cost": {"amount": 0.09, "source": "aider session print"},
+      "engine_tokens": ["92k sent, 1.3k cache hit, 21k received", "96k sent, 58k cache hit, 6.3k received", "108k sent, 58k cache hit, 5.6k received"],
+      "boundary_check": "all three claims verified against the code before commit: switch confined to the allow_hand branch; every call named (no first-only break); no-switch hand-time path untouched"
+    },
+    "cap": {"charged": 1, "allowed": 4, "budget_usd": 0.20, "spent_usd": 0.09}
+  },
+
+  "before_the_fix": {
+    "statement": "Six dispatches, three local models, zero changed lines. Five distinct failures, three of them the Orchestrator's and two the seats' context handling.",
+    "orchestrator_failures": [
+      "PLUMBLINE_MAKER_LOG unset — Aider refused to start (exit 2)",
+      "PLUMBLINE_MAKER_PROMPT_USD / PLUMBLINE_MAKER_COMPLETION_USD unset — Aider refused to start (exit 2)",
+      "no output budget: Aider never set num_predict for ollama models; qwen3.6 spent ~1,100 tokens thinking before emitting a character, so every local generation was starved, not confused"
+    ],
+    "seat_failures": [
+      "Ornith: three turns of prose, one permission probe (qprobe.py, a 'no new files' breach), one unverified upstream-archaeology claim",
+      "qwen3.6 (ornith's replacement): a refusal to acknowledge a dispatch that was on disk, 3,861 bytes, named by absolute path, at the moment it was handed over"
+    ]
+  },
+
+  "roster_finding": {
+    "statement": "The cloud seat carried what three local models could not. Stated as a measurement, not an opinion.",
+    "evidence": "six dispatches on local models (Ornith, qwen3.6:35b) produced zero changed lines; the first DeepSeek dispatch produced a 52-line behavioural diff satisfying all four target cases without moving any other-job case"
+  },
+
+  "route_defects_found_and_fixed": [
+    {"defect": "route-maker fell through silently when aider-dispatch.json was absent at Maker-session exit — a silent no-op where a refusal belonged", "fix": "5 s poll for the dispatch, then a named refusal, exit 3", "owner": "Owner"},
+    {"defect": "run-aider returned silently when Aider emitted no session cost line — a missing file indistinguishable from free", "fix": "writes {\"amount\": null, \"source\": \"no aider session cost line\", \"note\": \"unrecorded, not zero\"}", "owner": "Orchestrator"}
+  ],
+
+  "instrument_history_note": "Job 14 cost four instrument turns and two brief-quality defects of the Orchestrator's making (an E3-only brief that was not E3-only; conjunct 2 specified against a surface that publishes nothing). The seat stopped at both instead of writing something that could not fail. A future reader must not conclude the instrument was the problem — it was the thing that made the job measurable.",
+
+  "handover": {
+    "job": "job13-dispose-read",
+    "opening_facts": [
+      "disposition: null in both probe arms (as-is, and with decided_at added to the dispose ledger line)",
+      "adding decided_at changed no byte of hand_times or of the record",
+      "six of six real records carry a disposition block, so the claim is narrow: this dispose line shape is not read, and it drops without a refusal"
+    ],
+    "neighbouring_reds": ["the 59 s tolerance", "T2c", "T3", "E2"]
+  }
+}

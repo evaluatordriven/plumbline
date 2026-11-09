@@ -1,0 +1,6 @@
+{
+  "terminal_state": "needs_owner",
+  "outcome": "needs_owner",
+  "disposition_state": "not_yet_given",
+  "reason": "The harness-log capability is green on its own bar (12/12) and the Maker's code is correct -- that is what this job proved. The repository suite cannot be made green by fixture attribution: three conditions stack (the harness-log refusal, the ledger-writer requirement, and the fixture's own disposition shape), and each fix exposed the next. job-rejected cannot simultaneously serve the emitting cases and the refusal cases. The road is blocked by fixture archaeology, which is a decision for the Owner, not a verdict on the seat."
+}

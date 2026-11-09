@@ -1,0 +1,134 @@
+{
+  "job_id": "2026-11-08-cl1-time-source",
+  "job_name": "a CL1 packet may not carry a time that no act stamped",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "artifact": {
+    "repo": "plumbline",
+    "paths": [
+      "kit/emit_packet.py"
+    ]
+  },
+  "base": {
+    "ref": "ae95b38",
+    "branch": "feat/packet-cl1-time-source",
+    "note": "cut from Job 3's commit; Job 3's bar is green on this base"
+  },
+  "buyer": "Steve Moitozo II",
+  "specialist": "Steve Moitozo II",
+  "human_seat": "Steve Moitozo II",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "maker": {
+    "name": "plumbline-maker",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+    "handoff": "rule12"
+  },
+  "evaluator": {
+    "name": "plumbline-eval",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "openrouter",
+    "runs": 3
+  },
+  "standard_ref": {
+    "doc": "tests/test_packet_cl1_time_source.py",
+    "version": "61a6902b"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "a48a4645"
+  },
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "budget": {
+      "amount": 7,
+      "unit": "USD",
+      "time_hours_lt": 2
+    }
+  },
+  "k": 4,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "tests/test_packet_cl1_time_source.py",
+      "version": "61a6902b",
+      "hardness": "INVARIANT",
+      "note": "the frozen bar is the ground truth: 6 tests over the typed-time rule"
+    }
+  ],
+  "escalation": {
+    "route": "Owner",
+    "note": "needs_owner goes to the Architect for options and a recommendation; the Orchestrator delivers them"
+  },
+  "proposed": {
+    "level_claimed_for_own_record": "CL1",
+    "drafted_by": "plumbline-conductor (Orchestrator), from the Architect's ruling already embodied in the frozen bar"
+  },
+  "bar": {
+    "file": "tests/test_packet_cl1_time_source.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "frozenAt": "2026-11-08T03:51:46Z",
+    "dimensions": [
+      {
+        "id": "no_untimeable_times",
+        "criterion": "a CL1 packet carries no typed time field for approvals or disposition; times come from custody-events.jsonl, stamped by the act that wrote them",
+        "scale": {
+          "type": "count",
+          "threshold": 0
+        }
+      }
+    ],
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      }
+    ]
+  },
+  "disposition": "not_yet_given",
+  "disposition_by": "Steve Moitozo II",
+  "read": [
+    "tests/test_packet_cl1_time_source.py"
+  ],
+  "editable": [
+    "kit/emit_packet.py"
+  ],
+  "frozen": [
+    "tests/test_packet_cl1_time_source.py",
+    "tests/test_packet_cl1_sources.py",
+    "kit/emit_custody.py",
+    "kit/custody_history.py",
+    "kit/custody_ledger.py",
+    "kit/conductor_loop.py",
+    "schemas/instance-extensions.json",
+    "tools/pin.json"
+  ],
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "disposition_state": "given"
+}

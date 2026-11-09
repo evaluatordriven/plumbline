@@ -1,0 +1,22 @@
+Delivered. I did not measure a cost, so no cost file was written.
+
+**What I found**
+
+- Packet read at the given path only: test command is the frozen `tests/test_disposition_line_state.py`, frozen set is that test plus its fixture directory, editable set is `kit/emit_custody.py` alone.
+- Ran the packet's test command at the branch head (`0000feb`): **2 failed, 3 passed** — exactly the red the findings describe. Case A (contradiction) exits 0 and drops `declined`; case C (unreadable shape) exits 0 and writes the record through.
+- This is a kit change against a frozen suite, so I did **not** write the implementation in the work tree. The work tree is clean at `0000feb` and the frozen suite is still red there.
+
+**What I verified about the bar being satisfiable**
+
+In throwaway trees only (a copied tree, then a temporary git worktree I removed afterwards), a ~10-line change inside `kit/emit_custody.py` — a hard `disposition.state` gap on contradiction or on an unreadable shape, leaving the record's state the packet's — turned the bar **5 passed**, and the full `pytest tests` went from `2 failed, 258 passed` to **260 passed, 3 skipped**, no regressions. The record's disposition state still came from `packet.disposition_state`; the line was checked, never used.
+
+**Delivered files**
+
+    /home/jarbis1/tmp/plumbline-job13-record-1/aider-prompt.md
+    /home/jarbis1/tmp/plumbline-job13-record-1/aider-dispatch.json
+
+The prompt names the failing tests as the spec, names the frozen paths as do-not-edit, states the three required outcomes (contradiction refused naming both values and the field, agreement ignored, unreadable shape refused by name) and the two invariants that make a green bar legitimate — the line is checked never used, and the existing `disposition.state` gap/exit 1 is reused with no new refusal kind and no corpus change. It contains no solution code. The dispatch has `message` pointing at the prompt, `files` = `kit/emit_custody.py` only, `read` = the frozen test and fixture files, and the packet's test command verbatim.
+
+I did not call Aider, did not score, and did not declare a pass. The route launches Aider after I exit.
+
+session_id: 20261109_200413_3140ca

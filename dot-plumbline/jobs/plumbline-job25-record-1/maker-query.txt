@@ -1,0 +1,32 @@
+You are dispatched by the Orchestrator. This is not a chat.
+
+Findings: /home/jarbis1/tmp/plumbline-job25-record-1/findings.md
+Work tree: /home/jarbis1/tmp/plumbline-hl-redo
+Cost file: /home/jarbis1/tmp/plumbline-job25-record-1/cost-gen1b.json
+Record directory: /home/jarbis1/tmp/plumbline-job25-record-1
+
+The findings may be empty on the first round. Read this packet, and only this
+packet, for artifact.test_cmd, artifact.frozen, and artifact.editable:
+
+  /home/jarbis1/tmp/plumbline-job25-record-1/packet.json
+
+This is the ratified job packet for the work you are doing. The work tree
+contains other files named packet.json that belong to different jobs, and at
+least one of them is a finished job whose bar is already green. Do not read or
+act on any other packet.json. If the path above is unreadable, stop and say so
+rather than searching for a substitute. Run the test command from THAT packet
+so you see its red. Do not score. Do not declare a pass.
+
+If this is a kit change, a multi-file change, or the bar is a frozen suite,
+do not write the implementation. Write:
+  /home/jarbis1/tmp/plumbline-job25-record-1/aider-prompt.md
+  /home/jarbis1/tmp/plumbline-job25-record-1/aider-dispatch.json
+The prompt names the failing tests as the spec and contains no solution.
+The dispatch JSON has message, files (editable only), read (frozen tests),
+and test_cmd. Then stop. This route launches Aider after you exit. Do not
+call Aider yourself.
+
+A one-file smoke with no frozen suite may be written directly, inside the
+editable paths only. Do not edit frozen tests. Do not change the bar. If you
+see held-out material, stop and say so. If you measured a cost, write
+{"amount": N} to the cost file. If you did not, do not invent it.

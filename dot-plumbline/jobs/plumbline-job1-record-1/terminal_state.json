@@ -1,0 +1,7 @@
+{
+  "job_id": "2026-11-08-job1-fixture-pin",
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "disposition_state": "not_yet_given",
+  "notes": "Pin-reproduction green, not visible-failure repair. Scored dimension fixture_pin_reproduced against tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59). Pass rule: three scored runs, mean 1.0, min 1, T_accept 1, T_dim 1 -> accept. Evaluator cost $0.00162477. Ordering: freeze 2026-11-08T01:07:31Z, pin 2026-11-08T01:10:51Z, first evaluator call 2026-11-08T01:11:23Z. Maker: deepseek-flash, startedAt 2026-11-08T01:07:56Z, producedAt 2026-11-08T01:09:41Z. Artifact: two editable files changed (tests/test_loop_custody_on_finish.py and tests/test_loop_custody_sources.py) to reproduce target predecessor pin 049808b1; all four suites OK. disposition_state remains not_yet_given because the Owner has not acted."
+}

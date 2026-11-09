@@ -1,0 +1,23 @@
+{
+  "iteration": 1,
+  "verdict": "accept",
+  "pass_rule": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "mean": 1.0,
+    "min": 1,
+    "runs": 3,
+    "result": "accept"
+  },
+  "instrument_in_force": {
+    "rubric_sha256": "0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59",
+    "code_sha256": "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+  },
+  "violations": [],
+  "passes": [
+    {
+      "pass_id": "fixture_pin_reproduced",
+      "artifact": "passes/fixture_pin_reproduced.json"
+    }
+  ]
+}

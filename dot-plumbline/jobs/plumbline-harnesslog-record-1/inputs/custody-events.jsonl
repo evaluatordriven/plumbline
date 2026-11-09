@@ -1,0 +1,4 @@
+{"event": "freeze", "at": "2026-11-08T22:22:10Z", "bar_file": "custody/bar.md", "bar_sha256": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5", "writer": "kit/custody_ledger.py@cb22c1a89266"}
+{"event": "approve", "role": "buyer", "by": "Steve Moitozo II", "kind": "person", "at": "2026-11-08T22:22:10Z", "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5", "adopted": null, "writer": "kit/custody_ledger.py@cb22c1a89266"}
+{"event": "approve", "role": "specialist", "by": "Steve Moitozo II", "kind": "person", "at": "2026-11-08T22:22:10Z", "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5", "adopted": null, "writer": "kit/custody_ledger.py@cb22c1a89266"}
+{"event": "pin", "seat": "evaluator", "via": "openrouter.ai", "provider": "Z.AI", "slug": "z-ai/fp8", "host": "api.z.ai", "at": "2026-11-08T22:26:48Z", "writer": "kit/custody_ledger.py@cb22c1a89266"}

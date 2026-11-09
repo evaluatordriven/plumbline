@@ -1,0 +1,42 @@
+{
+  "pass_id": "drain_at_turn_start#p1",
+  "dimension": "drain_at_turn_start",
+  "status": "filed",
+  "channel": "harness",
+  "provider": "Z.AI",
+  "model": {
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "api.z.ai"
+  },
+  "scores": [
+    {
+      "dimension": "drain_at_turn_start",
+      "score": 1
+    },
+    {
+      "dimension": "drain_at_turn_start",
+      "score": 1
+    },
+    {
+      "dimension": "drain_at_turn_start",
+      "score": 1
+    }
+  ],
+  "runs": 3,
+  "at": "2026-11-08T18:28:18.604289+00:00",
+  "call_times": [
+    "2026-11-08T18:28:18.604289+00:00",
+    "2026-11-08T18:29:04.887805+00:00",
+    "2026-11-08T18:29:45.872407+00:00"
+  ],
+  "evidence": {
+    "drain_at_turn_start": "verdict-drain_at_turn_start-p1.json"
+  },
+  "standard": {
+    "ref": "tests/test_seat_move_notice_drain.py",
+    "version": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+  },
+  "void_cause": null,
+  "quote": "Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (the legacy 12-test bar also OK), and against the real conductor profile a live-enqueued notice (ebe0c6a5...) was staged by prepare_turn \u2014 mailbox emptied to exactly one inflight receipt with the context string returned \u2014 and removed by consume_turn, with empty-mailbox, corrupt-receipt, and stranded-inflight fail-closed behavior bar-covered; the uninstalled turn loop and the misdirected dispatch file list are disclosed out-of-scope gaps, not part of what this bar tests."
+}

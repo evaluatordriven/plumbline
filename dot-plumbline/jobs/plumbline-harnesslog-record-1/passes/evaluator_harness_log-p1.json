@@ -1,0 +1,41 @@
+{
+  "pass_id": "evaluator_harness_log#p1",
+  "dimension": "evaluator_harness_log",
+  "status": "filed",
+  "channel": "harness",
+  "provider": "Z.AI",
+  "model": {
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "api.z.ai"
+  },
+  "scores": [
+    {
+      "dimension": "evaluator_harness_log",
+      "score": 1
+    },
+    {
+      "dimension": "evaluator_harness_log",
+      "score": 1
+    },
+    {
+      "dimension": "evaluator_harness_log",
+      "score": 1
+    }
+  ],
+  "runs": 3,
+  "call_times": [
+    "2026-11-08T22:27:26.881300+00:00",
+    "2026-11-08T22:27:57.137990+00:00",
+    "2026-11-08T22:28:33.695907+00:00"
+  ],
+  "evidence": {
+    "evaluator_harness_log": "verdict-evaluator_harness_log-p1.json"
+  },
+  "standard": {
+    "ref": "tests/test_evaluator_harness_log.py",
+    "version": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5"
+  },
+  "void_cause": null,
+  "quote": "All twelve frozen-bar checks pass (12/12, exit 0) once the Maker's work is committed as efb36bb \u2014 the lone red on D4/D5 was the emitter's own dirty-tree custody gate refusing to measure, not a capability gap \u2014 and the capability is real code, not fixture assertion: kit/evaluator_harness_log.py (118 lines) supplies read(path), source() provenance, and a HarnessLogError carrying the offending call for the refuse-and-name paths, kit/emit_custody.py wires 11 harness_log references into the record (D4/D5), or_call.py already wrote sent_at/received_at entries for model turns (D1\u2013D3), the deterministic carve-out holds (D11), and both the wall-clock caveat (D12) and the out-of-worktree route deployment are declared limits outside the delivered in-repo scope."
+}

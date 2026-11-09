@@ -1,0 +1,632 @@
+[
+  {
+    "call": "no_untimeable_times#p1",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `no_untimeable_times`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full and both control cases behaved as declared."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION no_untimeable_times\n\nCLAIM: a CL1 packet may not carry a time that no act stamped. kit/emit_packet.py's cl1_source_gaps now reports a typed bar.approvals[].at and a typed disposition.at as gaps, because those times are stamped by the ledger's approve/dispose acts and not written into the packet. The packet keeps role, by and barDigest on an approval, and by and state on a disposition.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f) passes: `PYTHONPATH=. python3 tests/test_packet_cl1_time_source.py` -> Ran 6 tests, OK. Before the work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap.\n\n2. kit/emit_packet.py gained 13 insertions, 0 deletions, hashing to d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3. No other tracked file changed; the bar was not edited.\n\n3. The added code was read: after the existing approval checks it appends a gap for any non-blank approval `at`, and after the disposition.by check it appends a gap for a non-blank disposition `at`. Both messages name the ledger act as the source of the time.\n\n4. Job 3's bar on the same tree still passes: tests/test_packet_cl1_sources.py Ran 6 tests, OK — the new rule did not regress the earlier gate.\n\n5. CONTROL K1 conforms — on the job tree, a clean CL1 packet yields no gaps; adding a typed approval `at` yields exactly one approval-time gap, and adding a typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared.\n\n6. CONTROL K2 does_not_conform — on the untouched base cf283e71 the import fails: \"cannot import name 'cl1_source_gaps' from 'kit.emit_packet'\". Observed does_not_conform, as declared.\n\n7. Regression surface: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, and the one failure (validate_audit) reproduces identically on the untouched base, so it is pre-existing.\n\n8. Disclosed limit: no E-DI corpus resolves on this host, so five corpus checks SKIP; the gate was validated against the vendored pin.\n\nDecide: does the evidence show the typed-time rule was implemented as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T03:54:09.348620Z",
+    "received_at": "2026-11-08T03:54:33.751577Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 03:54:10 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=44,cfOrigin;dur=0,cfWorker;dur=1440",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794110049-KnKBaAfb5UKVBGucMYKO",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;3c757081-3add-4dd1-95c9-7e6d87919d92",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a571a2812e308b1f-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794110049-KnKBaAfb5UKVBGucMYKO",
+      "object": "chat.completion",
+      "created": 1794110049,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b…, Ran 6 tests OK) passes after a 13-insertion, 0-deletion change to kit/emit_packet.py that reports typed bar.approvals[].at and disposition.at as gaps naming the ledger approve/dispose acts as the time source; control K1 conforms (clean packet → no gaps, each typed time → exactly one gap), control K2 does_not_conform as declared (base cf283e71 fails to import cl1_source_gaps), the earlier cl1-sources bar and all 131 validate_schemas cases still behave as designed, and the single run_all failure (validate_audit) reproduces identically on the untouched base.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this evaluation request carefully.\n\nThe dimension is `no_untimeable_times` — the claim is that a CL1 packet may not carry a time that no act stamped. Specifically, `kit/emit_packet.py`'s `cl1_source_gaps` should now report:\n1. A typed `bar.approvals[].at` as a gap (because the time is stamped by the ledger's approve act, not written into the packet)\n2. A typed `disposition.at` as a gap (stamped by the dispose act)\n\nThe packet keeps `role`, `by`, and `barDigest` on an approval, and `by` and `state` on a disposition.\n\nNow let me check the evidence against the requirements for a score of 1:\n\nRequirements per my instructions: \"Score 1 only if the frozen bar passes in full and both control cases behaved as declared.\"\n\n1. **Frozen bar passes in full**: Evidence item 1 says the frozen bar `tests/test_packet_cl1_time_source.py` (sha256 61a6902b...) passes: Ran 6 tests, OK. Before the work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap. This shows the bar previously failed with exactly the two gaps the claim addresses (approval.at not reported as gap, disposition.at not reported as gap), and now passes. The bar hash is given, suggesting it's frozen/unchanged.\n\n2. **Change is minimal and only in the target file**: Evidence item 2: 13 insertions, 0 deletions in kit/emit_packet.py, hashing to d851fec8... No other tracked file changed; the bar was not edited. Good — the frozen bar wasn't tampered with.\n\n3. **Code review**: Evidence item 3: The added code appends a gap for non-blank approval `at` and for non-blank disposition `at`, with messages naming the ledger act as source. This matches the claim.\n\n4. **No regression of prior gate**: Evidence item 4: Job 3's bar `tests/test_packet_cl1_sources.py` Ran 6 tests, OK.\n\n5. **Control K1 (conforms)**: On the job tree, a clean CL1 packet yields no gaps; adding typed approval `at` yields exactly one approval-time gap; adding typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared. ✓\n\n6. **Control K2 (does_not_conform)**: On untouched base cf283e71, import fails: cannot import name 'cl1_source_gans'... wait, 'cl1_source_gaps' from 'kit.emit_packet'. Observed does_not_conform, as declared. ✓ This is a negative control showing the rule didn't exist before — the function itself is new. Hmm, wait. Actually, let me think about this. K2 is supposed to be a does_not_conform control. The base lacks the function entirely, so the import fails. Is that a valid does_not_conform? The declared behavior is \"does_not_conform\" and observed does_not_conform. The instruction says \"both control cases behaved as declared.\" K2 was declared does_not_conform and observed does_not_conform. So yes, it behaved as declared.\n\n   Hmm, but one might question: is an import failure a valid \"does_not_conform\"? The point of K2 is to show the rule is genuinely implemented in the working tree and not present in the base — i.e., the test would fail without the change. An import failure on base demonstrates the function is new. The control was declared as \"does_not_conform\" and observed as such. As long as the behavior matches the declaration, that's what my instruction requires.\n\n7. **Regression surface**: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, the one failure (validate_audit) reproduces identically on untouched base, so pre-existing. This is fine.\n\n8. **Disclosed limit**: No E-DI corpus, five corpus checks SKIP; gate validated against vendored pin. This is a disclosed limitation, not a failure of the frozen bar or controls.\n\nNow, the frozen bar passes in full (6 tests, OK), and both controls behaved as declared (K1 conforms, K2 does_not_conform). The change is surgical (13 insertions, 0 deletions in one file), the bar wasn't edited (hash given), no regressions beyond a pre-existing failure.\n\nOne thing to check: does the evidence support that the frozen bar specifically tests the typed-time rule? The bar's name is `test_packet_cl1_time_source.py`, and its pre-work failures were exactly about 'disposition.at' not found in gaps and the typed-approval case producing no gap. So the bar encodes the claim: typed times must be reported as gaps. Post-work it passes.\n\nAlso evidence item 3 confirms the code adds gaps for non-blank `at` fields in both approval and disposition, with messages naming the ledger act as the source — matching the claim's semantic (\"times stamped by the ledger's approve/dispose acts and not written into the packet\").\n\nDoes anything fail? The disclosed limit about the corpus is a limitation but the dimension's gate is the frozen bar + controls, which pass. The pre-existing validate_audit failure reproduces on base, so not caused by this change.\n\nScore: 1.\n\nObservation: one sentence measuring what I measured. Something like: \"The frozen bar test_packet_cl1_time_source.py (6 tests) passes on the 13-insertion emit_packet.py change that gaps typed approval.at and disposition.at as ledger-stamped times, with K1 yielding exactly one gap per typed time on an otherwise clean packet and K2 failing to import cl1_source_gaps on base cf283e71, and no regressions beyond a pre-existing validate_audit failure.\"\n\nNeed to be one sentence. Keep it tight.\n\nOutput format: single JSON object, nothing else: {\"score\": 1 or 0, \"observation\": \"<...>\"}.\n\nLet me draft the observation: \"The frozen bar (sha256 61a6902b…, 6 tests) passes after a 13-insertion change to kit/emit_packet.py that gaps typed approval.at and disposition.at as ledger-stamped times; control K1 shows a clean packet yields no gaps and each typed time yields exactly one named gap, control K2 shows base cf283e71 cannot import cl1_source_gaps, and the sole run_all failure (validate_audit) reproduces on base.\"\n\nThat's one sentence (with semicolons). Good.\n\nScore: 1.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this evaluation request carefully.\n\nThe dimension is `no_untimeable_times` — the claim is that a CL1 packet may not carry a time that no act stamped. Specifically, `kit/emit_packet.py`'s `cl1_source_gaps` should now report:\n1. A typed `bar.approvals[].at` as a gap (because the time is stamped by the ledger's approve act, not written into the packet)\n2. A typed `disposition.at` as a gap (stamped by the dispose act)\n\nThe packet keeps `role`, `by`, and `barDigest` on an approval, and `by` and `state` on a disposition.\n\nNow let me check the evidence against the requirements for a score of 1:\n\nRequirements per my instructions: \"Score 1 only if the frozen bar passes in full and both control cases behaved as declared.\"\n\n1. **Frozen bar passes in full**: Evidence item 1 says the frozen bar `tests/test_packet_cl1_time_source.py` (sha256 61a6902b...) passes: Ran 6 tests, OK. Before the work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap. This shows the bar previously failed with exactly the two gaps the claim addresses (approval.at not reported as gap, disposition.at not reported as gap), and now passes. The bar hash is given, suggesting it's frozen/unchanged.\n\n2. **Change is minimal and only in the target file**: Evidence item 2: 13 insertions, 0 deletions in kit/emit_packet.py, hashing to d851fec8... No other tracked file changed; the bar was not edited. Good — the frozen bar wasn't tampered with.\n\n3. **Code review**: Evidence item 3: The added code appends a gap for non-blank approval `at` and for non-blank disposition `at`, with messages naming the ledger act as source. This matches the claim.\n\n4. **No regression of prior gate**: Evidence item 4: Job 3's bar `tests/test_packet_cl1_sources.py` Ran 6 tests, OK.\n\n5. **Control K1 (conforms)**: On the job tree, a clean CL1 packet yields no gaps; adding typed approval `at` yields exactly one approval-time gap; adding typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared. ✓\n\n6. **Control K2 (does_not_conform)**: On untouched base cf283e71, import fails: cannot import name 'cl1_source_gans'... wait, 'cl1_source_gaps' from 'kit.emit_packet'. Observed does_not_conform, as declared. ✓ This is a negative control showing the rule didn't exist before — the function itself is new. Hmm, wait. Actually, let me think about this. K2 is supposed to be a does_not_conform control. The base lacks the function entirely, so the import fails. Is that a valid does_not_conform? The declared behavior is \"does_not_conform\" and observed does_not_conform. The instruction says \"both control cases behaved as declared.\" K2 was declared does_not_conform and observed does_not_conform. So yes, it behaved as declared.\n\n   Hmm, but one might question: is an import failure a valid \"does_not_conform\"? The point of K2 is to show the rule is genuinely implemented in the working tree and not present in the base — i.e., the test would fail without the change. An import failure on base demonstrates the function is new. The control was declared as \"does_not_conform\" and observed as such. As long as the behavior matches the declaration, that's what my instruction requires.\n\n7. **Regression surface**: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, the one failure (validate_audit) reproduces identically on untouched base, so pre-existing. This is fine.\n\n8. **Disclosed limit**: No E-DI corpus, five corpus checks SKIP; gate validated against vendored pin. This is a disclosed limitation, not a failure of the frozen bar or controls.\n\nNow, the frozen bar passes in full (6 tests, OK), and both controls behaved as declared (K1 conforms, K2 does_not_conform). The change is surgical (13 insertions, 0 deletions in one file), the bar wasn't edited (hash given), no regressions beyond a pre-existing failure.\n\nOne thing to check: does the evidence support that the frozen bar specifically tests the typed-time rule? The bar's name is `test_packet_cl1_time_source.py`, and its pre-work failures were exactly about 'disposition.at' not found in gaps and the typed-approval case producing no gap. So the bar encodes the claim: typed times must be reported as gaps. Post-work it passes.\n\nAlso evidence item 3 confirms the code adds gaps for non-blank `at` fields in both approval and disposition, with messages naming the ledger act as the source — matching the claim's semantic (\"times stamped by the ledger's approve/dispose acts and not written into the packet\").\n\nDoes anything fail? The disclosed limit about the corpus is a limitation but the dimension's gate is the frozen bar + controls, which pass. The pre-existing validate_audit failure reproduces on base, so not caused by this change.\n\nScore: 1.\n\nObservation: one sentence measuring what I measured. Something like: \"The frozen bar test_packet_cl1_time_source.py (6 tests) passes on the 13-insertion emit_packet.py change that gaps typed approval.at and disposition.at as ledger-stamped times, with K1 yielding exactly one gap per typed time on an otherwise clean packet and K2 failing to import cl1_source_gaps on base cf283e71, and no regressions beyond a pre-existing validate_audit failure.\"\n\nNeed to be one sentence. Keep it tight.\n\nOutput format: single JSON object, nothing else: {\"score\": 1 or 0, \"observation\": \"<...>\"}.\n\nLet me draft the observation: \"The frozen bar (sha256 61a6902b…, 6 tests) passes after a 13-insertion change to kit/emit_packet.py that gaps typed approval.at and disposition.at as ledger-stamped times; control K1 shows a clean packet yields no gaps and each typed time yields exactly one named gap, control K2 shows base cf283e71 cannot import cl1_source_gaps, and the sole run_all failure (validate_audit) reproduces on base.\"\n\nThat's one sentence (with semicolons). Good.\n\nScore: 1.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 702,
+        "completion_tokens": 1581,
+        "total_tokens": 2283,
+        "cost": 0.0008958,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0008958,
+          "upstream_inference_prompt_cost": 0.0001053,
+          "upstream_inference_completions_cost": 0.0007905
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1411,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 24179
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T03:54:09.51Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1375,
+        "moderation_latency": null,
+        "generation_time": 24179,
+        "tokens_prompt": 652,
+        "tokens_completion": 1660,
+        "native_tokens_prompt": 702,
+        "native_tokens_completion": 1581,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1411,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.0008958,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794110049-PJqeFvpcYCTCtNrOm5Fs",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794110049-KnKBaAfb5UKVBGucMYKO",
+        "upstream_id": "202611081154105438dfe5419847f3",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "202611081154105438dfe5419847f3",
+            "is_byok": false,
+            "latency": 1375,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.0008958,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T03:54:44.554011Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "no_untimeable_times#p2",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `no_untimeable_times`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full and both control cases behaved as declared."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION no_untimeable_times\n\nCLAIM: a CL1 packet may not carry a time that no act stamped. kit/emit_packet.py's cl1_source_gaps now reports a typed bar.approvals[].at and a typed disposition.at as gaps, because those times are stamped by the ledger's approve/dispose acts and not written into the packet. The packet keeps role, by and barDigest on an approval, and by and state on a disposition.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f) passes: `PYTHONPATH=. python3 tests/test_packet_cl1_time_source.py` -> Ran 6 tests, OK. Before the work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap.\n\n2. kit/emit_packet.py gained 13 insertions, 0 deletions, hashing to d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3. No other tracked file changed; the bar was not edited.\n\n3. The added code was read: after the existing approval checks it appends a gap for any non-blank approval `at`, and after the disposition.by check it appends a gap for a non-blank disposition `at`. Both messages name the ledger act as the source of the time.\n\n4. Job 3's bar on the same tree still passes: tests/test_packet_cl1_sources.py Ran 6 tests, OK — the new rule did not regress the earlier gate.\n\n5. CONTROL K1 conforms — on the job tree, a clean CL1 packet yields no gaps; adding a typed approval `at` yields exactly one approval-time gap, and adding a typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared.\n\n6. CONTROL K2 does_not_conform — on the untouched base cf283e71 the import fails: \"cannot import name 'cl1_source_gaps' from 'kit.emit_packet'\". Observed does_not_conform, as declared.\n\n7. Regression surface: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, and the one failure (validate_audit) reproduces identically on the untouched base, so it is pre-existing.\n\n8. Disclosed limit: no E-DI corpus resolves on this host, so five corpus checks SKIP; the gate was validated against the vendored pin.\n\nDecide: does the evidence show the typed-time rule was implemented as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T03:54:44.740950Z",
+    "received_at": "2026-11-08T03:55:04.708870Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 03:54:47 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=5,cfOrigin;dur=0,cfWorker;dur=2952",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794110084-SV4bvECrXBjLsrHfC4Zq",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;3c757081-3add-4dd1-95c9-7e6d87919d92",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a571a35e0d8ca590-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794110084-SV4bvECrXBjLsrHfC4Zq",
+      "object": "chat.completion",
+      "created": 1794110084,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar (sha-pinned, 6 tests OK, bar unedited) passes after a 13-insertion change to kit/emit_packet.py that flags typed approval.at and disposition.at as ledger-act-stamped gaps, with control K1 confirming exactly one gap per typed time on a clean packet and control K2 confirming the base commit fails to import cl1_source_gaps, both as declared.\"}",
+            "refusal": null,
+            "reasoning": "Let me evaluate this claim against the dimension `no_untimeable_times`.\n\nThe claim: a CL1 packet may not carry a time that no act stamped. The implementation should report typed bar.approvals[].at and typed disposition.at as gaps because those times are stamped by the ledger's approve/dispose acts, not written into the packet.\n\nEvidence review:\n\n1. Frozen bar test (test_packet_cl1_time_source.py, sha256 pinned) passes: 6 tests, OK. Before work it FAILED (failures=2): 'disposition.at' not found in '', and sibling typed-approval case producing no gap. This shows the frozen bar was failing before and passes after — the bar itself was not edited (evidence 2 says no other tracked file changed except kit/emit_packet.py with 13 insertions, 0 deletions).\n\n2. The diff is limited to kit/emit_packet.py: 13 insertions, 0 deletions. The bar was not edited — consistent with the frozen bar file's hash being pinned and tests passing on the same file (the sha256 pinned in the bar test would change if edited; also evidence says \"the bar was not edited\").\n\n3. The added code was read: appends a gap for non-blank approval `at` after existing approval checks; appends a gap for non-blank disposition `at` after disposition.by check. Both messages name the ledger act as source. This directly implements the typed-time rule.\n\n4. Job 3's bar still passes: tests/test_packet_cl1_sources.py 6 tests OK — no regression of the earlier gate.\n\n5. CONTROL K1 conforms: clean packet yields no gaps; typed approval `at` yields exactly one approval-time gap; typed disposition `at` yields exactly one disposition-time gap. Observed conforms as declared. This is a positive control showing the rule fires correctly and doesn't fire spuriously.\n\n6. CONTROL K2 does_not_conform: on the untouched base cf283e71, the import fails — cl1_source_gaps doesn't exist. Observed does_not_conform as declared. This is a negative control showing the function is genuinely new (the base doesn't have it), i.e., the check actually detects absence of implementation.\n\n7. Regression surface: validate_schemas all 131 cases behaved as designed; run_all tally pass=6 fail=1, and the one failure (validate_audit) reproduces identically on the untouched base — pre-existing, not caused by this change.\n\n8. Disclosed limit: no E-DI corpus resolves on this host, so five corpus checks SKIP; the gate was validated against the vendored pin.\n\nThe instruction: Score 1 only if the frozen bar passes in full AND both control cases behaved as declared.\n\n- Frozen bar passes in full: Yes, Ran 6 tests, OK, sha256 pinned, bar not edited.\n- Control K1 conforms as declared: Yes.\n- Control K2 does_not_conform as declared: Yes.\n\nThe K2 control is a bit unusual — it checks that on the base commit the function doesn't exist (import fails), demonstrating the work is genuinely new rather than pre-existing. That's declared as does_not_conform and observed as such. Both controls behaved as declared.\n\nThe dimension is about no untimeable times — a packet may not carry a time that no act stamped. The typed-time rule was implemented: approval.at and disposition.at in the packet are flagged as gaps because the ledger's acts stamp those times. The evidence chain is coherent: failing bar before, passing bar after, minimal diff limited to emit_packet.py, code read shows the exact gaps added with messages naming the ledger act, sibling bar not regressed, positive control shows precise firing, negative control shows base lacks the function, regression surface clean (only pre-existing failure).\n\nThe disclosed limit about the corpus: five corpus checks SKIP. Is that a blocker? The instruction says score 1 only if the frozen bar passes in full and both control cases behaved as declared. The frozen bar passed in full (6 tests OK). The corpus skips are outside the frozen bar — they're a disclosed environmental limitation, with the gate validated against the vendored pin. The scoring criterion is explicit: frozen bar passes in full + both controls as declared. That's satisfied.\n\nOne caution: the K2 control failing at import could mask whether the base had a different behavior, but the declared behavior was \"does_not_conform\" and it observed does_not_conform — the import failure is a legitimate detection of non-conformance (the function doesn't exist on base). That behaves as declared.\n\nSo score = 1.\n\nObservation: one sentence describing what was measured. Something like: \"The frozen bar (6 tests, OK, sha unchanged) passes with kit/emit_packet.py's 13-insertion change flagging typed approval/disposition `at` times as ledger-act-sourced gaps, and controls confirmed K1 fires exactly one gap per typed time and K2 fails to import on the base commit.\"\n\nKeep it to one sentence. Output only the JSON object.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me evaluate this claim against the dimension `no_untimeable_times`.\n\nThe claim: a CL1 packet may not carry a time that no act stamped. The implementation should report typed bar.approvals[].at and typed disposition.at as gaps because those times are stamped by the ledger's approve/dispose acts, not written into the packet.\n\nEvidence review:\n\n1. Frozen bar test (test_packet_cl1_time_source.py, sha256 pinned) passes: 6 tests, OK. Before work it FAILED (failures=2): 'disposition.at' not found in '', and sibling typed-approval case producing no gap. This shows the frozen bar was failing before and passes after — the bar itself was not edited (evidence 2 says no other tracked file changed except kit/emit_packet.py with 13 insertions, 0 deletions).\n\n2. The diff is limited to kit/emit_packet.py: 13 insertions, 0 deletions. The bar was not edited — consistent with the frozen bar file's hash being pinned and tests passing on the same file (the sha256 pinned in the bar test would change if edited; also evidence says \"the bar was not edited\").\n\n3. The added code was read: appends a gap for non-blank approval `at` after existing approval checks; appends a gap for non-blank disposition `at` after disposition.by check. Both messages name the ledger act as source. This directly implements the typed-time rule.\n\n4. Job 3's bar still passes: tests/test_packet_cl1_sources.py 6 tests OK — no regression of the earlier gate.\n\n5. CONTROL K1 conforms: clean packet yields no gaps; typed approval `at` yields exactly one approval-time gap; typed disposition `at` yields exactly one disposition-time gap. Observed conforms as declared. This is a positive control showing the rule fires correctly and doesn't fire spuriously.\n\n6. CONTROL K2 does_not_conform: on the untouched base cf283e71, the import fails — cl1_source_gaps doesn't exist. Observed does_not_conform as declared. This is a negative control showing the function is genuinely new (the base doesn't have it), i.e., the check actually detects absence of implementation.\n\n7. Regression surface: validate_schemas all 131 cases behaved as designed; run_all tally pass=6 fail=1, and the one failure (validate_audit) reproduces identically on the untouched base — pre-existing, not caused by this change.\n\n8. Disclosed limit: no E-DI corpus resolves on this host, so five corpus checks SKIP; the gate was validated against the vendored pin.\n\nThe instruction: Score 1 only if the frozen bar passes in full AND both control cases behaved as declared.\n\n- Frozen bar passes in full: Yes, Ran 6 tests, OK, sha256 pinned, bar not edited.\n- Control K1 conforms as declared: Yes.\n- Control K2 does_not_conform as declared: Yes.\n\nThe K2 control is a bit unusual — it checks that on the base commit the function doesn't exist (import fails), demonstrating the work is genuinely new rather than pre-existing. That's declared as does_not_conform and observed as such. Both controls behaved as declared.\n\nThe dimension is about no untimeable times — a packet may not carry a time that no act stamped. The typed-time rule was implemented: approval.at and disposition.at in the packet are flagged as gaps because the ledger's acts stamp those times. The evidence chain is coherent: failing bar before, passing bar after, minimal diff limited to emit_packet.py, code read shows the exact gaps added with messages naming the ledger act, sibling bar not regressed, positive control shows precise firing, negative control shows base lacks the function, regression surface clean (only pre-existing failure).\n\nThe disclosed limit about the corpus: five corpus checks SKIP. Is that a blocker? The instruction says score 1 only if the frozen bar passes in full and both control cases behaved as declared. The frozen bar passed in full (6 tests OK). The corpus skips are outside the frozen bar — they're a disclosed environmental limitation, with the gate validated against the vendored pin. The scoring criterion is explicit: frozen bar passes in full + both controls as declared. That's satisfied.\n\nOne caution: the K2 control failing at import could mask whether the base had a different behavior, but the declared behavior was \"does_not_conform\" and it observed does_not_conform — the import failure is a legitimate detection of non-conformance (the function doesn't exist on base). That behaves as declared.\n\nSo score = 1.\n\nObservation: one sentence describing what was measured. Something like: \"The frozen bar (6 tests, OK, sha unchanged) passes with kit/emit_packet.py's 13-insertion change flagging typed approval/disposition `at` times as ledger-act-sourced gaps, and controls confirmed K1 fires exactly one gap per typed time and K2 fails to import on the base commit.\"\n\nKeep it to one sentence. Output only the JSON object.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 702,
+        "completion_tokens": 1141,
+        "total_tokens": 1843,
+        "cost": 0.000599,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 640,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.000599,
+          "upstream_inference_prompt_cost": 2.85e-05,
+          "upstream_inference_completions_cost": 0.0005705
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1045,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 19804
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T03:54:44.809Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 2903,
+        "moderation_latency": null,
+        "generation_time": 19804,
+        "tokens_prompt": 652,
+        "tokens_completion": 1307,
+        "native_tokens_prompt": 702,
+        "native_tokens_completion": 1141,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1045,
+        "native_tokens_cached": 640,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.000599,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794110084-6GcV7KHmN96UeplLJDKo",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794110084-SV4bvECrXBjLsrHfC4Zq",
+        "upstream_id": "2026110811544591479b51c0574afe",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "2026110811544591479b51c0574afe",
+            "is_byok": false,
+            "latency": 2903,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.000599,
+        "cache_discount": 7.68e-05,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T03:55:15.312098Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "no_untimeable_times#p3",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `no_untimeable_times`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full and both control cases behaved as declared."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION no_untimeable_times\n\nCLAIM: a CL1 packet may not carry a time that no act stamped. kit/emit_packet.py's cl1_source_gaps now reports a typed bar.approvals[].at and a typed disposition.at as gaps, because those times are stamped by the ledger's approve/dispose acts and not written into the packet. The packet keeps role, by and barDigest on an approval, and by and state on a disposition.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f) passes: `PYTHONPATH=. python3 tests/test_packet_cl1_time_source.py` -> Ran 6 tests, OK. Before the work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap.\n\n2. kit/emit_packet.py gained 13 insertions, 0 deletions, hashing to d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3. No other tracked file changed; the bar was not edited.\n\n3. The added code was read: after the existing approval checks it appends a gap for any non-blank approval `at`, and after the disposition.by check it appends a gap for a non-blank disposition `at`. Both messages name the ledger act as the source of the time.\n\n4. Job 3's bar on the same tree still passes: tests/test_packet_cl1_sources.py Ran 6 tests, OK — the new rule did not regress the earlier gate.\n\n5. CONTROL K1 conforms — on the job tree, a clean CL1 packet yields no gaps; adding a typed approval `at` yields exactly one approval-time gap, and adding a typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared.\n\n6. CONTROL K2 does_not_conform — on the untouched base cf283e71 the import fails: \"cannot import name 'cl1_source_gaps' from 'kit.emit_packet'\". Observed does_not_conform, as declared.\n\n7. Regression surface: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, and the one failure (validate_audit) reproduces identically on the untouched base, so it is pre-existing.\n\n8. Disclosed limit: no E-DI corpus resolves on this host, so five corpus checks SKIP; the gate was validated against the vendored pin.\n\nDecide: does the evidence show the typed-time rule was implemented as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T03:55:15.588193Z",
+    "received_at": "2026-11-08T03:55:34.640651Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 03:55:17 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=6,cfOrigin;dur=0,cfWorker;dur=1720",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794110115-9mHXF5ov8QA554hOHhVj",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;3c757081-3add-4dd1-95c9-7e6d87919d92",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a571a41ecbbdfb94-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794110115-9mHXF5ov8QA554hOHhVj",
+      "object": "chat.completion",
+      "created": 1794110115,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar (sha256 61a6902b...) went from failures=2 to Ran 6 tests OK via 13 additive insertions in kit/emit_packet.py that flag typed approval.at and disposition.at as ledger-stamped gaps, with K1 conforming (clean packet: no gaps; one gap per injected typed time), K2 not conforming as declared (base cf283e71 cannot import cl1_source_gaps), the prior cl1_sources bar still passing, and the sole run_all failure (validate_audit) reproducing identically on the untouched base.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this claim carefully.\n\nThe dimension is `no_untimeable_times` — a CL1 packet may not carry a time that no act stamped. The claim is that kit/emit_packet.py's cl1_source_gaps now reports a typed bar.approvals[].at and a typed disposition.at as gaps, because those times are stamped by the ledger's approve/dispose acts and not written into the packet.\n\nEvidence review:\n\n1. Frozen bar test file (sha256 given) passes: Ran 6 tests, OK. Before work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap. So the bar went from failing 2 to passing 6. Good.\n\n2. Diff: kit/emit_packet.py gained 13 insertions, 0 deletions, hash d851fec... No other tracked file changed; the bar was not edited. Good — the frozen bar was not modified.\n\n3. Added code was read: appends gap for non-blank approval `at` and non-blank disposition `at`, messages name the ledger act as source. Good.\n\n4. Job 3's bar on the same tree still passes: tests/test_packet_cl1_sources.py Ran 6 tests, OK — no regression to earlier gate.\n\n5. CONTROL K1 conforms — clean packet yields no gaps; adding typed approval `at` yields exactly one approval-time gap; adding typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared.\n\n6. CONTROL K2 does_not_conform — on untouched base cf283e71, import fails: \"cannot import name 'cl1_source_g' from 'kit.emit_packet'\". Observed does_not_conform, as declared. Hmm — this is a \"does_not_conform\" control. The declaration here is presumably that the base tree (without the change) does not conform because the rule doesn't exist. The import failure is evidence the function doesn't exist on base — i.e., the typed-time rule is absent. That matches \"does_not_conform as declared\" — the control is designed to fail on the base, and it did fail. That's the expected negated behavior.\n\nWait, I should think about what \"control cases behaved as declared\" means. Typically in this plumbline evaluator pattern: there's a frozen bar (the test), a positive control (a known-conforming sample) and a negative control (a known-nonconforming sample). The evaluator scores 1 only if the frozen bar passes in full and both controls behaved as declared.\n\nK1 conforms: observed conforms. Good.\nK2 does_not_conform: observed does_not_conform. Good.\n\n7. Regression surface: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, one failure (validate_audit) reproduces identically on untouched base — pre-existing. Good.\n\n8. Disclosed limit: no E-DI corpus resolves, five corpus checks SKIP; gate validated against vendored pin. This is a disclosed limitation, not necessarily a blocker. The question is whether the frozen bar passes in full and controls behaved. The corpus skips are disclosed; the bar is the vendored pin tests which pass.\n\nNow, does the evidence show the typed-time rule was implemented as the bar requires?\n\nThe bar (test_packet_cl1_time_source.py, frozen hash) went from 2 failures to 0, 6 tests OK. The diff only touched kit/emit_packet.py with 13 insertions. Code read confirms the gaps are appended for typed approval `at` and disposition `at`. Both controls behaved as declared. Regression surface clean except a pre-existing failure.\n\nPotential concerns:\n- The bar hash given — do we know it matches the frozen bar? We can't verify without tools, but the evidence asserts the file's sha256. The instruction says we have no tools; we evaluate based on the evidence given. The evidence says the frozen bar passes.\n- The disclosed limit about corpus skips: does that invalidate? The dimension is about the packet rule; the corpus checks skipping is a disclosed limitation. The bar itself (vendored pin) passes. I think this is acceptable — the scoring rule says \"Score 1 only if the frozen bar passes in full and both control cases behaved as declared.\" Both conditions met: bar passes 6/6, K1 conforms, K2 does_not_conform as declared.\n\nOne more consideration: the pre-existing validate_audit failure — it reproduces identically on base, so pre-existing, not caused by the change. Fine.\n\nSo score = 1.\n\nObservation: one sentence describing what was measured. E.g., \"The frozen bar test_packet_cl1_time_source.py passed 6/6 after a 13-line emit_packet.py change adding typed approval.at and disposition.at gap detection, with K1 conforming (one gap per typed time) and K2 failing to import the rule on the untouched base, and no regressions beyond a pre-existing validate_audit failure.\"\n\nKeep it one sentence. Output only JSON.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this claim carefully.\n\nThe dimension is `no_untimeable_times` — a CL1 packet may not carry a time that no act stamped. The claim is that kit/emit_packet.py's cl1_source_gaps now reports a typed bar.approvals[].at and a typed disposition.at as gaps, because those times are stamped by the ledger's approve/dispose acts and not written into the packet.\n\nEvidence review:\n\n1. Frozen bar test file (sha256 given) passes: Ran 6 tests, OK. Before work it was FAILED (failures=2): 'disposition.at' not found in '', and the sibling typed-approval case producing no gap. So the bar went from failing 2 to passing 6. Good.\n\n2. Diff: kit/emit_packet.py gained 13 insertions, 0 deletions, hash d851fec... No other tracked file changed; the bar was not edited. Good — the frozen bar was not modified.\n\n3. Added code was read: appends gap for non-blank approval `at` and non-blank disposition `at`, messages name the ledger act as source. Good.\n\n4. Job 3's bar on the same tree still passes: tests/test_packet_cl1_sources.py Ran 6 tests, OK — no regression to earlier gate.\n\n5. CONTROL K1 conforms — clean packet yields no gaps; adding typed approval `at` yields exactly one approval-time gap; adding typed disposition `at` yields exactly one disposition-time gap. Observed conforms, as declared.\n\n6. CONTROL K2 does_not_conform — on untouched base cf283e71, import fails: \"cannot import name 'cl1_source_g' from 'kit.emit_packet'\". Observed does_not_conform, as declared. Hmm — this is a \"does_not_conform\" control. The declaration here is presumably that the base tree (without the change) does not conform because the rule doesn't exist. The import failure is evidence the function doesn't exist on base — i.e., the typed-time rule is absent. That matches \"does_not_conform as declared\" — the control is designed to fail on the base, and it did fail. That's the expected negated behavior.\n\nWait, I should think about what \"control cases behaved as declared\" means. Typically in this plumbline evaluator pattern: there's a frozen bar (the test), a positive control (a known-conforming sample) and a negative control (a known-nonconforming sample). The evaluator scores 1 only if the frozen bar passes in full and both controls behaved as declared.\n\nK1 conforms: observed conforms. Good.\nK2 does_not_conform: observed does_not_conform. Good.\n\n7. Regression surface: validate_schemas ALL 131 CASES BEHAVED AS DESIGNED; run_all PLUMBLINE-TALLY pass=6 fail=1, one failure (validate_audit) reproduces identically on untouched base — pre-existing. Good.\n\n8. Disclosed limit: no E-DI corpus resolves, five corpus checks SKIP; gate validated against vendored pin. This is a disclosed limitation, not necessarily a blocker. The question is whether the frozen bar passes in full and controls behaved. The corpus skips are disclosed; the bar is the vendored pin tests which pass.\n\nNow, does the evidence show the typed-time rule was implemented as the bar requires?\n\nThe bar (test_packet_cl1_time_source.py, frozen hash) went from 2 failures to 0, 6 tests OK. The diff only touched kit/emit_packet.py with 13 insertions. Code read confirms the gaps are appended for typed approval `at` and disposition `at`. Both controls behaved as declared. Regression surface clean except a pre-existing failure.\n\nPotential concerns:\n- The bar hash given — do we know it matches the frozen bar? We can't verify without tools, but the evidence asserts the file's sha256. The instruction says we have no tools; we evaluate based on the evidence given. The evidence says the frozen bar passes.\n- The disclosed limit about corpus skips: does that invalidate? The dimension is about the packet rule; the corpus checks skipping is a disclosed limitation. The bar itself (vendored pin) passes. I think this is acceptable — the scoring rule says \"Score 1 only if the frozen bar passes in full and both control cases behaved as declared.\" Both conditions met: bar passes 6/6, K1 conforms, K2 does_not_conform as declared.\n\nOne more consideration: the pre-existing validate_audit failure — it reproduces identically on base, so pre-existing, not caused by the change. Fine.\n\nSo score = 1.\n\nObservation: one sentence describing what was measured. E.g., \"The frozen bar test_packet_cl1_time_source.py passed 6/6 after a 13-line emit_packet.py change adding typed approval.at and disposition.at gap detection, with K1 conforming (one gap per typed time) and K2 failing to import the rule on the untouched base, and no regressions beyond a pre-existing validate_audit failure.\"\n\nKeep it one sentence. Output only JSON.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 702,
+        "completion_tokens": 1189,
+        "total_tokens": 1891,
+        "cost": 0.000623,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 640,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.000623,
+          "upstream_inference_prompt_cost": 2.85e-05,
+          "upstream_inference_completions_cost": 0.0005945
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1056,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 18804
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T03:55:15.651Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1612,
+        "moderation_latency": null,
+        "generation_time": 18804,
+        "tokens_prompt": 652,
+        "tokens_completion": 1295,
+        "native_tokens_prompt": 702,
+        "native_tokens_completion": 1189,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1056,
+        "native_tokens_cached": 640,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.000623,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794110115-0PtBwb85LLtXN97Hy768",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794110115-9mHXF5ov8QA554hOHhVj",
+        "upstream_id": "20261108115516b8746c1a33da4bd4",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "20261108115516b8746c1a33da4bd4",
+            "is_byok": false,
+            "latency": 1612,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.000623,
+        "cache_discount": 7.68e-05,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T03:55:39.962359Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "files": ["kit/conductor_loop.py"],
+  "read": ["tests/test_loop_freeze_conditional.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-freeze-cond-record-1/message.md"
+}

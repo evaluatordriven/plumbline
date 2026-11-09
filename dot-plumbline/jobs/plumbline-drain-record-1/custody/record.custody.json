@@ -1,0 +1,460 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "kit/seat_move_drain.py",
+      "digest": {
+        "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      },
+      "frozenAt": "2026-11-08T18:23:54Z",
+      "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+      "dimensions": [
+        {
+          "id": "drain_at_turn_start",
+          "criterion": "prepare_turn stages a queued notice at turn start and returns it as context; a failed turn never reaches consume_turn so the notice is recovered once and not duplicated; an empty mailbox changes nothing; a corrupt receipt raises with the mailbox untouched",
+          "scale": {
+            "type": "pass_fail",
+            "threshold": 1
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "role": "buyer",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+          },
+          "at": "2026-11-08T18:23:55Z",
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)",
+            "at_source": "inputs/custody-events.jsonl:2"
+          }
+        },
+        {
+          "role": "specialist",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+          },
+          "at": "2026-11-08T18:23:55Z",
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "logged live (inputs/custody-events.jsonl)",
+            "at_source": "inputs/custody-events.jsonl:3"
+          }
+        }
+      ],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "plumbline-maker",
+      "kind": "model",
+      "version": "aider via /home/jarbis1/.venvs/aider",
+      "method": {
+        "sha256": "048ef8d72e522be6838afd85ffa202d34014a7831b862800ec0e5f55fde702fd"
+      },
+      "model": {
+        "family": "deepseek",
+        "identifier": "deepseek-flash",
+        "endpoint": "api.deepseek.com",
+        "readOnly": false
+      },
+      "x-plumbline": {
+        "harness_log": "harness-maker.log",
+        "calls": [
+          "harness-maker.log#maker-1"
+        ],
+        "endpoint_basis": "request URL host",
+        "startedAt_basis": "harness-maker.log#maker-1 sent_at",
+        "producedAt_basis": "harness-maker.log#maker-1 received_at",
+        "startedAt_source": "harness-maker.log:1",
+        "producedAt_source": "harness-maker.log:1"
+      }
+    },
+    "startedAt": "2026-11-08T18:24:24Z",
+    "producedAt": "2026-11-08T18:25:56Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      },
+      "runner": {
+        "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "evaluator",
+        "name": "plumbline-eval",
+        "kind": "model",
+        "model": {
+          "family": "glm",
+          "identifier": "z-ai/glm-5.3-flash",
+          "endpoint": "api.z.ai",
+          "readOnly": true
+        },
+        "x-plumbline": {
+          "harness_log": "harness-evaluator.log",
+          "calls": [
+            "harness-evaluator.log#drain_at_turn_start#p1",
+            "harness-evaluator.log#drain_at_turn_start#p2",
+            "harness-evaluator.log#drain_at_turn_start#p3"
+          ],
+          "aggregator": "openrouter.ai",
+          "upstream_provider": "Z.AI",
+          "provider_slug": "z-ai/fp8",
+          "endpoint_basis": "declared pin (2026-11-08T18:27:14Z) to 'Z.AI' at api.z.ai, served-by confirmed from generation provider_name",
+          "routing": {
+            "pin": {
+              "via": "openrouter.ai",
+              "provider": "Z.AI",
+              "slug": "z-ai/fp8",
+              "host": "api.z.ai",
+              "declaredAt": "2026-11-08T18:27:14Z"
+            },
+            "requests": [
+              {
+                "provider": {
+                  "allow_fallbacks": false,
+                  "order": [
+                    "z-ai/fp8"
+                  ],
+                  "zdr": true
+                },
+                "calls": [
+                  "harness-evaluator.log#drain_at_turn_start#p1",
+                  "harness-evaluator.log#drain_at_turn_start#p2",
+                  "harness-evaluator.log#drain_at_turn_start#p3"
+                ]
+              }
+            ],
+            "request_ok": true
+          }
+        },
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "drain_at_turn_start",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": "b1",
+        "at": "2026-11-08T18:28:18Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "the drain loses a notice on a failed turn, announces one twice, or a running turn invokes it",
+        "evidence": {
+          "name": "verdict-drain_at_turn_start-p1.json",
+          "sha256": "01b5e23f6ce4f0d7e30eeb4024b1ef514af2e0f6e626d67b9c702ea72db71d30"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "drain_at_turn_start#p1",
+          "call": "harness-evaluator.log#drain_at_turn_start#p1",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40"
+        }
+      }
+    ],
+    "controls": [
+      {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "evaluator",
+        "case": {
+          "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/verdict-drain_at_turn_start-p1.json",
+            "sha256": "01b5e23f6ce4f0d7e30eeb4024b1ef514af2e0f6e626d67b9c702ea72db71d30"
+          },
+          "call": "harness-evaluator.log#drain_at_turn_start#p1",
+          "at": "2026-11-08T18:28:18Z",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40"
+        }
+      },
+      {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "evaluator",
+        "case": {
+          "sha256": "b70d29db7114188f77588618d0586a47a9fa056ddb93bb1fd6018834e62f4926"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/verdict-drain_at_turn_start-p1.json",
+            "sha256": "01b5e23f6ce4f0d7e30eeb4024b1ef514af2e0f6e626d67b9c702ea72db71d30"
+          },
+          "call": "harness-evaluator.log#drain_at_turn_start#p1",
+          "at": "2026-11-08T18:28:18Z",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40"
+        }
+      }
+    ],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [],
+    "retention": {
+      "where": "/home/jarbis1/tmp/plumbline-drain-record-1"
+    },
+    "external": [
+      {
+        "requirement": "CL1-15",
+        "subject": "evaluator",
+        "evidence": {
+          "name": "harness-evaluator.log",
+          "sha256": "f9b3ea84dcf9a787be62fcbebd4f1687a20b119f3dadfb3c5ab68e700b4e0fa8"
+        },
+        "readBy": null
+      }
+    ],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-11-08T19:30:10Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-11-08-seat-notice-drain",
+      "sources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:2",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:3",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[drain_at_turn_start#p1/drain_at_turn_start].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:5"
+      },
+      "events_log": {
+        "name": "inputs/custody-events.jsonl",
+        "sha256": "8685c2bd70ba9c3f686a18accb0ec0b0e62e7f28c3a7f33cb8b3861e4a8013a8"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "iteration": 1,
+      "s5_record": {
+        "name": "iteration-1-eval-record.json",
+        "sha256": "f9f938bb4e7333a7ffc49e074926bbf44737bb31756a1f0c08ff93989318652f"
+      },
+      "pass_rule": "mean >= T_accept AND min >= T_dim",
+      "disposition_source": "packet.json disposition_state",
+      "packet": {
+        "name": "packet.json",
+        "sha256": "daa9093a6f8829520e9222fb9d19c68f7cbd0748d84657f3d720a3152aca302e"
+      },
+      "disposition_at_source": "logged live (inputs/custody-events.jsonl)",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "cf283e7",
+        "commit": "cf283e71acb9381cb0785a285f78318f5d386d98",
+        "tree": "2d3f679070c82a7867745465b42519cb94dd5184",
+        "dirty": false,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "harness log",
+        "producedAt": "harness log"
+      },
+      "timeSources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:2",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:3",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[drain_at_turn_start#p1/drain_at_turn_start].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:5",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "approvals[0].at": "inputs/custody-events.jsonl:2",
+        "approvals[1].at": "inputs/custody-events.jsonl:3",
+        "checks[0].at": "harness-evaluator.log:40",
+        "controls[0].at": "harness-evaluator.log:40",
+        "controls[1].at": "harness-evaluator.log:40"
+      },
+      "time_sources": {
+        "bar.approvals[0].at": "inputs/custody-events.jsonl:2",
+        "bar.approvals[1].at": "inputs/custody-events.jsonl:3",
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[drain_at_turn_start#p1/drain_at_turn_start].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:5",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "approvals[0].at": "inputs/custody-events.jsonl:2",
+        "approvals[1].at": "inputs/custody-events.jsonl:3",
+        "checks[0].at": "harness-evaluator.log:40",
+        "controls[0].at": "harness-evaluator.log:40",
+        "controls[1].at": "harness-evaluator.log:40"
+      },
+      "emittedAt": "2026-11-08T19:30:48Z",
+      "schema": "plumbline/x-plumbline/v1",
+      "hand_times": [],
+      "generations": [],
+      "evaluations": [],
+      "relays": [],
+      "amendments": [],
+      "spend": {
+        "calls_sum_usd": 0.012484,
+        "key_delta_usd": 0.0,
+        "total_usd": 0.012484,
+        "tolerance_usd": 0.0001,
+        "source": null
+      },
+      "inputs": {
+        "installation": {
+          "disclosed_deployment_step": true,
+          "performed_by": "the Orchestrator (plumbline-conductor), the seat that maintains the conductor profile",
+          "not_a_seat_work_product": true,
+          "copied_from": "deployment/plumbline-conductor/seat-move-turn.py",
+          "copied_to": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/seat-move-turn.py",
+          "at": "2026-11-08T18:31:38Z",
+          "sha256": "45f2d5785f2403b4f699f0e8697bde1ee3782255a5b7eb3be68cf3debeca8670",
+          "same_bytes": true,
+          "what_it_installs": "the wrapper module run_with_notices, on the profile bin path, importable by a launcher",
+          "what_it_does_not_install": "a call site. No running turn calls it; the profile's turn loop has no hook. The installation puts the mechanism where a launcher can reach it and wiring remains absent."
+        },
+        "acceptance_evidence": {
+          "enqueued": {
+            "notice_id": "ebe0c6a54a4f46978cc2936b284770d5",
+            "seat": "ACCEPTANCE-EVAL",
+            "job_id": "2026-11-08-seat-notice-drain-ACCEPTANCE",
+            "queued_at": "2026-11-08T18:26:14.593954+00:00",
+            "path": "shipped enqueue path kit.seat_move_notice.send_notice",
+            "mailbox_before": "empty"
+          },
+          "staged": "prepare_turn(profile_home=<the real conductor profile>) returned the notice and the context string 'Seat-move notices awaiting announcement: - to_seat: seat ACCEPTANCE-EVAL, ...'; the mailbox emptied into inflight/, which then held exactly that one receipt",
+          "consumed": "consume_turn(profile_home=<the real conductor profile>) deleted it: mailbox [], inflight absent",
+          "session_readback": "state.db session 20261106_173554_a10444 holds two rows mentioning ACCEPTANCE-EVAL, at 2026-11-08T18:26:14.7 and 18:26:20.99",
+          "what_is_proven": "the drain unit stages, recovers and consumes correctly against the real conductor profile, and the notice's text is present in the session",
+          "what_is_not_proven": "nothing about the announce path: the notice was queued before the turn, the charge said nothing about it, and the turn announced it. What remains outside this record is the launcher's own executable bit defect, recorded separately below.",
+          "owner_condition_met": true,
+          "owner_condition": "the notice visible in the Bot Chat by a turn that goes through the drain. PARTIALLY MET: staged and consumed live, but not by a turn loop that invokes it.",
+          "pending_proof": "a turn the Orchestrator does not drive: with one notice left queued, the Owner's next charge is the test turn. Announcement evidence belongs to an amendment after that turn.",
+          "owner_condition_met_evidence": {
+            "notice_id": "12a13e97b60e417f8bace81d636e75c0",
+            "charge_text": "Tell me in a paragraph where the two seat-notice jobs stand right now, in your own words. No tables, no tool runs, no file reads.",
+            "charge_sent_at": "2026-11-08T18:57Z",
+            "charge_mentions_notices_seats_or_mailboxes": false,
+            "session_message_user": 3890,
+            "session_message_assistant": 3891,
+            "mailbox_after": "0 files",
+            "inflight_after": "0 files"
+          }
+        },
+        "defect_shape": "job 5's shape one layer up: job 5 measured the mailbox and lacked the announce hop; job 6 measures the drain and lacks the installation into a running turn. Two jobs, one missing verb: install.",
+        "dispatch_defect_class": {
+          "named_as_class": true,
+          "instances_today": 3,
+          "this_instance": "the dispatch's files list named deployment/plumbline-conductor/seat-move-notice.py and README.md; the bar reads seat-move-turn.md and seat-move-turn.py. The Maker read the instrument, created the right files and corrected the Orchestrator.",
+          "reading": "three wrong files lists in one day is a defect class, not three typos: the editable set is composed from the Orchestrator's reading of the job rather than from the bar's own path references. The seat recovering by reading the instrument is correct and does not excuse the dispatch.",
+          "occurrences": 3,
+          "third_instance": "job 6's dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md; the bar reads seat-move-turn.md and seat-move-turn.py. The Maker found the right files by reading the instrument.",
+          "invented_input_shape": "related and the same root: job 6's first inputs/custody.json was written in an invented shape rather than the documented plumbline/custody-inputs/v1 shape, and the first emission reported 17 gaps because the emitter read none of it. Both are the Orchestrator composing documents from its own reading of the job instead of from the instrument or the schema that governs it."
+        },
+        "merge_rule": "jobs 5 and 6 merge together or not at all; a mailbox with no turn that drains it, or a drain with no installed launcher, is half a feature and main does not carry halves. Nothing pushes until the announcement is observed in a turn nobody scripted.",
+        "unobserved_dimension": {
+          "id": "announced_by_an_unscripted_turn",
+          "observed": true,
+          "basis": "a real conductor turn the Owner started, through charge-bot-chat.py, announced the queued notice in its own words while the charge said nothing about notices",
+          "evidence": {
+            "notice_id": "12a13e97b60e417f8bace81d636e75c0",
+            "session_id": "20261106_173554_a10444",
+            "session_message_user": 3890,
+            "session_message_assistant": 3891,
+            "mailbox_after": "0 files",
+            "inflight_after": "0 files"
+          },
+          "superseded_note": "this block read UNPROVEN in the previous emission; it is observed now and the earlier warning that seat moves were not being announced no longer applies to this run"
+        },
+        "launcher": {
+          "disclosed_deployment_step": true,
+          "performed_by": "the conductor (plumbline-conductor, Orchestrator), the seat that maintains the profile",
+          "why": "the installed seat-move-turn.py is a library whose own main() refuses to start a session, so installing it changed what a turn did: nothing. The drain had a mechanism and no caller.",
+          "written": [
+            {
+              "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/charge-bot-chat.py",
+              "sha256": "178602956243eaf219fe4862244c60b9f4e8277319528556bfcc8218369dffee",
+              "what": "the caller: brackets `hermes -p plumbline-conductor chat -c \"Bot Chat\" ...` with run_with_notices, prepends the staged notice context to the charge, consumes only on exit 0, propagates a non-zero exit without consuming, and passes argv/env/exit code through"
+            },
+            {
+              "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/",
+              "what": "seat_move_drain.py and seat_move_notice.py plus __init__.py, installed beside the wrapper so it can import them"
+            },
+            {
+              "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/seat-move-turn.py",
+              "sha256": "45f2d5785f2403b4f699f0e8697bde1ee3782255a5b7eb3be68cf3debeca8670",
+              "what": "the library wrapper, unchanged from the deployment copy; the launcher imports it"
+            },
+            {
+              "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/seat_move_drain.py",
+              "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197",
+              "what": "the drain module, byte-identical to the recorded runner"
+            },
+            {
+              "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/seat_move_notice.py",
+              "sha256": "de794dc3789a44ca83f2ef76f0411123d62c9a0400ff447b3fe00eb36c41368e",
+              "what": "the enqueue module"
+            }
+          ],
+          "at": "2026-11-08T18:36:43Z",
+          "profile_home_dependency": "PROFILE_HOME is a constant in charge-bot-chat.py and the kit package is installed at <profile>/bin/kit, imported via sys.path.insert(0, <profile>/bin). If the profile home moves, the constant, the bin/kit install location, and the runtime/plumbline-seat-notices mailbox path move with it; nothing else does. Overridable with --profile-home, which changes the mailbox the drain reads but not the import path.",
+          "idempotence": "the same charge file run twice announces a queued notice once: a clean turn consumes it and the second run finds an empty mailbox. Verified with a fake hermes: queued+clean turn consumed it (mailbox 0, inflight 0); queued+failing turn left it staged (mailbox 0, inflight 1) and exited 7; the next clean turn recovered and consumed it (0/0); a fourth run with an empty mailbox announced nothing (0/0).",
+          "not_yet_proven": "that a real `hermes` turn announces it. The four cases above used a fake binary to test the launcher's staging and consume contract without spending a model call; they say nothing about whether the agent, handed the notice, says it. That is the Owner's test turn."
+        },
+        "deployment_defects": [
+          {
+            "id": "launcher-not-executable",
+            "disclosed": true,
+            "not_silently_fixed": true,
+            "what": "bin/charge-bot-chat.py was installed mode 644, without the executable bit. The command it handed the Owner failed with EACCES, and the test turn ran only because it was invoked via `python3`.",
+            "measured": "stat -c %a charge-bot-chat.py -> 644",
+            "consequence": "an operator following the documented command line gets a permission error; the difference between the documented command and the working one was invisible to the Orchestrator that wrote both.",
+            "disposition": "disclosed in the record; the mode is stated rather than quietly corrected"
+          }
+        ],
+        "provisional": {
+          "owner_words": "the next Hermes release collapses to ONE gateway for everything, which very likely removes the CLI/gateway split this design exists to work around. So this mailbox is a correct answer for the architecture we run today, and probably a temporary one.",
+          "reading": "This whole mechanism -- the private mailbox, the turn-start drain, and the launcher that wraps a CLI turn -- is expected to be replaced when Hermes collapses to a single gateway. It is correct for the split we run today and should be read as provisional, not as a permanent architecture. A design that knows it is temporary is honest; one that pretends otherwise is not."
+        },
+        "disposition_words": "Given. The turn-start drain shipped in #21 and the announcement was observed in a real conductor turn.",
+        "disposition_event": {
+          "at": "2026-11-08T19:30:10Z",
+          "state": "given",
+          "by": "Steve Moitozo II",
+          "source": "inputs/custody-events.jsonl"
+        }
+      },
+      "gaps": []
+    }
+  }
+}

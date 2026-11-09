@@ -1,0 +1,2881 @@
+Warning: Input is not a terminal (fd=0).
+────────────────────────────────────────────────────────────────────────────────
+Aider v0.86.2
+Model: deepseek/deepseek-v4-flash with diff edit format, infinite output
+Git repo: .git with 934 files
+Repo-map: using 512 tokens, auto refresh
+Added tests/validate_schemas.py to the chat.
+Added tests/test_evaluator_harness_log.py to the chat (read-only).
+Added kit/emit_custody.py to the chat (read-only).
+
+Initial repo scan can be slow in larger repos, but only happens once.
+Scanning repo:   0%|          | 0/934 [00:00<?, ?it/s]Scanning repo:  38%|███▊      | 356/934 [00:00<00:00, 3303.11it/s]Scanning repo:  74%|███████▎  | 687/934 [00:00<00:00, 1206.41it/s]Scanning repo:  93%|█████████▎| 872/934 [00:00<00:00, 951.82it/s] Scanning repo: 100%|██████████| 934/934 [00:01<00:00, 804.63it/s]
+--------------------------------------------------------------------------------
+
+► THINKING                                                                      
+
+Let me understand the situation. We need to edit tests/validate_schemas.py only.
+
+The FIX fixture (tests/fixtures/custody/job-rejected) has a model evaluator and 
+no harness log; under the new contract (D6/D7) the emitter refuses it. Actually 
+wait: the E3 test asserts that emit(FIX, ...) refuses with hand-time for the    
+evaluator log calls (harness-eval-a.log has entries without logger sent_at). And
+there's custody/evidence/harness-eval-a.log present in the fixture (stranger    
+bundle needs it). So the evaluator has a harness log but the log entries lack   
+sent_at/received_at → hand times → refusal exit 3.                              
+
+Hmm, but the user says "The fixture job at FIX has a MODEL evaluator and no     
+harness log." Let me check: emit(FIX, rec_path) with allow_hand=True (default of
+emit is allow_hand=True). So hand times are allowed, record gets written. But   
+D6/D7 says a model evaluator with no harness log refuses. Hmm — does FIX have   
+harness_log named in custody inputs? Let me check the fixture's custody.json    
+content... We don't have it. The stranger bundle test requires                  
+evidence/harness-eval-a.log present in the zip. So there is an evaluator harness
+log.                                                                            
+
+But the user's description says no harness log. Perhaps the emitted harness log 
+exists but the evaluator's harness_log field is not named in custody inputs?    
+Actually find_log for evaluator uses e.get("harness_log") or the CL1-15 external
+entry. Hmm.                                                                     
+
+Regardless, the instruction is: the emitter now refuses FIX. Well, we can't run 
+it. But the user asserts: "The fixture job at FIX has a MODEL evaluator and no  
+harness log. Under the new contract (D6/D7) the emitter REFUSES it, so rec is {}
+and line 510 raises KeyError: 'predicate'."                                     
+
+Hmm, but wait: if FIX's model evaluator had no harness log, then mark of hand   
+times... whatever. The important thing: we need to make FIX assert refusal, and 
+move emit-success checks to a fixture that supplies harness log times.          
+
+Which fixture supplies real logger times? Perhaps                               
+tests/fixtures/custody/failures/...? Or maybe the tool-built job (TJ) which     
+stamps logs via stamp_log. Actually in the file, tool_built_job builds a job    
+with stamped logs and then emits with allow_hand=False and asserts exit 0.      
+That's inside a try/except at the end (T4 case) — an existing fixture. But we   
+need one for the emit-success checks early in the file (before tool_built_job is
+defined at line ~700).                                                          
+
+Alternatively, we could build the emit-success fixture locally: copy FIX, and   
+stamp its harness logs with logger times (like stamp_log). But the emitter also 
+requires hand times elsewhere — with allow_hand=True (as emit default), hand    
+times are allowed, so only the missing-log refusal matters. Also, we need an    
+"emits with no gap (exit 0)" — exit 0 means no hard gaps. That's more demanding:
+all fields must have sources.                                                   
+
+Hmm, does the current FIX emit with exit 0? Yes — currently res(... fixture job 
+emits with no gap (exit 0), rc == 0). So FIX emits with 0 gaps. So FIX has      
+everything: bar, approvals, maker model with harness log, evaluator with harness
+log... Wait, but if the evaluator had no harness log, the emitter would add a   
+gap "no harness log (CL1-15) for model evaluator" (soft, hard=False). Hmm, that 
+gap is hard=False (external gap), so exit 0 still possible.                     
+
+Actually now under the new contract, a model evaluator with no harness log      
+REFUSES (exit 3). So FIX must have a harness log for the evaluator... but then  
+the log's calls lack logger sent_at → in evaluator_history,                     
+harness_log.read(log) is called first, which raises HarnessLogError if entries  
+are missing sent_at/received_at or reversed → refusal with kind "time". So FIX  
+refuses now, regardless of allow_hand. That matches the user's statement loosely
+("no harness log" is their description, but really the log is unreadable per the
+new module).                                                                    
+
+OK so what fixture supplies real logger times? Let me think:                    
+tests/fixtures/custody/ — we've seen FIX = job-rejected, plus failures/         
+overlays. Is there another fixture? The user says "There is already a fixture in
+the repo that supplies harness-log times: kit/emit_custody.py's expectations and
+the corpus battery's own fixtures, plus the shape the frozen bar builds at      
+tests/test_evaluator_harness_log.py — read that bar for the exact harness-log   
+entry shape (sent_at, received_at, request.url, response.model) and reuse it."  
+
+Hmm, that's a bit vague. I think the cleanest approach: create a helper that    
+copies FIX and rewrites its harness logs with logger-stamped entries, then use  
+that as the emit-success fixture. That satisfies "reuse the shape" from the bar.
+
+But careful: rewriting the evaluator harness log's entries means the entries    
+must contain sent_at, received_at, request.url, response.model, and call        
+matching the pass's call field in custody inputs. The read() function in        
+kit/evaluator_harness_log.py we only have a summary — read(path) -> dict, and   
+HarnessLogError. The tests in the frozen bar show entries: {"call": "dim1#p1",  
+"sent_at": ..., "received_at": ..., "request": {"url": ...}, "response":        
+{"model": ...}}. And entries keyed by call id. The record takes check times from
+ev_entries[evaluator][f.get("call")] → entry.received_at, entry.source,         
+entry.name.                                                                     
+
+So for the emit-success fixture: rewrite each call in the evaluator log, adding 
+sent_at/received_at. But the existing log entries must already have call names  
+matching custody inputs' passes[].call and controls[].call. Since FIX currently 
+emits with exit 0 (with hand-time allowance), the x-plumbline cross-checks pass,
+meaning times in custody inputs vs log server times agree within tolerance. If  
+we add sent_at/received_at, then H.cross_check compares custody's typed at with 
+call.at which now = received_at. So we must set received_at equal to the custody
+at (or within 60s). Safer: set sent_at = at - 4s (or at - 1s) and received_at = 
+at, matching the custody inputs' times. But we don't know the fixture content   
+precisely.                                                                      
+
+Hmm, alternatively set sent_at = received_at = the entry's existing server time 
+(Date header / created). That's what stamp_log does at the end of the file: it  
+uses the same at for every call, from the freeze time + 1 second. Hmm, but      
+that's for the tool-built job.                                                  
+
+Risk: the fixture's server-side times may be consistent with custody at values  
+already (since currently hand at matches server time). Then setting sent_at =   
+received_at = server time would keep cross-check passing (at == received_at).   
+Good. And order checks: check times must be before disposition.at, after        
+producedAt (maker last call). Hmm, if the maker log also gets stamped, the      
+maker's producedAt is the last call's received_at = server Date header. There's 
+already a cross_check between custody's producedAt and log's produced, which    
+currently passes (as hand time allowed? cross_check happens regardless of hand  
+allowance — actually H.cross_check(ref, "producedAt", ci.get("producedAt"),     
+produced, ...) — refusals don't depend on allow_hand). So currently the         
+fixture's typed producedAt matches the log's times. Good, so the fixture is     
+self-consistent already.                                                        
+
+So simply adding sent_at/received_at to each call equal to the log's own time   
+(Date header or created epoch) should keep everything consistent. But wait —    
+evaluator_history calls harness_log.read(log) which raises on entries missing   
+received_at → now fixed. Then H.read_log parses the log; flag_calls no longer   
+flags. Good.                                                                    
+
+However, we need the log format to match. What format? The frozen bar tests     
+write a JSON list. For FIX fixture, harness-eval-a.log — the E3 test asserts    
+out.count("harness-eval-a.log#") >= 3, meaning the fixture log has ≥3 calls     
+(multi-entry). Format? Could be JSONL or a JSON list. We'd need to handle both  
+in the stamping helper (like stamp_log does).                                   
+
+But there's a subtlety: harness_log.read (kit/evaluator_harness_log.py) may     
+require a certain shape: entries with a call name. The fixture's calls          
+presumably have call fields.                                                    
+
+Actually — maybe I can avoid guessing by simply reusing the existing stamp_log  
+helper? It's defined near line ~700, after the emit-success section. But        
+SEARCH/REPLACE moves are allowed: I could move stamp_log earlier... but that's a
+bigger refactor, and it uses _iso etc. Hmm, but the instructions say I can move 
+code with 2 blocks. But keeping changes localized is better.                    
+
+Alternative approach: keep FIX refusal assertion, and build the emit-success    
+fixture with a small local helper that:                                         
+
+                                                                                
+ def harness_logged(name):                                                      
+     """FIX with logger sent_at/received_at written into every call of its      
+ harness logs (the shape                                                        
+     tests/test_evaluator_harness_log.py asserts: sent_at, received_at,         
+ request.url, response.model).                                                  
+     Without them every call is a hand time and, for a model evaluator, the log 
+ cannot be read."""                                                             
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     for lg in (d / "custody" / "evidence").glob("harness-*.log"):              
+         stamp_logger_times(lg)                                                 
+     return d                                                                   
+                                                                                
+
+But the times: to be safe, set sent_at and received_at from the log's own server
+time — response headers Date, or response.created. Actually H.Call computes     
+self.at from received_at if present, else created, else Date header. If we set  
+received_at to the Date header, at stays the same as before. And sent_at: we    
+need sent_at <= received_at and sent_at to be used for maker's started (first   
+call's started = sent_at if present). Currently maker's startedAt cross-check   
+uses first.started which is derived from... Let me recall Call.started —        
+probably sent_at or created or Date. If sent_at is absent, started falls back to
+created/Date. Currently the fixture's startedAt passes the cross-check with     
+started = some fallback. If we now add sent_at equal to the same fallback time, 
+started remains the same.                                                       
+
+So: sent_at = received_at = the call's existing effective instant. But how to   
+compute the existing effective instant robustly in the test? Take               
+response.headers.Date parsed, or response.created. Simplest: set both to the    
+value from the response Date header if present, else response.created epoch →   
+ISO. Hmm, complexity.                                                           
+
+Alternative: use custody_history.read_log to parse the log and get c.at, then   
+set sent_at = received_at = H.iso(c.at)? But importing custody_history in the   
+test... The test already imports? Let me look: the test imports jsonschema,     
+tools/edi_corpus. It doesn't import custody_history. But it runs scripts via    
+subprocess with SNAP as the tree. Could import sys.path.insert(0, str(SNAP /    
+"kit"))... Hmm, but SNAP is a copy in TMP, and H.read_log takes a path. That    
+would be a reasonable, non-brittle approach: use the same reader the emitter    
+uses.                                                                           
+
+Hmm, but careful: the emitter refuses by default? No, reading is fine.          
+
+But which tree to import from: REPO / "kit"? The suite runs from REPO; importing
+from REPO is fine for test purposes. But maybe simpler: no import; do a         
+hand-rolled parse of the log.                                                   
+
+Hmm risk: If the log entries have a response.headers with Date and created, we  
+can just replicate:                                                             
+
+                                                                                
+ def _stamp_calls(path, at_iso):                                                
+     ...                                                                        
+                                                                                
+
+But we need per-call times, and different calls at different times (order       
+checks: maker producedAt <= evaluator check times? Actually check_order:        
+producedAt < checks < disposition). If we set all calls of all logs to the same 
+time, order checks may complain ("producedAt not before checks" —               
+before("producedAt", Pd, n, t) uses a > b → equal times pass). Let's check      
+before(an,a,bn,b) default strict=False: refuses if a > b. Equal is fine. And    
+before("startedAt", S, "producedAt", Pd): equal fine. And bar.frozenAt strictly 
+before startedAt: freeze is earlier in fixture, fine (we don't change freeze).  
+
+But the maker's calls and evaluator's calls would have equal times — fine.      
+
+But careful: disposition.at must be after the last check before("the last       
+check", last, "disposition.at", D) — D is the fixture's disposition time, later.
+Fine.                                                                           
+
+However the fixture's custody at values for passes/controls must match the new  
+received_at within tolerance (60s) — a hard refusal via H.cross_check. If we set
+all calls to one time, e.g., the maker log's time, then the pass at typed in    
+custody.json would presumably differ by more than 60s → refusal. So we must     
+preserve each call's own time.                                                  
+
+Simplest robust approach: for each call, compute its current effective instant  
+from the same precedence the emitter uses (received_at → created → Date header),
+then write sent_at = received_at = that instant. If we can't determine (none    
+present), leave... but then read() raises for missing received_at. Then we'd    
+need a fallback.                                                                
+
+Hmm, let me think about what the fixture log actually looks like. Let's search  
+the repo? We cannot read files not provided... but we can use the info          
+available: the stranger bundle requires evidence/harness-eval-a.log. The E3 test
+says out.count("harness-eval-a.log#") >= 3 and .sent_at in out and              
+"server-header" or "response-created" in out. That means for each call the      
+hand-time entry's source is "server-header" or "response-created" — i.e.,       
+Call.hand_time_entries() emits source "server-header" when the server Date      
+header is used, "response-created" when created epoch used. So each call has    
+either a Date header or a created epoch.                                        
+
+So I can compute the instant: prefer response.headers.Date? The emitter's       
+precedence: received first (absent), then created, then Date? Let's read from   
+H.Call.init summary: hdrs = raw.get("response_headers") or raw.get("headers") or
+{}, self.sent, self.received, self.created, self.at not shown fully. The        
+hand_time_entries source is either "server-header" or "response-created". Likely
+precedence: at = received_at or parse(created) or parse(Date). Hmm which one    
+first? The docstring in emit_custody says "a server-set time from a harness log 
+call with no logger sent_at/received_at (the response Date header or its created
+epoch)". Order ambiguous.                                                       
+
+To avoid duplicate logic, best to import the emitter's own reader:              
+kit/custody_history.py's read_log(path, ref, who) returns Call objects with .at,
+.iso... And Call.source_of etc. Actually H.iso(c.at) gives the instant. Then    
+write sent_at = received_at = H.iso(c.at). That preserves at exactly, so        
+cross-checks remain unchanged.                                                  
+
+But hold on: H.read_log might itself use H.Refusals — it takes (log, ref, who). 
+It may add refusals for malformed entries, but not for missing sent_at (that's  
+flag_calls). Fine, we ignore refusals.                                          
+
+Also at might be None for entries lacking all three; then read() would fail; but
+the E3 test indicates each call has server time, so fine.                       
+
+So the helper:                                                                  
+
+                                                                                
+ sys.path.insert(0, str(REPO / "kit"))                                          
+ import custody_history as _H                                                   
+                                                                                
+
+Hmm, importing from REPO/kit while the emitter runs from SNAP — fine for        
+computing times (both same code, hopefully). Actually careful: importing        
+custody_history from REPO/kit at module import time may execute code. It's a kit
+module; should be import-safe. But there's a subtlety: the test harness sets env
+CUSTODY_DIR removal etc. Should be fine.                                        
+
+Alternatively import lazily inside the helper to keep the module's import graph 
+unchanged. I'll do a lazy import inside the helper.                             
+
+Now, the pass/control call linkage. In evaluator_history, after                 
+harness_log.read, H.read_log builds calls dict keyed by name; if two calls share
+a name, setdefault keeps the first. For linking: link_call(ev_calls, evaluator, 
+f.get("call"), ...). If the fixture's passes have call fields that match names  
+in the log, fine. Since currently the fixture emits with exit 0 and 2 checks,   
+the linking works (or falls back: linkable = (f.get("call") in ev_map) if       
+f.get("call") else bool(ev_map)). Hmm — the current fixture's typed at was a    
+hand time (E2 test says passes.pass-a.at typed → hand). Wait, that's for a      
+copied fixture where they set at; so originally FIX's passes.pass-a has no at,  
+and the check's time comes from the linked call (xc["at_source"], from          
+call.source_at() or the entry). Hmm, but then at_v = H.iso(entry.received_at) — 
+derived from harness_log.read, which currently fails → hence the new refusal.   
+
+OK. And with received_at stamped from c.at, entry.received_at == c.at, so at_v  
+unchanged.                                                                      
+
+Also f.get("call") must be in ev_map for linkable; if call not set and ev_map   
+has 1 call → linkable with the single call. Fine.                               
+
+Now what about controls: link_call(ev_calls, k.get("evaluator"), k.get("call"), 
+f"eval_{...}"). If control's call is set and matches, fine.                     
+
+Wait, but E3 asserts out.count("harness-eval-a.log#") >= 3 — meaning the eval   
+log has ≥3 calls. And controls link to eval_d1 etc. Fine.                       
+
+But there's a catch: H.read_log sets Call.name = raw.get("call") or             
+raw.get("name"). If entries have call names like "eval_a2", etc. Fine.          
+
+Another catch: harness_log.read(path) — what does it return and what does it    
+validate? We only have a summary: def read(path) -> dict. In emit_custody,      
+entries = harness_log.read(log) then (ev_entries[...]).get(f.get("call")) →     
+entry objects with .received_at, .source, .name. So read returns a mapping      
+call→entry. It raises HarnessLogError for malformed/partial/reversed logs. Which
+logs does it accept — JSON list? Presumably the same shapes as or_call (JSON    
+list) or JSONL. It's used on the FIX fixture? Currently the FIX fixture's log   
+presumably parses fine structurally (with server times) but has no              
+sent_at/received_at... wait, the D6/D7 contract: "A model evaluator with no     
+harness log REFUSES". Hmm, but we don't know read()'s exact validation: does it 
+require sent_at/received_at per entry (per D9 partial entry refusal) — yes, D9: 
+an entry missing received_at refuses. So read on FIX's log raises → refusal.    
+That's the "no harness log" in the ruling's paraphrase — the log is unreadable  
+per the new contract.                                                           
+
+Hmm, wait, but is that right? The user says "The fixture job at FIX has a MODEL 
+evaluator and no harness log." Maybe in the fixture's custody inputs, the       
+evaluator has no harness_log field and there's no external entry for it. But the
+stranger bundle expects evidence/harness-eval-a.log in the zip... Actually the  
+bundle packing may include evidence files by glob regardless of the inputs'     
+naming.                                                                         
+
+If there's no harness_log named, evaluator_history → find_log(job, ev_dir, None,
+None) → None → ref.add("time", f"{who}: a model evaluator needs its harness log 
+...") → exit 3. And emit passes --allow-hand-times but that doesn't matter;     
+refusals of kind "time" for missing log are unconditional (D6 says refuse).     
+
+Hmm but then how did the current code emit FIX with exit 0? Because before the  
+fix, missing harness log only produced a gap (note external), not a refusal.    
+Right — "the measured emitter emitted note external: no harness log and still   
+wrote the record." Yes! D7 says exactly that: "the measured emitter emitted note
+external: no harness log". So FIX indeed has a model evaluator with NO harness  
+log (only evidence/external? no). So the fixture's evaluator has no harness_log 
+and there's external? If external had an entry for the evaluator with           
+evidence_file harness-eval-a.log, then evaluator_history would find it via      
+ci["external"]. Hmm, currently find_log(job, ev_dir, rel, None) with rel from   
+harness_log or external entry. If neither, None.                                
+
+But emit_custody's external loop: "for e in evs: if e["kind"] == "model" and not
+any(x.get("subject") == e["id"] for x in external): gaps.add("external", ...,   
+False)". So the note "no harness log" for model evaluator.                      
+
+But wait — E3 test at the end: emit(FIX, ..., allow_hand=False) expects exit 3  
+with harness-eval-a.log# counts ≥3 and .sent_at — that requires the evaluator's 
+log to BE found. Contradiction with "no harness log"? Unless E3's expected      
+refusal comes from elsewhere... Hmm. E3: "every call of an evaluator the logger 
+did not stamp is named (harness-eval-a.log, server time)". For that,            
+evaluator_history must find harness-eval-a.log. So there IS an external entry   
+naming it, i.e., rel found. Then how is it "no harness log"?                    
+
+Hold on. Maybe with the new fix (already committed), the emitter refuses        
+earlier: harness_log.read(log) raises (missing received_at) → refusal naming the
+log — before flag_calls. Then E3's assertion out.count("harness-eval-a.log#") >=
+3 and ".sent_at" in out would FAIL, because the refusal message from            
+harness_log.read names the entry as <log>:<line> maybe, not harness-eval-a.log#.
+
+Hmm. But the task says defect A is fixed and committed, meaning                 
+kit/emit_custody.py already imports the new module and refuses missing evaluator
+logs. And the E3 test currently exists in the file (presumably passing before   
+the fix?). The user says "Do not edit tests/test_evaluator_harness_log.py,      
+kit/emit_custody.py, kit/evaluator_harness_log.py". So after defect A fix, the  
+numbers we must achieve: tests/test_evaluator_harness_log.py OK 12 tests, and   
+validate_schemas ALL PASS.                                                      
+
+So E3's assertion must still pass with the new emitter? Hmm, E3 expects exit 3, 
+out.count("harness-eval-a.log#") >= 3, ".sent_at" in out, and source            
+"server-header" or "response-created". Would the new refusal message include    
+harness-eval-a.log#N.sent_at? The harness_log.read module was presumably        
+designed by the same person (the bar re-cut) — its error messages probably name 
+entries like <log>#<i>.received_at or similar. We can't know.                   
+
+Hmm, wait. Maybe harness_log.read is more lenient: maybe it refuses only when   
+the log is malformed/partial/reversed, and does NOT require sent_at (it can     
+derive from server headers)? Then read() succeeds on FIX's log (server times    
+present), entries have received_at derived from the server time. Then the new D6
+refusal is about the missing log, not unreadable entries. Then FIX... has a log?
+ugh.                                                                            
+
+The instruction from the user is explicit: FIX must now assert REFUSAL because  
+"a MODEL evaluator with no harness log" refuses the record. And "Move the       
+emit-success checks ... onto a fixture that DOES supply real logger times". So  
+we accept that FIX refuses.                                                     
+
+But E3 asserts a specific refusal text about harness-eval-a.log# with .sent_at. 
+If FIX refuses earlier due to missing log, E3 fails. Unless the refusal path is:
+log found (external entry), harness_log.read raises because entries lack        
+sent_at... then E3's expected text must be the module's message, which the test 
+author wrote as harness-eval-a.log#... Actually maybe the module's message      
+format is exactly harness-eval-a.log#3.sent_at — the source/label convention.   
+Plausible: read labels entries as <log.name>#<i>, and errors like               
+harness-eval-a.log#3: no sent_at. Then .sent_at in out ✓, count ≥3 ✓ (three bad 
+calls). And "server-header"/"response-created" — hmm, would read's error mention
+that? Maybe: "no logger sent_at (using response Date header)"? Hmm.             
+
+We can't resolve this without running. Since we can't run, we must propose edits
+we believe correct, and the user will run and report. But I should minimize     
+risk: keep E3 as-is (not our business; the task says only fix the KeyError      
+defect).                                                                        
+
+Hmm, but if E3 breaks, "ALL N CASES" fails, and the user will come back. Let's  
+think harder about whether our change affects E3. E3 emits FIX with             
+allow_hand=False, expecting exit 3. If FIX refuses for missing/unreadable log,  
+exit is 3 and the message includes...? The known refusal text from              
+evaluator_history for missing log: "evaluator {id}: a model evaluator needs its 
+harness log (evaluators[].harness_log, or the CL1-15 external entry for it);    
+none named/not found: ..., so its check times and endpoint have no source". That
+contains "harness" but not "harness-eval-a.log#" and not ".sent_at", and not    
+server-header. So E3 would fail with the missing-log path.                      
+
+
+
+Therefore FIX must have an evaluator harness log named                          
+("server-header"/"response-created" sources indicate calls exist), and the new  
+refusal must come from harness_log.read, whose message apparently contains "#"  
+and the field name and the basis. That's consistent with E3 being written AFTER 
+defect A (the file is the re-cut version). Wait — the E3 test comment says "the 
+fixture's evaluator log has no logger sent_at". Yes! E3 comment: "(the fixture's
+evaluator log has no logger sent_at)". So the fixture DOES have an evaluator    
+log, just without logger timestamps.                                            
+
+So the user's statement "has a MODEL evaluator and no harness log" refers to the
+contract sense: no usable harness log (no logger times). Fine.                  
+
+Now: harness_log.read raises on FIX's log → refusal naming                      
+harness-eval-a.log#N.... So E3 passes. Good, that means the new refusal path is 
+harness_log.read, and our emitted record's at for checks would come from        
+entry.received_at if read succeeds.                                             
+
+Hmm wait, if read requires logger sent_at/received_at (D9 partial refusal), then
+to make the emit-success fixture we MUST add logger times to the eval log. And  
+also the maker log? D6 concerns model evaluator; but the maker's times come from
+H.read_log (the old reader), which uses server times when logger times are      
+absent — that's just a hand time (allowed with --allow-hand-times). But the "no 
+gap (exit 0)" requirement: the maker hand times are hand times → with           
+allow_hand=True they're listed, not hard gaps, so exit 0 still holds? Currently 
+FIX emits exit 0 with hand times allowed (emit defaults allow_hand=True) — yes, 
+and the current checks pass. However x-plumbline.times etc. fine.               
+
+But careful: exit 0 means no HARD gaps. Hand-time allowance removes the refusal;
+hard gaps are things like missing bar digest. So stamping only eval log's logger
+times suffices to avoid the D6/D9 refusal, and exit 0 remains.                  
+
+But hold on: the T7b/E3 case shows that when allow_hand=False FIX refuses with  
+hand-time for eval log calls. After we add logger times to the eval log in our  
+NEW fixture (a copy), FIX itself stays untouched (E3 depends on FIX being       
+unstamped). Good — we copy FIX into a new job dir and stamp only the copy.      
+
+Now, D8/D9: harness_log.read refuses reversed/partial. Our stamped entries:     
+sent_at <= received_at needed. If we set both to the same instant, fine.        
+
+Now, what instant? We must preserve at semantics for cross-checks. Let's think: 
+what does read() produce as received_at when present? The parsed received_at    
+timestamp. at_v = H.iso(entry.received_at) becomes the check's at. Cross-check  
+H.cross_check(ref, f"passes.{pid}.at", f.get("at"), call.at, ...) uses call.at  
+from H.read_log — now = received_at = our value. If custody passes.pass-a has no
+at (E2's copy added it), then no cross-check on at. But what about              
+controls[*].at? link_call then cross_check with k.get("at") if set. If controls 
+have typed at in the fixture and we set received_at to the call's server time — 
+which already equals the typed at within tolerance (since currently emitting    
+with hand times passes — wait, does it? H.cross_check is a refusal regardless of
+allow_hand; the current FIX run gives exit 0, so cross-checks currently pass).  
+So using the call's current server-derived instant preserves the status quo     
+exactly.                                                                        
+
+So: for each entry in the eval log, set sent_at = received_at = the instant the 
+old reader derived (Date header or created). To compute that, use               
+kit/custody_history.py's read_log. But wait: does read_log skip entries lacking 
+at? It returns Calls; H.iso(c.at). If c.at is None → skip/error.                
+
+Actually, is using custody_history's read_log safe regarding "who"/refusals?    
+H.read_log(log, ref, who) — signature per usage: H.read_log(log, ref, "maker"). 
+It might add refusals for missing times? For the maker it's used to read; J: the
+maker's calls would be flagged as hand times by flag_calls (not read_log). Let  
+me just use a dummy Refusals.                                                   
+
+Alternatively, simpler and dependency-free: parse the Date header ourselves with
+email.utils.parsedate_to_datetime, or the created epoch. But the precedence     
+matters for exactness... Actually if both present and differ, at picks one. To  
+be exact, use the emitter's reader.                                             
+
+Hmm, but there's another wrinkle: harness_log.read might not accept the same log
+shapes. The eval log's shape is what it is; read() is designed for it.          
+
+Also: the module read() returns entries keyed by call. For our copy, names      
+unchanged.                                                                      
+
+Let me now also consider: does harness_log.read require the log to be JSONL or  
+JSON list? Unknown; it reads FIX's log (whatever format it is).                 
+
+Implementation plan:                                                            
+
+ 1 Add a helper near the other custody helpers (after job_copy/append_text? It's
+   used at the emit-success section, which is after job_copy). Place it right   
+   before the emit-success block.                                               
+
+                                                                                
+ def logged_job(name):                                                          
+     """FIX with the logger's own sent_at/received_at written into every call   
+ of its harness logs.                                                           
+                                                                                
+     The fixture's logs carry server times only, so a model evaluator's log     
+ cannot be read (D6/D7:                                                         
+     the emitter refuses a model evaluator whose check times have no logged     
+ source) and every call                                                         
+     is a hand time. The entry shape is the frozen bar's                        
+ (tests/test_evaluator_harness_log.py):                                         
+     sent_at, received_at, the request url and the served model. The instants   
+ are the ones the                                                               
+     fixture already carries -- the response Date header or its created epoch   
+ -- so nothing the                                                              
+     fixture asserts about its own timeline moves."""                           
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     sys.path.insert(0, str(SNAP / "kit"))                                      
+     try:                                                                       
+         import custody_history as _hist                                        
+     finally:                                                                   
+         sys.path.pop(0)                                                        
+     for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):      
+         calls = _hist.read_log(lg, _hist.Refusals(), "test")                   
+         ... rewrite ...                                                        
+     return d                                                                   
+                                                                                
+
+Hmm, rewriting needs to know the file format (JSON list vs JSONL) and to map    
+Call → raw dict. Call has .i (index) and .raw. If the log is a JSON list, raw is
+the entry dict; writing back the modified list preserves order by index. If     
+JSONL, each line is an entry; raw is the parsed line; we can rewrite lines by   
+index.                                                                          
+
+But Call.raw may be a copy or the actual dict? self.raw = raw — actual          
+reference. If read_log parses the whole list into dicts, mutating c.raw mutates 
+the doc. Then dumping the doc works. But we don't know whether read_log         
+pre-processes (e.g., merges). Risky.                                            
+
+Safer: do our own minimal, format-preserving transform:                         
+
+                                                                                
+ def _with_logger_times(path):                                                  
+     text = path.read_text(encoding="utf-8")                                    
+     try:                                                                       
+         doc = json.loads(text)                                                 
+     except ValueError:                                                         
+         doc = None                                                             
+     if isinstance(doc, list):                                                  
+         items, dump = doc, lambda it: json.dumps(it, indent=2) + "\n"          
+     else:                                                                      
+         items = [json.loads(ln) for ln in text.splitlines() if ln.strip()]     
+         dump = lambda it: "".join(json.dumps(e) + "\n" for e in it)            
+     for e in items:                                                            
+         if isinstance(e, dict) and not e.get("sent_at") and not                
+ e.get("received_at"):                                                          
+             at = _server_instant(e)                                            
+             if at:                                                             
+                 e["sent_at"] = e["received_at"] = at                           
+     path.write_text(dump(items), encoding="utf-8")                             
+                                                                                
+
+Hmm, but if the log is a single JSON object (not list) — like the same-family   
+test that does json.loads(lg.read_text()) and treats it as one call with        
+x["response"]! Look:                                                            
+
+                                                                                
+ j = job_copy("pin-attempt")                                                    
+ lg = j / "custody" / "evidence" / "harness-maker-fixture.log"; x =             
+ json.loads(lg.read_text())                                                     
+ x["response"]["openrouter_metadata"] = ...                                     
+                                                                                
+
+So harness-maker-fixture.log is a JSON object (a single call) or a dict wrapper.
+And stamp_log handles list/dict/JSONL:                                          
+
+                                                                                
+ doc = json.loads(text)                                                         
+ items, array = (doc, True) if isinstance(doc, list) else ([doc], False)        
+ ...                                                                            
+ path.write_text((json.dumps(items, indent=2) + "\n") if array                  
+                 else "".join(json.dumps(c) + "\n" for c in items),             
+ encoding="utf-8")                                                              
+                                                                                
+
+So stamp_log in this file already implements exactly this transform, with a     
+fixed at. I can generalize it and move it up, or define a small variant.        
+
+Given the instruction "reuse the shape", and to minimize duplication, I'll move 
+stamp_log (and _iso/_ts if needed) up before its new first use? Moving functions
+is allowed but requires care: _iso and _ts also used later. Simpler: define a   
+new helper specifically for this in the custody section, using a per-entry      
+server instant, and leave stamp_log alone.                                      
+
+Server instant extraction:                                                      
+
+                                                                                
+ def _server_instant(entry):                                                    
+     """The instant a call's own response carried: the logger's times if        
+ present, else the response                                                     
+     `created` epoch, else the Date header. Same precedence as                  
+ kit/custody_history.py."""                                                     
+     for k in ("sent_at", "received_at"):                                       
+         v = entry.get(k)                                                       
+         if isinstance(v, str) and v:                                           
+             ...                                                                
+                                                                                
+
+Hmm. Actually, precedence matters only for choosing what to stamp. Simplest and 
+safest: use the server time (created or Date) rather than sent/received — that's
+what at resolves to when logger times are absent. Order: created first or Date  
+first? From E3's sources: "server-header" or "response-created" — both possible.
+hand_time_entries reports the source. In H.Call, self.at likely = received or   
+created or Date. Let me guess from maker_history: "startedAt_basis":            
+(f"{first.label} sent_at" if first.sent else (f"{first.label} response created" 
+if first.created else f"{first.label} response Date header")) — precedence: sent
+→ created → Date. And at_basis for last: f"{last.label} received_at" if         
+last.received else f"{last.label} {last.at_basis}" where at_basis ∈ {response   
+created, response Date header}. So at = received or created or Date header.     
+Good: precedence created before Date.                                           
+
+So:                                                                             
+
+                                                                                
+ def _call_instant(e):                                                          
+     created = ((e.get("response") or {}).get("created"))                       
+     if isinstance(created, (int, float)) and not isinstance(created, bool):    
+         return datetime.fromtimestamp(created,                                 
+ timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")                                   
+     hdrs = e.get("response_headers") or e.get("headers") or (e.get("response") 
+ or {}).get("headers") or {}                                                    
+     date = hdrs.get("Date") or hdrs.get("date")                                
+     if isinstance(date, str) and date:                                         
+         try:                                                                   
+             from email.utils import parsedate_to_datetime                      
+             return                                                             
+ parsedate_to_datetime(date).astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M: 
+ %SZ")                                                                          
+         except Exception:                                                      
+             return None                                                        
+     return None                                                                
+                                                                                
+
+Hmm, headers in H.Call: hdrs = raw.get("response_headers") or raw.get("headers")
+or {} — so headers at top level of entry, not inside response. OK, include both.
+
+Then:                                                                           
+
+                                                                                
+ def logger_stamped_job(name):                                                  
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):      
+         text = lg.read_text(encoding="utf-8")                                  
+         try:                                                                   
+             doc = json.loads(text)                                             
+         except ValueError:                                                     
+             doc = None                                                         
+         array = isinstance(doc, list)                                          
+         items = doc if array else ([doc] if doc is not None else               
+                                    [json.loads(ln) for ln in text.splitlines() 
+ if ln.strip()])                                                                
+         for e in items:                                                        
+             if not isinstance(e, dict) or e.get("sent_at") or                  
+ e.get("received_at"):                                                          
+                 continue                                                       
+             at = _call_instant(e)                                              
+             if at:                                                             
+                 e["sent_at"] = e["received_at"] = at                           
+         lg.write_text((json.dumps(items, indent=2) + "\n") if array            
+                       else "".join(json.dumps(e) + "\n" for e in items),       
+ encoding="utf-8")                                                              
+     return d                                                                   
+                                                                                
+
+Wait, careful with the dict case: stamp_log writes dict case as JSONL lines.    
+Hmm, that changes format from single object to JSONL — but                      
+"harness-maker-fixture.log" was read by json.loads as a dict in tests after     
+stamp_log? No — after stamp_log, the same-family test isn't rerun. But at the   
+final T4 tool-built job, stamp_log rewrites all harness logs, converting dict → 
+JSONL. Then H.read_log handles both. OK.                                        
+
+But wait: for the same-family test (line ~560) reading                          
+json.loads(lg.read_text()) expecting a dict — that runs before T4 and on a fresh
+copy. Fine.                                                                     
+
+For our new fixture: if the maker log is a dict and we convert it to JSONL, does
+H.read_log handle it? Yes, since stamp_log does this for T4 and T4 passes       
+(asserts exit 0). Good. But to be safer, preserve the dict form: if doc is a    
+dict, write json.dumps(doc, indent=2). Hmm, but read_log... it handled dict     
+before, so preserving is safest. Let me preserve:                               
+
+Actually if items is a single dict, write json.dumps(doc, indent=2) + "\n". But 
+is the existing single-object file one call or a wrapper with "calls"?          
+x["response"]["openrouter_metadata"] and x["request"]["url"] in other tests     
+suggest it's a single call object at top level. Then preserve.                  
+
+Hmm, but what if it's JSONL already (multiple entries)? Then doc is None        
+(ValueError) and we handle lines.                                               
+
+Hmm, but json.loads could succeed on a JSONL file? No.                          
+
+OK. But wait — will stamping the maker log create problems? The maker log's     
+calls currently produce hand times with allow_hand; stamping them makes them    
+logged. Cross-checks use call.started/call.at which we preserve (sent_at =      
+created/Date = same as before). But hmm: first.started — before, started = sent?
+absent → created/Date. Now sent_at set to created/Date → started = sent_at =    
+same. ✓. last.at = received_at = same as before ✓.                              
+
+But careful about _call_instant order for the maker log: created first, then    
+Date. If at before was created (since H.at prefers received→created→Date and    
+started prefers sent→created→Date), fine.                                       
+
+Edge: entries with a created inside response but the log's response.Date is     
+earlier — irrelevant.                                                           
+
+Now also: with the eval log stamped, D3 ordering: sent_at == received_at ✓.     
+
+Now the emit-success block becomes:                                             
+
+                                                                                
+ # The fixture's own logs carry server times only: a MODEL evaluator's log with 
+ no logger                                                                      
+ # sent_at/received_at has no source for its check times, so the record is      
+ REFUSED (D6/D7,                                                                
+ # tests/test_evaluator_harness_log.py). Asserted here, positively, before any  
+ record is read.                                                                
+ o_fix = TMP / "fixture-refused.json"                                           
+ rc_fix, out_fix = emit(FIX, o_fix)                                             
+ res((f"{S} · a model evaluator whose harness log carries no logger times is    
+ refused (exit 3, [time])",                                                     
+      rc_fix == 3 and "[time]" in out_fix and "harness-eval-a.log" in out_fix   
+ and not o_fix.exists(),                                                        
+      f"exit {rc_fix}: {out_fix.strip()[-140:]}"))                              
+                                                                                
+
+Hmm, but what tag does the new refusal use? In evaluator_history,               
+harness_log.read failure → ref.add("time", ...) → tag [time]. Yes, in the given 
+emit_custody code:                                                              
+
+                                                                                
+     try:                                                                       
+         entries = harness_log.read(log)                                        
+     except harness_log.HarnessLogError as exc:                                 
+         ref.add("time", f"{who}: {exc}")                                       
+         return {}                                                              
+                                                                                
+
+Good: [time].                                                                   
+
+Wait — but hold on: does the given emit_custody (which we're told is already    
+fixed and committed) match this chat's version? The chat's version has the      
+harness_log.read import and try/except. Yes, that's the "fixed" version. Good.  
+
+And if the evaluator's harness log is NOT found (rel None) → refusal "[time]"   
+with "needs its harness log". To be robust to either path (file missing vs      
+unreadable), assert rc == 3 and "[time]" in out and not o.exists() plus "harness
+log" in out? The D6 test asserts "harness log" in out. Both messages contain    
+"harness log": the read error message — unknown. Hmm.                           
+
+Safest assertion: exit 3, "[time]", and the word "evaluator" (both messages     
+start with evaluator <id>:), and nothing written. Also assert the message names 
+the log or "harness log": the missing path says "needs its harness log"; the    
+read path — probably names the file. I'll assert "harness" in out (both contain 
+"harness": "harness log" / "harness-eval-a.log"). Good enough and truthful.     
+
+Then:                                                                           
+
+                                                                                
+ job_logged = logger_stamped_job("fixture-logged")                              
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(job_logged, rec_path)                                           
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job with logger-stamped harness logs emits with no gap    
+ (exit 0)", rc == 0, out.strip()[-90:]))                                        
+                                                                                
+
+then the same three check calls and the three bad = deepcopy checks, unchanged. 
+
+But hold on: if rc != 0, rec = {} and check(...) on {} → passed False vs        
+expected True → records FAIL, no KeyError. Good: check guards. But the deepcopy 
+lines: bad = copy.deepcopy(rec); bad["predicate"]["verdict"] = "reject" →       
+KeyError if rec == {}. So rec must be valid. To be safe without try/except, we  
+can build the bad records from a record we know: hmm. Options: use rec but only 
+if populated; the instruction says don't wrap KeyError in try/except. But the   
+point is the fixture now emits, so rec is populated. Fine — but if the          
+environment fails, we get a crash instead of a FAIL row. The instruction says   
+assert refusals positively; for the success fixture the checks work on rec.     
+Since check() handles empty rec gracefully (it records FAIL), but deepcopy      
+won't... For robustness, we could guard by using rec if rec else <minimal>?     
+That's hacky.                                                                   
+
+Alternative: build the bad variants from rec after asserting... I'll keep it    
+simple and faithful: rec should be populated. Actually, to be extra safe I can  
+key off rec.get("predicate"):                                                   
+
+Hmm, bad = copy.deepcopy(rec); bad.setdefault("predicate", {})... — no, changes 
+semantics. Keep as-is; if emission fails, the suite crashes and that's a loud   
+failure. Hmm, but the user asked "must reach ALL N CASES". A crash is worse than
+FAIL. I could compute the bad docs from rec but skip if empty:                  
+
+Actually, we can restructure minimally:                                         
+
+                                                                                
+ bad = copy.deepcopy(rec); bad["predicate"]["verdict"] = "reject"               
+                                                                                
+
+Leave. The existing file already had that pattern and only worked because rec   
+was populated.                                                                  
+
+Hmm, one more consideration: does the emit-success fail earlier because of      
+--expect-revision? No.                                                          
+
+Now, will emit(job_logged, rec_path) return exit 0? Concerns:                   
+
+(a) With eval log stamped, harness_log.read must accept it. The module may      
+require e.g. received_at >= sent_at ✓, and maybe a call name ✓ (present in      
+fixture), and request.url ✓ (fixture has it, since bundle/maker tests use       
+request url). It may also require response.model? D2 asserts model named. The   
+fixture's response probably has model (the check "emitted record names model"). 
+OK.                                                                             
+
+Potential risk: harness_log.read may expect a JSON list file (or_call's format),
+while the fixture's eval log might be JSONL or a dict. Since read() is used on  
+this exact fixture by the E3 test (it raises), it must parse it at least        
+partially. If it raises a parse error rather than a missing-time error... then  
+FIX would refuse for a different reason and E3's .sent_at assertion wouldn't    
+hold. The re-cut bar's E3 comment says "the fixture's evaluator log has no      
+logger sent_at", implying read gets to the time check. So the format is         
+supported. After stamping, read succeeds.                                       
+
+(b) entry.received_at used for at_v: with our stamping = created/Date instant.  
+Previously at_v was the linked call's call.at (from H.read_log) = same. So      
+cross-checks unchanged.                                                         
+
+But wait: entry.source → xc["at_source"] = entry.source — the record's          
+time_sources change (now harness-eval-a.log:3 instead of inputs line). No       
+assertion depends on that for FIX... The bundle test only checks files. OK.     
+
+(c) Order checks: check_order uses pn and now. With times unchanged, fine.      
+
+(d) Spend: spend_block sums call costs — unchanged.                             
+
+(e) The fixture's external entry digest: external[i].evidence = digest of       
+ev_dir/evidence_file — but we REWROTE that file, changing its sha256! The       
+external entry's evidence digest is computed at emit time from the file, so it's
+consistent within the record. But bar.digest etc. unaffected. And is there any  
+assertion comparing the record's digests to the ORIGINAL fixture files? Yes:    
+"record carries no file the fixture lacks: every digest is a file's" — compares 
+bar.digest.sha256 to (FIX / "custody" / "bar.md") — bar.md unchanged ✓.         
+
+Also the stranger bundle test uses FIX and rec_path... wait:                    
+
+                                                                                
+ zp = TMP / "bundle.zip"                                                        
+ rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),      
+ "--record", str(rec_path), "--out", str(zp)])                                  
+                                                                                
+
+and checks manifest sha256s inside the zip match (self-consistent: it packs     
+FIX's files and the record; the record's subject/evidence digests must match the
+packed files!). If rec_path comes from our logged copy while packing FIX's      
+files, the digests won't match FIX's rewritten logs →                           
+tools/pack_stranger_bundle.py might fail (rc != 0) or the manifest check still  
+passes (manifest is over packed files). The check need = {...,                  
+"evidence/harness-eval-a.log"} presence ✓. The bundle tool may verify record    
+digests against job files — likely? It's a "stranger bundle"; probably it packs 
+and hashes, maybe verifying the record's subject digests. Risky: if it verifies,
+using rec from the logged copy against FIX breaks.                              
+
+Also later: head = ... uses rec for the emitter commit check — fine (from logged
+copy, same emitter).                                                            
+
+Hmm, and rec is used in the "matching pin" test: mx = (rec.get("predicate") or  
+{}).get("maker") or {} — from the logged copy; maker endpoint unaffected ✓.     
+
+So the safest: name the success record rec_path as before (TMP /                
+"fixture.custody.json"), and give the bundle the FIX record? The bundle test    
+currently packs FIX's files with rec_path. If rec_path is emitted from a copy   
+whose evidence log differs from FIX's, and the bundle tool verifies digests, it 
+fails.                                                                          
+
+Better approach: make the logged job and use it for BOTH the record and the     
+bundle? But the bundle test explicitly uses FIX... We could keep bundle on FIX  
+with a record emitted from FIX — impossible now (refused).                      
+
+Alternative: make the logged copy's rewrite inside FIX? No, mustn't modify the  
+repo fixture — actually, is FIX a shipped fixture edited? It's in the repo      
+(tests/fixtures/custody/job-rejected). We shouldn't edit it (not in our editable
+set... it isn't committed; editing fixtures isn't in the editable list).        
+
+Hmm. Option: emit from the logged copy AND pack the bundle from the logged copy?
+The bundle check uses FIX for job-dir but the record must come from the same    
+job. Since our copy is a full copy of FIX with only the harness logs' logger    
+times added, packing from the copy tests the same thing. So: change the bundle  
+block to use the logged job dir. But that changes those lines — allowed? They're
+in the editable file. But the instruction says don't delete checks; changing the
+job dir source is fine and arguably part of the move.                           
+
+But wait: would packing from the copy still satisfy need <= set(z.namelist())?  
+The names inside the zip are relative paths like "evidence/harness-eval-a.log"  
+✓.                                                                              
+
+Hmm, but hold on. Maybe the bundle tool doesn't verify digests against the      
+record; it just packs listed files and writes MANIFEST of what it packed. Then  
+FIX + rec(logged) is fine. Unknown. To minimize risk, I'll switch the bundle    
+job-dir to the logged copy as well (and the determinism check). That keeps      
+records and files consistent.                                                   
+
+Hmm, but rec_path from the logged copy — will the bundle include                
+evidence/harness-eval-a.log? The bundler probably collects subject files, bar   
+file, evidence files referenced, harness logs. Yes.                             
+
+Now, also the earlier block:                                                    
+
+                                                                                
+ res((f"{S} · record carries no file the fixture lacks: every digest is a       
+ file's",                                                                       
+      rec.get("predicate", {}).get("bar", {}).get("digest", {}).get("sha256")   
+      == hashlib.sha256((FIX / "custody" / "bar.md").read_bytes()).hexdigest(), 
+ "bar digest is not bar.md's"))                                                 
+                                                                                
+
+bar.md unchanged ✓.                                                             
+
+Other later uses of FIX with emit: T3 allow-hand (emit(FIX, o, allow_hand=True) 
+expecting rc == 0 and hand_times listing!). That will now FAIL because FIX      
+refuses. Hmm! T2/T3 cases:                                                      
+
+                                                                                
+ o = TMP / "t3-allow.json"                                                      
+ rc, out = emit(FIX, o, allow_hand=True)                                        
+ rx = ...                                                                       
+ res((f"{S} · T3 with --allow-hand-times the record is written and hand_times   
+ lists the hand fields with file:line", rc == 0 and ...))                       
+                                                                                
+
+Under the new contract, FIX refuses regardless of the switch → T3 fails. The    
+ruling only mentions moving the emit-success checks... but T3/T7b also depend on
+FIX emitting. Hmm. But wait — is that true? --allow-hand-times doesn't bypass   
+the harness_log.read refusal (D9 refusal is ref.add("time", ...), exit 3,       
+unconditional). So T3 fails.                                                    
+
+The task statement says "Move the emit-success checks — ... — onto a fixture    
+that DOES supply real logger times". T3 is also an emit-success check (exit 0). 
+And T2? T2 expects exit 3 [hand-time] with nothing written — that still holds?  
+With FIX, the new refusal happens first (evaluator_history → read fails) and ref
+contains both? Let's trace: in build, evaluators loop calls evaluator_history,  
+which does harness_log.read first → raises → adds [time] refusal and returns {} 
+→ ev_calls[id] = {} (no calls). Then later hand marks? For the maker:           
+maker_history runs first (before evaluators), marking maker hand times. So ref  
+has both hand-time marks for maker and the [time] refusal. So T2                
+(allow_hand=False) still exits 3 with [hand-time] present ✓ and "disposition.at"
+in out with inputs-no-ledger ✓ (maker hand marks + startedAt/producedAt typed?  
+those are in custody.json presumably).                                          
+
+T3 (allow_hand=True) → still refuses because of the [time] refusal → FAIL. And  
+T3's second check: "the switch silences nothing else: failures/hand-times still 
+refuses" — that's on job_copy with overlay, fine.                               
+
+Also E2's allow-hand check:                                                     
+
+                                                                                
+ o = TMP / "t2pass-allow.json"                                                  
+ rc, out = emit(j, o, allow_hand=True)                                          
+                                                                                
+
+where j = job_copy("t2-pass-at") = copy of FIX with passes at typed → expects rc
+== 0 and checks[0].at == "2026-10-20T12:00:03Z". Under new contract FIX refuses 
+→ FAIL. Hmm! That's another emit-success-on-FIX case.                           
+
+Also T2c/E2 refusal case (rc==3) still passes but perhaps for a different reason
+([time] and hand-time both present) ✓.                                          
+
+And the V1/V3/T2 roundtrip:                                                     
+
+                                                                                
+ rt_rec = TMP / "roundtrip.custody.json"                                        
+ rc, out = emit(FIX, rt_rec, allow_hand=True)                                   
+ vrc, vout = verify_record(rt_rec, FIX, VCO)                                    
+                                                                                
+
+expects rc == 0 and vrc == 0 → FAIL under new contract.                         
+
+And the "hand_times" check on rt_xp → FAIL.                                     
+
+So there are 4+ cases on FIX expecting success. The task says "Move the         
+emit-success checks ... (list of 6)" — but reality requires moving all          
+FIX-success cases. Hmm, but maybe the user's list is exactly what breaks with   
+KeyError, and they will discover more. Better: fix all of them now so "ALL N    
+CASES" passes. The ruling allows editing tests/validate_schemas.py generally    
+("repair ii", editable_after_ruling). And "Do NOT delete any check" — so I must 
+keep each check, just point it at the logged fixture.                           
+
+But careful: T3's hand_times check requires hand times to remain in the record: 
+the logged job still has hand times (maker times? no—we stamped maker log too,  
+so maker times come from the log; typed disposition.at in custody.json → is it  
+typed? The fixture's disposition.at... the T3 check asserts "disposition.at" in 
+by_field and line is not None and len(ht) >= 1. If we stamp all logs, remaining 
+hand times: disposition.at if typed in custody.json (yes, likely, since the     
+no-switch T2 test asserts disposition.at is named as inputs-no-ledger) ✓. Also  
+approvals' at typed in custody.json → hand. So hand_times non-empty ✓.          
+
+But hmm: if we stamp the maker log, the maker's hand times disappear, and T2's  
+first assertion only needs [hand-time] and "disposition.at" + inputs-no-ledger. 
+Since T2 runs on FIX (unstamped), unaffected.                                   
+
+So T3: run on the logged job. Then rc == 0 ✓ (hopefully), hand_times lists      
+disposition.at etc ✓.                                                           
+
+E2 (t2-pass-at + allow_hand): the copy has typed passes.pass-a.at = 12:00:02Z,  
+but the call's at is the fixture's ~12:00:03Z; under allow_hand, the record     
+carries the call's time 12:00:03Z ✓ and hand_times has passes.pass-a.at with    
+source inputs-no-ledger ✓. But this job is a copy of FIX, unlogged → refuses. So
+must switch to copy of the LOGGED job. job_copy copies FIX + overlay. Need a    
+variant: copy logged job then apply ledger_edit. Since job_copy(name, overlay)  
+copies FIX; I can instead copy the logged job dir:                              
+
+Maybe simplest: make logged_job a cached base and define logged_copy(name) =    
+copytree(logged_base). Since the emit-success block and later blocks all need   
+it. Let me restructure:                                                         
+
+ • Create LOGGED = logger_stamped_job("fixture-logged") once (before first use),
+   then use shutil.copytree(LOGGED, TMP / name) for variants.                   
+
+But careful: emit(LOGGED, ...) directly writes a record into LOGGED? No, --out  
+given. OK.                                                                      
+
+However, copies-of-copies: job_copy uses FIX; for variants of the logged job    
+define:                                                                         
+
+                                                                                
+ def same_job_with_logger_times(name, base=None):                               
+     d = TMP / name                                                             
+     shutil.copytree(base or LOGGED, d)                                         
+     return d                                                                   
+                                                                                
+
+Also need the failures overlays? For E2, only a custody.json edit.              
+
+And the roundtrip: emit(LOGGED, rt_rec, allow_hand=True) and                    
+verify_record(rt_rec, LOGGED, VCO). verification: the stand-in checker verifies 
+subject files at job/custody/files — LOGGED has them (copied) ✓. But rewrote    
+evidence logs — verifier may check... The kit/plumbline_verify.py checks record 
+vs files, including evidence digests — those in the record are computed from    
+LOGGED's files, and we pass --evidence LOGGED/custody/evidence → consistent ✓.  
+
+Now: T4's tool-built job does job_copy(name) → FIX + tool rebuild, then         
+stamp_log with a fixed time for all calls. That case expects exit 0 with        
+--allow-hand-times off. It stamps logs (including eval), so harness_log.read    
+succeeds → no refusal. But does it? stamp_log sets sent_at = received_at = fz+1s
+for ALL calls of all logs. Then cross-check: custody.json's passes have at      
+removed (tool_built_job pops at), controls too ✓. And order check: all times    
+equal fz+1 ≤ disposition. OK. But also H.cross_check(ref, "startedAt",          
+ci.get("startedAt"), started...) where ci startedAt popped ✓.                   
+
+Hmm, but does read() accept it? sent==received ✓.                               
+
+So T4 presumably already is the "fixture that supplies logger times" the ruling 
+refers to! And it's built by tool_built_job. But it's defined later; the        
+emit-success block could use it? It's defined at line ~700 with a big helper    
+set, and inside it there's a try: block; using it earlier would require moving  
+lots of code. Our simpler logger_stamped_job copy is cleaner.                   
+
+Hmm, but wait: "There is already a fixture in the repo that supplies harness-log
+times" — maybe meaning stamp_log. Right.                                        
+
+OK now let me also check other FIX-based success expectations:                  
+
+  1 res(... fixture job emits with no gap (exit 0)) ✓ move.                     
+  2 Two check calls ✓.                                                          
+  3 Three deepcopy bads ✓.                                                      
+  4 record carries no file the fixture lacks — uses rec + FIX/bar.md ✓ (bar.md  
+    unchanged in copy).                                                         
+  5 disposition given job_copy("given") → expects r2 verdict reject etc. →      
+    refuses now? job_copy copies FIX with unstamped eval log → refusal → r2 = {}
+    → assertion fails. Must use LOGGED copy. Its assertion: disposition.state ==
+    "given", verdict "reject". Since it reads TMP/given.json for r2 → need      
+    rc==0. So base on LOGGED.                                                   
+  6 no-disposition → expects rc == 1 (hard gap disposition.state) and record    
+    written. With refusal, rc 3 → fail. Base on LOGGED.                         
+  7 bad-remedy → emit(j, TMP/"remedy.json") then reads record unconditionally → 
+    KeyError → crash. Base on LOGGED.                                           
+  8 no-violation-dimension → expects rc == 1, record read. Base on LOGGED.      
+  9 same-family → reads TMP/same.json predicate → base on LOGGED (and it edits  
+    maker log by replacing model id: ml.read_text().replace("fixture/maker-1",  
+    "example-1") — on LOGGED, the maker log is now JSON (or JSONL) with sent_at;
+    replace still works; but wait LOGGED's maker log format may have changed    
+    from dict→? We preserve dict form. ml.read_text().replace(...) works        
+    regardless ✓). But it sets c["evaluator"]["model"] = maker model and expects
+    sameModelAsMaker True and family gap. If maker log model becomes "example-1"
+    while evaluator identifier is "z-ai/..."? Hmm, in the original, evaluator   
+    model identifier is fixture-based? The edit replaces maker-1 with example-1 
+    in the maker log, and c["maker"]["model"] = dict(evaluator's model). Then   
+    annotate checks identifier vs log model → if                                
+    c["maker"]["model"]["identifier"] = evaluator's identifier and the log says 
+    "example-1" — that's a mismatch only if identifiers are not "example-1"...  
+    Confusing; but since this test currently passes on FIX with the same logic, 
+    running it on LOGGED (same content + sent_at) preserves behavior — as long  
+    as annotate gives the same result. With sent_at added, at unchanged ✓. So   
+    fine.                                                                       
+
+Hmm, but same-family may refuse due to model_matches mismatch, and the test     
+expects rc ignored (it just reads the record). If rc != 0 → record missing →    
+KeyError. Currently it emits fine.                                              
+
+Wait — did same-family currently emit fine? It expects r5["evaluators"][0] —    
+yes, record written. And with cross-checks: the maker's model identifier becomes
+the evaluator's model identifier but the maker log names example-1... Let's not 
+worry; behavior preserved.                                                      
+
+ 10 no-inputs → expects rc == 1, record written. Removing custody.json → with no
+    inputs, evaluator_history loops over ci.get("evaluators") = none → no       
+    refusal. So emits exit 1 (gaps). Base doesn't matter, but FIX refusal? With 
+    no custody.json, there are no evaluators → no [time] refusal → emits rc 1 ✓ 
+    (as before). Good, leave on FIX.                                            
+ 11 open-job → rc 2 before inputs ✓.                                            
+ 12 Emission cases in pin section: emit(j, TMP/"unpinned.json") where j =       
+    job_copy("pin-unpinned","routing-unpinned") expecting rc==1 and record. Base
+    → must be LOGGED, else refusal (rc3, no record) → KeyError. Hmm! Many of    
+    these pin tests base on FIX copies and expect records.                      
+
+Let's enumerate all job_copy(...) uses that expect a written record:            
+
+ • "given" (expects record)                                                     
+ • "no-disposition" (record)                                                    
+ • "bad-remedy" (record)                                                        
+ • "no-violation-dimension" (record)                                            
+ • "same-family" (record)                                                       
+ • "no-inputs" (record; no evaluators → fine on FIX)                            
+ • pin: "pin-unpinned" overlay (record)                                         
+ • pin: "pin-deny" (expects rc == 0)                                            
+ • pin: "pin-nobody" (record, rc 1)                                             
+ • "agent-adopted" (rc == 0)                                                    
+ • "live-match" (record, rc 0)                                                  
+ • "f1h" (record, rc 0)                                                         
+ • "x1-inputs" (record, rc 0)                                                   
+ • tool-built (already stamps)                                                  
+ • E2 "t2-pass-at" (rc 0 with allow)                                            
+ • F1f relay job (expects rc 3 first, then rc 0 after adding buyer approve)     
+ • T3 (allow) on FIX                                                            
+ • roundtrip on FIX                                                             
+
+And refusal cases (expect exit 3): those still work on FIX? They currently      
+expect exit 3 for a specific reason/tag. Adding a second refusal ([time] missing
+log) doesn't change exit code, but res checks tag presence: e.g. [endpoint] —   
+ref contains both [endpoint] and [time]? The check is f"[{tag}]" in out → still 
+true ✓ (message prints all rows). Some check the specific text like             
+"api.deepinfra.com" in out — the refusal prints all rows, so the endpoint       
+refusal is still there ✓. But some check refused("a pin declared after the      
+seat's first call", job_copy("pin-late", "pin-late"), "order") — still [order]  
+present? Order check requires maker_history to find calls... it does (maker log 
+found) ✓. Fine.                                                                 
+
+But hmm: careful — with the eval log unreadable, ev_calls empty, so link_call   
+for checks isn't reached (the checks loop is later; linkable is False since     
+ev_map empty) — fine.                                                           
+
+However, for refusal cases that rely on the maker's endpoint (pin-fb, pin-miss, 
+pin-attempt, pin-none, pin-unlogged, vendor-host, no-maker-log, wrong-model,    
+unlinked-control, model-approver...), the evaluator refusal also appears but    
+doesn't remove the maker refusals ✓. Except: unlinked-control expects a [time]  
+refusal naming the control — still produced? The control loop calls             
+link_call(ev_calls, ...), ev_calls empty for that evaluator (ev_calls[id] = {} —
+wait, evaluator_history returns {} on read failure, so ev_calls[e.get("id")] =  
+eh.get("calls", {}) → {}. Then link_call(ev_calls, ev_id, ...): ev_id in        
+ev_calls → True (key present with empty dict) → calls = {} → if not calls:      
+return None ✓ no extra refusal. So "unlinked-control" expected refusal "a       
+control linked to no call in the harness log" [time] would NOT be produced now! 
+→ that test FAILS.                                                              
+
+Hmm. That's a deeper break. Unless... those refusal tests keep working          
+because... no.                                                                  
+
+Hmm hold on. Maybe I'm wrong that FIX's evaluator log is unreadable. Let's      
+reconsider. Maybe the fixture's evaluator IS a model with a harness log whose   
+entries DO have sent_at/received_at? Then no refusal from read; the only new    
+refusal is... D6 concerns missing log. Hmm, but E3 says the fixture's evaluator 
+log has no logger sent_at. Conflict.                                            
+
+Unless: E3's fixture log belongs to the evaluator and it lacks sent_at → read() 
+uses server time for received_at, i.e., read() is LENIENT (accepts entries with 
+server-only times, deriving received_at), and D9 partial = missing BOTH         
+received_at and server time? Hmm: D9 says "an entry missing received_at         
+refuses". If read derives received_at from the server time, then... it's not    
+missing.                                                                        
+
+Hmm! Maybe harness_log.read's HarnessLogError is raised when an entry has no    
+received_at AND no server time to fall back on. Then FIX's eval log (server     
+times present) reads fine, and the new D6 refusal for FIX... would not happen.  
+But the user says FIX now refuses.                                              
+
+Alternatively read requires sent_at/received_at strictly, and E3's assertions   
+(harness-eval-a.log# count ≥3, ".sent_at", server-header/response-created) come 
+from a refusal message produced by... flag_calls! Which runs only if read       
+succeeds. Hmm, but read fails first (in the fixed emitter, read is called before
+H.read_log). So flag_calls never runs for FIX → E3's                            
+out.count("harness-eval-a.log#") >= 3 must come from read's own error message.  
+read's message would have to enumerate all entries and mention                  
+server-header/response-created. Unlikely...                                     
+
+Ugh, we're in a hall of mirrors without running the code. Let me reconsider:    
+maybe harness_log.read is lenient in the sense: it parses the log, and for each 
+entry derives received_at = logger value or server header, and sent_at = logger 
+value or... and records HarnessLogError only for malformed JSON / reversed /    
+missing-everything. But then how does D6/D7 work? D6 = the file is MISSING →    
+evaluator_history → find_log returns None → refusal. In FIX, maybe the          
+evaluator's harness log file is named in external but the emitter's find_log    
+uses ev_dir and rel... it finds it ✓.                                           
+
+Hmm, so under lenient read, FIX would NOT refuse, contradicting the user's      
+premise. But the user's premise could be based on running the suite and seeing  
+KeyError: 'predicate' — which means rec is {} — which means rc != 0 and nothing 
+written. So FIX does refuse in reality. Then E3's message expectations must come
+from the module's error text. And unlinked-control breaks.                      
+
+Unless harness_log.read raises only for the log being unparseable/partial... and
+FIX's log has entries missing received_at entirely (no server time either?) —   
+but E3 says "(the fixture's evaluator log has no logger sent_at)" and expects   
+"server-header"/"response-created" in output — those come from flag_calls'      
+hand_time_entries. So flag_calls DOES run in E3 → read succeeded! Therefore E3's
+refusal is from hand times flagged (allow_hand=False) → [hand-time] refusals    
+naming harness-eval-a.log#N.sent_at with source server-header/response-created. 
+
+So read() succeeds on FIX's eval log! Then where does FIX's refusal come from   
+now?? Maybe from D6: the log is found but... hmm, or harness_log.read returns   
+entries and the emitter checks each linked entry has sent_at/received_at? But   
+E3's flow shows flag_calls ran → read ok → then a separate per-entry check? No: 
+flag_calls flags hand times with the switch, so with allow_hand=True (as in the 
+emit-success block) FIX would emit ✓ — contradicting KeyError.                  
+
+Hmm, wait: flag_calls(log_calls, hand) is called with the H.read_log calls, not 
+the harness_log entries. And E3 is about hand times. So read succeeding is      
+consistent with E3.                                                             
+
+Then why does FIX refuse now? Because of D6/D7: "a MODEL evaluator with no      
+harness log REFUSES". If the log is found and readable, no refusal... unless the
+evaluator's custody inputs don't name a harness log and the emitter's external  
+list doesn't either — but E3 shows the emitter read harness-eval-a.log for the  
+evaluator. Contradiction again, unless E3's job isn't FIX... E3: rc, out =      
+emit(FIX, TMP / "e3.json", allow_hand=False). Hmm, it IS FIX.                   
+
+Wait... maybe the refusal for FIX comes from evaluator_history's read failing   
+because the eval log is a maker-style log? no.                                  
+
+Hold on, maybe the answer: harness_log.read(log) in the fixed emitter REPLACED  
+the H.read_log for the evaluator path, and the fixture's log — E3 expects counts
+≥3 of "harness-eval-a.log#" — and read's error message might say e.g.           
+harness-eval-a.log#1: no sent_at (server-header time ...). Both E3-compatible   
+AND refusal-compatible! I.e., read refuses entries with no logger sent_at, and  
+its error names entries with the source of the fallback time. Then count >= 3   
+and ".sent_at" and "server-header" all hold from read's single error message.   
+And flag_calls never runs — but then hand_times for the fixture's eval log      
+wouldn't be listed... T3's hand_times check only requires disposition.at + ≥1   
+entry ✓ (maker + approvals still hand).                                         
+
+Hmm, that's plausible: read() is the new module (kit/evaluator_harness_log.py)  
+written for D6-D11, and it refuses partial logs; a "partial entry" per D9 is one
+missing received_at. And it might report the server-time source. Its error text 
+probably like: harness-eval-a.log#2: no sent_at/received_at (only the response  
+Date header). That gives all E3 tokens. Yes! And D8/D9 refusals "name the entry"
+like dim1#p1.                                                                   
+
+If so, after we stamp sent_at/received_at into each entry, read succeeds. And   
+unlinked-control still breaks (ev_calls empty).                                 
+
+Hmm. Unless with read failing, evaluator_history returns {} → ev_calls[id] = {} 
+→ and unlinked-control expects "[time]" + specific text "no harness call of     
+evaluator ... is linked to it". That would fail.                                
+
+So maybe the fixed emitter doesn't bail out on read failure; it records the     
+refusal and continues? Looking at the given code:                               
+
+                                                                                
+     try:                                                                       
+         entries = harness_log.read(log)                                        
+     except harness_log.HarnessLogError as exc:                                 
+         ref.add("time", f"{who}: {exc}")                                       
+         return {}                                                              
+                                                                                
+
+It returns {} — bails.                                                          
+
+Then unlinked-control: refused(..., "time") — checks [time] in out → the read   
+refusal already gives [time] ✓ — and the res line additionally? Let's look:     
+
+                                                                                
+ o = refused("a control linked to no call in the harness log",                  
+ job_copy("unlinked-control"), "time")                                          
+                                                                                
+
+It ignores the returned text. So ✓ passes (any [time] refusal).                 
+
+refused(...) only asserts exit 3, tag present, nothing written. Good — most     
+refusal tests are robust.                                                       
+
+But some res(...) lines inspect the returned output text:                       
+
+ • vendor-host: res(... "api.deepinfra.com" in o ...) — maker refusal present ✓ 
+   (maker_history runs before evaluators and returns its refusal; the endpoint  
+   refusal mentions api.deepinfra.com) ✓.                                       
+ • pin-fb: 'Together' in o and "fallback" in o and "'DeepInfra'" in o — maker   
+   path ✓.                                                                      
+ • pin-miss: "does not say which provider served it" ✓ maker.                   
+ • pin-attempt: "fallback was attempted" ✓ maker.                               
+ • pin-none: "no provider pin was declared" ✓ maker.                            
+ • T7b/E3: from read's message ✓ (assumed).                                     
+ • pin-nobody: record-based (rb) rc==1 — job_copy("pin-nobody") is a FIX copy   
+   with maker log edited → now refused → rb = {} → KeyError! Hmm: rb =          
+   json.loads(...) if is_file else {} then rb["predicate"] → KeyError. That's   
+   another break. Must base on LOGGED.                                          
+ • "exp-tree.json" on FIX with --expect-revision expects rc == 0 → breaks. Base 
+   on LOGGED.                                                                   
+ • refused("a stated revision the emitter is not at", FIX, "revision", ...) —   
+   expects [revision] tag; ref contains [revision] AND [time] → ✓.              
+ • dirty/nogit refusals on FIX ✓ (revision refusal present).                    
+ • emit(FIX, TMP/"t3c.json", allow_hand=True) reverse? fine.                    
+ • F1f: job_copy("f1f-relay") with allow_hand=True expects rc==3 [approval] ✓   
+   (approval refusal present alongside [time]) — first part ✓. Second: after    
+   adding buyer approve, expects rc2 == 0 → breaks (still refused for [time]).  
+   Must base on LOGGED.                                                         
+ • E1 dispose-mismatch: job_copy copy of FIX, allow_hand=True, expects rc==3    
+   with [time] and "disposition:" ✓ (both refusals present; "disposition:" text 
+   from the dispose mismatch) ✓.                                                
+ • T2b/T2d: exit 3 ✓.                                                           
+ • "t3-contradiction" overlay: rc 3 ✓.                                          
+ • "keep-old" refusal leaves existing bytes ✓.                                  
+ • tol-59: expects rc == 0 and record's checks[0].at == log time → breaks. Must 
+   base on LOGGED.                                                              
+ • "tol-61" refusal ✓.                                                          
+ • live-match: rc==0 + record → base LOGGED.                                    
+ • agent-adopted: rc==0 → LOGGED.                                               
+ • "no-maker-log": refused [time] ✓ (also [time] from evaluator) ✓.             
+ • "wrong-model": refused [model] ✓ (maker annotate gives [model]) ✓.           
+ • f1h: rc==0 + record → LOGGED (but careful: appends ledger lines; fine).      
+ • x1: rc==0 + record → LOGGED.                                                 
+ • "orchestrator/no-orchestrator" etc. refusal ✓.                               
+ • "bot-unmarked" etc. ✓.                                                       
+ • "no-orchestrator" expects [approval] ✓.                                      
+ • refused("hand times typed after the maker call also break event order",      
+   job_copy("fail-order", "hand-times"), "order") — the failure overlays. The   
+   overlays themselves are FIX-based jobs with typed times. Expecting [order].  
+   With the eval-log refusal added, does [order] still arise? The order refusal 
+   for hand-times overlay comes from check_order comparing typed pass/control   
+   times vs maker log → maker_history runs, calls exist ✓ → refusals include    
+   [order] ✓.                                                                   
+
+Wait: the failure overlays ("hand-times", "after-emit", "router-endpoint",      
+"agent-approval") — fail-after-emit expects [after-emit]; that's from           
+check_order with typed times after now? It uses now at emission. OK, independent
+✓.                                                                              
+
+Hmm, but careful: if these overlay jobs' custody.json now also has typed times  
+and the emitter bails early... no, refusals accumulate; check_order still runs  
+(at end of build) ✓ unless an exception. With evaluators loop returning {}, the 
+pred still built ✓.                                                             
+
+ • refused("a hand time 61 s off its harness call (tolerance 60 s)", j, "time") 
+   ✓.                                                                           
+ • The fail-order overlay path: "failures/hand-times" etc.                      
+
+And tol-61 uses ledger_edit on custody.json of FIX copy → [time] ✓ (also        
+missing-log [time]) ✓.                                                          
+
+OK. So the scope is bigger than the 6 lines but the direction is the same: every
+case that needs a WRITTEN record must run on a job whose harness logs carry     
+logger times. That's a lot of job_copy(...) → need a base parameter.            
+
+Wait wait. Let me re-examine: is it really true that FIX refuses? The user      
+explicitly says so and says line 510 KeyError. Let me trust it.                 
+
+But then E3 (which expects [time] with harness-eval-a.log# and .sent_at and     
+server-header) — under the read-refusal, if read's message lacks                
+"server-header"... The user tells us the suite currently... hmm, they only      
+mention ONE defect (KeyError). If E3 also failed, they'd probably mention it. So
+E3 passes as-is with the new emitter. Good: so read's message contains those    
+tokens, consistent with my assumption.                                          
+
+Now let me limit risk: The user said "ONE defect, one file" and "Implement      
+repair (ii)" with 3 steps, and "Do NOT delete any check". They may not be aware 
+of the wider fallout... but they claim running the suite shows the KeyError     
+first (it crashes early, so they never saw the later failures). So after fixing 
+the KeyError, they'd hit bad-remedy KeyError etc.                               
+
+To be safe and thorough, my edit should make ALL cases pass. That means:        
+introduce a logged base and switch every record-writing case onto it, while     
+keeping all refusal cases on the unstamped fixture (still valid, since they only
+need exit 3 + tag).                                                             
+
+Hmm, but risk: switching e.g. same-family to LOGGED might alter outcomes (e.g., 
+sameModelAsMaker requires maker log model change...). Let's check each          
+carefully.                                                                      
+
+Actually, maybe a lower-risk approach: rather than switching dozens of jobs,    
+make job_copy itself return a logged copy? No — refusal cases rely on the       
+unstamped log for their tags? No, they rely on other refusals; but              
+T2/T2b/T2c/T2d/T3-contradiction/E3 DO rely on the unstamped log (T2 expects     
+hand-time refusal naming harness? T2's "T2c" check needs disposition.at         
+inputs-no-ledger ✓ independent). E3 absolutely needs FIX unstamped. T2's first  
+assertion: rc == 3 and "[hand-time]" in out and "REFUSED (history)" in out and  
+not o.exists() ✓ independent of log stamping. T2c: disposition.at               
+inputs-no-ledger ✓ independent.                                                 
+
+But if job_copy returned logged copies, the refusal cases like "no-maker-log"   
+(deletes maker log) → [time] ✓; "wrong-model" → [model] ✓; "pin-late" → [order] 
+✓; "fail-*" overlays → tags ✓; "vendor-host" → [endpoint] naming                
+api.deepinfra.com ✓; "unlinked-control" → needs a [time] refusal; with logged   
+copies, ev_calls non-empty and link_call with call="eval_nope" → [time] "no     
+harness call ... is linked" ✓ (better!). tol-61 → cross_check [time] ✓.         
+
+Hmm, but the failure overlays (failures/hand-times etc.) also include typed pass
+times? They expect specific refusals; with logged copies they'd still fail for  
+their reason ✓ but maybe now succeed instead? E.g., fail-after-emit overlay     
+expects [after-emit] ✓ regardless.                                              
+
+Risk: agent-approval overlay ✓.                                                 
+
+But this blanket change would also affect job_copy used for "no-inputs" (deletes
+custody.json) ✓, and "open-job" (rc 2) ✓.                                       
+
+However, the E2 case (t2-pass-at) expects typed at to be a hand time            
+(inputs-no-ledger) — works with logged copies ✓, and expects rc == 0 with       
+allow_hand and checks[0].at == "2026-10-20T12:00:03Z" — that requires the log's 
+call time to be 12:00:03Z; with our stamping preserved instants ✓ (assuming the 
+fixture's server time is 12:00:03Z as the test states).                         
+
+But blanket-changing job_copy alters the refusal tests in subtle ways I can't   
+verify (e.g., "model-approver" expects [approval] — fine).                      
+
+Hmm, but there's a real danger: job_copy is used by refused(...) heavily. If a  
+job that previously refused only because of X now has an additional refusal,    
+fine. But could enabling the evaluator log remove a refusal and make rc == 0?   
+E.g. "no-maker-log"? no. "unlinked-control": previously (with read failing)     
+[time] from the evaluator; now control-linking [time] ✓ still refused.          
+
+Alternatively, the minimal-risk approach: don't touch refusal cases; only change
+cases expecting a written record. That requires a per-call decision — many      
+places. That's a big diff but surgical.                                         
+
+Let me enumerate precisely from the file (line by line) which emit(...) calls   
+expect a record (rc 0 or 1 with record read). I'll go through the custody part. 
+
+A. emit-success block (FIX direct) — 6 checks + refusal new. B. "given" job_copy
+→ record. C. "no-disposition" → record. D. "bad-remedy" → record (unconditional 
+read). E. "no-violation-dimension" → record. F. "same-family" → record. G.      
+"no-inputs" → record; no evaluators ⇒ no refusal; keep FIX (works). Actually ci 
+= {} → no evaluators → no refusal ✓. H. "open-job" → rc 2 ✓. I. fail-* refusals 
+✓. J. keep-old ✓. K. tol-61 refusal ✓; tol-59 → record (needs base). L.         
+vendor-host ✓. M. pin-fb/pin-miss/pin-late/pin-attempt/pin-none/pin-unlogged    
+refusals ✓. N. "pin-unpinned" → record rc 1. O. "pin-deny" → rc 0. P.           
+"pin-nobody" → record rc 1. Q. ledger-pin-late refusal ✓ (uses run_py on ledger,
+not emit; FIX copy fine). R. ledger-pin-ok → ledger only ✓. S. no-maker-log     
+refusal ✓; wrong-model ✓; unlinked-control ✓. T. approval refusals ✓;           
+agent-adopted → rc 0 (needs base). U. live-mismatch ✓; live-match → rc 0 (base).
+V. bar-moved refusal ✓. W. head/emitter revision check → uses rec (from logged  
+base ✓). X. exp-tree.json emit(FIX, ...) rc 0 → base. Y. exp-bad refusal ✓;     
+dirty/nogit refusals ✓. Z. bundle → uses FIX + rec_path: must align with the    
+base. AA. T2 refusal ✓ (FIX needed! T2 asserts hand-time refusal naming fields; 
+would logged FIX still refuse? With LOGGED, hand times from maker gone, but     
+disposition.at typed remains → [hand-time] ✓. But keep FIX to be faithful: the  
+T2 case is specifically "hand times are refused by default". Hmm, with FIX the  
+refusal is now [time] from the eval log, but wait — the eval log mismatch...    
+hold on. Which refusal happens with FIX? The [time] from read. But then         
+hand_times never get marked (maker_history runs before evaluators! yes: maker   
+loop runs first, marks maker hand times; then evaluators). So [hand-time]       
+appears ✓. And T2 asserts "[hand-time]" ✓ and "disposition.at" with             
+inputs-no-ledger ✓ (disposition marking happens AFTER evaluators — it's near the
+end of build, after checks; careful: mark(...) for disposition happens later,   
+and if hand and not allow_hand: ref.add("hand-time", ...) happens at the very   
+end of build ✓ regardless of earlier refusals). Good ✓.                         
+
+Keep T2 on FIX (it's a default-refusal test, and FIX's unstamped log is the     
+worst case). ✓                                                                  
+
+BB. T2b/T2d on job_copy → refusal ✓ keep. CC. T3 allow on FIX → needs base      
+(LOGGED). DD. E2 (t2-pass-at) refusal + allow-record → the allow part needs     
+base; the refusal part too? The refusal part asserts "passes.pass-a.at" and     
+"inputs-no-ledger" — with LOGGED base, typed at still marked ✓ and rc 3 ✓. So   
+use LOGGED for both. EE. E3 on FIX → keep (asserts the unstamped log's refusal).
+FF. E1 dispose-mismatch on job_copy + allow → expects [time] "disposition:" ✓   
+either base; with LOGGED base, the dispose mismatch still refuses ✓ and record  
+not needed. Keep FIX? With FIX, [time] from log too; assertion "disposition:" in
+out and "[time]" in out ✓. Keep as is. GG. roundtrip emit(FIX) rc 0 → base. HH. 
+F1f → first rc 3 ✓; second rc 0 → base LOGGED. II. f1h → record → base. JJ. x1 →
+record → base. KK. tool-built → uses job_copy → if I change job_copy's default  
+base to LOGGED, the tool_built_job would strip times and stamp logs anyway ✓ —  
+actually it deletes ats and stamps, so it works on either base. Fine.           
+
+Now "P" pin-nobody: it edits the maker log with json.loads(...) → expects a     
+dict. On LOGGED, the maker log: we preserve dict form ✓ (must ensure). And the  
+evaluator log gets stamped ✓.                                                   
+
+And "M" pin-attempt reads json.loads(lg.read_text()) as dict — must preserve    
+dict form for maker log. ✓ with preservation.                                   
+
+Also "F" same-family does ml.write_text(ml.read_text().replace(...)) ✓.         
+
+Now, how to give the tests a LOGGED base with minimal, readable edits:          
+
+Define near job_copy:                                                           
+
+                                                                                
+ def logger_stamped(name):                                                      
+     """A copy of the job-rejected fixture whose harness logs carry the         
+ logger's own sent_at and                                                       
+     received_at on every call -- the entry shape                               
+ tests/test_evaluator_harness_log.py D1-D3 asserts                              
+     (sent_at, received_at, request.url, response.model). The fixture's logs    
+ carry server times only,                                                       
+     so a MODEL evaluator's check times have no logged source and the emitter   
+ REFUSES the record                                                             
+     (D6/D7); a case that needs a WRITTEN record runs on this copy instead. The 
+ instants are the ones                                                          
+     the fixture already carries (the response `created` epoch, else its Date   
+ header), so nothing the                                                        
+     fixture asserts about its own timeline moves."""                           
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):      
+         _stamp_logger_times(lg)                                                
+     return d                                                                   
+                                                                                
+                                                                                
+ def _stamp_logger_times(path):                                                 
+     text = path.read_text(encoding="utf-8")                                    
+     try:                                                                       
+         doc = json.loads(text)                                                 
+     except ValueError:                                                         
+         doc = None                                                             
+     if isinstance(doc, list):                                                  
+         items, dump = doc, lambda it: json.dumps(it, indent=2) + "\n"          
+     elif isinstance(doc, dict):                                                
+         items, dump = [doc], lambda it: json.dumps(it[0], indent=2) + "\n"     
+     else:                                                                      
+         items = [json.loads(ln) for ln in text.splitlines() if ln.strip()]     
+         dump = lambda it: "".join(json.dumps(e) + "\n" for e in it)            
+     for e in items:                                                            
+         if not isinstance(e, dict) or e.get("sent_at") or                      
+ e.get("received_at"):                                                          
+             continue                                                           
+         at = _server_instant(e)                                                
+         if at:                                                                 
+             e["sent_at"] = e["received_at"] = at                               
+     path.write_text(dump(items), encoding="utf-8")                             
+                                                                                
+                                                                                
+ def _server_instant(e):                                                        
+     """The instant the fixture's response carried: its `created` epoch, else   
+ its Date header."""                                                            
+     created = (e.get("response") or {}).get("created")                         
+     if isinstance(created, (int, float)) and not isinstance(created, bool):    
+         return datetime.fromtimestamp(created,                                 
+ timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")                                   
+     hdrs = e.get("response_headers") or e.get("headers") or (e.get("response") 
+ or {}).get("headers") or {}                                                    
+     date = hdrs.get("Date") or hdrs.get("date")                                
+     if isinstance(date, str) and date:                                         
+         try:                                                                   
+             from email.utils import parsedate_to_datetime                      
+             parsed = parsedate_to_datetime(date)                               
+         except (TypeError, ValueError):                                        
+             return None                                                        
+         if parsed.tzinfo is None:                                              
+             parsed = parsed.replace(tzinfo=timezone.utc)                       
+         return parsed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")  
+     return None                                                                
+                                                                                
+
+Then LOGGED = logger_stamped("fixture-logged") — but careful: it's created at   
+module scope in the custody section, like SNAP. But TMP blocks are removed at   
+the end (shutil.rmtree(TMP)). Fine.                                             
+
+Where does FIX exist? Defined at top of PART 3. ✓. And datetime/timezone        
+imported there ✓ (from datetime import datetime, timedelta, timezone).          
+
+Now, job_copy(name, overlay) — used by many. I'll add a base parameter? Many    
+call sites. Alternative: define                                                 
+
+                                                                                
+ def success_job(name, overlay=None):                                           
+     """job_copy, but with harness logs that carry the logger's own times (a    
+ record can be written)."""                                                     
+     d = TMP / name                                                             
+     shutil.copytree(LOGGED, d)                                                 
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+                                                                                
+
+Then change the ~10 record-writing call sites to success_job. Hmm, but          
+"same-family", "pin-deny", etc. use job_copy. Let me count edits. Each is a     
+small SEARCH/REPLACE.                                                           
+
+Hmm, that's ~12 blocks. Plus the emit-success block, E2/T3, roundtrip, exp-tree,
+f1h, x1, agent-adopted, live-match, pin-unpinned, pin-nobody, pin-deny, tol-59, 
+given, no-disposition, bad-remedy, no-violation-dimension, same-family,         
+F1f(second).                                                                    
+
+Alternatively — simpler and fewer edits: change job_copy to copy from LOGGED by 
+default, and give the refusal-focused ones... no, they're fine either way; but  
+E3/T2/T2b need FIX explicitly (they use FIX directly, not job_copy!). Let me    
+check: E3 uses emit(FIX, ...) ✓ direct. T2 emit(FIX, ...) ✓. T2b/T2d use        
+job_copy → with LOGGED base, would T2b still refuse with "ledger-hand"? Yes:    
+appends a hand-written approve line → [hand-time] ledger-hand ✓. T2d ✓. tol-61  
+✓. vendor-host ✓. fail-* overlays: job_copy(f"fail-{ov}", ov) — with LOGGED base
++ overlay ✓ still refuse (their causes are in inputs/logs). pin-late overlay etc
+✓. no-orchestrator ✓.                                                           
+
+Risk of blanket change: something that previously refused now emits. Consider   
+"unlinked-control": LOGGED + control call "eval_nope" → link_call refuses [time]
+✓. "wrong-model" ✓. "no-maker-log" ✓.                                           
+
+Consider "fail-hand-times" overlay: expects [time]; with LOGGED, the typed      
+pass/control times in the overlay conflict with the log → [time] ✓.             
+
+Consider "pin-unpinned" overlay expecting rc == 1 with a record: with LOGGED ✓  
+(currently fails, needs base).                                                  
+
+Consider "agent-adopted" rc 0 ✓.                                                
+
+So blanket-changing job_copy to base on LOGGED solves all record-writing sites  
+at once, and refusal sites keep refusing. That's ~1 edit instead of 12. But:    
+does it break "no-inputs"? copytree(LOGGED) then delete custody.json ✓ same.    
+"open-job" ✓.                                                                   
+
+But wait: two refusal cases may become writes? Let's scan each refused(...) /   
+rc==3 expectation:                                                              
+
+  1 fail-hand-times/after-emit/router-endpoint/agent-approval — causes in       
+    overlay inputs/logs. For "router-endpoint" (overlay), the maker log         
+    presumably has a router URL where upstream can't be determined → [endpoint] 
+    ✓.                                                                          
+  2 keep-old (agent-approval) ✓.                                                
+  3 tol-61 ✓.                                                                   
+  4 vendor-host ✓.                                                              
+  5 pin-fb ✓ pin-miss ✓ pin-late ✓ pin-attempt ✓ pin-none ✓ pin-unlogged (no    
+    events log; typed pin → [endpoint]) ✓.                                      
+  6 ledger-pin-late: run_py on ledger ✓ (not emit).                             
+  7 no-maker-log ✓ wrong-model ✓ unlinked-control ✓.                            
+  8 approval ones ✓.                                                            
+  9 live-mismatch ✓ (appends conflicting ledger line).                          
+ 10 bar-moved ✓.                                                                
+ 11 exp-bad, dirty, nogit ✓.                                                    
+ 12 T2b/T2d ✓.                                                                  
+ 13 "t3-contradiction" (failures/hand-times with allow_hand) ✓ expects rc 3.    
+ 14 E1 dispose-mismatch: appends a dispose line + typed at → [time]             
+    "disposition:" ✓.                                                           
+ 15 F1f first ✓ ([approval]).                                                   
+
+And T3 on FIX → change to LOGGED.                                               
+
+Hmm, but one more: with LOGGED base, the evaluator's log now parses, and        
+ev_entries populated → checks get at from entries; check_order compares         
+producedAt < check times; the times are the fixture's own → previously (with    
+entries failing) the check's at came from call.at (same). Wait, before the fix  
+(old emitter) the check's at came from link_call's call.at and x.at_source from 
+call.source_at(). In the fixed emitter, entries override: at_v =                
+H.iso(entry.received_at) and xc["at_source"] = entry.source. Since              
+entry.received_at == call.at (our stamping) ✓ same.                             
+
+Alright. But is harness_log.read's received_at strictly from the entry dict?    
+yes.                                                                            
+
+One more risk: harness_log.read may demand call names matching, or may reject   
+sent_at == received_at (D3 says received must not be BEFORE sent; equal ok ✓).  
+
+Another risk: read might require the log file to be a JSON LIST. If the eval log
+is a dict (single call), then... E3's count("harness-eval-a.log#") >= 3 implies 
+3+ entries. So it's a list or JSONL. Our stamper handles both.                  
+
+Now the emit-success block rewrite:                                             
+
+                                                                                
+ # the fixture's own harness logs carry server times only: a MODEL evaluator    
+ whose check times have no                                                      
+ # logged source REFUSES the record (D6/D7,                                     
+ tests/test_evaluator_harness_log.py) -- it must not reach a                    
+ # record at all. The emit-success checks run on a copy whose calls carry the   
+ logger's own times.                                                            
+ o_ref = TMP / "fixture-refused.json"                                           
+ rc, out = emit(FIX, o_ref)                                                     
+ res((f"{S} · a model evaluator whose harness log carries no logger times is    
+ refused, naming the log "                                                      
+      f"(exit 3, [time], nothing written)",                                     
+      rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),  
+ f"exit {rc}: {out.strip()[-140:]}"))                                           
+                                                                                
+ LOGGED = logger_stamped("fixture-logged")   # ... maybe define earlier         
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(LOGGED, rec_path)                                               
+ rec = ...                                                                      
+ res((f"{S} · fixture job with logger-stamped harness logs emits with no gap    
+ (exit 0)", rc == 0, out.strip()[-90:]))                                        
+                                                                                
+
+Then bundle uses LOGGED.                                                        
+
+Where to define LOGGED? Right before use in the emit-success block (module      
+level).                                                                         
+
+Then T3: emit(LOGGED, o, allow_hand=True).                                      
+
+E2: job_copy("t2-pass-at") → with blanket change it's LOGGED-based ✓.           
+
+Roundtrip: emit(LOGGED, rt_rec, allow_hand=True) and verify_record(rt_rec,      
+LOGGED, VCO).                                                                   
+
+exp-tree: emit(LOGGED, TMP/"exp-tree.json", extra=("--expect-revision",         
+head[1][:12])) — but head computed from SNAP; the record's emitter commit is    
+from SNAP ✓ (emit runs SNAP's emitter with a LOGGED job dir). ✓                 
+
+Bundle: run_py([... "pack_stranger_bundle.py", "--job-dir", str(LOGGED),        
+"--record", str(rec_path), ...]) and the determinism second run likewise.       
+
+Hmm, wait: the bundle test also checks need includes "bar/bar.md",              
+"files/artifact.md", "evidence/pass-a-D2.txt", "evidence/harness-eval-a.log" —  
+present in LOGGED ✓.                                                            
+
+And res(... record carries no file the fixture lacks ...) uses FIX/bar.md ✓     
+(same file in copy).                                                            
+
+Now also res((f"{S} · the record names the emitter's commit and tree, clean",   
+rec... uses rec from LOGGED ✓.                                                  
+
+Now, "the endpoint refusal names the upstream the log shows" etc. unchanged.    
+
+Now: does emit(LOGGED, ...) produce x-plumbline.times "harness log"? For the    
+maker, mk.get("startedAt") now from log (sent_at) ✓.                            
+
+Potential problem: H.cross_check(ref, "startedAt", ci.get("startedAt"), started,
+...): started = first.started = sent_at = created instant = same as before ✓.   
+
+Potential problem: order check before("bar.frozenAt", F, "startedAt", S,        
+strict=True) ✓ unchanged.                                                       
+
+Potential problem: check_order before("producedAt", Pd, n, t) for checks —      
+unchanged ✓.                                                                    
+
+Another potential problem: spend — unchanged.                                   
+
+OK. Also: with LOGGED, hand_times for T3 include disposition.at ✓ and maybe     
+nothing else — len(ht) >= 1 ✓.                                                  
+
+Hmm, but T3 also asserts by_field["disposition.at"].get("line") is not None ✓   
+(typed in custody.json → line found).                                           
+
+Now: think about whether emit(LOGGED, ...) might exit 1 (hard gap) for some     
+reason. Previously FIX emitted exit 0; the only changes are log times. Hand-time
+refusals disappear (not gifts). Hard gaps: routing.maker.request? The fixture's 
+request asks for the pin properly (the "matching pin" test asserts request_ok   
+True) ✓. So exit 0 ✓.                                                           
+
+Wait, careful: previously with hand times allowed, hand dict entries existed;   
+exit code unaffected. ✓                                                         
+
+Now, another thought: hard gaps include missing bar.approvals etc. — unchanged. 
+
+OK. Also the initial rc, out = emit(FIX, rec_path) removal: rec_path used later 
+(bundle, V1). We keep the name.                                                 
+
+Now, one important detail: the refusal asserted for FIX — "[time]" in out. Is   
+the tag definitely "time"? In the given emitter, ref.add("time", ...) for       
+HarnessLogError ✓. But if the refusal path is find_log returning None → also    
+"time" ✓. Good.                                                                 
+
+Do we also want to assert the content "harness"? Both messages contain "harness 
+log" except the read error which contains the log name "harness-eval-a.log" →   
+contains "harness" ✓.                                                           
+
+Also "nothing written" ✓.                                                       
+
+Now: the order of definitions. logger_stamped defined after job_copy, and LOGGED
+created at the emit-success block. But job_copy (blanket changed) references    
+LOGGED at call time — and job_copy is called earlier? Let's check: job_copy     
+first used at j = job_copy("given") which is after the emit-success block ✓. And
+SNAP/rec etc. But job_copy is also used inside... no earlier. ✓                 
+
+But careful: with blanket change, job_copy uses LOGGED → recursion? No.         
+
+Hmm, but is the blanket change too clever? It changes semantics of job_copy for 
+ALL tests, and if a refusal test's expected specific text was previously        
+provided by the evaluator-log failure... e.g. "T7b/E3" uses FIX directly ✓.     
+Others: refused("a model maker with no harness log", j, "time") — no text check 
+✓.                                                                              
+
+Hmm, refused("a hand time 61 s off its harness call (tolerance 60 s)", j,       
+"time") ✓.                                                                      
+
+I think it's acceptable. But the diff for job_copy needs a comment explaining   
+it, and keep a way to get the un-stamped copy (FIX directly).                   
+
+Alternatively, keep job_copy as-is and add success_job and change the ~12 sites.
+More edits, less behavioral surprise for refusal cases. Hmm. The gating         
+question: could a blanket change make some refusal case emit and thus fail?     
+Let's double check each "refused" job's cause is independent of the evaluator   
+log being unreadable:                                                           
+
+ • fail-hand-times: overlay likely sets typed pass/control/etc times + maybe a  
+   contradictory eval log? If the overlay's cause was "hand times" only, then   
+   with --allow-hand-times... but emit default allow_hand=True! Look: refused() 
+   calls emit(j, o, **kw) with default allow_hand=True. So hand-time refusals   
+   never fire in refused(...); they rely on the T2-style direct calls with      
+   allow_hand=False. So refused("failure fixture hand-times", ..., "time") —    
+   with allow_hand=True, the [time] refusal must come from a CONTRADICTION      
+   (cross_check) or... the hand-time overlay's typed times disagreeing with the 
+   log by >60s → [time] ✓ independent of our stamping. But careful: our stamping
+   sets received_at = created/Date — if that differs from what H.read_log used  
+   before... it's the same value (precedence preserved) ✓. So cross-check       
+   results identical ✓.                                                         
+ • fail-after-emit: [after-emit] from check_order comparing times to now ✓.     
+ • fail-router-endpoint ✓.                                                      
+ • fail-agent-approval ✓.                                                       
+
+Fine. And T2 etc. direct-on-FIX ✓.                                              
+
+So blanket change is safe-ish. But hmm, one more: "keep-old" uses               
+job_copy("keep-old", "agent-approval") and asserts the existing record is       
+untouched (rc 3) ✓.                                                             
+
+I'll go with adding a base parameter defaulting to LOGGED? That'd read oddly.   
+Instead:                                                                        
+
+                                                                                
+ def job_copy(name, overlay=None, base=None):                                   
+     """A throwaway copy of the job-rejected fixture -- by default WITH the     
+ logger's own times written into its                                            
+     harness logs (LOGGED), because a record can only be written from a log the 
+ emitter can read (D6/D7). A                                                    
+     refusal case that depends on the fixture's server-times-only log asks for  
+ base=FIX explicitly."""                                                        
+     d = TMP / name                                                             
+     shutil.copytree(base or LOGGED, d)                                         
+     ...                                                                        
+                                                                                
+
+Then refusal cases that need the unstamped log would pass base=FIX. Which ones? 
+Only E3-like; none of the job_copy ones need unstamped. And T2 uses FIX         
+directly.                                                                       
+
+Hmm, but then job_copy's default depends on LOGGED which is created later; but  
+Python resolves at call time ✓, and LOGGED exists by the time any job_copy is   
+called (emit-success block runs before). But logger_stamped must be defined     
+before job_copy? No, only at call time.                                         
+
+Wait — actually, is LOGGED created before the first job_copy call? The          
+emit-success block: I'll create LOGGED there, then later j = job_copy("given")  
+✓.                                                                              
+
+Alright. But hmm, job_copy default base change means tool_built_job's           
+job_copy(name) gets LOGGED — then it deletes ats, deletes events log, deletes   
+routing, stamps logs with a single time. Fine ✓. But it also expects            
+harness-maker*.log present ✓.                                                   
+
+Hmm, but tool_built_job's first step: cj read, pops frozenAt/approvals etc. Then
+run("freeze"). Fine.                                                            
+
+One catch: in tool_built_job, stamp_log writes sent_at = received_at = at (a    
+single fixed instant for all calls). Then harness_log.read gets sent==received ✓
+and check times all equal. check_order: producedAt == checks times;             
+before("producedAt", Pd, n, t) → a > b? equal → pass ✓. This already works      
+today? Today the eval log stamping is applied to the eval log too (glob         
+harness-*.log) — and the emitter's evaluator_history calls harness_log.read; the
+current committed T4 test expects exit 0 with no switch... So T4 already relies 
+on read succeeding on the stamped log. Which strongly supports: stamping works, 
+and read accepts sent==received.                                                
+
+And T4 was presumably passing before defect A? No — defect A introduced         
+harness_log.read; T4 as written (the re-cut file) expects it to work. The user  
+says defect A is fixed and committed, and presumably T4 passes now? They didn't 
+run validate_schemas successfully (crash at line 510). But they might have.     
+Whatever.                                                                       
+
+The strongest signal: T4 stamps logs and expects exit 0. Our approach mirrors   
+stamp_log exactly.                                                              
+
+Given that, maybe I should just reuse stamp_log! But it's defined later in the  
+file (inside the T4 section, before tool_built_job), and takes a single at. Our 
+logger_stamped could call it if moved up. Moving _iso/_ts/stamp_log up is       
+possible: they're at module level, defined before tool_built_job, in the T4     
+area. Moving them up to the custody helper area would be a "2-block move"       
+(delete + insert). That reduces duplicated parsing logic... but stamp_log takes 
+one fixed at for all calls, which would flatten the timeline and break          
+cross-checks (typed ats in custody.json for passes/controls vs a flat time).    
+Wait — does the fixture type at for passes? E2 shows FIX has no typed passes at 
+(they add it). Controls: refused("...")... there's a control call linkage;      
+controls likely have no typed at either (E2 only mentions passes). And          
+approvals/freeze/disposition are typed. So a flat stamp might still pass        
+cross-checks if passes/controls have no typed times... but H.cross_check also   
+runs for startedAt/producedAt if typed in custody.json — are they?              
+tool_built_job pops them, implying they ARE typed in the fixture. Then a flat   
+stamp would break the startedAt cross-check → refusal.                          
+
+So per-call instants are needed. Also T4 avoids this by removing typed times.   
+
+Therefore implement our own stamper preserving each call's instant. Good.       
+
+Now — hmm, one more thought about _server_instant precedence: H.Call.at =       
+received or created or Date. started = sent or created or Date. So for at, if   
+received absent → created, else Date. Using created-then-Date matches ✓.        
+
+But careful: some entries may have neither created nor Date (then read would    
+already fail for them: "no time"). Those would remain unstamped → refusal. Can't
+help; but E3 says each call has a server time source.                           
+
+Let me also double check Call.hand_time_entries sources: "server-header" and    
+"response-created" correspond to Date and created ✓.                            
+
+Now, about external entries in custody.json referencing harness-eval-a.log with 
+a digest? The emitter computes the digest itself from the file, so no stale     
+digest in inputs ✓ (T5 not present here).                                       
+
+Alright, let me now write the edits.                                            
+
+Edit 1: job_copy base + helpers (insert logger_stamped, _stamp_logger_times,    
+_server_instant).                                                               
+
+Current code:                                                                   
+
+                                                                                
+ def job_copy(name, overlay=None):                                              
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+                                                                                
+
+Replace with new version + helpers. But logger_stamped uses LOGGED? No. And     
+job_copy default base uses LOGGED which is defined later — fine at call time,   
+but flake8-ish; acceptable. Hmm, but "LOGGED" must be defined before the first  
+call. Let me instead define LOGGED immediately after the helpers:               
+
+                                                                                
+ LOGGED = logger_stamped("fixture-logged")                                      
+                                                                                
+
+But then the emit-success block uses LOGGED; and job_copy default base=LOGGED.  
+Defining LOGGED right there is clean (before job_copy definition? order:        
+helpers, LOGGED, job_copy). But LOGGED creation needs TMP ✓.                    
+
+Wait, but the emit-success block is where the fixture refusal happens; LOGGED   
+creation causes an extra copytree — fine.                                       
+
+Edit 2: emit-success block rewrite.                                             
+
+Current:                                                                        
+
+                                                                                
+ # the emitter on the synthetic fixture                                         
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(FIX, rec_path)                                                  
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job emits with no gap (exit 0)", rc == 0,                 
+ out.strip()[-90:]))                                                            
+ check(S, "emitted record is valid against the PINNED custody schema", True,    
+ rec, V_CUST)                                                                   
+ check(S, "emitted record is valid against the derived Plumbline custody        
+ schema", True, rec, V_CREC)                                                    
+ bad = copy.deepcopy(rec); bad["predicate"]["verdict"] = "reject"               
+ check(S, "a bare predicate.verdict is refused (verdict rides only in           
+ x-plumbline)", False, bad, V_CREC)                                             
+ bad = copy.deepcopy(rec);                                                      
+ bad["predicate"]["violations"][0]["x-plumbline"].pop("locator", None)          
+ check(S, "a violation with no rule-4 locator is refused", False, bad, V_CREC)  
+ bad = copy.deepcopy(rec); bad["predicate"]["x-plumbline"]["verdict"] = "pass"  
+ check(S, "x-plumbline.verdict outside Plumbline's four verdicts is refused",   
+ False, bad, V_CREC)                                                            
+                                                                                
+
+New:                                                                            
+
+                                                                                
+ # the fixture's harness logs carry server times only, so a MODEL evaluator's   
+ check times have no logged                                                     
+ # source: the emitter REFUSES the record (D6/D7,                               
+ tests/test_evaluator_harness_log.py) -- it must not reach                      
+ # the record checks below at all. The emit-success checks run on LOGGED, whose 
+ calls carry the logger's times.                                                
+ o_ref = TMP / "fixture-refused.json"                                           
+ rc, out = emit(FIX, o_ref)                                                     
+ res((f"{S} · a model evaluator whose harness log carries no logger times is    
+ refused, naming the log "                                                      
+      f"(exit 3, [time], nothing written)",                                     
+      rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),  
+      f"exit {rc}: {out.strip()[-140:]}"))                                      
+                                                                                
+ # the emitter on the synthetic fixture, with the logger's own times on every   
+ call                                                                           
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(LOGGED, rec_path)                                               
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job with logger-stamped harness logs emits with no gap    
+ (exit 0)", rc == 0, out.strip()[-90:]))                                        
+                                                                                
+
+then unchanged checks. But KeyError risk if rec empty... The check calls handle 
+it; then bad = copy.deepcopy(rec); bad["predicate"] KeyError. Hmm. Should I     
+guard? The instruction: "Do NOT wrap the KeyError in a try/except." So leave.   
+OK.                                                                             
+
+Edit 3: bundle uses LOGGED (2 spots).                                           
+
+Current:                                                                        
+
+                                                                                
+ zp = TMP / "bundle.zip"                                                        
+ rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),      
+ "--record", str(rec_path), "--out", str(zp)])                                  
+                                                                                
+
+→ LOGGED.                                                                       
+
+and                                                                             
+
+                                                                                
+     rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),   
+ "--record", str(rec_path), "--out", str(TMP / "b2.zip")])                      
+                                                                                
+
+→ LOGGED.                                                                       
+
+Edit 4: T3 allow: rc, out = emit(FIX, o, allow_hand=True) → LOGGED. Need unique 
+context.                                                                        
+
+Edit 5: roundtrip: rc, out = emit(FIX, rt_rec, allow_hand=True) → LOGGED; vrc,  
+vout = verify_record(rt_rec, FIX, VCO) → LOGGED.                                
+
+Edit 6: exp-tree: rc, out = emit(FIX, TMP / "exp-tree.json", extra=...) →       
+LOGGED.                                                                         
+
+Edit 7: E2 changes? j = job_copy("t2-pass-at") → default LOGGED via job_copy ✓  
+no edit.                                                                        
+
+Edit 8: F1f second emit → job_copy default LOGGED ✓ no edit. But careful: the   
+F1f job is job_copy("f1f-relay") → LOGGED base ✓, and the second phase expects  
+rc2 == 0 ✓.                                                                     
+
+Hmm, but wait: with LOGGED base and the added relay line and specialist         
+approve... the first phase expects [approval] refusal ✓.                        
+
+Now, are there other direct emit(FIX, ...) calls? Let's scan:                   
+
+ • rc, out = emit(FIX, rec_path) (edit 2)                                       
+ • rc, out = emit(FIX, TMP / "exp-tree.json", ...) (edit 6)                     
+ • refused("a stated revision the emitter is not at", FIX, "revision",          
+   "exp-bad.json", extra=...) → expects [revision] ✓ keep FIX.                  
+ • o = TMP / "t3-allow.json"; rc, out = emit(FIX, o, allow_hand=True) (edit 4)  
+ • rc, out = emit(FIX, TMP / "e3.json", allow_hand=False) → keep (E3).          
+ • rc, out = emit(FIX, rt_rec, allow_hand=True) (edit 5)                        
+ • o = TMP / "t2-refuse.json"; rc, out = emit(FIX, o, allow_hand=False) → keep  
+   (T2).                                                                        
+
+Good.                                                                           
+
+Now, with job_copy defaulting to LOGGED, does any refusal case now write a      
+record where it expected refusal? Let me re-scan the refused() calls with LOGGED
+base for causes that might vanish... Their causes are all in inputs/logs        
+unrelated to logger times. I'm fairly confident.                                
+
+But one: refused("a control linked to no call in the harness log",              
+job_copy("unlinked-control"), "time") ✓.                                        
+
+And refused("a hand time 61 s off its harness call", j, "time") ✓.              
+
+And o = refused("a hand vendor host when the log shows the routed upstream", j, 
+"endpoint") ✓.                                                                  
+
+Hmm, one thing: j = job_copy("pin-attempt") then lg = ...; x =                  
+json.loads(lg.read_text()) — LOGGED's maker log preserved as a dict ✓ (my       
+_stamp_logger_times writes back the same form for dict). Ensure the dict branch 
+writes the whole dict back with indent=2 (format change is fine since json.loads
+works).                                                                         
+
+Careful: if the maker log is a dict, _server_instant(e) where e = the dict      
+itself (items=[doc]) — a single call object with "response" ✓.                  
+
+But what if the file is a dict wrapper like {"calls": [...]}? Then we'd try to  
+stamp the wrapper and no calls get sent_at → fix fails (refusal persists). The  
+other tests (x["response"]["openrouter_metadata"]) prove the top-level dict IS a
+call ✓.                                                                         
+
+And harness-eval-a.log: list or JSONL with ≥3 entries ✓.                        
+
+Hmm, what about same-family: it does ml.read_text().replace("fixture/maker-1",  
+"example-1") — on the dict form ✓.                                              
+
+Now let's also double check logger_stamped copies FIX → LOGGED created once; but
+job_copy copies LOGGED → each job has fresh copies ✓ and jobs that MODIFY logs  
+don't affect LOGGED ✓.                                                          
+
+One catch: same-family writes ml in the job copy ✓.                             
+
+Another catch: clean_checkout/SNAP unaffected.                                  
+
+Now about rec used later for the "matching pin" checks: mx =                    
+rec["predicate"]["maker"] ✓ from LOGGED record; maker endpoint                  
+"api.deepinfra.com" ✓ (log unchanged in endpoint terms... wait, we stamped times
+only ✓).                                                                        
+
+Hmm, mxx.get("routing").get("request_ok") — from LOGGED's maker log (unchanged  
+request) ✓.                                                                     
+
+Now — a possible issue with LOGGED: x-plumbline.times = {"startedAt": "harness  
+log", ...} now, affecting check_order's tolerance (logged events get tolerance) 
+— previously hand-entered → strict. With LOGGED, times equal a close date? The  
+fixture has no close (packet close popped only in tool_built_job). Does FIX's   
+packet.json have a close.date? If yes and startedAt == producedAt == log times, 
+and close date is later ✓ fine. Tolerance only loosens ✓.                       
+
+Another: after-emit check in check_order: t > now + tol. The fixture's times are
+2026-10-20 → in the past ✓.                                                     
+
+OK, now also: does emit(LOGGED, ...) produce x-plumbline.hand_times containing  
+maker/evaluator entries? No (all logged) — only typed ones (approvals,          
+disposition). For T3 len(ht) >= 1 ✓.                                            
+
+Hmm, but T3 also asserts by_field["disposition.at"].get("line") is not None —   
+depends on line_in(inputs_path, at, "at") finding the line in custody.json ✓    
+(typed there).                                                                  
+
+Wait, actually: is disposition.at typed in FIX's custody.json? T2c asserts      
+disposition.at is named as inputs-no-ledger ✓ yes.                              
+
+Now: E1 dispose-mismatch is job_copy("dispose-mismatch") → LOGGED base; appends 
+a dispose line with decided_at 12:31 while custody.json has at 12:30 → [time] ✓.
+
+Hmm, but with LOGGED, the record... refusal anyway ✓.                           
+
+Now consider "live-match": appends matching freeze+approve lines → expects rc 0 
+and rl["bar"]["approvals"][1]["x-plumbline"]["time_source"].startswith("logged  
+live") ✓.                                                                       
+
+"agent-adopted" rc 0 ✓.                                                         
+
+"f1h": rc 0 ✓ — but wait, it appends ledger lines with writer:                  
+kit/custody_ledger.py@... and times 2026-10-20T10:xx. check_order may now       
+complain about order? The times are 10:30/10:32 etc. vs check times 12:00 ✓.    
+
+Hmm, and spend_block uses calls ✓.                                              
+
+"x1-inputs" rc 0 ✓.                                                             
+
+Now: does any of these now produce a hard gap? They already produced exit 0/1 as
+asserted ✓.                                                                     
+
+Wait, one: "given" expects r2 verdict "reject" — xp["verdict"] from the §5      
+record ✓ unchanged.                                                             
+
+OK, also: disposition "given" — state = packet's ✓.                             
+
+Now let me reconsider Edit 1's placement and whether defining LOGGED before     
+job_copy is fine w.r.t. name resolution: yes.                                   
+
+But there's a subtlety: logger_stamped uses _stamp_logger_times and             
+_server_instant defined just above ✓.                                           
+
+Additionally, do we need from email.utils import parsedate_to_datetime at module
+top? I'll import locally inside the function to keep the diff small (imports    
+inside functions are OK but ruff might complain; fine).                         
+
+Actually, better: put the import at the top-level import block? The existing top
+has import hashlib, json, os, subprocess, sys and PART 3 does import shutil,    
+tempfile, zipfile, copy, hashlib, time and from datetime import .... Adding from
+email.utils import parsedate_to_datetime to the PART-3 import line is clean:    
+
+                                                                                
+ import shutil, tempfile, zipfile, copy, hashlib, time                          
+ from datetime import datetime, timedelta, timezone                             
+ from email.utils import parsedate_to_datetime                                  
+                                                                                
+
+Then edit that line. Yes, do that.                                              
+
+Now let me write _server_instant without local import.                          
+
+Now, potential lint: lambda assignment (E731) — the file already does similar?  
+stamp_log uses conditional expression with dump? It uses inline ternaries. To   
+avoid E731, I'll structure differently:                                         
+
+                                                                                
+ def _stamp_logger_times(path):                                                 
+     text = path.read_text(encoding="utf-8")                                    
+     try:                                                                       
+         doc = json.loads(text)                                                 
+     except ValueError:                                                         
+         doc = None                                                             
+     array = isinstance(doc, list)                                              
+     single = isinstance(doc, dict)                                             
+     items = doc if array else ([doc] if single else [json.loads(ln) for ln in  
+ text.splitlines() if ln.strip()])                                              
+     for e in items:                                                            
+         if isinstance(e, dict) and not e.get("sent_at") and not                
+ e.get("received_at"):                                                          
+             at = _server_instant(e)                                            
+             if at:                                                             
+                 e["sent_at"] = e["received_at"] = at                           
+     if array:                                                                  
+         path.write_text(json.dumps(items, indent=2) + "\n", encoding="utf-8")  
+     elif single:                                                               
+         path.write_text(json.dumps(items[0], indent=2) + "\n",                 
+ encoding="utf-8")                                                              
+     else:                                                                      
+         path.write_text("".join(json.dumps(e) + "\n" for e in items),          
+ encoding="utf-8")                                                              
+                                                                                
+
+Good.                                                                           
+
+Now write logger_stamped:                                                       
+
+                                                                                
+ def logger_stamped(name):                                                      
+     """A copy of the job-rejected fixture whose harness logs carry the         
+ logger's own sent_at and received_at on                                        
+     every call -- the entry shape the frozen bar asserts                       
+ (tests/test_evaluator_harness_log.py D1-D3: sent_at,                           
+     received_at, request.url, response.model). The fixture's logs carry server 
+ times only, so a MODEL evaluator's                                             
+     check times have no logged source and the emitter REFUSES the record       
+ (D6/D7); a case that needs a WRITTEN                                           
+     record runs on this copy. Each call keeps the instant the fixture already  
+ carries (its response `created`                                                
+     epoch, else its Date header), so nothing the fixture asserts about its own 
+ timeline moves."""                                                             
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):      
+         _stamp_logger_times(lg)                                                
+     return d                                                                   
+                                                                                
+
+Then LOGGED = logger_stamped("fixture-logged").                                 
+
+Then job_copy:                                                                  
+
+                                                                                
+ def job_copy(name, overlay=None, base=None):                                   
+     """A throwaway copy of the job-rejected fixture. By default the copy is    
+ LOGGED: its harness logs carry the                                             
+     logger's own times, so a record can be written. Pass base=FIX for a case   
+ that needs the fixture's                                                       
+     server-times-only log (the refusal cases that depend on it use FIX         
+ directly)."""                                                                  
+     d = TMP / name                                                             
+     shutil.copytree(base or LOGGED, d)                                         
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+                                                                                
+
+Hmm, "Pass base=FIX for a case that needs..." — no such case currently; maybe   
+don't mention. I'll keep it brief.                                              
+
+Now, do all job_copy call sites benefit? The overlays: failures/<ov> copied over
+the LOGGED copy — the overlay may include its own harness logs (e.g.            
+router-endpoint overlay has a maker log with a router URL). dirs_exist_ok=True  
+overwrites ✓. Then that overlay's log has server-only times possibly → the      
+evaluator log from overlay? If the overlay replaces the eval log with one       
+lacking logger times... hmm, unlikely (overlays are small). If it does, the     
+refusal still fires with its own tag ✓ (the tag we assert is the overlay's      
+cause). So fine.                                                                
+
+Now the F1f care: job_copy("f1f-relay") then emit(j, o, allow_hand=True) ✓.     
+
+Now, one more potential trap: refused(...) returns the output for two cases     
+("vendor-host", "pin-fb", etc.) — fine.                                         
+
+Also: out_ = refused(...) unused var – existing.                                
+
+Now, what about the case refused("a pin declared after the seat's first call",  
+job_copy("pin-late", "pin-late"), "order"): with LOGGED, the maker log's calls  
+exist ✓, pin logged after → [order] ✓.                                          
+
+Next: verify there are no other places constructing jobs expecting records that 
+I've missed. Let me re-scan the text of PART 3 carefully.                       
+
+  1 res(... vendored schema ...) — no emit.                                     
+  2 build_schemas checks.                                                       
+  3 t = tree_copy(...) etc.                                                     
+  4 emit-success block (edit).                                                  
+  5 j = job_copy("given") ✓ default.                                            
+  6 no-disposition ✓.                                                           
+  7 bad-remedy ✓.                                                               
+  8 no-violation-dimension ✓.                                                   
+  9 same-family ✓.                                                              
+ 10 no-inputs ✓.                                                                
+ 11 open-job ✓.                                                                 
+ 12 refused loop (fail-*) ✓.                                                    
+ 13 keep-old ✓.                                                                 
+ 14 tol-61/tol-59 ✓.                                                            
+ 15 vendor-host ✓.                                                              
+ 16 pin block: rec-based ✓; pin-fb, pin-miss, pin-late, pin-attempt, pin-none,  
+    pin-unlogged ✓ refusals; pin-unpinned ✓ record; pin-deny ✓ rc0; pin-nobody ✓
+    record; ledger pin tests ✓.                                                 
+ 17 no-maker-log, wrong-model, unlinked-control ✓ refusals.                     
+ 18 approval refusals ✓; agent-adopted rc0 ✓.                                   
+ 19 live-mismatch ✓; live-match rc0 ✓.                                          
+ 20 bar-moved ✓.                                                                
+ 21 emitter revision: uses rec ✓; exp-tree (edit); exp-bad ✓; dirty/nogit ✓.    
+ 22 bundle (edit).                                                              
+ 23 T2 (FIX direct) ✓.                                                          
+ 24 T2b/T2d ✓.                                                                  
+ 25 T3 (edit).                                                                  
+ 26 T7b/E3 (FIX direct) ✓.                                                      
+ 27 T4 tool-built ✓.                                                            
+ 28 E2 ✓ via job_copy.                                                          
+ 29 dispose-mismatch ✓.                                                         
+ 30 V1 roundtrip (edit).                                                        
+ 31 hand_times check on rt_xp ✓ (LOGGED has hand_times incl. disposition.at ✓,  
+    but the check asserts all entries have field/file/line not None ✓).         
+ 32 F1f ✓.                                                                      
+ 33 rmtree.                                                                     
+
+Wait — #31: all(e.get("line") is not None ...) — for LOGGED, hand_times entries:
+approvals (line found?), disposition (line found). If some hand (e.g.,          
+bar.approvals[0].at) has line=None... In the original FIX run this check passed 
+(rt_xp from FIX with allow_hand). With LOGGED, fewer entries, still fine? The   
+remaining ones are the same entries that were in the original set (subset) ✓    
+since original set included them with lines not None.                           
+
+Hmm, but careful: with LOGGED, maker.start/producedAt typed-at hand times       
+disappear? They were marked via mark("startedAt", rel_inputs, line_in(...)) only
+if ci.get("startedAt") exists ✓ (typed). Those marks happen regardless of log   
+stamping. So they remain ✓. Good, unchanged.                                    
+
+Actually wait: hand_times is only about refusals/allowance; the check requires  
+every entry has field/file/line. Fine.                                          
+
+Now let's also double-check the check helper's behavior for the two schema      
+checks with rec from LOGGED: the record must be valid against both schemas.     
+Adding sent_at/received_at doesn't affect the record shape except at_source     
+strings and times ✓ valid.                                                      
+
+Hmm, one more: the record's external[].evidence.sha256 — computed from LOGGED's 
+rewritten log ✓; and subject files ✓.                                           
+
+Now, what about check(S, "emitted record is valid against the PINNED custody    
+schema", True, rec, V_CUST) — if rec == {} it'd be invalid → FAIL row, not crash
+✓.                                                                              
+
+Let me now think about whether emit(LOGGED, rec_path) could still refuse for    
+another reason: harness_log.read also requires... maybe entries must have call  
+names? If the fixture's eval log entries lack call, read might raise (naming    
+entry #N). Then our fixture still refuses and the success checks fail. But the  
+record previously linked checks to calls via f.get("call") in ev_map... The eval
+log entries must be named for link_call; E2 expects checks[0].at == log time,   
+meaning linkage worked via name or single-call fallback (there are ≥3 calls, so 
+name linkage is required) → entries have names ✓.                               
+
+Also read() may require received_at >= sent_at (equal ✓).                       
+
+Another thought: read() might validate that each entry's call is unique or that 
+the file is JSONL only. Ugh. Can't do more.                                     
+
+Now, is there a risk that logger_stamped writes received_at as the Date header  
+while the emitter previously used created? Our precedence matches H's.          
+
+Hmm, one more: H.Call uses hdrs = raw.get("response_headers") or                
+raw.get("headers") or {} — top-level headers. My _server_instant checks         
+e.get("response_headers"), e.get("headers"), then e["response"]["headers"].     
+Slight superset; ordering: response_headers, headers, response.headers. Fine.   
+
+Now write the SEARCH/REPLACE blocks. Need exact existing text.                  
+
+Block 1: the PART-3 import line.                                                
+
+Exact text:                                                                     
+
+                                                                                
+ import shutil, tempfile, zipfile, copy, hashlib, time                          
+ from datetime import datetime, timedelta, timezone                             
+                                                                                
+
+Block 2: job_copy replace.                                                      
+
+Exact:                                                                          
+
+                                                                                
+ def job_copy(name, overlay=None):                                              
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+                                                                                
+
+Block 3: emit-success block.                                                    
+
+Block 4: bundle (two occurrences in different contexts; they differ so separate 
+blocks).                                                                        
+
+First bundle occurrence:                                                        
+
+                                                                                
+ zp = TMP / "bundle.zip"                                                        
+ rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),      
+ "--record", str(rec_path), "--out", str(zp)])                                  
+                                                                                
+
+Second:                                                                         
+
+                                                                                
+     rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),   
+ "--record", str(rec_path), "--out", str(TMP / "b2.zip")])                      
+                                                                                
+
+Block 5: exp-tree.                                                              
+
+                                                                                
+ rc, out = emit(FIX, TMP / "exp-tree.json", extra=("--expect-revision",         
+ head[1][:12]))                                                                 
+                                                                                
+
+Block 6: T3.                                                                    
+
+                                                                                
+ o = TMP / "t3-allow.json"                                                      
+ rc, out = emit(FIX, o, allow_hand=True)                                        
+                                                                                
+
+Block 7: roundtrip.                                                             
+
+                                                                                
+ rt_rec = TMP / "roundtrip.custody.json"                                        
+ rc, out = emit(FIX, rt_rec, allow_hand=True)                                   
+ vrc, vout = verify_record(rt_rec, FIX, VCO)                                    
+                                                                                
+
+Now, where exactly does LOGGED get defined in block 2/3? I'll define the helpers
++ LOGGED in block 2 (replacing job_copy), so LOGGED exists before the           
+emit-success block.                                                             
+
+Order within block 2: _server_instant, _stamp_logger_times, logger_stamped,     
+LOGGED = logger_stamped("fixture-logged"), then job_copy.                       
+
+Hmm: LOGGED created at that point — TMP exists ✓, FIX exists ✓.                 
+
+Wait: emit defined before job_copy? Order in file: run_py, tree_copy,           
+clean_checkout, SNAP, emit, job_copy, append_text... Let me check: the file     
+shows:                                                                          
+
+                                                                                
+ SNAP = clean_checkout(TMP / "tree-clean")                                      
+                                                                                
+                                                                                
+ def emit(job, out, tree=None, extra=(), allow_hand=True):                      
+     ...                                                                        
+     return run_py(args)                                                        
+                                                                                
+                                                                                
+ def job_copy(name, overlay=None):                                              
+                                                                                
+
+Yes ✓.                                                                          
+
+Now also: is E3's expectation affected by our fixture refusal addition? No.     
+
+One more: does the new refusal case at the emit-success block come BEFORE       
+SNAP-based checks? irrelevant.                                                  
+
+Now, another consideration: the user said the editable set is exactly           
+tests/validate_schemas.py, and asked not to touch kit/emit_custody.py ✓.        
+
+But is a change to job_copy's default beyond "repair (ii)"? The ruling says     
+editable_after_ruling = tests/validate_schemas.py, and repair ii = "Moving the  
+emit-success checks to a fixture that already supplies real logger times".      
+Extending to all record-writing cases is in the same spirit and required for the
+suite to pass. I'll explain in my message.                                      
+
+Hmm, but wait. Let me reconsider whether switching job_copy default to LOGGED   
+could break the refusal cases that expect the evaluator's missing-log refusal...
+none assert it.                                                                 
+
+But one subtle one: refused("a model maker with no harness log", ...) — after   
+deleting the maker log, maker_history → [time]. Evaluator now readable ✓. Tag ✓.
+
+And ledger-pin-late: run_py([LEDGER, "pin", ...]) on LOGGED copy → "already     
+records" ✓.                                                                     
+
+Now, one more thought about the emit-success "no gap (exit 0)". With LOGGED,    
+hand times are fewer, so no new gaps. But: could stamping the maker log remove  
+x-plumbline.times hand classification and change a HARD gap? No.                
+
+But here's a thought: routing.maker.request requires the pin to be declared     
+before the first call: check_pin_order(pin, calls, "maker", ref) → uses the     
+LOGGED copy's ledger (same) ✓.                                                  
+
+OK.                                                                             
+
+Also: the record's x-plumbline.emitter check uses head from SNAP ✓.             
+
+Let me now also double check the LOGGED creation happens before emit(FIX,       
+o_ref)? Order: LOGGED defined earlier (block 2) ✓.                              
+
+One risk: creating LOGGED runs shutil.copytree(FIX, d) — FIX exists ✓.          
+
+Now write the final blocks.                                                     
+
+For block 3, I need exact current text (from the file):                         
+
+                                                                                
+ # the emitter on the synthetic fixture                                         
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(FIX, rec_path)                                                  
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job emits with no gap (exit 0)", rc == 0,                 
+ out.strip()[-90:]))                                                            
+                                                                                
+
+Replace with refusal + LOGGED emit.                                             
+
+Let me draft the refusal message text carefully:                                
+
+                                                                                
+ # The fixture's own logs carry server times only: a MODEL evaluator's check    
+ times then have no logged source,                                              
+ # and the record is REFUSED (D6/D7, tests/test_evaluator_harness_log.py) --    
+ asserted here, before any record is                                            
+ # read, so the refusal cannot pass by the absence of an exception. The record  
+ checks below run on LOGGED, whose                                              
+ # calls carry the logger's own sent_at/received_at.                            
+ o_ref = TMP / "fixture-refused.json"                                           
+ rc, out = emit(FIX, o_ref)                                                     
+ res((f"{S} · a model evaluator whose harness log carries no logger times is    
+ refused, naming the log "                                                      
+      f"(exit 3, [time], nothing written)",                                     
+      rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),  
+      f"exit {rc}: {out.strip()[-140:]}"))                                      
+                                                                                
+ # the emitter on the synthetic fixture, every call carrying the logger's own   
+ times                                                                          
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(LOGGED, rec_path)                                               
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job with logger-stamped harness logs emits with no gap    
+ (exit 0)", rc == 0, out.strip()[-90:]))                                        
+                                                                                
+
+Good.                                                                           
+
+Now the message to the user: explain changes briefly and note I could not run   
+the suite here (no shell execution available? Actually I'm the assistant; I     
+can't run). The user asked to run both and report numbers — I cannot execute    
+commands. I should say so and ask them to run. Hmm, "Reply in English", they    
+expect code. I'll note I can't execute and give the commands.                   
+
+Let me double check block 2 text exactly matches, including the blank lines     
+around. The file:                                                               
+
+                                                                                
+ def job_copy(name, overlay=None):                                              
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+                                                                                
+                                                                                
+ def append_text(path, text):                                                   
+                                                                                
+
+OK.                                                                             
+
+Now, for emit(LOGGED, o, allow_hand=True) in T3 — the SEARCH must be unique. The
+line o = TMP / "t3-allow.json" is unique ✓.                                     
+
+Write everything.                                                               
+
+One more check on _server_instant returning e.g. "2026-10-20T12:00:03Z" — from  
+created epoch: datetime.fromtimestamp(created, timezone.utc). If the fixture's  
+created epoch is float, includes microseconds → format omits them ✓ (that's     
+fine; microsecond truncation could shift by <1s; RFC regex in emitter allows    
+optional fraction; our string has none ✓ and cross_check tolerance 60s ✓).      
+
+But careful: if created has fractional seconds and the typed at is exactly the  
+integer second, fine.                                                           
+
+Also H.iso format: "%Y-%m-%dT%H:%M:%SZ"? presumably ✓ (matches the emitter's RFC
+regex).                                                                         
+
+Now, _stamp_logger_times for the JSONL branch: json.loads(ln) may fail on blank?
+filtered ✓.                                                                     
+
+Edge: file may be JSONL but with a leading BOM? ignore.                         
+
+Let me finalize. Also should I worry that logger_stamped's for lg in            
+...glob("harness-*.log") matches harness-maker-fixture.log ✓ and                
+harness-eval-a.log ✓. Are there others (e.g. controls logs)? glob covers all ✓. 
+
+Also: should we stamp logs only under evidence? yes.                            
+
+Write blocks now.                                                               
+
+Also the check import of datetime in _server_instant uses datetime.fromtimestamp
+— datetime is imported from datetime module ✓.                                  
+
+Final answer with blocks and a note about not being able to execute.            
+
+--------------------------------------------------------------------------------
+
+► ANSWER                                                                        
+
+I read the ruling and the bar. Two things beyond the literal six lines are      
+load-bearing here, so I want to state them before the blocks:                   
+
+ 1 The FIX fixture cannot reach any record-reading check any more (the bad =    
+   copy.deepcopy(rec) lines are just the first crash). The job is refused at    
+   harness_log.read, so every case in this file that expects a written record   
+   (given, no-disposition, bad-remedy, tol-59, pin-unpinned, pin-deny,          
+   pin-nobody, agent-adopted, live-match, f1h, x1-inputs, t3-allow, the         
+   round-trip, the bundle) would KeyError or FAIL after the first fix. Repair   
+   (ii) is therefore applied once, at job_copy: record-writing cases get a copy 
+   whose calls carry the logger's times; the refusal cases (T2, T2b, T2d,       
+   T7b/E3) keep running against FIX directly and still assert the unreadable    
+   log's refusal by its own text.                                               
+ 2 The instants written are the ones the fixture already carries (the response  
+   created epoch, else its Date header — the same precedence                    
+   kit/custody_history.py uses), so nothing the fixture asserts about its own   
+   timeline moves. The entry shape is the frozen bar's: sent_at, received_at,   
+   request.url, response.model.                                                 
+ 3 No check is deleted, and the refusal is asserted positively (exit 3, [time], 
+   names the harness log, nothing written) — not by a swallowed exception.      
+
+I cannot execute commands in this environment, so I can't report the two run    
+numbers myself; the commands to run are at the end.                             
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ import shutil, tempfile, zipfile, copy, hashlib, time                          
+ from datetime import datetime, timedelta, timezone                             
+ =======                                                                        
+ import shutil, tempfile, zipfile, copy, hashlib, time                          
+ from datetime import datetime, timedelta, timezone                             
+ from email.utils import parsedate_to_datetime                                  
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ def job_copy(name, overlay=None):                                              
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+ =======                                                                        
+ def _server_instant(e):                                                        
+     """The instant a call's own response carried: its `created` epoch, else    
+ its Date header. Same precedence as                                            
+     kit/custody_history.py (Call.at: received_at, then created, then the       
+ header), so stamping the logger's times                                        
+     onto the value the reader already derived moves nothing in the fixture's   
+ timeline."""                                                                   
+     created = (e.get("response") or {}).get("created")                         
+     if isinstance(created, (int, float)) and not isinstance(created, bool):    
+         return datetime.fromtimestamp(created,                                 
+ timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")                                   
+     hdrs = e.get("response_headers") or e.get("headers") or (e.get("response") 
+ or {}).get("headers") or {}                                                    
+     date = hdrs.get("Date") or hdrs.get("date")                                
+     if isinstance(date, str) and date:                                         
+         try:                                                                   
+             parsed = parsedate_to_datetime(date)                               
+         except (TypeError, ValueError):                                        
+             return None                                                        
+         if parsed.tzinfo is None:                                              
+             parsed = parsed.replace(tzinfo=timezone.utc)                       
+         return parsed.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")  
+     return None                                                                
+                                                                                
+                                                                                
+ def _stamp_logger_times(path):                                                 
+     """Write the logger's own sent_at/received_at into every call of one       
+ harness log that carries neither,                                              
+     preserving the file's format (JSON list, single object, or JSONL). A call  
+ that already carries them is                                                   
+     left exactly as it is: the emitter only reads its inputs, and so does      
+ this."""                                                                       
+     text = path.read_text(encoding="utf-8")                                    
+     try:                                                                       
+         doc = json.loads(text)                                                 
+     except ValueError:                                                         
+         doc = None                                                             
+     array, single = isinstance(doc, list), isinstance(doc, dict)               
+     items = doc if array else ([doc] if single else [json.loads(ln) for ln in  
+ text.splitlines() if ln.strip()])                                              
+     for e in items:                                                            
+         if isinstance(e, dict) and not e.get("sent_at") and not                
+ e.get("received_at"):                                                          
+             at = _server_instant(e)                                            
+             if at:                                                             
+                 e["sent_at"] = e["received_at"] = at                           
+     if array:                                                                  
+         path.write_text(json.dumps(items, indent=2) + "\n", encoding="utf-8")  
+     elif single:                                                               
+         path.write_text(json.dumps(items[0], indent=2) + "\n",                 
+ encoding="utf-8")                                                              
+     else:                                                                      
+         path.write_text("".join(json.dumps(e) + "\n" for e in items),          
+ encoding="utf-8")                                                              
+                                                                                
+                                                                                
+ def logger_stamped(name):                                                      
+     """A copy of the job-rejected fixture whose harness logs carry the         
+ logger's own sent_at and received_at on                                        
+     every call -- the entry shape the frozen bar asserts                       
+ (tests/test_evaluator_harness_log.py D1-D3: sent_at,                           
+     received_at, request.url, response.model). The fixture's logs carry server 
+ times only, so a MODEL evaluator's                                             
+     check times have no logged source and the emitter REFUSES the record       
+ (D6/D7); every case that needs a WRITTEN                                       
+     record runs on a copy built here."""                                       
+     d = TMP / name                                                             
+     shutil.copytree(FIX, d)                                                    
+     for lg in sorted((d / "custody" / "evidence").glob("harness-*.log")):      
+         _stamp_logger_times(lg)                                                
+     return d                                                                   
+                                                                                
+                                                                                
+ LOGGED = logger_stamped("fixture-logged")                                      
+                                                                                
+                                                                                
+ def job_copy(name, overlay=None):                                              
+     """A throwaway copy of the job-rejected fixture, WITH the logger's own     
+ times in its harness logs (LOGGED):                                            
+     a record can only be written from a log the emitter can honestly read. The 
+ cases that assert a refusal                                                    
+     depending on the fixture's server-times-only log drive FIX directly (T2,   
+ T2b, T2d, T7b/E3)."""                                                          
+     d = TMP / name                                                             
+     shutil.copytree(LOGGED, d)                                                 
+     if overlay:                                                                
+         shutil.copytree(FIX.parent / "failures" / overlay, d,                  
+ dirs_exist_ok=True)                                                            
+     return d                                                                   
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ # the emitter on the synthetic fixture                                         
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(FIX, rec_path)                                                  
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job emits with no gap (exit 0)", rc == 0,                 
+ out.strip()[-90:]))                                                            
+ =======                                                                        
+ # The fixture's own logs carry server times only, so a MODEL evaluator's check 
+ times have no logged source and                                                
+ # the record is REFUSED (D6/D7, tests/test_evaluator_harness_log.py). Asserted 
+ here, positively, before any                                                   
+ # record is read: the refusal must not pass by the absence of an exception.    
+ o_ref = TMP / "fixture-refused.json"                                           
+ rc, out = emit(FIX, o_ref)                                                     
+ res((f"{S} · a model evaluator whose harness log carries no logger times is    
+ refused, naming the log "                                                      
+      f"(exit 3, [time], nothing written)",                                     
+      rc == 3 and "[time]" in out and "harness" in out and not o_ref.exists(),  
+      f"exit {rc}: {out.strip()[-140:]}"))                                      
+                                                                                
+ # the emitter on the synthetic fixture, every call carrying the logger's own   
+ sent_at/received_at                                                            
+ rec_path = TMP / "fixture.custody.json"                                        
+ rc, out = emit(LOGGED, rec_path)                                               
+ rec = json.loads(rec_path.read_text(encoding="utf-8")) if rec_path.is_file()   
+ else {}                                                                        
+ res((f"{S} · fixture job with logger-stamped harness logs emits with no gap    
+ (exit 0)", rc == 0, out.strip()[-90:]))                                        
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ zp = TMP / "bundle.zip"                                                        
+ rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),      
+ "--record", str(rec_path), "--out", str(zp)])                                  
+ =======                                                                        
+ zp = TMP / "bundle.zip"                                                        
+ rc, out = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(LOGGED),   
+ "--record", str(rec_path), "--out", str(zp)])                                  
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+     rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir", str(FIX),   
+ "--record", str(rec_path), "--out", str(TMP / "b2.zip")])                      
+ =======                                                                        
+     rc2, _ = run_py(["tools/pack_stranger_bundle.py", "--job-dir",             
+ str(LOGGED), "--record", str(rec_path), "--out", str(TMP / "b2.zip")])         
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ rc, out = emit(FIX, TMP / "exp-tree.json", extra=("--expect-revision",         
+ head[1][:12]))                                                                 
+ =======                                                                        
+ rc, out = emit(LOGGED, TMP / "exp-tree.json", extra=("--expect-revision",      
+ head[1][:12]))                                                                 
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ o = TMP / "t3-allow.json"                                                      
+ rc, out = emit(FIX, o, allow_hand=True)                                        
+ =======                                                                        
+ o = TMP / "t3-allow.json"                                                      
+ rc, out = emit(LOGGED, o, allow_hand=True)                                     
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+tests/validate_schemas.py                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ rt_rec = TMP / "roundtrip.custody.json"                                        
+ rc, out = emit(FIX, rt_rec, allow_hand=True)                                   
+ vrc, vout = verify_record(rt_rec, FIX, VCO)                                    
+ =======                                                                        
+ rt_rec = TMP / "roundtrip.custody.json"                                        
+ rc, out = emit(LOGGED, rt_rec, allow_hand=True)                                
+ vrc, vout = verify_record(rt_rec, LOGGED, VCO)                                 
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+After applying, run both and report the numbers:                                
+
+                                                                                
+ python3 tests/test_evaluator_harness_log.py                                    
+ EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py   
+                                                                                
+
+If f1f-relay-ok, t2-pass-at (allow-hand half) or pin-deny misbehave, the cause  
+will be printed on the case's own line — send me that line and the emitter's    
+refusal text and I will adjust only the fixture copy, not the refusal           
+assertions.                                                                     
+
+Tokens: 52k sent, 5.5k cache hit, 36k received. Cost: $0.06 message, $0.06 
+session.
+Applied edit to tests/validate_schemas.py
+run-aider: recorded cost 0.06 from aider session print

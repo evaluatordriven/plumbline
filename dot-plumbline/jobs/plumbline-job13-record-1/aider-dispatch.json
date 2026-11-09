@@ -1,0 +1,16 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job13-record-1/aider-prompt.md",
+  "files": [
+    "kit/emit_custody.py"
+  ],
+  "read": [
+    "tests/test_disposition_line_state.py",
+    "tests/fixtures/custody/job-disposition-line/packet.json",
+    "tests/fixtures/custody/job-disposition-line/inputs/custody.json",
+    "tests/fixtures/custody/job-disposition-line/inputs/custody-events.jsonl",
+    "tests/fixtures/custody/job-disposition-line/README.md"
+  ],
+  "test_cmd": "EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 -m pytest tests/test_disposition_line_state.py -q",
+  "auto_test": true,
+  "auto_lint": false
+}

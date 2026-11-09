@@ -1,0 +1,15 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-escalate-record/aider-prompt.md",
+  "files": [
+    "kit/escalate.py"
+  ],
+  "read": [
+    "tests/test_escalate.py",
+    "schemas/job-packet.schema.json",
+    "kit/conductor_loop.py"
+  ],
+  "test_cmd": [
+    "python3",
+    "tests/test_escalate.py"
+  ]
+}

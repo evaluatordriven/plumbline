@@ -1,0 +1,29 @@
+{
+  "run": 1,
+  "batch": "b1",
+  "calls": [
+    {
+      "call": "evaluator_harness_log#p1",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T22:27:26.881300+00:00"
+    },
+    {
+      "call": "evaluator_harness_log#p2",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T22:27:57.137990+00:00"
+    },
+    {
+      "call": "evaluator_harness_log#p3",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T22:28:33.695907+00:00"
+    }
+  ],
+  "guard": {
+    "pin_at": "2026-11-08T22:26:48Z",
+    "first_call_at": "2026-11-08T22:27:26Z",
+    "pin_precedes_calls": true
+  }
+}

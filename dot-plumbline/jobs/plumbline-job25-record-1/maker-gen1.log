@@ -1,0 +1,27 @@
+Work tree unchanged by me — the only modification is the pre-existing bar section the Orchestrator froze. I measured no cost (no paid calls made), so I write no cost file.
+
+Dispatch complete.
+
+Measured the red myself with the packet's command, from the packet at /home/jarbis1/tmp/plumbline-job25-record-1/packet.json:
+
+    EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py
+    137/141 PASSED — 4 FAILED
+    JOB25 b1 · b2 · c1 · d1
+
+This is a multi-file kit change against a frozen suite, so I wrote no implementation. Written:
+
+    /home/jarbis1/tmp/plumbline-job25-record-1/aider-prompt.md
+    /home/jarbis1/tmp/plumbline-job25-record-1/aider-dispatch.json
+
+prompt — names the four failing case ids as the spec, points at the JOB 25 section of the frozen suite and at the fixture's own log as the source of call ids, states the law (the switch admits a typed time, not an unstamped machine check time) without prescribing a solution, names tests/validate_schemas.py and tests/fixtures/** as do-not-edit, names the two editable kit files and nothing else, and requires the a1–a4 regression set to stay green.
+
+dispatch — message: the prompt path; files: kit/emit_custody.py, kit/custody_history.py; read: tests/validate_schemas.py, tests/fixtures/custody/job-rejected/custody/evidence/harness-eval-a.log (verified the path exists); test_cmd: the packet's command verbatim.
+
+Two things for you, not for me to act on:
+
+1. The work tree already carries an uncommitted 164-line addition to tests/validate_schemas.py — the JOB 25 bar. It is frozen and I did not touch it, but the Orchestrator commits before measuring, so that diff must be in the commit or the bar is not there for Aider.
+2. tests/fixtures/** is frozen in the packet; the case bodies read the fixture through job_copy, so the fixture must be present unchanged in the tree Aider runs in.
+
+Cost: not recorded — I made no paid model calls, so no cost file was written. Not scored, no pass declared. Aider is not launched by me; route-maker launches it from the dispatch after this turn.
+
+session_id: 20261109_190040_0987e5

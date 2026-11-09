@@ -1,0 +1,295 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "tests/test_loop_custody_on_finish.py",
+      "digest": {
+        "sha256": "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+      }
+    },
+    {
+      "name": "tests/test_loop_custody_sources.py",
+      "digest": {
+        "sha256": "ae84ee51cec0a8c2f3a924069c164b1ce54c4efc746f54e7c4da18b73ff2b535"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59"
+      },
+      "frozenAt": "2026-11-08T01:07:31Z",
+      "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+      "dimensions": [
+        {
+          "id": "fixture_pin_reproduced",
+          "criterion": "the fixtures plant the custody bar and the predecessor bytes reproduce the pin target",
+          "scale": {
+            "type": "pass_fail",
+            "threshold": 1
+          }
+        }
+      ],
+      "approvals": [],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "plumbline-maker",
+      "kind": "model",
+      "version": "aider via /home/jarbis1/.venvs/aider",
+      "method": {
+        "sha256": "bd2e887524b4bf6174f44b5925c758ea763dfe02c7bef0ea859494d971324681"
+      },
+      "model": {
+        "family": "deepseek",
+        "identifier": "deepseek-flash",
+        "endpoint": "api.deepseek.com",
+        "readOnly": false
+      },
+      "x-plumbline": {
+        "harness_log": "harness-maker.log",
+        "calls": [
+          "harness-maker.log#maker-1"
+        ],
+        "endpoint_basis": "request URL host",
+        "startedAt_basis": "harness-maker.log#maker-1 sent_at",
+        "producedAt_basis": "harness-maker.log#maker-1 received_at",
+        "startedAt_source": "harness-maker.log:1",
+        "producedAt_source": "harness-maker.log:1"
+      }
+    },
+    "startedAt": "2026-11-08T01:07:56Z",
+    "producedAt": "2026-11-08T01:09:41Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59"
+      },
+      "runner": {
+        "sha256": "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "evaluator",
+        "name": "plumbline-eval",
+        "kind": "model",
+        "model": {
+          "family": "glm",
+          "identifier": "z-ai/glm-5.3-flash",
+          "endpoint": "api.z.ai",
+          "readOnly": true
+        },
+        "x-plumbline": {
+          "harness_log": "harness-evaluator.log",
+          "calls": [
+            "harness-evaluator.log#fixture_pin_reproduced#p1",
+            "harness-evaluator.log#fixture_pin_reproduced#p2",
+            "harness-evaluator.log#fixture_pin_reproduced#p3"
+          ],
+          "aggregator": "openrouter.ai",
+          "upstream_provider": "Z.AI",
+          "provider_slug": "z-ai/fp8",
+          "endpoint_basis": "declared pin (2026-11-08T01:10:51Z) to 'Z.AI' at api.z.ai, served-by confirmed from generation provider_name",
+          "routing": {
+            "pin": {
+              "via": "openrouter.ai",
+              "provider": "Z.AI",
+              "slug": "z-ai/fp8",
+              "host": "api.z.ai",
+              "declaredAt": "2026-11-08T01:10:51Z"
+            },
+            "requests": [
+              {
+                "provider": {
+                  "allow_fallbacks": false,
+                  "order": [
+                    "z-ai/fp8"
+                  ],
+                  "zdr": true
+                },
+                "calls": [
+                  "harness-evaluator.log#fixture_pin_reproduced#p1",
+                  "harness-evaluator.log#fixture_pin_reproduced#p2",
+                  "harness-evaluator.log#fixture_pin_reproduced#p3"
+                ]
+              }
+            ],
+            "request_ok": true
+          }
+        },
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "fixture_pin_reproduced",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": "b1",
+        "at": "2026-11-08T01:11:23Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "the fixtures do not plant the custody bar, or the predecessor bytes do not reproduce the named pin target",
+        "evidence": {
+          "name": "verdict-fixture_pin_reproduced-p1.json",
+          "sha256": "24902ba2586befa60177e749cb28632ad7c58412bbabe3424cf4c3cfddd15b81"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "fixture_pin_reproduced",
+          "call": "harness-evaluator.log#fixture_pin_reproduced#p1",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40",
+          "quotes": [
+            {
+              "quote": "The frozen bar tests/test_job1_fixture_pin.py passes from the worktree root (4 tests, OK, exit 0) and the predecessor file tests/test_loop_custody_on_finish.py hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, exactly the pin target the bar names, with t",
+              "inEvidenceFile": true
+            }
+          ]
+        }
+      }
+    ],
+    "controls": [],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [],
+    "retention": {
+      "where": "/home/jarbis1/tmp/plumbline-job1-record-1"
+    },
+    "external": [
+      {
+        "requirement": "CL1-15",
+        "subject": "evaluator",
+        "evidence": {
+          "name": "harness-evaluator.log",
+          "sha256": "a64430a5795a6906a228d3f7629b0079e7ebe0e34040bbf1fca7ca2943effa7b"
+        },
+        "readBy": null
+      }
+    ],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-11-08T19:29:58Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-11-08-job1-fixture-pin",
+      "sources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[fixture_pin_reproduced/fixture_pin_reproduced].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3"
+      },
+      "events_log": {
+        "name": "inputs/custody-events.jsonl",
+        "sha256": "418deac3f83f7f787eeae6173cccdd118d927a18768e96e89e9310b7f2c50d92"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "iteration": 1,
+      "s5_record": {
+        "name": "iteration-1-eval-record.json",
+        "sha256": "49cda4d5841e99d68f58b0d0e19dfedc19f7f63aae3f7f4da941645f3583ce8f"
+      },
+      "pass_rule": {
+        "T_accept": 1,
+        "T_dim": 1,
+        "mean": 1.0,
+        "min": 1,
+        "runs": 3,
+        "result": "accept"
+      },
+      "disposition_source": "packet.json disposition_state",
+      "packet": {
+        "name": "packet.json",
+        "sha256": "5d35e77c9c757e6f2f7b8e100a21c486c5a90bce414acdd74aab6ca6cfd5a337"
+      },
+      "disposition_at_source": "logged live (inputs/custody-events.jsonl)",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "cf283e7",
+        "commit": "cf283e71acb9381cb0785a285f78318f5d386d98",
+        "tree": "2d3f679070c82a7867745465b42519cb94dd5184",
+        "dirty": false,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "harness log",
+        "producedAt": "harness log"
+      },
+      "timeSources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[fixture_pin_reproduced/fixture_pin_reproduced].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "harness-evaluator.log:40"
+      },
+      "time_sources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[fixture_pin_reproduced/fixture_pin_reproduced].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "harness-evaluator.log:40"
+      },
+      "emittedAt": "2026-11-08T19:30:48Z",
+      "schema": "plumbline/x-plumbline/v1",
+      "hand_times": [],
+      "generations": [],
+      "evaluations": [],
+      "relays": [],
+      "amendments": [],
+      "spend": {
+        "calls_sum_usd": 0.010741,
+        "key_delta_usd": 0.0,
+        "total_usd": 0.010741,
+        "tolerance_usd": 0.0001,
+        "source": null
+      },
+      "inputs": {
+        "disposition_words": "Given. The work shipped in #16; the five gaps are the packet-template defect fixed in Jobs 3 and 4.",
+        "disposition_event": {
+          "at": "2026-11-08T19:29:58Z",
+          "state": "given",
+          "by": "Steve Moitozo II",
+          "source": "inputs/custody-events.jsonl"
+        }
+      },
+      "gaps": [
+        {
+          "field": "bar.approvals",
+          "reason": "no buyer/specialist approval recorded",
+          "hard": true
+        },
+        {
+          "field": "controls",
+          "reason": "evaluator evaluator batch b1 has no control expecting conforms",
+          "hard": true
+        },
+        {
+          "field": "controls",
+          "reason": "evaluator evaluator batch b1 has no control expecting does_not_conform",
+          "hard": true
+        },
+        {
+          "field": "controls",
+          "reason": "no control recorded",
+          "hard": true
+        }
+      ]
+    }
+  }
+}

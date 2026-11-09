@@ -1,0 +1,21 @@
+Dispatch written and verified. Stopping here as the route requires — Aider is launched by `route-maker` after I exit.
+
+What I did, and what I measured:
+
+Red confirmed on this tree at 851a07d, clean, using the packet's own test command:
+- `EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py` → 132/139, 7 failed, including `J14/A1` and `J14/A2`.
+- `python3 tests/test_evaluator_harness_log.py` → Ran 15, 2 failed: `test_d13_switch_does_not_admit_an_unsourced_evaluator_time`, `test_d14_switch_refusal_names_every_unstamped_call`.
+
+Why this route: the bar is a frozen suite (`tests/validate_schemas.py` and `tests/test_evaluator_harness_log.py`, both named `artifact.frozen` in the packet) and the fix touches the two editable modules. That is not a one-file smoke, so I did not write the implementation.
+
+Files written, outside the work tree:
+- `/home/jarbis1/tmp/plumbline-job12d-record-1/aider-prompt.md` — names the failing tests as the spec, states the behaviour (the switch confines to typed hand times; an unsourced model-evaluator check time stays refused, every unstamped call named), lists the must-stay-green cases and the five reds belonging to other jobs, and names the frozen paths as do-not-edit. No solution is given; it points at where to read.
+- `/home/jarbis1/tmp/plumbline-job12d-record-1/aider-dispatch.json` — `message` the prompt path, `files` the two editable paths only, `read` the frozen tests plus `kit/evaluator_harness_log.py`, `docs/custody-emission.md`, `AGENTS.md`, `test_cmd` copied verbatim from the packet.
+
+Two notes for you:
+- A prior turn in this record directory left an `aider-dispatch.json` pointing at `aider-prompt-attempt4.md`. I read that prompt; it carried the same brief. I repointed the dispatch to the canonical `aider-prompt.md` and kept attempt4's extra `read` entries, so nothing it held is lost.
+- Cost: I did not measure a spend figure for this turn, so I wrote nothing to `/home/jarbis1/tmp/plumbline-job12d-record-1/cost-gen1b.json`.
+
+Work tree is untouched and clean at 851a07d. I did not call Aider, did not edit any frozen file, and did not score.
+
+session_id: 20261109_164723_d3cbfb

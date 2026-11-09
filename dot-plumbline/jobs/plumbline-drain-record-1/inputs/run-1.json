@@ -1,0 +1,29 @@
+{
+  "run": 1,
+  "batch": "b1",
+  "calls": [
+    {
+      "call": "drain_at_turn_start#p1",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T18:28:18Z"
+    },
+    {
+      "call": "drain_at_turn_start#p2",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T18:29:04Z"
+    },
+    {
+      "call": "drain_at_turn_start#p3",
+      "provider": "Z.AI",
+      "score": 1,
+      "at": "2026-11-08T18:29:45Z"
+    }
+  ],
+  "guard": {
+    "pin_at": "2026-11-08T18:27:14Z",
+    "first_call_at": "2026-11-08T18:28:18Z",
+    "pin_precedes_calls": true
+  }
+}

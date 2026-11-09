@@ -1,0 +1,13 @@
+{
+  "job": "job-25-harness-log-redo",
+  "artifact": {
+    "test_cmd": "EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py",
+    "frozen": ["tests/validate_schemas.py", "tests/fixtures/**"],
+    "editable": ["kit/emit_custody.py", "kit/custody_history.py"],
+    "tree": "/home/jarbis1/tmp/plumbline-hl-redo",
+    "branch": "feat/harness-log-redo",
+    "base": "db9d6b7"
+  },
+  "bounds": {"maker_generations": 2, "usd": 0.20},
+  "ratified": false
+}

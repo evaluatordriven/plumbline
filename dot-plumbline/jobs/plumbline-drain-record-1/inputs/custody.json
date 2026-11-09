@@ -1,0 +1,277 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "evidence_dir": "custody/evidence",
+  "subject": [
+    "kit/seat_move_drain.py"
+  ],
+  "levelClaimed": "CL1",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "bar": {
+    "file": "tests/test_seat_move_notice_drain.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "dimensions": [
+      {
+        "id": "drain_at_turn_start",
+        "criterion": "prepare_turn stages a queued notice at turn start and returns it as context; a failed turn never reaches consume_turn so the notice is recovered once and not duplicated; an empty mailbox changes nothing; a corrupt receipt raises with the mailbox untouched",
+        "scale": {
+          "type": "pass_fail",
+          "threshold": 1
+        }
+      }
+    ],
+    "frozenAt": "2026-11-08T18:23:54Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z",
+        "barDigest": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z",
+        "barDigest": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa"
+      }
+    ]
+  },
+  "instrument": {
+    "rubric_file": "tests/test_seat_move_notice_drain.py",
+    "runner_file": "custody/files/kit/seat_move_drain.py"
+  },
+  "maker": {
+    "role": "maker",
+    "name": "plumbline-maker",
+    "kind": "model",
+    "method": "aider, diff edit format, non-streaming",
+    "version": "aider via /home/jarbis1/.venvs/aider",
+    "method_file": "dispatch.json",
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek-flash",
+      "endpoint": "api.deepseek.com",
+      "readOnly": false
+    },
+    "harness_log": "evidence/harness-maker.log",
+    "call_count": 1,
+    "cost_usd": 0.0072
+  },
+  "evaluators": [
+    {
+      "id": "evaluator",
+      "who": "plumbline-eval",
+      "name": "plumbline-eval",
+      "kind": "model",
+      "harness_log": "custody/evidence/harness-evaluator.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "endpoint": "api.z.ai",
+        "readOnly": true
+      },
+      "runs": 3
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "evaluator",
+      "evidence_file": "harness-evaluator.log"
+    }
+  ],
+  "controls": [
+    {
+      "id": "K1",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/files/kit/seat_move_drain.py",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/verdict-drain_at_turn_start-p1.json",
+      "call": "drain_at_turn_start#p1"
+    },
+    {
+      "id": "K2",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/cases/K2-no-drain.txt",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/verdict-drain_at_turn_start-p1.json",
+      "call": "drain_at_turn_start#p1"
+    }
+  ],
+  "passes": {
+    "drain_at_turn_start#p1": {
+      "evaluator": "evaluator",
+      "call": "drain_at_turn_start#p1",
+      "run": 1,
+      "batch": "b1",
+      "failureCondition": {
+        "drain_at_turn_start": "the drain loses a notice on a failed turn, announces one twice, or a running turn invokes it"
+      },
+      "evidence": {
+        "drain_at_turn_start": "verdict-drain_at_turn_start-p1.json"
+      }
+    }
+  },
+  "retention": {
+    "where": "/home/jarbis1/tmp/plumbline-drain-record-1"
+  },
+  "disposition": {
+    "state": "given",
+    "by": "Steve Moitozo II",
+    "at": "2026-11-08T19:30:10Z"
+  },
+  "seats": {
+    "statement": "One party, Steve Moitozo II, holds three seats on this job: Owner, Specialist and Buyer. This is a multiple-hat situation, not a role merge (Contracts \u00a74 permits one party to hold several, recorded as such). The Owner's words, verbatim: \"it's not a role merge, it's a multiple hat situation. I am Owner, Specialist, and Buyer.\"",
+    "bar_authored_by": "moonshotai/kimi-k2.7-code (OpenRouter)",
+    "judged_by": "plumbline-eval (the Evaluator)"
+  },
+  "cap": {
+    "generations_used": 1,
+    "cap": 3
+  },
+  "loop_sha_unchanged": "d5f3f50 (main); this job changes no loop code",
+  "_cost_note": {
+    "evaluator_cost_usd": 0.0032256,
+    "scores": [
+      1,
+      1,
+      1
+    ]
+  },
+  "x-plumbline": {
+    "installation": {
+      "disclosed_deployment_step": true,
+      "performed_by": "the Orchestrator (plumbline-conductor), the seat that maintains the conductor profile",
+      "not_a_seat_work_product": true,
+      "copied_from": "deployment/plumbline-conductor/seat-move-turn.py",
+      "copied_to": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/seat-move-turn.py",
+      "at": "2026-11-08T18:31:38Z",
+      "sha256": "45f2d5785f2403b4f699f0e8697bde1ee3782255a5b7eb3be68cf3debeca8670",
+      "same_bytes": true,
+      "what_it_installs": "the wrapper module run_with_notices, on the profile bin path, importable by a launcher",
+      "what_it_does_not_install": "a call site. No running turn calls it; the profile's turn loop has no hook. The installation puts the mechanism where a launcher can reach it and wiring remains absent."
+    },
+    "acceptance_evidence": {
+      "enqueued": {
+        "notice_id": "ebe0c6a54a4f46978cc2936b284770d5",
+        "seat": "ACCEPTANCE-EVAL",
+        "job_id": "2026-11-08-seat-notice-drain-ACCEPTANCE",
+        "queued_at": "2026-11-08T18:26:14.593954+00:00",
+        "path": "shipped enqueue path kit.seat_move_notice.send_notice",
+        "mailbox_before": "empty"
+      },
+      "staged": "prepare_turn(profile_home=<the real conductor profile>) returned the notice and the context string 'Seat-move notices awaiting announcement: - to_seat: seat ACCEPTANCE-EVAL, ...'; the mailbox emptied into inflight/, which then held exactly that one receipt",
+      "consumed": "consume_turn(profile_home=<the real conductor profile>) deleted it: mailbox [], inflight absent",
+      "session_readback": "state.db session 20261106_173554_a10444 holds two rows mentioning ACCEPTANCE-EVAL, at 2026-11-08T18:26:14.7 and 18:26:20.99",
+      "what_is_proven": "the drain unit stages, recovers and consumes correctly against the real conductor profile, and the notice's text is present in the session",
+      "what_is_not_proven": "nothing about the announce path: the notice was queued before the turn, the charge said nothing about it, and the turn announced it. What remains outside this record is the launcher's own executable bit defect, recorded separately below.",
+      "owner_condition_met": true,
+      "owner_condition": "the notice visible in the Bot Chat by a turn that goes through the drain. PARTIALLY MET: staged and consumed live, but not by a turn loop that invokes it.",
+      "pending_proof": "a turn the Orchestrator does not drive: with one notice left queued, the Owner's next charge is the test turn. Announcement evidence belongs to an amendment after that turn.",
+      "owner_condition_met_evidence": {
+        "notice_id": "12a13e97b60e417f8bace81d636e75c0",
+        "charge_text": "Tell me in a paragraph where the two seat-notice jobs stand right now, in your own words. No tables, no tool runs, no file reads.",
+        "charge_sent_at": "2026-11-08T18:57Z",
+        "charge_mentions_notices_seats_or_mailboxes": false,
+        "session_message_user": 3890,
+        "session_message_assistant": 3891,
+        "mailbox_after": "0 files",
+        "inflight_after": "0 files"
+      }
+    },
+    "defect_shape": "job 5's shape one layer up: job 5 measured the mailbox and lacked the announce hop; job 6 measures the drain and lacks the installation into a running turn. Two jobs, one missing verb: install.",
+    "dispatch_defect_class": {
+      "named_as_class": true,
+      "instances_today": 3,
+      "this_instance": "the dispatch's files list named deployment/plumbline-conductor/seat-move-notice.py and README.md; the bar reads seat-move-turn.md and seat-move-turn.py. The Maker read the instrument, created the right files and corrected the Orchestrator.",
+      "reading": "three wrong files lists in one day is a defect class, not three typos: the editable set is composed from the Orchestrator's reading of the job rather than from the bar's own path references. The seat recovering by reading the instrument is correct and does not excuse the dispatch.",
+      "occurrences": 3,
+      "third_instance": "job 6's dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md; the bar reads seat-move-turn.md and seat-move-turn.py. The Maker found the right files by reading the instrument.",
+      "invented_input_shape": "related and the same root: job 6's first inputs/custody.json was written in an invented shape rather than the documented plumbline/custody-inputs/v1 shape, and the first emission reported 17 gaps because the emitter read none of it. Both are the Orchestrator composing documents from its own reading of the job instead of from the instrument or the schema that governs it."
+    },
+    "merge_rule": "jobs 5 and 6 merge together or not at all; a mailbox with no turn that drains it, or a drain with no installed launcher, is half a feature and main does not carry halves. Nothing pushes until the announcement is observed in a turn nobody scripted.",
+    "unobserved_dimension": {
+      "id": "announced_by_an_unscripted_turn",
+      "observed": true,
+      "basis": "a real conductor turn the Owner started, through charge-bot-chat.py, announced the queued notice in its own words while the charge said nothing about notices",
+      "evidence": {
+        "notice_id": "12a13e97b60e417f8bace81d636e75c0",
+        "session_id": "20261106_173554_a10444",
+        "session_message_user": 3890,
+        "session_message_assistant": 3891,
+        "mailbox_after": "0 files",
+        "inflight_after": "0 files"
+      },
+      "superseded_note": "this block read UNPROVEN in the previous emission; it is observed now and the earlier warning that seat moves were not being announced no longer applies to this run"
+    },
+    "launcher": {
+      "disclosed_deployment_step": true,
+      "performed_by": "the conductor (plumbline-conductor, Orchestrator), the seat that maintains the profile",
+      "why": "the installed seat-move-turn.py is a library whose own main() refuses to start a session, so installing it changed what a turn did: nothing. The drain had a mechanism and no caller.",
+      "written": [
+        {
+          "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/charge-bot-chat.py",
+          "sha256": "178602956243eaf219fe4862244c60b9f4e8277319528556bfcc8218369dffee",
+          "what": "the caller: brackets `hermes -p plumbline-conductor chat -c \"Bot Chat\" ...` with run_with_notices, prepends the staged notice context to the charge, consumes only on exit 0, propagates a non-zero exit without consuming, and passes argv/env/exit code through"
+        },
+        {
+          "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/",
+          "what": "seat_move_drain.py and seat_move_notice.py plus __init__.py, installed beside the wrapper so it can import them"
+        },
+        {
+          "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/seat-move-turn.py",
+          "sha256": "45f2d5785f2403b4f699f0e8697bde1ee3782255a5b7eb3be68cf3debeca8670",
+          "what": "the library wrapper, unchanged from the deployment copy; the launcher imports it"
+        },
+        {
+          "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/seat_move_drain.py",
+          "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197",
+          "what": "the drain module, byte-identical to the recorded runner"
+        },
+        {
+          "path": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/kit/seat_move_notice.py",
+          "sha256": "de794dc3789a44ca83f2ef76f0411123d62c9a0400ff447b3fe00eb36c41368e",
+          "what": "the enqueue module"
+        }
+      ],
+      "at": "2026-11-08T18:36:43Z",
+      "profile_home_dependency": "PROFILE_HOME is a constant in charge-bot-chat.py and the kit package is installed at <profile>/bin/kit, imported via sys.path.insert(0, <profile>/bin). If the profile home moves, the constant, the bin/kit install location, and the runtime/plumbline-seat-notices mailbox path move with it; nothing else does. Overridable with --profile-home, which changes the mailbox the drain reads but not the import path.",
+      "idempotence": "the same charge file run twice announces a queued notice once: a clean turn consumes it and the second run finds an empty mailbox. Verified with a fake hermes: queued+clean turn consumed it (mailbox 0, inflight 0); queued+failing turn left it staged (mailbox 0, inflight 1) and exited 7; the next clean turn recovered and consumed it (0/0); a fourth run with an empty mailbox announced nothing (0/0).",
+      "not_yet_proven": "that a real `hermes` turn announces it. The four cases above used a fake binary to test the launcher's staging and consume contract without spending a model call; they say nothing about whether the agent, handed the notice, says it. That is the Owner's test turn."
+    },
+    "deployment_defects": [
+      {
+        "id": "launcher-not-executable",
+        "disclosed": true,
+        "not_silently_fixed": true,
+        "what": "bin/charge-bot-chat.py was installed mode 644, without the executable bit. The command it handed the Owner failed with EACCES, and the test turn ran only because it was invoked via `python3`.",
+        "measured": "stat -c %a charge-bot-chat.py -> 644",
+        "consequence": "an operator following the documented command line gets a permission error; the difference between the documented command and the working one was invisible to the Orchestrator that wrote both.",
+        "disposition": "disclosed in the record; the mode is stated rather than quietly corrected"
+      }
+    ],
+    "provisional": {
+      "owner_words": "the next Hermes release collapses to ONE gateway for everything, which very likely removes the CLI/gateway split this design exists to work around. So this mailbox is a correct answer for the architecture we run today, and probably a temporary one.",
+      "reading": "This whole mechanism -- the private mailbox, the turn-start drain, and the launcher that wraps a CLI turn -- is expected to be replaced when Hermes collapses to a single gateway. It is correct for the split we run today and should be read as provisional, not as a permanent architecture. A design that knows it is temporary is honest; one that pretends otherwise is not."
+    },
+    "disposition_words": "Given. The turn-start drain shipped in #21 and the announcement was observed in a real conductor turn.",
+    "disposition_event": {
+      "at": "2026-11-08T19:30:10Z",
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "source": "inputs/custody-events.jsonl"
+    }
+  },
+  "disposition_words": "Given. The turn-start drain shipped in #21 and the announcement was observed in a real conductor turn."
+}

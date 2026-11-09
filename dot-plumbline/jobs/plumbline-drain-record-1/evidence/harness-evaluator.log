@@ -1,0 +1,632 @@
+[
+  {
+    "call": "drain_at_turn_start#p1",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `drain_at_turn_start`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION drain_at_turn_start\n\nCLAIM, narrowly: kit/seat_move_drain.py provides prepare_turn, which recovers any notice stranded in inflight by a failed turn, drains the mailbox FIFO into inflight, and returns the notices plus a context string; consume_turn deletes the staged files and is called only after a clean turn; an empty mailbox changes nothing; a corrupt receipt raises with the mailbox untouched. The deployment record documents the mechanism and the live verification step.\n\nThis dimension does NOT claim that a running conductor turn invokes the drain. It does not.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_seat_move_notice_drain.py (sha256 e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa, frozen 2026-11-08T18:23:54Z) passes: Ran 7 tests, OK, exit code 0. Job 5's bar (tests/test_seat_move_notice.py) also still passes, Ran 12 OK.\n\n2. LIVE STAGING AND CONSUME, against the real conductor profile, not a fixture:\n   - enqueued one real notice through the shipped path: id ebe0c6a54a4f46978cc2936b284770d5, seat ACCEPTANCE-EVAL, job 2026-11-08-seat-notice-drain-ACCEPTANCE, queued_at 2026-11-08T18:26:14.593954+00:00. Mailbox before: empty. After: one receipt file.\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice and the context string 'Seat-move notices awaiting announcement: - to_seat: seat ACCEPTANCE-EVAL, job ..., notice ebe0c6a5...'. The mailbox emptied and inflight/ then held exactly that one receipt.\n   - consume_turn(profile_home=...) then deleted it: mailbox [] and inflight absent.\n   - state.db session 20261106_173554_a10444 contains two rows mentioning ACCEPTANCE-EVAL at 18:26:14.7 and 18:26:20.99.\n\n3. THE LIMIT, stated and not omitted: both of those state.db rows are role=tool output from the Orchestrator's own scripts, not an assistant message announcing a seat move. The notice is present in the session because the turn's tool traffic carried it; no turn was designed to announce it. No running conductor turn calls prepare_turn - the launcher is a template in deployment/plumbline-conductor/, not an installed script.\n\n4. Fail-closed per the bar: a failed turn never reaches consume_turn, so staged files remain in inflight and the next prepare_turn recovers them once; a corrupt receipt raises before staging so it is neither replayed nor dropped; an empty mailbox returns ([], '') and creates nothing.\n\n5. Control pair: K1 conforms - a queued notice stages and consumes cleanly; K2 does_not_conform - the pre-work tree had no kit/seat_move_drain.py at all, so no drain existed.\n\n6. Disclosed dispatch defect: the Orchestrator's dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md, but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker found the correct files by reading the bar and created them. The dispatch's editable list was wrong; the work is right.\n\nDecide: does the evidence show the drain unit behaves as the bar requires, with the missing turn-loop installation explicitly out of scope for this score?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T18:27:31.058390Z",
+    "received_at": "2026-11-08T18:28:18.604289Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 18:27:32 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=8,cfOrigin;dur=0,cfWorker;dur=1409",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794162451-2DiXmxuATgNwKqOLErOx",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;e27fff22-c34f-474a-896f-4de6a01f251f",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a576a1d75dc25c81-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794162451-2DiXmxuATgNwKqOLErOx",
+      "object": "chat.completion",
+      "created": 1794162451,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (the legacy 12-test bar also OK), and against the real conductor profile a live-enqueued notice (ebe0c6a5...) was staged by prepare_turn — mailbox emptied to exactly one inflight receipt with the context string returned — and removed by consume_turn, with empty-mailbox, corrupt-receipt, and stranded-inflight fail-closed behavior bar-covered; the uninstalled turn loop and the misdirected dispatch file list are disclosed out-of-scope gaps, not part of what this bar tests.\"}",
+            "refusal": null,
+            "reasoning": "Let me work through this carefully.\n\nThe dimension is `drain_at_turn_start`. The claim, narrowly stated:\n\n- `kit/seat_move_drain.py` provides `prepare_turn`, which:\n  - recovers any notice stranded in inflight by a failed turn,\n  - drains the mailbox FIFO into inflight,\n  - returns the notices plus a context string.\n- `consume_turn` deletes the staged files and is called only after a clean turn.\n- An empty mailbox changes nothing.\n- A corrupt receipt raises with the mailbox untouched.\n- The deployment record documents the mechanism and the live verification step.\n\nThe dimension explicitly does NOT claim that a running conductor turn invokes the drain.\n\nSo the question: does the evidence show the drain unit behaves as the bar requires, with the missing turn-loop installation explicitly out of scope for this score?\n\nMy instructions as the Plumbline Evaluator: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nLet me check the evidence against these criteria:\n\n1. Frozen bar passes in full: Yes. tests/test_seat_move_notice_drain.py, sha256 frozen 2026-11-08T18:23:54Z, ran 7 tests, OK, exit code 0. Also Job 5's older bar (tests/test_seat_move_notice.py) still passes: 12 tests OK. So the frozen bar passes in full. ✓\n\n2. Live staging-and-consume against the real conductor profile was observed: Yes.\n   - A real notice was enqueued through the shipped path: id ebe0c6a54a4f46978cc2936b284770d5, seat ACCEPTANCE-EVAL, job 2026-11-08-seat-notice-drain-ACCEPTANCE, queued_at timestamp. Mailbox before: empty; after: one receipt file.\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice plus the context string. Mailbox emptied; inflight/ held exactly that one receipt.\n   - consume_turn then deleted it: mailbox [] and inflight absent.\n   - state.db session 20261106_173554_a10444 contains two rows mentioning ACCEPTANCE-EVAL at the right times.\n\nThis is live staging (prepare_turn draining mailbox → inflight) and consume (consume_turn deleting staged files) against the real conductor profile, not a fixture. ✓\n\n3. The limit: the state.db rows are tool output, not an assistant announcement; no running conductor turn calls prepare_turn. But the dimension explicitly does NOT claim that a running conductor turn invokes the drain. So this limit is out of scope for this score. It's disclosed, not omitted — good.\n\n4. Fail-closed behavior per the bar: failed turn never reaches consume_turn, staged files remain in inflight and next prepare_turn recovers them once; corrupt receipt raises before staging; empty mailbox returns ([], '') and creates nothing. These are bar-tested behaviors; the bar passing covers them (assuming the bar tests them, which the claim says it does — the frozen bar is the specification).\n\n5. Control pair: K1 conforms (queued notice stages and consumes cleanly); K2 does_not_conform (no kit/seat_move_drain.py existed pre-work, so no drain). This supports the causal attribution.\n\n6. Disclosed dispatch defect: the dispatch named the wrong editable files; the Maker found the correct files by reading the bar and created them. The work is right; the dispatch was wrong. This is a process gap, not a gap in what this dimension scores. Should it affect the score? My instructions say score only what the bar tests. The dispatch defect doesn't affect whether the bar passes or whether the live staging-and-consume was observed. It's a separate process concern. It doesn't change the score for this dimension.\n\nNow, one thing to scrutinize: \"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\" The missing installation — the launcher being a template in deployment/plumbline-conductor/ rather than an installed script — is explicitly out of scope. The dimension doesn't claim a running turn invokes the drain. So the missing installation is a separate gap, recorded elsewhere, not scored here.\n\nAnother scrutiny point: the live test — was it truly against the real conductor profile? Evidence says \"profile_home=<conductor profile home>\", \"against the real conductor profile, not a fixture\", and the state.db session 20261106_173554_a10444 contains rows from the profile's state. The two rows mention ACCEPTANCE-EVAL at 18:26:14.7 and 18:26:20.99, consistent with the enqueue (queued_at 18:26:14.59) and the prepare/consume sequence. So yes, live verification against the real profile.\n\nIs there anything the claim requires that isn't evidenced?\n\n- prepare_turn recovers stranded inflight: this is bar-tested (fail-closed section says \"the next prepare_turn recovers them once\"). The bar passing covers it. The live test didn't explicitly demonstrate the recovery path (it started with an empty inflight), but the bar tests it and passes. The claim's narrow scope is \"behaves as the bar requires\" — bar passing + live staging/consume is what's required for score 1 per my instructions.\n- consume_turn called only after a clean turn: that's a property of the caller (the turn loop), which isn't installed. But the claim's unit is the drain module itself; \"consume_turn is called only after a clean turn\" is about the intended call discipline, and the bar presumably tests the fail-closed consequence (files remain if consume not called). The missing caller is the installation gap, out of scope.\n- Empty mailbox changes nothing: bar-tested (\"returns ([], '') and creates nothing\"), and the live test had mailbox empty before enqueue, though the explicit empty-mailbox test is in the bar.\n- Corrupt receipt raises with mailbox untouched: bar-tested, passes.\n- Deployment record documents the mechanism and live verification step: the evidence mentions \"deployment/plumbline-conductor/\" contains seat-move-turn.md and seat-move-turn.py per the bar's expectations; the dispatch defect named different files but the Maker created the right ones. Evidence item 6 says the bar reads seat-move-turn.md and seat-move-turn.py and the Maker created them. Does the deployment record document the live verification step? The claim says \"The deployment record documents the mechanism and the live verification step.\" The evidence doesn't explicitly quote the deployment record's content, but the bar passing implies the bar checks whatever it checks — actually the bar is the test file, not the deployment record check. Hmm.\n\nLet me think. The claim includes \"The deployment record documents the mechanism and the live verification step.\" Is there evidence for this? Item 6 mentions deployment/plumbline-conductor/ contains seat-move-turn.md and seat-move-turn.py (the bar reads those). The dispatch defect named seat-move-notice.py and README.md — wrong files. The Maker created seat-move-turn.md and seat-move-turn.py. So the deployment record (seat-move-turn.md presumably) exists. Whether it documents the mechanism and the live verification step — the bar passing suggests the bar may check for documentation content, or the deployment record may be checked separately. The evidence doesn't explicitly state that the deployment record documents the live verification step. But the live verification itself was performed and observed (item 2). The claim's core is the drain unit's behavior; the deployment record documentation is a secondary element.\n\nHmm, but should I require explicit evidence that the deployment record documents the live verification step? The evaluation instruction is: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed.\" That's the two-part criterion. Both are satisfied. The deployment record documentation is part of the claim, but my scoring instruction gives the precise gate. The frozen bar passing in full — if the bar tests the deployment record documentation, then it's covered; if not, it's not scored here (\"Score only what the bar tests\").\n\nActually, let me reconsider: \"Score only what the bar tests\" — so my score should reflect what the frozen bar tests, plus the observed live staging-and-consume. Both gates are met. The documentation of the live verification step in the deployment record: the live verification was performed and its results are recorded in state.db and in this evidence. Whether the deployment record file documents it is a smaller point; the bar passing and the live observation are the gates. I'll note in the observation what I measured.\n\nSo: score 1.\n\nObservation: one sentence describing what I measured. Something like: \"Frozen bar (7 tests OK) and legacy bar (12 OK) pass, and against the real conductor profile a live enqueued notice was staged by prepare_turn (mailbox emptied, single inflight receipt, context string returned) and removed by consume_turn, with the uninstalled turn loop and misdirected dispatch recorded as out-of-scope gaps.\"\n\nThat's one sentence. Good.\n\nWait — one more consideration on the dispatch defect. The dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md, but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files by reading the bar. So the files exist and pass. The dispatch's editable list was wrong. This is a process defect but doesn't affect what the bar tests or the live behavior. It doesn't change the score here.\n\nAlso the limit in item 3: the state.db rows are tool output, not an assistant announcement. The dimension doesn't claim announcement by a turn. The claim is narrowly about the drain unit. So this is disclosed and out of scope.\n\nFinal answer: {\"score\": 1, \"observation\": \"...\"}\n\nLet me write the observation carefully, one sentence, describing what I measured:\n\n\"Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (legacy 12-test bar also OK), and against the real conductor profile a live enqueued notice (ebe0c6a5...) was staged by prepare_turn — mailbox emptied, exactly one inflight receipt, context string returned — and deleted by consume_turn, with fail-closed/corrupt/empty behaviors bar-covered; the absent turn-loop installation and wrong dispatch file list are disclosed as out-of-scope gaps.\"\n\nThat's one sentence (with em dashes and semicolons). Good.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me work through this carefully.\n\nThe dimension is `drain_at_turn_start`. The claim, narrowly stated:\n\n- `kit/seat_move_drain.py` provides `prepare_turn`, which:\n  - recovers any notice stranded in inflight by a failed turn,\n  - drains the mailbox FIFO into inflight,\n  - returns the notices plus a context string.\n- `consume_turn` deletes the staged files and is called only after a clean turn.\n- An empty mailbox changes nothing.\n- A corrupt receipt raises with the mailbox untouched.\n- The deployment record documents the mechanism and the live verification step.\n\nThe dimension explicitly does NOT claim that a running conductor turn invokes the drain.\n\nSo the question: does the evidence show the drain unit behaves as the bar requires, with the missing turn-loop installation explicitly out of scope for this score?\n\nMy instructions as the Plumbline Evaluator: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nLet me check the evidence against these criteria:\n\n1. Frozen bar passes in full: Yes. tests/test_seat_move_notice_drain.py, sha256 frozen 2026-11-08T18:23:54Z, ran 7 tests, OK, exit code 0. Also Job 5's older bar (tests/test_seat_move_notice.py) still passes: 12 tests OK. So the frozen bar passes in full. ✓\n\n2. Live staging-and-consume against the real conductor profile was observed: Yes.\n   - A real notice was enqueued through the shipped path: id ebe0c6a54a4f46978cc2936b284770d5, seat ACCEPTANCE-EVAL, job 2026-11-08-seat-notice-drain-ACCEPTANCE, queued_at timestamp. Mailbox before: empty; after: one receipt file.\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice plus the context string. Mailbox emptied; inflight/ held exactly that one receipt.\n   - consume_turn then deleted it: mailbox [] and inflight absent.\n   - state.db session 20261106_173554_a10444 contains two rows mentioning ACCEPTANCE-EVAL at the right times.\n\nThis is live staging (prepare_turn draining mailbox → inflight) and consume (consume_turn deleting staged files) against the real conductor profile, not a fixture. ✓\n\n3. The limit: the state.db rows are tool output, not an assistant announcement; no running conductor turn calls prepare_turn. But the dimension explicitly does NOT claim that a running conductor turn invokes the drain. So this limit is out of scope for this score. It's disclosed, not omitted — good.\n\n4. Fail-closed behavior per the bar: failed turn never reaches consume_turn, staged files remain in inflight and next prepare_turn recovers them once; corrupt receipt raises before staging; empty mailbox returns ([], '') and creates nothing. These are bar-tested behaviors; the bar passing covers them (assuming the bar tests them, which the claim says it does — the frozen bar is the specification).\n\n5. Control pair: K1 conforms (queued notice stages and consumes cleanly); K2 does_not_conform (no kit/seat_move_drain.py existed pre-work, so no drain). This supports the causal attribution.\n\n6. Disclosed dispatch defect: the dispatch named the wrong editable files; the Maker found the correct files by reading the bar and created them. The work is right; the dispatch was wrong. This is a process gap, not a gap in what this dimension scores. Should it affect the score? My instructions say score only what the bar tests. The dispatch defect doesn't affect whether the bar passes or whether the live staging-and-consume was observed. It's a separate process concern. It doesn't change the score for this dimension.\n\nNow, one thing to scrutinize: \"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\" The missing installation — the launcher being a template in deployment/plumbline-conductor/ rather than an installed script — is explicitly out of scope. The dimension doesn't claim a running turn invokes the drain. So the missing installation is a separate gap, recorded elsewhere, not scored here.\n\nAnother scrutiny point: the live test — was it truly against the real conductor profile? Evidence says \"profile_home=<conductor profile home>\", \"against the real conductor profile, not a fixture\", and the state.db session 20261106_173554_a10444 contains rows from the profile's state. The two rows mention ACCEPTANCE-EVAL at 18:26:14.7 and 18:26:20.99, consistent with the enqueue (queued_at 18:26:14.59) and the prepare/consume sequence. So yes, live verification against the real profile.\n\nIs there anything the claim requires that isn't evidenced?\n\n- prepare_turn recovers stranded inflight: this is bar-tested (fail-closed section says \"the next prepare_turn recovers them once\"). The bar passing covers it. The live test didn't explicitly demonstrate the recovery path (it started with an empty inflight), but the bar tests it and passes. The claim's narrow scope is \"behaves as the bar requires\" — bar passing + live staging/consume is what's required for score 1 per my instructions.\n- consume_turn called only after a clean turn: that's a property of the caller (the turn loop), which isn't installed. But the claim's unit is the drain module itself; \"consume_turn is called only after a clean turn\" is about the intended call discipline, and the bar presumably tests the fail-closed consequence (files remain if consume not called). The missing caller is the installation gap, out of scope.\n- Empty mailbox changes nothing: bar-tested (\"returns ([], '') and creates nothing\"), and the live test had mailbox empty before enqueue, though the explicit empty-mailbox test is in the bar.\n- Corrupt receipt raises with mailbox untouched: bar-tested, passes.\n- Deployment record documents the mechanism and live verification step: the evidence mentions \"deployment/plumbline-conductor/\" contains seat-move-turn.md and seat-move-turn.py per the bar's expectations; the dispatch defect named different files but the Maker created the right ones. Evidence item 6 says the bar reads seat-move-turn.md and seat-move-turn.py and the Maker created them. Does the deployment record document the live verification step? The claim says \"The deployment record documents the mechanism and the live verification step.\" The evidence doesn't explicitly quote the deployment record's content, but the bar passing implies the bar checks whatever it checks — actually the bar is the test file, not the deployment record check. Hmm.\n\nLet me think. The claim includes \"The deployment record documents the mechanism and the live verification step.\" Is there evidence for this? Item 6 mentions deployment/plumbline-conductor/ contains seat-move-turn.md and seat-move-turn.py (the bar reads those). The dispatch defect named seat-move-notice.py and README.md — wrong files. The Maker created seat-move-turn.md and seat-move-turn.py. So the deployment record (seat-move-turn.md presumably) exists. Whether it documents the mechanism and the live verification step — the bar passing suggests the bar may check for documentation content, or the deployment record may be checked separately. The evidence doesn't explicitly state that the deployment record documents the live verification step. But the live verification itself was performed and observed (item 2). The claim's core is the drain unit's behavior; the deployment record documentation is a secondary element.\n\nHmm, but should I require explicit evidence that the deployment record documents the live verification step? The evaluation instruction is: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed.\" That's the two-part criterion. Both are satisfied. The deployment record documentation is part of the claim, but my scoring instruction gives the precise gate. The frozen bar passing in full — if the bar tests the deployment record documentation, then it's covered; if not, it's not scored here (\"Score only what the bar tests\").\n\nActually, let me reconsider: \"Score only what the bar tests\" — so my score should reflect what the frozen bar tests, plus the observed live staging-and-consume. Both gates are met. The documentation of the live verification step in the deployment record: the live verification was performed and its results are recorded in state.db and in this evidence. Whether the deployment record file documents it is a smaller point; the bar passing and the live observation are the gates. I'll note in the observation what I measured.\n\nSo: score 1.\n\nObservation: one sentence describing what I measured. Something like: \"Frozen bar (7 tests OK) and legacy bar (12 OK) pass, and against the real conductor profile a live enqueued notice was staged by prepare_turn (mailbox emptied, single inflight receipt, context string returned) and removed by consume_turn, with the uninstalled turn loop and misdirected dispatch recorded as out-of-scope gaps.\"\n\nThat's one sentence. Good.\n\nWait — one more consideration on the dispatch defect. The dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md, but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files by reading the bar. So the files exist and pass. The dispatch's editable list was wrong. This is a process defect but doesn't affect what the bar tests or the live behavior. It doesn't change the score here.\n\nAlso the limit in item 3: the state.db rows are tool output, not an assistant announcement. The dimension doesn't claim announcement by a turn. The claim is narrowly about the drain unit. So this is disclosed and out of scope.\n\nFinal answer: {\"score\": 1, \"observation\": \"...\"}\n\nLet me write the observation carefully, one sentence, describing what I measured:\n\n\"Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (legacy 12-test bar also OK), and against the real conductor profile a live enqueued notice (ebe0c6a5...) was staged by prepare_turn — mailbox emptied, exactly one inflight receipt, context string returned — and deleted by consume_turn, with fail-closed/corrupt/empty behaviors bar-covered; the absent turn-loop installation and wrong dispatch file list are disclosed as out-of-scope gaps.\"\n\nThat's one sentence (with em dashes and semicolons). Good.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 888,
+        "completion_tokens": 2340,
+        "total_tokens": 3228,
+        "cost": 0.0013032,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0013032,
+          "upstream_inference_prompt_cost": 0.0001332,
+          "upstream_inference_completions_cost": 0.00117
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2205,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 47386
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T18:27:31.106Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1243,
+        "moderation_latency": null,
+        "generation_time": 47386,
+        "tokens_prompt": 886,
+        "tokens_completion": 2762,
+        "native_tokens_prompt": 888,
+        "native_tokens_completion": 2340,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 2205,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.0013032,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794162451-AXVC6jNmjMCXEKKX5Vnq",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794162451-2DiXmxuATgNwKqOLErOx",
+        "upstream_id": "202611090227317aca8baade4f4701",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "202611090227317aca8baade4f4701",
+            "is_byok": false,
+            "latency": 1243,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.0013032,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T18:28:29.231676Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "drain_at_turn_start#p2",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `drain_at_turn_start`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION drain_at_turn_start\n\nCLAIM, narrowly: kit/seat_move_drain.py provides prepare_turn, which recovers any notice stranded in inflight by a failed turn, drains the mailbox FIFO into inflight, and returns the notices plus a context string; consume_turn deletes the staged files and is called only after a clean turn; an empty mailbox changes nothing; a corrupt receipt raises with the mailbox untouched. The deployment record documents the mechanism and the live verification step.\n\nThis dimension does NOT claim that a running conductor turn invokes the drain. It does not.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_seat_move_notice_drain.py (sha256 e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa, frozen 2026-11-08T18:23:54Z) passes: Ran 7 tests, OK, exit code 0. Job 5's bar (tests/test_seat_move_notice.py) also still passes, Ran 12 OK.\n\n2. LIVE STAGING AND CONSUME, against the real conductor profile, not a fixture:\n   - enqueued one real notice through the shipped path: id ebe0c6a54a4f46978cc2936b284770d5, seat ACCEPTANCE-EVAL, job 2026-11-08-seat-notice-drain-ACCEPTANCE, queued_at 2026-11-08T18:26:14.593954+00:00. Mailbox before: empty. After: one receipt file.\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice and the context string 'Seat-move notices awaiting announcement: - to_seat: seat ACCEPTANCE-EVAL, job ..., notice ebe0c6a5...'. The mailbox emptied and inflight/ then held exactly that one receipt.\n   - consume_turn(profile_home=...) then deleted it: mailbox [] and inflight absent.\n   - state.db session 20261106_173554_a10444 contains two rows mentioning ACCEPTANCE-EVAL at 18:26:14.7 and 18:26:20.99.\n\n3. THE LIMIT, stated and not omitted: both of those state.db rows are role=tool output from the Orchestrator's own scripts, not an assistant message announcing a seat move. The notice is present in the session because the turn's tool traffic carried it; no turn was designed to announce it. No running conductor turn calls prepare_turn - the launcher is a template in deployment/plumbline-conductor/, not an installed script.\n\n4. Fail-closed per the bar: a failed turn never reaches consume_turn, so staged files remain in inflight and the next prepare_turn recovers them once; a corrupt receipt raises before staging so it is neither replayed nor dropped; an empty mailbox returns ([], '') and creates nothing.\n\n5. Control pair: K1 conforms - a queued notice stages and consumes cleanly; K2 does_not_conform - the pre-work tree had no kit/seat_move_drain.py at all, so no drain existed.\n\n6. Disclosed dispatch defect: the Orchestrator's dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md, but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker found the correct files by reading the bar and created them. The dispatch's editable list was wrong; the work is right.\n\nDecide: does the evidence show the drain unit behaves as the bar requires, with the missing turn-loop installation explicitly out of scope for this score?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T18:28:29.414344Z",
+    "received_at": "2026-11-08T18:29:04.887805Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 18:28:30 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=1333",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794162509-vVrSnFz2gTNAQBYuCZpw",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;e27fff22-c34f-474a-896f-4de6a01f251f",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a576a3442fc4fc7c-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794162509-vVrSnFz2gTNAQBYuCZpw",
+      "object": "chat.completion",
+      "created": 1794162509,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"Measured the frozen bar test_seat_move_notice_drain.py passing in full (7/7, exit 0, with Job 5's 12-test bar also green) and observed live staging-and-consume against the real conductor profile: a shipped-path-enqueued notice (ebe0c6a5..., 2026-11-08T18:26:14Z) was returned by prepare_turn with its context string, moved mailbox→inflight, then deleted by consume_turn, corroborated by two state.db rows at 18:26:14/18:26:20; the absent turn-loop installation and the dispatch's wrong editable-list are separate gaps outside what this bar and this score test.\"}",
+            "refusal": null,
+            "reasoning": "Let me carefully analyze this evaluation task.\n\nThe dimension is `drain_at_turn_start`. The claim is narrow:\n1. kit/seat_move_drain.py provides prepare_turn, which:\n   - recovers any notice stranded in inflight by a failed turn\n   - drains the mailbox FIFO into inflight\n   - returns the notices plus a context string\n2. consume_turn deletes the staged files and is called only after a clean turn\n3. an empty mailbox changes nothing\n4. a corrupt receipt raises with the mailbox untouched\n5. The deployment record documents the mechanism and the live verification step\n\nImportantly, the dimension does NOT claim that a running conductor turn invokes the drain.\n\nThe scoring rule: Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\n\nLet me check the evidence:\n\n1. Frozen bar tests/test_seat_move_notice_drain.py (sha256 given, frozen 2026-11-08T18:23:54Z) passes: Ran 7 tests, OK, exit code 0. Job 5's bar also still passes (Ran 12 OK). ✓ Frozen bar passes in full.\n\n2. Live staging and consume against the real conductor profile:\n   - Real notice enqueued through shipped path: id given, seat, job, queued_at. Mailbox before empty, after one receipt file. ✓ staging real\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice plus context string. Mailbox emptied, inflight/ held exactly one receipt. ✓ drain works live\n   - consume_turn(profile_home=...) deleted it: mailbox [] and inflight absent. ✓ consume works live\n   - state.db session contains two rows mentioning ACCEPTANCE-EVAL at those times. ✓ evidence of live execution\n\n3. The limit: rows are tool output, not an assistant announcement; no running turn calls prepare_turn — launcher is a template, not installed. But this is explicitly out of scope per the dimension claim (\"This dimension does NOT claim that a running conductor turn invokes the drain\") and per the scoring instruction (\"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here\").\n\n4. Fail-closed per the bar: covered by the bar tests (7 tests presumably include recovery of inflight stranded notices, corrupt receipt raising, empty mailbox). The bar passing covers these. Also stated in evidence.\n\n5. Control pair: K1 conforms, K2 does not (no kit file at all in pre-work tree). ✓\n\n6. Disclosed dispatch defect: the dispatch named wrong files (seat-move-notice.py and README.md) but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files. The work is right; the dispatch's editable list was wrong. Does this affect the score? The scoring is on the bar passing and live verification. The dispatch defect is a process gap, not a failure of the dimension's claim. The deployment record — wait, the claim says \"The deployment record documents the mechanism and the live verification step.\" Is there evidence of this? Evidence item 6 mentions README.md was named in dispatch but the bar reads seat-move-turn.md. Hmm. The deployment record: does the evidence show it documents the mechanism and live verification step? The evidence doesn't explicitly state the deployment record's content. But the bar is frozen and tests the code behavior; the deployment record documentation is part of the claim but the scoring rule says \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed.\" That's the two-part criterion. The deployment record documentation presumably is tested by the bar (bars in this kind of setup often check documentation existence) — the bar reads seat-move-turn.md and seat-move-turn.py, which suggests the bar checks the markdown doc. Since the bar passes (7 tests OK), and the bar reads seat-move-turn.md, presumably the doc requirement is covered by the bar.\n\nThe scoring rule is explicit: Score 1 only if (a) frozen bar passes in full AND (b) live staging-and-consume against the real conductor profile was observed. Both are satisfied:\n\n(a) Ran 7 tests, OK, exit code 0 — frozen bar passes in full. Also Job 5's bar still passes (12 OK), so no regression.\n\n(b) Live staging-and-consume observed: real notice enqueued through shipped path with concrete id/timestamp, prepare_turn returned it with context string, mailbox emptied, inflight held it, consume_turn deleted it, state.db rows corroborate. This is against the real conductor profile (profile_home=<conductor profile home>), not a fixture.\n\nThe limits (item 3) — the notice isn't announced by an assistant turn, launcher not installed — are explicitly out of scope: \"This dimension does NOT claim that a running conductor turn invokes the drain. It does not.\" And the instruction: \"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nThe dispatch defect (item 6): the editable list was wrong, but the Maker read the bar and created the right files. The work is right. The dispatch defect is a separate process gap; it doesn't invalidate the bar passing or the live verification. Could one argue the dispatch defect undermines confidence that the deliverable is what the bar tests? The bar has a frozen sha256; the files the bar reads are seat-move-turn.md and seat-move-turn.py; the Maker created those. The dispatch naming README.md doesn't change what the bar tests. The live verification was done against the real conductor profile with the shipped enqueue path. So the score stands at 1.\n\nWait — one thing to double-check: the claim says kit/seat_move_drain.py provides prepare_turn. Evidence item 5 says K2 (pre-work tree) had no kit/seat_move_drain.py at all, so no drain existed — implying the post-work tree has kit/seat_move_drain.py (K1 conforms). Evidence item 2 says prepare_turn and consume_turn were called with profile_home — the module exists and functions. The bar tests the module. Good.\n\nAlso \"consume_turn ... is called only after a clean turn\" — in the live test, consume_turn was called after prepare_turn succeeded (clean turn simulation). The bar presumably tests the fail-closed path (failed turn never reaches consume_turn). Evidence item 4 states fail-closed per the bar. Good.\n\n\"an empty mailbox changes nothing\" — bar covers; evidence item 4 says empty mailbox returns ([], '') and creates nothing.\n\n\"a corrupt receipt raises with the mailbox untouched\" — bar covers; evidence item 4 says corrupt receipt raises before staging so neither replayed nor dropped.\n\nSo the answer: score 1, with observation describing what was measured.\n\nThe observation should be one sentence: what I measured. Something like: \"Frozen bar test_seat_move_notice_drain.py passed 7/7 (and Job 5's bar 12/12), and a live end-to-end against the real conductor profile showed a shipped-path enqueued notice (ebe0c6a5...) staged by prepare_turn into inflight with context string, removed by consume_turn, corroborated by state.db rows; the uninstalled turn-loop launcher is out of scope for this dimension and recorded as a separate gap.\"\n\nThat's one sentence. Keep it concise but complete.\n\nFormat: single JSON object, nothing else. {\"score\": 1, \"observation\": \"...\"}\n\nLet me make sure the observation is one sentence — can use semicolons.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me carefully analyze this evaluation task.\n\nThe dimension is `drain_at_turn_start`. The claim is narrow:\n1. kit/seat_move_drain.py provides prepare_turn, which:\n   - recovers any notice stranded in inflight by a failed turn\n   - drains the mailbox FIFO into inflight\n   - returns the notices plus a context string\n2. consume_turn deletes the staged files and is called only after a clean turn\n3. an empty mailbox changes nothing\n4. a corrupt receipt raises with the mailbox untouched\n5. The deployment record documents the mechanism and the live verification step\n\nImportantly, the dimension does NOT claim that a running conductor turn invokes the drain.\n\nThe scoring rule: Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\n\nLet me check the evidence:\n\n1. Frozen bar tests/test_seat_move_notice_drain.py (sha256 given, frozen 2026-11-08T18:23:54Z) passes: Ran 7 tests, OK, exit code 0. Job 5's bar also still passes (Ran 12 OK). ✓ Frozen bar passes in full.\n\n2. Live staging and consume against the real conductor profile:\n   - Real notice enqueued through shipped path: id given, seat, job, queued_at. Mailbox before empty, after one receipt file. ✓ staging real\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice plus context string. Mailbox emptied, inflight/ held exactly one receipt. ✓ drain works live\n   - consume_turn(profile_home=...) deleted it: mailbox [] and inflight absent. ✓ consume works live\n   - state.db session contains two rows mentioning ACCEPTANCE-EVAL at those times. ✓ evidence of live execution\n\n3. The limit: rows are tool output, not an assistant announcement; no running turn calls prepare_turn — launcher is a template, not installed. But this is explicitly out of scope per the dimension claim (\"This dimension does NOT claim that a running conductor turn invokes the drain\") and per the scoring instruction (\"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here\").\n\n4. Fail-closed per the bar: covered by the bar tests (7 tests presumably include recovery of inflight stranded notices, corrupt receipt raising, empty mailbox). The bar passing covers these. Also stated in evidence.\n\n5. Control pair: K1 conforms, K2 does not (no kit file at all in pre-work tree). ✓\n\n6. Disclosed dispatch defect: the dispatch named wrong files (seat-move-notice.py and README.md) but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files. The work is right; the dispatch's editable list was wrong. Does this affect the score? The scoring is on the bar passing and live verification. The dispatch defect is a process gap, not a failure of the dimension's claim. The deployment record — wait, the claim says \"The deployment record documents the mechanism and the live verification step.\" Is there evidence of this? Evidence item 6 mentions README.md was named in dispatch but the bar reads seat-move-turn.md. Hmm. The deployment record: does the evidence show it documents the mechanism and live verification step? The evidence doesn't explicitly state the deployment record's content. But the bar is frozen and tests the code behavior; the deployment record documentation is part of the claim but the scoring rule says \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed.\" That's the two-part criterion. The deployment record documentation presumably is tested by the bar (bars in this kind of setup often check documentation existence) — the bar reads seat-move-turn.md and seat-move-turn.py, which suggests the bar checks the markdown doc. Since the bar passes (7 tests OK), and the bar reads seat-move-turn.md, presumably the doc requirement is covered by the bar.\n\nThe scoring rule is explicit: Score 1 only if (a) frozen bar passes in full AND (b) live staging-and-consume against the real conductor profile was observed. Both are satisfied:\n\n(a) Ran 7 tests, OK, exit code 0 — frozen bar passes in full. Also Job 5's bar still passes (12 OK), so no regression.\n\n(b) Live staging-and-consume observed: real notice enqueued through shipped path with concrete id/timestamp, prepare_turn returned it with context string, mailbox emptied, inflight held it, consume_turn deleted it, state.db rows corroborate. This is against the real conductor profile (profile_home=<conductor profile home>), not a fixture.\n\nThe limits (item 3) — the notice isn't announced by an assistant turn, launcher not installed — are explicitly out of scope: \"This dimension does NOT claim that a running conductor turn invokes the drain. It does not.\" And the instruction: \"Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nThe dispatch defect (item 6): the editable list was wrong, but the Maker read the bar and created the right files. The work is right. The dispatch defect is a separate process gap; it doesn't invalidate the bar passing or the live verification. Could one argue the dispatch defect undermines confidence that the deliverable is what the bar tests? The bar has a frozen sha256; the files the bar reads are seat-move-turn.md and seat-move-turn.py; the Maker created those. The dispatch naming README.md doesn't change what the bar tests. The live verification was done against the real conductor profile with the shipped enqueue path. So the score stands at 1.\n\nWait — one thing to double-check: the claim says kit/seat_move_drain.py provides prepare_turn. Evidence item 5 says K2 (pre-work tree) had no kit/seat_move_drain.py at all, so no drain existed — implying the post-work tree has kit/seat_move_drain.py (K1 conforms). Evidence item 2 says prepare_turn and consume_turn were called with profile_home — the module exists and functions. The bar tests the module. Good.\n\nAlso \"consume_turn ... is called only after a clean turn\" — in the live test, consume_turn was called after prepare_turn succeeded (clean turn simulation). The bar presumably tests the fail-closed path (failed turn never reaches consume_turn). Evidence item 4 states fail-closed per the bar. Good.\n\n\"an empty mailbox changes nothing\" — bar covers; evidence item 4 says empty mailbox returns ([], '') and creates nothing.\n\n\"a corrupt receipt raises with the mailbox untouched\" — bar covers; evidence item 4 says corrupt receipt raises before staging so neither replayed nor dropped.\n\nSo the answer: score 1, with observation describing what was measured.\n\nThe observation should be one sentence: what I measured. Something like: \"Frozen bar test_seat_move_notice_drain.py passed 7/7 (and Job 5's bar 12/12), and a live end-to-end against the real conductor profile showed a shipped-path enqueued notice (ebe0c6a5...) staged by prepare_turn into inflight with context string, removed by consume_turn, corroborated by state.db rows; the uninstalled turn-loop launcher is out of scope for this dimension and recorded as a separate gap.\"\n\nThat's one sentence. Keep it concise but complete.\n\nFormat: single JSON object, nothing else. {\"score\": 1, \"observation\": \"...\"}\n\nLet me make sure the observation is one sentence — can use semicolons.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 888,
+        "completion_tokens": 1751,
+        "total_tokens": 2639,
+        "cost": 0.0010087,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0010087,
+          "upstream_inference_prompt_cost": 0.0001332,
+          "upstream_inference_completions_cost": 0.0008755
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1594,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 35299
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T18:28:29.475Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1191,
+        "moderation_latency": null,
+        "generation_time": 35299,
+        "tokens_prompt": 886,
+        "tokens_completion": 2018,
+        "native_tokens_prompt": 888,
+        "native_tokens_completion": 1751,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1594,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.0010087,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794162509-1QD8zCUPLUwh9yfz7pF0",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794162509-vVrSnFz2gTNAQBYuCZpw",
+        "upstream_id": "202611090228303ead68dbabd84285",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "202611090228303ead68dbabd84285",
+            "is_byok": false,
+            "latency": 1191,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.0010087,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T18:29:15.601819Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "drain_at_turn_start#p3",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `drain_at_turn_start`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION drain_at_turn_start\n\nCLAIM, narrowly: kit/seat_move_drain.py provides prepare_turn, which recovers any notice stranded in inflight by a failed turn, drains the mailbox FIFO into inflight, and returns the notices plus a context string; consume_turn deletes the staged files and is called only after a clean turn; an empty mailbox changes nothing; a corrupt receipt raises with the mailbox untouched. The deployment record documents the mechanism and the live verification step.\n\nThis dimension does NOT claim that a running conductor turn invokes the drain. It does not.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_seat_move_notice_drain.py (sha256 e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa, frozen 2026-11-08T18:23:54Z) passes: Ran 7 tests, OK, exit code 0. Job 5's bar (tests/test_seat_move_notice.py) also still passes, Ran 12 OK.\n\n2. LIVE STAGING AND CONSUME, against the real conductor profile, not a fixture:\n   - enqueued one real notice through the shipped path: id ebe0c6a54a4f46978cc2936b284770d5, seat ACCEPTANCE-EVAL, job 2026-11-08-seat-notice-drain-ACCEPTANCE, queued_at 2026-11-08T18:26:14.593954+00:00. Mailbox before: empty. After: one receipt file.\n   - prepare_turn(profile_home=<conductor profile home>) returned that notice and the context string 'Seat-move notices awaiting announcement: - to_seat: seat ACCEPTANCE-EVAL, job ..., notice ebe0c6a5...'. The mailbox emptied and inflight/ then held exactly that one receipt.\n   - consume_turn(profile_home=...) then deleted it: mailbox [] and inflight absent.\n   - state.db session 20261106_173554_a10444 contains two rows mentioning ACCEPTANCE-EVAL at 18:26:14.7 and 18:26:20.99.\n\n3. THE LIMIT, stated and not omitted: both of those state.db rows are role=tool output from the Orchestrator's own scripts, not an assistant message announcing a seat move. The notice is present in the session because the turn's tool traffic carried it; no turn was designed to announce it. No running conductor turn calls prepare_turn - the launcher is a template in deployment/plumbline-conductor/, not an installed script.\n\n4. Fail-closed per the bar: a failed turn never reaches consume_turn, so staged files remain in inflight and the next prepare_turn recovers them once; a corrupt receipt raises before staging so it is neither replayed nor dropped; an empty mailbox returns ([], '') and creates nothing.\n\n5. Control pair: K1 conforms - a queued notice stages and consumes cleanly; K2 does_not_conform - the pre-work tree had no kit/seat_move_drain.py at all, so no drain existed.\n\n6. Disclosed dispatch defect: the Orchestrator's dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md, but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker found the correct files by reading the bar and created them. The dispatch's editable list was wrong; the work is right.\n\nDecide: does the evidence show the drain unit behaves as the bar requires, with the missing turn-loop installation explicitly out of scope for this score?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T18:29:15.784790Z",
+    "received_at": "2026-11-08T18:29:45.872407Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 18:29:17 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=3,cfOrigin;dur=0,cfWorker;dur=1480",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794162555-J5j85a5VKtni6o1hkdzf",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;e27fff22-c34f-474a-896f-4de6a01f251f",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a576a465fc2728b0-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794162555-J5j85a5VKtni6o1hkdzf",
+      "object": "chat.completion",
+      "created": 1794162555,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar tests/test_seat_move_notice_drain.py (sha256 e143f8b6..., frozen 2026-11-08T18:23:54Z) passes in full (7 tests OK, exit 0, with Job 5's 12-test bar unregressed), and live staging-and-consume was observed against the real conductor profile: a notice enqueued via the shipped path (ebe0c6a54a4f46978cc2936b284770d5) was returned by prepare_turn with its context string, moved from mailbox to inflight/, then deleted by consume_turn, while the uninstalled turn-loop launcher and tool-output-only state.db rows are explicitly out of scope for this dimension.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this carefully.\n\nThe dimension is `drain_at_turn_start`. The claim is narrow:\n- kit/seat_move_drain.py provides prepare_turn, which:\n  - recovers any notice stranded in inflight by a failed turn\n  - drains the mailbox FIFO into inflight\n  - returns the notices plus a context string\n- consume_turn deletes the staged files and is called only after a clean turn\n- an empty mailbox changes nothing\n- a corrupt receipt raises with the mailbox untouched\n- The deployment record documents the mechanism and the live verification step\n\nThe dimension explicitly does NOT claim that a running conductor turn invokes the drain.\n\nEvidence assessment:\n\n1. Frozen bar passes: tests/test_seat_move_notice_drain.py, sha256 given, frozen 2026-11-08T18:23:54Z, Ran 7 tests OK, exit 0. Also Job 5's bar still passes (12 tests OK). Good.\n\n2. Live staging and consume against the real conductor profile:\n   - Real notice enqueued through shipped path with id, seat, job, queued_at. Mailbox before empty, after one receipt file.\n   - prepare_turn(profile_home=...) returned that notice and context string. Mailbox emptied, inflight held exactly one receipt.\n   - consume_turn(profile_home=...) deleted it: mailbox empty, inflight absent.\n   - state.db session rows confirm activity at the right timestamps.\n\n3. The limit: those state.db rows are tool output, not an assistant announcement. No running conductor turn calls prepare_turn - the launcher is a template, not installed. This is explicitly out of scope per the dimension definition.\n\n4. Fail-closed behavior per the bar: failed turn never reaches consume_turn so staged files remain in inflight and next prepare_turn recovers them; corrupt receipt raises before staging; empty mailbox returns ([], '') and creates nothing.\n\n5. Control pair: K1 conforms, K2 (pre-work) doesn't.\n\n6. Disclosed dispatch defect: dispatch named wrong files but Maker found correct files via reading the bar. The work is right.\n\nNow, the scoring instruction: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nCheck:\n- Frozen bar passes in full: Yes - 7 tests OK, exit 0, with sha256 and freeze timestamp. Also Job 5's bar passes (12 tests), so no regression.\n- Live staging-and-consume against the real conductor profile observed: Yes - real notice enqueued via shipped path, prepare_turn staged it into inflight and returned it plus context string, consume_turn deleted it. This was against the real conductor profile home, not a fixture.\n\nThe missing turn-loop installation is explicitly out of scope: \"This dimension does NOT claim that a running conductor turn invokes the drain. It does not.\" And the scoring instruction reiterates: \"the missing installation is recorded as a separate gap, not scored here.\"\n\nThe dispatch defect (item 6) is about the editable list being wrong, but the actual work files match the bar's expectations - the bar reads seat-move-turn.md and seat-move-turn.py and those pass. The work is right; the dispatch naming is a process defect, not a defect in the drain unit behavior. Does the claim require the dispatch to be correct? The claim is about kit/seat_move_drain.py's behavior and the deployment record documenting mechanism and live verification. The dispatch defect doesn't touch the claim.\n\nWait - one thing to check: the claim says \"kit/seat_move_drain.py provides prepare_turn\" but evidence item 6 says the dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md while the bar reads seat-move-turn.md and seat-move-turn.py. Hmm, this is about the deployment record files, not the kit module. The bar reads seat-move-turn.md and seat-move-turn.py - and the bar passes, so those files exist and satisfy the bar. The kit module kit/seat_move_drain.py - the bar tests it (7 tests) and passes, so it exists and behaves.\n\nThe claim's elements:\n- prepare_turn recovers stranded inflight notices: tested by bar (fail-closed behavior, item 4: \"a failed turn never reaches consume_turn, so staged files remain in inflight and the next prepare_turn recovers them once\") - bar passes, so covered.\n- drains mailbox FIFO into inflight and returns notices plus context string: both bar-tested and live-observed.\n- consume_turn deletes staged files, called only after clean turn: bar-tested; live-observed deletion.\n- empty mailbox changes nothing: bar-tested (returns ([], '') and creates nothing).\n- corrupt receipt raises with mailbox untouched: bar-tested (raises before staging, neither replayed nor dropped).\n- deployment record documents mechanism and live verification: the bar reads seat-move-turn.md and seat-move-turn.py and passes, implying the deployment record files exist and satisfy the bar's documentation requirements. Actually, I should be careful - does the bar verify documentation content? Item 6 says the bar reads seat-move-turn.md and seat-move-turn.py, so yes, the bar includes the deployment record files in its checks, and the bar passes.\n\nHmm, but wait: the claim says the deployment record is \"deployment/plumbline-conductor/\" presumably. The dispatch defect says the dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files. So seat-move-turn.md (the deployment record) exists and the bar passes reading it. Good.\n\nEverything the bar tests passes, and the live verification was observed against the real profile. The limits (state.db rows are tool output, no installed launcher) are explicitly out of scope for this dimension.\n\nSo score = 1.\n\nThe observation should be one sentence summarizing what was measured: frozen bar 7/7 pass, live prepare_turn staged a real enqueued notice into inflight and consume_turn deleted it against the real conductor profile; the missing turn-loop installation is out of scope for this dimension.\n\nLet me craft the observation: \"The frozen bar (tests/test_seat_move_notice_drain.py, 7 tests OK) passes and live verification against the real conductor profile showed prepare_turn staging a shipped-path-enqueued notice (ebe0c6a5...) into inflight with its context string and consume_turn deleting it, so the drain unit meets the bar; the absent turn-loop invocation is out of scope for this dimension.\"\n\nOne sentence, that's fine.\n\nOutput must be a single JSON object and nothing else.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this carefully.\n\nThe dimension is `drain_at_turn_start`. The claim is narrow:\n- kit/seat_move_drain.py provides prepare_turn, which:\n  - recovers any notice stranded in inflight by a failed turn\n  - drains the mailbox FIFO into inflight\n  - returns the notices plus a context string\n- consume_turn deletes the staged files and is called only after a clean turn\n- an empty mailbox changes nothing\n- a corrupt receipt raises with the mailbox untouched\n- The deployment record documents the mechanism and the live verification step\n\nThe dimension explicitly does NOT claim that a running conductor turn invokes the drain.\n\nEvidence assessment:\n\n1. Frozen bar passes: tests/test_seat_move_notice_drain.py, sha256 given, frozen 2026-11-08T18:23:54Z, Ran 7 tests OK, exit 0. Also Job 5's bar still passes (12 tests OK). Good.\n\n2. Live staging and consume against the real conductor profile:\n   - Real notice enqueued through shipped path with id, seat, job, queued_at. Mailbox before empty, after one receipt file.\n   - prepare_turn(profile_home=...) returned that notice and context string. Mailbox emptied, inflight held exactly one receipt.\n   - consume_turn(profile_home=...) deleted it: mailbox empty, inflight absent.\n   - state.db session rows confirm activity at the right timestamps.\n\n3. The limit: those state.db rows are tool output, not an assistant announcement. No running conductor turn calls prepare_turn - the launcher is a template, not installed. This is explicitly out of scope per the dimension definition.\n\n4. Fail-closed behavior per the bar: failed turn never reaches consume_turn so staged files remain in inflight and next prepare_turn recovers them; corrupt receipt raises before staging; empty mailbox returns ([], '') and creates nothing.\n\n5. Control pair: K1 conforms, K2 (pre-work) doesn't.\n\n6. Disclosed dispatch defect: dispatch named wrong files but Maker found correct files via reading the bar. The work is right.\n\nNow, the scoring instruction: \"Score 1 only if the frozen bar passes in full AND the live staging-and-consume against the real conductor profile was observed. Score only what the bar tests; the missing installation is recorded as a separate gap, not scored here.\"\n\nCheck:\n- Frozen bar passes in full: Yes - 7 tests OK, exit 0, with sha256 and freeze timestamp. Also Job 5's bar passes (12 tests), so no regression.\n- Live staging-and-consume against the real conductor profile observed: Yes - real notice enqueued via shipped path, prepare_turn staged it into inflight and returned it plus context string, consume_turn deleted it. This was against the real conductor profile home, not a fixture.\n\nThe missing turn-loop installation is explicitly out of scope: \"This dimension does NOT claim that a running conductor turn invokes the drain. It does not.\" And the scoring instruction reiterates: \"the missing installation is recorded as a separate gap, not scored here.\"\n\nThe dispatch defect (item 6) is about the editable list being wrong, but the actual work files match the bar's expectations - the bar reads seat-move-turn.md and seat-move-turn.py and those pass. The work is right; the dispatch naming is a process defect, not a defect in the drain unit behavior. Does the claim require the dispatch to be correct? The claim is about kit/seat_move_drain.py's behavior and the deployment record documenting mechanism and live verification. The dispatch defect doesn't touch the claim.\n\nWait - one thing to check: the claim says \"kit/seat_move_drain.py provides prepare_turn\" but evidence item 6 says the dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md while the bar reads seat-move-turn.md and seat-move-turn.py. Hmm, this is about the deployment record files, not the kit module. The bar reads seat-move-turn.md and seat-move-turn.py - and the bar passes, so those files exist and satisfy the bar. The kit module kit/seat_move_drain.py - the bar tests it (7 tests) and passes, so it exists and behaves.\n\nThe claim's elements:\n- prepare_turn recovers stranded inflight notices: tested by bar (fail-closed behavior, item 4: \"a failed turn never reaches consume_turn, so staged files remain in inflight and the next prepare_turn recovers them once\") - bar passes, so covered.\n- drains mailbox FIFO into inflight and returns notices plus context string: both bar-tested and live-observed.\n- consume_turn deletes staged files, called only after clean turn: bar-tested; live-observed deletion.\n- empty mailbox changes nothing: bar-tested (returns ([], '') and creates nothing).\n- corrupt receipt raises with mailbox untouched: bar-tested (raises before staging, neither replayed nor dropped).\n- deployment record documents mechanism and live verification: the bar reads seat-move-turn.md and seat-move-turn.py and passes, implying the deployment record files exist and satisfy the bar's documentation requirements. Actually, I should be careful - does the bar verify documentation content? Item 6 says the bar reads seat-move-turn.md and seat-move-turn.py, so yes, the bar includes the deployment record files in its checks, and the bar passes.\n\nHmm, but wait: the claim says the deployment record is \"deployment/plumbline-conductor/\" presumably. The dispatch defect says the dispatch named deployment/plumbline-conductor/seat-move-notice.py and README.md but the bar reads seat-move-turn.md and seat-move-turn.py. The Maker created the correct files. So seat-move-turn.md (the deployment record) exists and the bar passes reading it. Good.\n\nEverything the bar tests passes, and the live verification was observed against the real profile. The limits (state.db rows are tool output, no installed launcher) are explicitly out of scope for this dimension.\n\nSo score = 1.\n\nThe observation should be one sentence summarizing what was measured: frozen bar 7/7 pass, live prepare_turn staged a real enqueued notice into inflight and consume_turn deleted it against the real conductor profile; the missing turn-loop installation is out of scope for this dimension.\n\nLet me craft the observation: \"The frozen bar (tests/test_seat_move_notice_drain.py, 7 tests OK) passes and live verification against the real conductor profile showed prepare_turn staging a shipped-path-enqueued notice (ebe0c6a5...) into inflight with its context string and consume_turn deleting it, so the drain unit meets the bar; the absent turn-loop invocation is out of scope for this dimension.\"\n\nOne sentence, that's fine.\n\nOutput must be a single JSON object and nothing else.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 888,
+        "completion_tokens": 1561,
+        "total_tokens": 2449,
+        "cost": 0.0009137,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0009137,
+          "upstream_inference_prompt_cost": 0.0001332,
+          "upstream_inference_completions_cost": 0.0007805
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1393,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 29987
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T18:29:15.838Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1427,
+        "moderation_latency": null,
+        "generation_time": 29987,
+        "tokens_prompt": 886,
+        "tokens_completion": 1800,
+        "native_tokens_prompt": 888,
+        "native_tokens_completion": 1561,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1393,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.0009137,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794162555-8Bb0boLw0p6gWtlpTJik",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794162555-J5j85a5VKtni6o1hkdzf",
+        "upstream_id": "2026110902291679e801c934c74d74",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "2026110902291679e801c934c74d74",
+            "is_byok": false,
+            "latency": 1427,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.0009137,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T18:29:56.517371Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  }
+]

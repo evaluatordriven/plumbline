@@ -1,0 +1,150 @@
+{
+  "job_id": "2026-11-08-evaluator-harness-log",
+  "job_name": "a model evaluator's turn writes a harness log, and the record takes its check times from that log",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "size": "M",
+  "artifact": {
+    "repo": "plumbline",
+    "paths": [
+      "kit/emit_custody.py",
+      "kit/evaluator_harness_log.py"
+    ]
+  },
+  "base": {
+    "ref": "f5e5434",
+    "branch": "feat/evaluator-harness-log"
+  },
+  "seats": {
+    "statement": "One party, Steve Moitozo II, holds three seats on this job: Owner, Specialist and Buyer (Contracts \u00a74, one party may hold several, recorded as such). The Owner's words: \"it's not a role merge, it's a multiple hat situation. I am Owner, Specialist, and Buyer.\"",
+    "owner": "Steve Moitozo II",
+    "buyer": "Steve Moitozo II",
+    "specialist": "Steve Moitozo II",
+    "holder_count": 1
+  },
+  "buyer": "Steve Moitozo II",
+  "specialist": "Steve Moitozo II",
+  "human_seat": "Steve Moitozo II",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "maker": {
+    "name": "plumbline-maker",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+    "handoff": "rule12"
+  },
+  "evaluator": {
+    "name": "plumbline-eval",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "openrouter",
+    "runs": 3
+  },
+  "standard_ref": {
+    "doc": "tests/test_evaluator_harness_log.py",
+    "version": "46159f05"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "a48a4645"
+  },
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "budget": {
+      "amount": 8,
+      "unit": "USD",
+      "time_hours_lt": 2
+    }
+  },
+  "k": 4,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "tests/test_evaluator_harness_log.py",
+      "version": "46159f05",
+      "hardness": "INVARIANT",
+      "note": "the frozen bar is the ground truth: 12 checks over the harness log and the record that reads it"
+    }
+  ],
+  "escalation": {
+    "route": "Owner"
+  },
+  "proposed": {
+    "level_claimed_for_own_record": "CL1",
+    "drafted_by": "plumbline-conductor (Orchestrator), from the Architect's bar"
+  },
+  "bar": {
+    "file": "tests/test_evaluator_harness_log.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "frozenAt": "2026-11-08T22:22:10Z",
+    "dimensions": [
+      {
+        "id": "evaluator_harness_log",
+        "criterion": "an evaluator call writes a harness log entry per call with sent/received times, model and endpoint; the custody record takes its check times from that log and names it; a missing, reversed, partial or unparseable log refuses rather than noting; a deterministic checker with no log is not refused",
+        "scale": {
+          "type": "pass_fail",
+          "threshold": 1
+        }
+      }
+    ],
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T22:22:10Z",
+        "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T22:22:10Z",
+        "barDigest": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5"
+      }
+    ]
+  },
+  "disposition_state": "not_yet_given",
+  "read": [
+    "tests/test_evaluator_harness_log.py"
+  ],
+  "editable": [
+    "kit/emit_custody.py",
+    "kit/evaluator_harness_log.py"
+  ],
+  "deployment_step": {
+    "declared": true,
+    "files_outside_the_worktree": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "performed_by": "the Orchestrator or the Owner's agent, not the Maker",
+    "note": "the profile route cannot be reached by the Maker (run-aider refuses absolute paths). The Maker builds the in-repo module; the route wiring is a deployment step recorded separately."
+  },
+  "frozen": [
+    "tests/test_evaluator_harness_log.py",
+    "kit/conductor_loop.py",
+    "kit/emit_packet.py",
+    "kit/custody_history.py",
+    "kit/custody_ledger.py",
+    "tools/edi/or_call.py",
+    "schemas/instance-extensions.json",
+    "tools/pin.json"
+  ],
+  "terminal_state": "needs_owner",
+  "outcome": "needs_owner"
+}

@@ -1,0 +1,10 @@
+[
+  {
+    "role": "system",
+    "content": "You are the Plumbline Evaluator for dimension `fixture_pin_reproduced`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names."
+  },
+  {
+    "role": "user",
+    "content": "DIMENSION fixture_pin_reproduced\n\nCLAIM: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59) passed: `python3 tests/test_job1_fixture_pin.py` -> Ran 4 tests, OK, exit 0, run from the worktree root /home/jarbis1/tmp/plumbline-fixtures. Before the work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names.\n\n3. The diff is 3 insertions and 1 deletion across exactly the two editable files: _job() in test_loop_custody_on_finish.py writes custody/bar.md; _prepare() in test_loop_custody_sources.py does the same and PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; the bar file itself is untouched; no kit/ or schemas/ file was modified.\n\n4. All four suites pass on this tree: test_loop_custody_sources OK, test_loop_custody_on_finish OK, test_conductor_loop OK, test_loop_started_at OK.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after the change; the fixture bars are preparation for the later job that lands the freeze, not a repair of a red on this base.\n\nDecide: does the evidence show the fixture pin was reproduced as the bar requires?"
+  }
+]

@@ -1,0 +1,24 @@
+You are dispatched by the Orchestrator. This is not a chat.
+
+Findings: /home/jarbis1/tmp/plumbline-escalate-record/findings-01.json
+Work tree: /home/jarbis1/tmp/plumbline-escalate
+Cost file: /home/jarbis1/tmp/plumbline-escalate-record/cost-01-maker.json
+Record directory: /home/jarbis1/tmp/plumbline-escalate-record
+
+The findings may be empty on the first round. Read packet.json for
+artifact.test_cmd, artifact.frozen, and artifact.editable. Run the test
+command so you see the red. Do not score. Do not declare a pass.
+
+If this is a kit change, a multi-file change, or the bar is a frozen suite,
+do not write the implementation. Write:
+  /home/jarbis1/tmp/plumbline-escalate-record/aider-prompt.md
+  /home/jarbis1/tmp/plumbline-escalate-record/aider-dispatch.json
+The prompt names the failing tests as the spec and contains no solution.
+The dispatch JSON has message, files (editable only), read (frozen tests),
+and test_cmd. Then stop. This route launches Aider after you exit. Do not
+call Aider yourself.
+
+A one-file smoke with no frozen suite may be written directly, inside the
+editable paths only. Do not edit frozen tests. Do not change the bar. If you
+see held-out material, stop and say so. If you measured a cost, write
+{"amount": N} to the cost file. If you did not, do not invent it.

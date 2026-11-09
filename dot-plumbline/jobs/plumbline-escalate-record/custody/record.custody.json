@@ -1,0 +1,505 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "round-01/editable/kit/escalate.py",
+      "digest": {
+        "sha256": "61225c4d1e4ce6a777910cc17d6d280fcc91af36ade4aabdd967cb32de7d4dc2"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": null,
+      "frozenAt": null,
+      "author": null,
+      "dimensions": [],
+      "approvals": [],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": null,
+      "kind": null,
+      "version": null,
+      "method": null,
+      "model": null
+    },
+    "startedAt": "2026-11-06T18:20:40Z",
+    "producedAt": "2026-11-06T18:30:21Z",
+    "instrument": {
+      "rubric": null,
+      "runner": null
+    },
+    "evaluators": [
+      {
+        "id": "evaluator",
+        "name": "evaluator",
+        "kind": "model",
+        "model": null,
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "module_is_public_kit_escalate",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. kit.escalate.__file__ resolves to kit/escalate.py under the repo root; source contains no email and none of the six profile names; deliver() requires architect and transport as keyword-only parameters with no default; deliver(self.record) alone raises TypeError.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "loop_does_not_call_the_architect",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. kit/conductor_loop.py contains neither 'kit.escalate' nor 'import escalate'; escalate.deliver also ran with conductor_loop.loop replaced by an assertion-raising sentinel and the sentinel was never called across all delivery paths.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "broken_or_incomplete_architect_delivers_nothing",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. All seven broken-architect shapes (raise, None, bare string, {}, blank text, whitespace text, null text) produced transport.call_count == 0, no delivered=True, no 'verified' label anywhere in the result or changed files, and the analysis text was written nowhere.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "delivers_architect_text_with_sha256_and_not_verified",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. deliver() returned delivered=True with sha256 equal to hashlib.sha256 of the sent text, the transport received the text unchanged as first positional, architect and transport were each called once, the digest appears in some file under the record dir, and no 'verified' string appears in the result or any written file.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "retry_does_not_send_twice_or_rerun_rounds",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. After a successful send, escalate was reloaded and deliver() was called again with a different architect and transport: the second transport was not called and the loop sentinel never fired, so the durable record prevents both a double send and a re-run of rounds.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "transport_failure_is_not_sent_twice",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. The first transport raised RuntimeError and was called exactly once; after module reload a second transport was not called, so a failed send still counts as made and no retry re-sends.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "broken_run_does_not_consume_the_send",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. A raising architect left transport.call_count == 0 with no send recorded; a later finished architect then sent once with delivered=True and the analysis text unchanged.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "decide_records_the_reply_and_does_not_touch_terminal_state",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. decide(record_dir, reply) wrote the exact reply text into some file under the record dir while terminal_state in summary.json and escalation.json remained 'needs_owner' before and after, and no loop() call occurred.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "proposed_packet_ratified_is_not_delivered",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. An architect run carrying a schema-valid ratified packet produced transport.call_count == 0 and no delivered=True result; the ratification check blocks delivery.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "proposed_packet_invalid_is_not_delivered",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. An architect run carrying {\"ratified\": false} alone (which fails the Draft 2020-12 job-packet schema: 'entry' is a required property) produced transport.call_count == 0 and no delivered=True result; the validation check blocks delivery.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "proposed_packet_unratified_is_delivered_and_not_run",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. An architect run carrying the schema-valid unratified fixture was delivered once (transport.call_count == 1, text unchanged, delivered=True, correct sha256) with no loop() call; the unratified packet rides along with the text and is never run.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "null_proposed_packet_is_not_present",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-06T18:30:21Z",
+        "outcome": null,
+        "score": 1.0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": "accepted",
+          "verdict": "accept",
+          "stop": "accepted",
+          "observation": "Test passed. proposed_packet null is treated as not present: the run delivered once with delivered=True and correct sha256, and neither the result nor any written file carries a 'verified' label.",
+          "at_source": "round-01.json:4"
+        }
+      }
+    ],
+    "controls": [],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [],
+    "retention": null,
+    "external": [],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-11-08T19:30:15Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-11-06-escalate",
+      "sources": {
+        "startedAt": "packet.json:114",
+        "producedAt": "packet.json:60",
+        "disposition.by": "inputs/custody-events.jsonl:1",
+        "disposition.at": "inputs/custody-events.jsonl:1"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "stop": "accepted",
+      "round_count": 1,
+      "rounds": [
+        {
+          "round": 1,
+          "record": "round-01.json",
+          "sha256": "8e61a6da4ab0111c1dc4703930e595c0f2bdde4899931b5cfb5ab4de46d610c3"
+        }
+      ],
+      "evaluator_runs": [
+        {
+          "round": 1,
+          "exit": 0,
+          "output_sha256": "ad2966ba6365e53f5be6fbf418e8e3094e75fea1d12e29237d531c677cb87693"
+        },
+        {
+          "round": 1,
+          "exit": 0,
+          "output_sha256": "ddb8e96c17fe9837227f84de20fe18c8c51f3fbfccd3385047ac3bc8e43bca95"
+        },
+        {
+          "round": 1,
+          "exit": 0,
+          "output_sha256": "8184c3243a81a974be80feb837cd4ce4d58a4b0c3aae5cd3aba45245b896045b"
+        }
+      ],
+      "spend": {
+        "rounds_cost_usd": 0.057718,
+        "source": "round-*.json cost"
+      },
+      "schema": "plumbline/x-plumbline/v1",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "261b3a0",
+        "commit": "261b3a02ddbff3ab8897dfb15fd5364fb8d4b172",
+        "tree": "28f4093e2aaefe1f8595cf079989305648ff382a",
+        "dirty": true,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "packet.json started_at",
+        "producedAt": "packet.json ended_at"
+      },
+      "hand_times": [],
+      "timeSources": {
+        "startedAt": "packet.json:114",
+        "producedAt": "packet.json:60",
+        "disposition.by": "inputs/custody-events.jsonl:1",
+        "disposition.at": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "round-01.json:4",
+        "checks[1].at": "round-01.json:4",
+        "checks[2].at": "round-01.json:4",
+        "checks[3].at": "round-01.json:4",
+        "checks[4].at": "round-01.json:4",
+        "checks[5].at": "round-01.json:4",
+        "checks[6].at": "round-01.json:4",
+        "checks[7].at": "round-01.json:4",
+        "checks[8].at": "round-01.json:4",
+        "checks[9].at": "round-01.json:4",
+        "checks[10].at": "round-01.json:4",
+        "checks[11].at": "round-01.json:4"
+      },
+      "time_sources": {
+        "startedAt": "packet.json:114",
+        "producedAt": "packet.json:60",
+        "disposition.by": "inputs/custody-events.jsonl:1",
+        "disposition.at": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "round-01.json:4",
+        "checks[1].at": "round-01.json:4",
+        "checks[2].at": "round-01.json:4",
+        "checks[3].at": "round-01.json:4",
+        "checks[4].at": "round-01.json:4",
+        "checks[5].at": "round-01.json:4",
+        "checks[6].at": "round-01.json:4",
+        "checks[7].at": "round-01.json:4",
+        "checks[8].at": "round-01.json:4",
+        "checks[9].at": "round-01.json:4",
+        "checks[10].at": "round-01.json:4",
+        "checks[11].at": "round-01.json:4"
+      },
+      "emittedAt": "2026-11-08T19:42:43Z",
+      "gaps": [
+        {
+          "field": "bar.digest",
+          "reason": "the run wrote no frozen bar file, and its packet names none",
+          "hard": false
+        },
+        {
+          "field": "bar.frozenAt",
+          "reason": "the run wrote no freeze time",
+          "hard": false
+        },
+        {
+          "field": "bar.author",
+          "reason": "the run wrote no bar author",
+          "hard": false
+        },
+        {
+          "field": "bar.dimensions",
+          "reason": "the run wrote no bar dimension",
+          "hard": false
+        },
+        {
+          "field": "bar.approvals",
+          "reason": "the run recorded no approval",
+          "hard": false
+        },
+        {
+          "field": "maker.name",
+          "reason": "the packet's maker block names no name",
+          "hard": false
+        },
+        {
+          "field": "maker.kind",
+          "reason": "the packet's maker block names no kind",
+          "hard": false
+        },
+        {
+          "field": "maker.version",
+          "reason": "the packet's maker block names no version",
+          "hard": false
+        },
+        {
+          "field": "maker.method",
+          "reason": "the run wrote no maker method file",
+          "hard": false
+        },
+        {
+          "field": "instrument.rubric",
+          "reason": "the run wrote no rubric file and pinned no rubric digest",
+          "hard": false
+        },
+        {
+          "field": "instrument.runner",
+          "reason": "the run wrote no runner file and pinned no runner digest",
+          "hard": false
+        },
+        {
+          "field": "evaluators[0].name",
+          "reason": "the packet's evaluator block names no name",
+          "hard": false
+        },
+        {
+          "field": "checks.batch",
+          "reason": "the run's round records name no batch",
+          "hard": false
+        },
+        {
+          "field": "checks.failureCondition",
+          "reason": "the packet declares no per-dimension failure condition",
+          "hard": false
+        },
+        {
+          "field": "checks.outcome",
+          "reason": "the run's round records carry a score, not a custody outcome per dimension",
+          "hard": false
+        },
+        {
+          "field": "checks.evidence",
+          "reason": "the run wrote no evaluator evidence file",
+          "hard": false
+        },
+        {
+          "field": "controls",
+          "reason": "the run's round records carry no control case",
+          "hard": false
+        },
+        {
+          "field": "external",
+          "reason": "the run wrote no harness log, so no CL1-15 evidence exists",
+          "hard": false
+        },
+        {
+          "field": "retention",
+          "reason": "the run recorded no retention location",
+          "hard": false
+        }
+      ]
+    }
+  }
+}
