@@ -81,6 +81,11 @@ class FinishFilesItself(unittest.TestCase):
             self.assertEqual(len(status["record_sha256"]), 64)
             self.assertTrue(os.path.isfile(os.path.join(repo, "run-log.json")),
                             "filing wrote no run-log row")
+            # The copy must be able to say how it was filed. Measured 2026-11-09: the folder was copied before
+            # the row was written, so the filed summary carried `filing: null` while the live one carried it.
+            filed_summary = json.load(open(os.path.join(dest, "summary.json")))
+            self.assertTrue((filed_summary.get("filing") or {}).get("filed"),
+                            "the filed copy cannot say how it was filed: %r" % (filed_summary.get("filing"),))
 
     def test_with_no_destination_the_status_is_still_written_and_says_why(self):
         with TemporaryDirectory() as tmp:

@@ -632,6 +632,13 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
     halt["filing"] = file_finish(record_dir, halt)
     _dump(os.path.join(record_dir, "summary.json"), halt)
+    # The folder was copied BEFORE this row existed, so the filed copy could not say how it was filed.
+    # Measured 2026-11-09 on Job 31's first close: the filed summary carried `filing: null` while the live one
+    # carried the row. A record that cannot describe its own filing is the same defect as a status file that
+    # cannot describe its own custody — so the final summary is written into the copy as well.
+    filed = halt["filing"].get("dest")
+    if halt["filing"].get("filed") and filed and os.path.isdir(filed):
+        _dump(os.path.join(filed, "summary.json"), halt)
     return halt
 
 
