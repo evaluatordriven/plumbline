@@ -205,9 +205,17 @@ class EmitterReadsTheLogTests(unittest.TestCase):
         (job / "custody" / "bar.md").write_text("bar\n")
         return job
 
-    def _emit(self, job):
-        return subprocess.run([sys.executable, str(EMIT), "--job-dir", str(job)],
-                              capture_output=True, text=True, cwd=str(REPO))
+    def _emit(self, job, allow_hand_times=False):
+        # DIVERGENCE CLOSED (Job 14). This suite passed NO switch on every path; validate_schemas.py:606 passes
+        # --allow-hand-times. The two instruments measured the same emitter under different switches, and that is
+        # how the suite stayed green over an emitter that wrote a record whose evaluator times had no logger
+        # source. Both instruments now drive BOTH switches: the suite's default stays the no-switch path it always
+        # tested (D6-D10), and the cases whose whole point is what the switch admits or refuses pass it
+        # explicitly (D13-D15), so a case states which switch it means instead of inheriting one.
+        args = [sys.executable, str(EMIT), "--job-dir", str(job)]
+        if allow_hand_times:
+            args.append("--allow-hand-times")
+        return subprocess.run(args, capture_output=True, text=True, cwd=str(REPO))
 
     def _record(self, job):
         p = job / "custody" / "record.custody.json"
@@ -278,6 +286,56 @@ class EmitterReadsTheLogTests(unittest.TestCase):
         r = self._emit(job)
         self.assertNotIn("needs its harness log", r.stdout + r.stderr,
                          "a deterministic evaluator must not be refused for having no log")
+
+    # ---- D13-D15: the --allow-hand-times boundary. The switch is about HAND-ENTERED times; an unsourced
+    # model-evaluator check time is not one, and the switch must not reach it. Face 2 (naming every unstamped
+    # call) is what the refusal is measured by, so D14 cannot be satisfied by the abort-at-first-entry behaviour.
+    UNSTAMPED = {"call": "dim1#p1",
+                 "request": {"url": "https://api.z.ai/chat/completions"},
+                 "response": {"model": "z-ai/glm-5.3-flash"},
+                 "response_headers": {"Date": "Sun, 08 Nov 2026 10:00:09 GMT"}}
+
+    def test_d13_switch_does_not_admit_an_unsourced_evaluator_time(self):
+        """D13: under --allow-hand-times an unsourced model-evaluator check time is still refused, naming the log."""
+        job = self._job(json.dumps(self.UNSTAMPED) + "\n")
+        r = self._emit(job, allow_hand_times=True)
+        out = r.stdout + r.stderr
+        self.assertNotEqual(r.returncode, 0,
+                            f"the switch admitted an unsourced model-evaluator time\n{out}")
+        self.assertIn("harness-eval.log", out, f"the refusal does not name the log\n{out}")
+        self.assertIsNone(self._record(job), f"a refused record was written anyway\n{out}")
+
+    def test_d14_switch_refusal_names_every_unstamped_call(self):
+        """D14: the naming E3 delivered survives the switch -- every call named, not aborted at the first."""
+        log = [self.UNSTAMPED,
+               dict(self.UNSTAMPED, call="dim1#p2"),
+               dict(self.UNSTAMPED, call="dim1#p3")]
+        job = self._job(json.dumps(log) + "\n")
+        r = self._emit(job, allow_hand_times=True)
+        out = r.stdout + r.stderr
+        self.assertNotEqual(r.returncode, 0, f"an unsourced evaluator time was admitted\n{out}")
+        for n in (1, 2, 3):
+            self.assertIn(f"dim1#p{n}", out, f"call dim1#p{n} was not named\n{out}")
+        self.assertIn(".sent_at", out, f"the unstamped field is not named\n{out}")
+
+    def test_d15_switch_admits_a_genuine_hand_entered_time(self):
+        """D15: a value typed into custody.json with no ledger line is still admitted and listed under the switch."""
+        job = self._job(json.dumps(self.GOOD) + "\n")
+        p = job / "inputs" / "custody.json"
+        c = json.loads(p.read_text())
+        c["passes"]["dim1#p1"]["at"] = "2026-11-08T10:00:06Z"   # typed: no ledger line behind it
+        p.write_text(json.dumps(c))
+        r = self._emit(job, allow_hand_times=True)
+        rec = self._record(job)
+        self.assertIsNotNone(rec, f"the switch refused a genuine hand time\n{r.stdout}{r.stderr}")
+        assert rec is not None
+        ht = ((rec["predicate"].get("x-plumbline") or {}).get("hand_times") or [])
+        entry = next((e for e in ht if e.get("field") == "passes.dim1#p1.at"), None)
+        self.assertIsNotNone(entry, f"the admitted hand time is not listed: {ht}")
+        self.assertTrue(entry.get("file") and entry.get("source"), f"no file/source: {entry}")
+        # ...and the record still carries the LOG's time, not the typed one.
+        self.assertEqual((rec["predicate"]["checks"][0]).get("at"), "2026-11-08T10:00:09Z",
+                         "the record took the typed hand time instead of the log's")
 
 
 class LimitTests(unittest.TestCase):

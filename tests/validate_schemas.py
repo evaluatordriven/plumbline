@@ -1095,6 +1095,61 @@ res((f"{S} · T7b/E3 every evaluator call the logger did not stamp is named (har
      rc == 3 and out.count("harness-eval-a.log#") >= 3 and ".sent_at" in out
      and ("server-header" in out or "response-created" in out), f"exit {rc}: {out.strip()[-160:]}"))
 
+# ---- JOB 14, THE `--allow-hand-times` BOUNDARY: ONE BEHAVIOUR, THREE FACES ----
+# A1/A2 assert the switch does not reach a MODEL EVALUATOR's unsourced check time. A3 asserts E3's delivered
+# behaviour is what the refusal is measured BY -- every unstamped call named, not the log aborted at its first
+# entry -- so A1 cannot be satisfied by regressing the naming. A4 asserts the switch still admits a genuine
+# hand-entered time. A1 must not pass by A4's absence, and A4 must not pass by A1's.
+#
+# The three faces run on the SAME job, built once with job_copy_raw(): that is FIX (its harness logs carry server
+# times only, no logger sent_at/received_at), plus the one genuine hand time this job's own custody.json already
+# carries -- a typed `passes.pass-a.at` with no ledger line. So the switch is the ONLY difference between A1 and
+# A4: with it, the record is still refused for the evaluator's unsourced time (A1), and once that one defect is
+# fixed the SAME job's hand-entered pass time is admitted and listed (A4). A hand time is typed into
+# inputs/custody.json; an unsourced model-evaluator check time is a server-set time with no logger stamp. They
+# are different sources, and this switch was always about the first.
+j14 = job_copy_raw("j14-boundary")
+c14 = json.loads((j14 / "inputs" / "custody.json").read_text(encoding="utf-8"))
+c14["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"        # typed: no ledger line behind it
+(j14 / "inputs" / "custody.json").write_text(json.dumps(c14, indent=2) + "\n", encoding="utf-8")
+o14 = TMP / "j14-switch-on.json"
+rc, out = emit(j14, o14, allow_hand=True)
+res((f"{S} · J14/A1 a model evaluator's check time is refused UNDER --allow-hand-times, naming the log "
+     f"(exit 3, [time], nothing written)",
+     rc == 3 and "[time]" in out and "harness-eval-a.log" in out and not o14.exists(),
+     f"exit {rc}: {out.strip()[-160:]}"))
+res((f"{S} · J14/A2 the refusal cites the EVALUATOR path, not only the maker's (evaluator eval-a, [hand-time] "
+     f"listing harness-eval-a.log)",
+     rc == 3 and "evaluator" in out and "harness-eval-a.log#" in out,
+     f"exit {rc}: {out.strip()[-160:]}"))
+# A3: the naming E3 delivered, under the SAME fixture and the SAME switch A1 is refused under. Every call,
+# both fields, the log path and the call id -- the abort-at-the-first-entry behaviour would name one entry.
+res((f"{S} · J14/A3 E3's naming survives: every unstamped evaluator call is named (>= 3 harness-eval-a.log# "
+     f"entries, .sent_at, the file:line)",
+     rc == 3 and out.count("harness-eval-a.log#") >= 3 and ".sent_at" in out
+     and "harness-eval-a.log:" in out, f"exit {rc}: {out.strip()[-160:]}"))
+# A4: the switch still does what its name says. Stamp the evaluator's (and every other model seat's) harness
+# calls the way a logger does -- the job_copy_logged() stamp, the log's own response instant -- so the ONLY
+# unsourced time left is the typed pass time. The switch must admit it and list it with file and source. (What
+# the check then CARRIES is settled by E2/T3, which are live and unmodified: the record takes the linked call's
+# time and lists the typed value as a hand time. This case does not re-open that; it asserts only that the
+# switch still admits a hand time, so face 1 cannot be satisfied by disabling the switch.)
+j14b = job_copy_logged("j14-hand-only")
+c14b = json.loads((j14b / "inputs" / "custody.json").read_text(encoding="utf-8"))
+c14b["passes"]["pass-a"]["at"] = "2026-10-20T12:00:02Z"
+(j14b / "inputs" / "custody.json").write_text(json.dumps(c14b, indent=2) + "\n", encoding="utf-8")
+o14b = TMP / "j14-switch-hand.json"
+rc, out = emit(j14b, o14b, allow_hand=True)
+r14b = json.loads(o14b.read_text(encoding="utf-8"))["predicate"] if o14b.is_file() else {}
+ht14 = {e.get("field"): e for e in ((r14b.get("x-plumbline") or {}).get("hand_times") or [])}
+res((f"{S} · J14/A4 a genuine hand-entered time is still admitted under the switch and listed with file and source",
+     rc == 0 and bool(ht14) and all(e.get("file") and e.get("source") for e in ht14.values())
+     and (ht14.get("passes.pass-a.at") or {}).get("file") == "inputs/custody.json"
+     and (ht14.get("passes.pass-a.at") or {}).get("source") == "inputs-no-ledger"
+     and ((r14b.get("x-plumbline") or {}).get("allowances") or {}).get("hand_times", {}).get("switch")
+         == "--allow-hand-times",
+     f"exit {rc}: hand_times={sorted(ht14)}"))
+
 # E1: a real disagreement between custody.json's disposition.at and the line's decided_at still refuses
 j = job_copy("dispose-mismatch")
 c = json.loads((j / "inputs" / "custody.json").read_text(encoding="utf-8"))
