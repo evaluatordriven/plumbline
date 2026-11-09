@@ -71,14 +71,33 @@ class Entry:
         return f"{self.log_name}:{line}" if line is not None else None
 
 
-def read(path) -> dict:
-    """Every call of the harness log at `path`, by call name, in file order.
+def read(path, allow_unstamped: str = "refuse") -> dict:
+    """Every stamped call of the harness log at `path`, by call name, in file order.
 
     Raises HarnessLogError when the file is unreadable, is not JSON, is neither a
-    list of entries nor a single entry object, or when an entry is missing its call
-    name, sent_at or received_at, or has received_at before sent_at.
+    list of entries nor a single entry object, when an entry names no call, when a
+    stamp is PRESENT but not RFC 3339 UTC, or when received_at is before sent_at.
+
+    `allow_unstamped` decides what an ABSENT `sent_at` / `received_at` is:
+
+      "refuse" (the default) -- an absent stamp is a malformed log, refused as it
+          always was. A caller that wants every log sound gets that.
+      "skip"   -- an absent stamp is NOT this reader's to refuse: the entry is left
+          out of the returned map (its times are None), because a call the logger
+          did not stamp carries no logger time to read, and its time must come from
+          the response instead. Every OTHER refusal above is raised unchanged and
+          in the same order, so a log with a present-but-unreadable, reversed, unnamed
+          or non-JSON defect still refuses; only absences are tolerated. The caller
+          names those calls (`Entry.raw` and the log itself are all it needs).
+
+    The returned map is every entry that had both stamps. An entry that was skipped
+    is still an entry of the file, so a caller that must name it reads the file; this
+    module never decides that an unstamped call is acceptable, only that it is not
+    malformed.
     """
     p = Path(path)
+    if allow_unstamped not in ("refuse", "skip"):
+        raise ValueError(f"allow_unstamped is {allow_unstamped!r}: it is 'refuse' or 'skip'")
     try:
         text = p.read_text(encoding="utf-8")
     except OSError as exc:
@@ -104,6 +123,13 @@ def read(path) -> dict:
             raise HarnessLogError(p, f"entry {i} names no call")
         sent = parse_instant(item.get("sent_at"))
         received = parse_instant(item.get("received_at"))
+        absent = (sent is None and item.get("sent_at") in (None, "")) or \
+                 (received is None and item.get("received_at") in (None, ""))
+        if absent and allow_unstamped == "skip":
+            # A call the logger did not stamp carries no logger time to read. It is left out, not refused:
+            # the time must come from the response, and the caller names it. Every other defect below still
+            # refuses, so this is the ONLY tolerance the seam opens.
+            continue
         if sent is None:
             raise HarnessLogError(p, "sent_at is missing or not RFC 3339 UTC (...Z)", name)
         if received is None:
