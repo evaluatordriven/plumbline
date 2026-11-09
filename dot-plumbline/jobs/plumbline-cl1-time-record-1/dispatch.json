@@ -1,0 +1,6 @@
+{
+  "files": ["kit/emit_packet.py"],
+  "read": ["tests/test_packet_cl1_time_source.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-cl1-time-record-1/message.md"
+}

@@ -1,0 +1,23 @@
+{
+  "iteration": 1,
+  "verdict": "accept",
+  "pass_rule": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "mean": 1.0,
+    "min": 1,
+    "runs": 3,
+    "result": "accept"
+  },
+  "instrument_in_force": {
+    "rubric_sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f",
+    "code_sha256": "d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3"
+  },
+  "violations": [],
+  "passes": [
+    {
+      "pass_id": "no_untimeable_times",
+      "artifact": "passes/no_untimeable_times.json"
+    }
+  ]
+}

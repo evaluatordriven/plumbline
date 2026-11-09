@@ -18,6 +18,7 @@ did).
     plumbline_job.py close --job-dir dot-plumbline/jobs/<job-id> --run run.json [--run run2.json] [--corpus PATH]
                            [--terminal-state accepted|needs_owner|rejected [--outcome O]]
     plumbline_job.py custody --job-dir dot-plumbline/jobs/<job-id> [--out-dir DIR]    (no corpus needed)
+    plumbline_job.py file --job-dir <ended job dir> [--into dot-plumbline/jobs] [--backfill]
 
 `open` creates the directory, emits the packet, and files the brief under `inputs/`. If the packet emitter
 refuses the brief, THE DIRECTORY IS REMOVED: a job folder that exists without readable terms is the exact
@@ -269,6 +270,57 @@ def do_close(a) -> int:
 TERMINALS = ("accepted", "needs_owner", "rejected")
 
 
+def do_file(a) -> int:
+    """Copy an ended job into the repo's `dot-plumbline/jobs/` and record the filing.
+
+    WHY THIS IS A COMMAND AND NOT A HABIT. `dot-plumbline/jobs/` held two jobs on 2026-11-09 while Jobs 3-25
+    lived only in scratch record directories, because a commit that said "file closed jobs in dot-plumbline
+    going forward" asked a person to remember. The repo's own record stopped growing, and a later census read
+    the `examples/` fixtures instead — the same jobs twice — and reported a premise the repo could not support.
+    Copying happens here, the row is written by log_row(), and `tests/test_dot_plumbline_filing.py` fails when
+    a row names a folder that is not there or a folder carries no packet.
+    """
+    import hashlib
+    src = Path(a.job_dir).expanduser().resolve()
+    if not (src / "packet.json").is_file():
+        print(f"NOT FILED: {src} carries no packet.json. A job folder comes into existence BY emitting its "
+              f"packet, so a folder without one is a probe or an abandoned run — filing it would put noise in "
+              f"the permanent record.")
+        return 2
+    into = Path(a.into).expanduser() if a.into else HERE.parent / "dot-plumbline" / "jobs"
+    into = into.resolve()
+    dest = into / src.name
+    if src == dest.resolve():
+        print(f"NOT FILED: {src} is already the filed folder. A filing that copies onto itself destroys the "
+              f"source; there is nothing to do.")
+        return 2
+    if dest.exists() and not a.force:
+        print(f"NOT FILED: {dest} already exists. Re-filing over a record replaces the only copy of what was "
+              f"filed; pass --force only when the source is known to be the same job, later.")
+        return 1
+    ignore = shutil.ignore_patterns("__pycache__", "*.pyc", ".aider*")
+    if dest.exists():
+        shutil.rmtree(dest)
+    shutil.copytree(src, dest, ignore=ignore)
+    files = sorted(p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file())
+    packet = dest / "packet.json"
+    extra = {
+        "kit_close": False,
+        "source": str(src),
+        "files": len(files),
+        "packet_sha256": hashlib.sha256(packet.read_bytes()).hexdigest(),
+    }
+    if a.backfill:
+        extra["unfiled_backfill"] = True
+    doc = json.loads(packet.read_text())
+    if isinstance(doc, dict) and doc.get("job_id") and doc["job_id"] != dest.name:
+        extra["packet_job_id"] = doc["job_id"]
+    log_row(dest, "filed", extra, a.run_log)
+    print(f"filed: {dest}  ({len(files)} files, packet sha256 {extra['packet_sha256'][:12]})")
+    return 0
+
+
+
 def do_custody(a) -> int:
     """Emit (or re-emit) the custody/v1 record for a job that has ended. Reads only the job's own files."""
     job = Path(a.job_dir).expanduser()
@@ -337,8 +389,16 @@ def main() -> int:
     k.add_argument("--allow-hand-times", action="store_true",
                    help="pass the hand-time allowance to the emitter; the verifier still enforces the flags")
     k.add_argument("--custody", help="the custody checker checkout (default: $PLUMBLINE_CUSTODY)")
+    f = sub.add_parser("file", help="copy an ended job into dot-plumbline/jobs/ and record the filing")
+    f.add_argument("--job-dir", required=True, help="the ended job's folder (must carry packet.json)")
+    f.add_argument("--into", help="the jobs directory (default: <repo>/dot-plumbline/jobs)")
+    f.add_argument("--run-log", help="override the run-log path (default: <into>/../run-log.json)")
+    f.add_argument("--backfill", action="store_true",
+                   help="mark the row `unfiled_backfill: true` — for a job that ended before filing was a command")
+    f.add_argument("--force", action="store_true",
+                   help="replace an existing filed folder; only when the source is known to be the same job, later")
     a = ap.parse_args()
-    return {"open": do_open, "close": do_close, "custody": do_custody}[a.cmd](a)
+    return {"open": do_open, "close": do_close, "custody": do_custody, "file": do_file}[a.cmd](a)
 
 
 if __name__ == "__main__":

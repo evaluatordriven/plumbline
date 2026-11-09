@@ -1,0 +1,25 @@
+{
+  "pass_id": "no_untimeable_times",
+  "status": "filed",
+  "channel": "model",
+  "provider": "Z.AI",
+  "model": "z-ai/glm-5.3-flash",
+  "family": "glm",
+  "scores": [
+    {
+      "dimension": "no_untimeable_times",
+      "score": 1,
+      "run": 1
+    },
+    {
+      "dimension": "no_untimeable_times",
+      "score": 1,
+      "run": 2
+    },
+    {
+      "dimension": "no_untimeable_times",
+      "score": 1,
+      "run": 3
+    }
+  ]
+}

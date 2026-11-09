@@ -1,0 +1,19 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "bar": {},
+  "disposition": {
+    "state": "given",
+    "by": "Steve Moitozo II",
+    "at": "2026-11-08T19:30:15Z"
+  },
+  "disposition_words": "Given, and the hollow record acknowledged: the work shipped in #15, the record carries no summary and no terminal state, and that emptiness is the finding, not something this disposition repairs.",
+  "x-plumbline": {
+    "disposition_words": "Given, and the hollow record acknowledged: the work shipped in #15, the record carries no summary and no terminal state, and that emptiness is the finding, not something this disposition repairs.",
+    "disposition_event": {
+      "at": "2026-11-08T19:30:15Z",
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "source": "inputs/custody-events.jsonl"
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "record_type": "evaluator-record",
+  "record_version": "1",
+  "job_id": "2026-11-08-seat-notice-drain",
+  "iteration": 1,
+  "standard": {
+    "ref": "tests/test_seat_move_notice_drain.py",
+    "version": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa",
+    "frozen_at": "2026-11-08T18:23:54Z"
+  },
+  "runner": {
+    "ref": "custody/files/kit/seat_move_drain.py",
+    "version": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197"
+  },
+  "evaluator": {
+    "seat": "plumbline-eval",
+    "kind": "model",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "api.z.ai",
+    "provider_served": "Z.AI"
+  },
+  "runs": 3,
+  "thresholds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0
+  },
+  "dimensions": [
+    {
+      "id": "drain_at_turn_start",
+      "criterion": "prepare_turn stages a queued notice at turn start and returns it as context; a failed turn leaves it recoverable exactly once; an empty mailbox changes nothing; a corrupt receipt raises",
+      "observation": {
+        "observed": true,
+        "basis": "Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (the legacy 12-test bar also OK), and against the real conductor profile a live-enqueued notice (ebe0c6a5...) was staged by prepare_turn \u2014 mailbox emptied to exactly one inflight receipt with the context string returned \u2014 and removed by consume_turn, with empty-mailbox, corrupt-receipt, and stranded-inflight fail-closed behavior bar-covered; the uninstalled turn loop and the misdirected dispatch file list are disclosed out-of-scope gaps, not part of what this bar tests.",
+        "fresh": true
+      },
+      "scores": [
+        1,
+        1,
+        1
+      ],
+      "mean": 1.0,
+      "min": 1,
+      "verdict": "pass",
+      "limit": "measures the drain unit; no running conductor turn invokes it, so announcement by an unscripted turn is NOT shown"
+    },
+    {
+      "id": "announced_by_an_unscripted_turn",
+      "criterion": "a conductor turn nobody scripted invokes the drain on its own and announces the notice",
+      "observation": {
+        "observed": true,
+        "basis": "a real conductor turn, started by the Owner, announced the queued notice in its own words",
+        "fresh": true
+      },
+      "scores": [],
+      "mean": null,
+      "min": null,
+      "verdict": "pass",
+      "evidence": {
+        "notice_id": "12a13e97b60e417f8bace81d636e75c0",
+        "direction": "from_seat",
+        "seat": "OBSERVED-TURN-EVAL",
+        "job_id": "2026-11-08-observed-turn-eval",
+        "queued_at": "2026-11-08T18:55:45Z",
+        "charge_text": "Tell me in a paragraph where the two seat-notice jobs stand right now, in your own words. No tables, no tool runs, no file reads.",
+        "charge_mentions_notices": false,
+        "charge_sent_through": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/charge-bot-chat.py",
+        "charge_sent_at": "2026-11-08T18:57Z",
+        "session_id": "20261106_173554_a10444",
+        "session_message_user": 3890,
+        "session_message_assistant": 3891,
+        "observed": "message 3890 carried the staged preamble naming the notice; message 3891 is the assistant announcing it in its own prose -- the id, the direction, the seat and the job",
+        "mailbox_after": "0 files",
+        "inflight_after": "0 files"
+      }
+    }
+  ],
+  "pass_rule": "mean >= T_accept AND min >= T_dim",
+  "result": "accepted",
+  "cost_usd": 0.0032256,
+  "notes": [
+    "three passes, all 1, served by Z.AI; every pass independently named the unproven announcement",
+    "the second dimension was never observed and forces needs_owner regardless of the first dimension's pass"
+  ],
+  "verdict": "accept",
+  "passes": [
+    {
+      "pass_id": "drain_at_turn_start#p1",
+      "artifact": "passes/drain_at_turn_start-p1.json",
+      "dimension": "drain_at_turn_start",
+      "batch": "b1",
+      "run": 1
+    }
+  ]
+}

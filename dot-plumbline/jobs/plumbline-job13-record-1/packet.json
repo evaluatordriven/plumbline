@@ -1,0 +1,13 @@
+{
+  "job": "job-13-dispose-read",
+  "artifact": {
+    "test_cmd": "EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 -m pytest tests/test_disposition_line_state.py -q",
+    "frozen": ["tests/test_disposition_line_state.py", "tests/fixtures/custody/job-disposition-line/**"],
+    "editable": ["kit/emit_custody.py"],
+    "tree": "/home/jarbis1/tmp/plumbline-job13-v2",
+    "branch": "feat/dispose-read-v2",
+    "base": "f18c95629bd5394b50d6af7cf7d0040cc1e4e413"
+  },
+  "bounds": {"maker_generations": 2, "usd": 0.20},
+  "ratified": false
+}

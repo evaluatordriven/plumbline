@@ -1,0 +1,49 @@
+{
+  "job_id": "2026-11-08-cl1-time-source",
+  "record_kind": "terminal-state",
+  "terminal_state": "accepted",
+  "outcome": "accepted",
+  "verdict": "accept",
+  "iteration_record": "iteration-1-eval-record.json",
+  "disposition": {
+    "state": "not_yet_given",
+    "by": "Steve Moitozo II",
+    "note": "Owner disposition not performed for this job. Acceptance rests on the pass rule (mean >= T_accept and min >= T_dim over three scored runs). The Owner's rail is that no approval act is performed on his behalf and neither the Architect nor the Orchestrator may give one."
+  },
+  "pass_rule": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "mean": 1.0,
+    "min": 1,
+    "runs": 3,
+    "result": "accept"
+  },
+  "dimension": {
+    "name": "no_untimeable_times",
+    "scores": [1, 1, 1],
+    "mean": 1.0,
+    "min": 1,
+    "pass_id": "no_untimeable_times"
+  },
+  "instrument_in_force": {
+    "rubric_sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f",
+    "code_sha256": "d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3"
+  },
+  "artifact": {
+    "path": "kit/emit_packet.py",
+    "change": "+13 / -0"
+  },
+  "controls": {
+    "K1": "does_conform",
+    "K2": "does_not_conform"
+  },
+  "approval_and_disposition_gaps": {
+    "present": true,
+    "source_classes": ["bar.approvals[].at", "disposition.at"],
+    "meaning": "This job's packet carries no typed approval time and no typed disposition time because the rule it adds forbids a CL1 packet from carrying any such time; the time must come from the ledger act that wrote it. The packet was assembled after the bar was frozen and therefore conforms immediately. However, because no approve act or disposition act has yet been written through the ledger, the custody emitter still reports the corresponding gaps. Those gaps are not a defect: they are evidence that the rule now binds — a packet cannot be made clean by writing times into it. The job's success is the gate, not its own certificate."
+  },
+  "written_by": "plumbline-architect (Architect seat)",
+  "written_at": "2026-11-08T03:58:46Z"
+}

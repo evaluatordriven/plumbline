@@ -1,0 +1,14 @@
+I don't see any `aider-prompt.md` or `aider-dispatch.json` files in the current tree. This is not a `route-maker` dispatch to me — there's no findings file, work tree reference, or cost file named in my query.
+
+I am your **Maker** (Playbook §6, Contracts §4). My function is to receive a job dispatch from the Orchestrator and produce an artifact in response. But I have not received one.
+
+What I see here: this is just the raw environment — a Plumbline repo at commit `851a07d` on branch `job12-on-0920`, with a long git history (lots of feature branches for loop, custody, seat moves, etc.). No job instructions were delivered to me.
+
+**If you want me to work on something specific**, tell me what you need — e.g.:
+- "Fix the failures in kit/emit_custody.py"
+- "Implement a new bar for job 14"  
+- "Run the test suite and fix failures"
+
+Otherwise, I'm standing by.
+
+session_id: 20261109_164432_a964aa

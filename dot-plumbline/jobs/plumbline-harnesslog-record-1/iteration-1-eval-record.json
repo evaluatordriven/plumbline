@@ -1,0 +1,66 @@
+{
+  "record_type": "evaluator-record",
+  "record_version": "1",
+  "job_id": "2026-11-08-evaluator-harness-log",
+  "iteration": 1,
+  "standard": {
+    "ref": "tests/test_evaluator_harness_log.py",
+    "version": "46159f05d273eff74dd38e5536e72084f4bb06c45cd1af68c103e83046ce6be5",
+    "frozen_at": "2026-11-08T22:22:10Z"
+  },
+  "runner": {
+    "ref": "custody/files/kit/emit_custody.py",
+    "version": "efb36bb (the Maker's work, committed by the Orchestrator to measure)"
+  },
+  "evaluator": {
+    "seat": "plumbline-eval",
+    "kind": "model",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "api.z.ai",
+    "provider_served": "Z.AI"
+  },
+  "runs": 3,
+  "thresholds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0
+  },
+  "dimensions": [
+    {
+      "id": "evaluator_harness_log",
+      "criterion": "the harness log carries the per-call times, the record takes its check times from it, and a bad log refuses",
+      "observation": {
+        "observed": true,
+        "basis": "All twelve frozen-bar checks pass (12/12, exit 0) once the Maker's work is committed as efb36bb \u2014 the lone red on D4/D5 was the emitter's own dirty-tree custody gate refusing to measure, not a capability gap \u2014 and the capability is real code, not fixture assertion: kit/evaluator_harness_log.py (118 lines) supplies read(path), source() provenance, and a HarnessLogError carrying the offending call for the refuse-and-name paths, kit/emit_custody.py wires 11 harness_log references into the record (D4/D5), or_call.py already wrote sent_at/received_at entries for model turns (D1\u2013D3), the deterministic carve-out holds (D11), and both the wall-clock caveat (D12) and the out-of-worktree route deployment are declared limits outside the delivered in-repo scope.",
+        "fresh": true
+      },
+      "scores": [
+        1,
+        1,
+        1
+      ],
+      "mean": 1.0,
+      "min": 1,
+      "verdict": "pass",
+      "limit": "the bar does not prove the times are honest about the wall clock (D12)"
+    }
+  ],
+  "pass_rule": "mean >= T_accept AND min >= T_dim",
+  "result": "accepted",
+  "verdict": "accept",
+  "cost_usd": 0.00320131,
+  "passes": [
+    {
+      "pass_id": "evaluator_harness_log#p1",
+      "artifact": "passes/evaluator_harness_log-p1.json",
+      "dimension": "evaluator_harness_log",
+      "batch": "b1",
+      "run": 1
+    }
+  ],
+  "notes": [
+    "three passes, all 1, served by Z.AI; every pass independently named the dirty-tree condition",
+    "the deployment step (the profile route) is declared and NOT performed"
+  ]
+}

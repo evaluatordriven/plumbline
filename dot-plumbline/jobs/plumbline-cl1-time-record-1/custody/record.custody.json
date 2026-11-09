@@ -1,0 +1,357 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "kit/emit_packet.py",
+      "digest": {
+        "sha256": "d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.6",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      },
+      "frozenAt": "2026-11-08T03:51:46Z",
+      "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+      "dimensions": [
+        {
+          "id": "no_untimeable_times",
+          "criterion": "a CL1 packet carries no typed time for approvals or disposition; times come from custody-events.jsonl stamped by the act",
+          "scale": {
+            "type": "count",
+            "threshold": 0
+          }
+        }
+      ],
+      "approvals": [
+        {
+          "role": "buyer",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+          },
+          "at": null,
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "hand-entered"
+          }
+        },
+        {
+          "role": "specialist",
+          "by": "Steve Moitozo II",
+          "barDigest": {
+            "sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+          },
+          "at": null,
+          "adopted": null,
+          "x-plumbline": {
+            "kind": "person",
+            "time_source": "hand-entered"
+          }
+        }
+      ],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "plumbline-maker",
+      "kind": "model",
+      "version": "aider via /home/jarbis1/.venvs/aider",
+      "method": {
+        "sha256": "123f46d8ecde63cbe1623cfe5e227dd96c766883f960c9ac0b2d76bd87048e7b"
+      },
+      "model": {
+        "family": "deepseek",
+        "identifier": "deepseek-flash",
+        "endpoint": "api.deepseek.com",
+        "readOnly": false
+      },
+      "x-plumbline": {
+        "harness_log": "harness-maker.log",
+        "calls": [
+          "harness-maker.log#maker-1"
+        ],
+        "endpoint_basis": "request URL host",
+        "startedAt_basis": "harness-maker.log#maker-1 sent_at",
+        "producedAt_basis": "harness-maker.log#maker-1 received_at",
+        "startedAt_source": "harness-maker.log:1",
+        "producedAt_source": "harness-maker.log:1"
+      }
+    },
+    "startedAt": "2026-11-08T03:52:08Z",
+    "producedAt": "2026-11-08T03:52:23Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      },
+      "runner": {
+        "sha256": "d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "evaluator",
+        "name": "plumbline-eval",
+        "kind": "model",
+        "model": {
+          "family": "glm",
+          "identifier": "z-ai/glm-5.3-flash",
+          "endpoint": "api.z.ai",
+          "readOnly": true
+        },
+        "x-plumbline": {
+          "harness_log": "harness-evaluator.log",
+          "calls": [
+            "harness-evaluator.log#no_untimeable_times#p1",
+            "harness-evaluator.log#no_untimeable_times#p2",
+            "harness-evaluator.log#no_untimeable_times#p3"
+          ],
+          "aggregator": "openrouter.ai",
+          "upstream_provider": "Z.AI",
+          "provider_slug": "z-ai/fp8",
+          "endpoint_basis": "declared pin (2026-11-08T03:53:41Z) to 'Z.AI' at api.z.ai, served-by confirmed from generation provider_name",
+          "routing": {
+            "pin": {
+              "via": "openrouter.ai",
+              "provider": "Z.AI",
+              "slug": "z-ai/fp8",
+              "host": "api.z.ai",
+              "declaredAt": "2026-11-08T03:53:41Z"
+            },
+            "requests": [
+              {
+                "provider": {
+                  "allow_fallbacks": false,
+                  "order": [
+                    "z-ai/fp8"
+                  ],
+                  "zdr": true
+                },
+                "calls": [
+                  "harness-evaluator.log#no_untimeable_times#p1",
+                  "harness-evaluator.log#no_untimeable_times#p2",
+                  "harness-evaluator.log#no_untimeable_times#p3"
+                ]
+              }
+            ],
+            "request_ok": true
+          }
+        },
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "no_untimeable_times",
+        "evaluator": "evaluator",
+        "run": 1,
+        "batch": "b1",
+        "at": "2026-11-08T03:54:33Z",
+        "outcome": "conforms",
+        "score": 1,
+        "failureCondition": "a typed bar.approvals[].at or disposition.at in a CL1 packet is not reported as a gap",
+        "evidence": {
+          "name": "verdict-no_untimeable_times-p1.json",
+          "sha256": "31f97b555ffdfd99705adb699dc3132a335569cdd05e2674412e4713fb29e820"
+        },
+        "unobserved": null,
+        "x-plumbline": {
+          "pass_id": "no_untimeable_times",
+          "call": "harness-evaluator.log#no_untimeable_times#p1",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40",
+          "quotes": [
+            {
+              "quote": "The frozen bar tests/test_packet_cl1_time_source.py (sha256 61a6902b…, Ran 6 tests OK) passes after a 13-insertion, 0-deletion change to kit/emit_packet.py that reports typed bar.approvals[].at and disposition.at as gaps naming the ledger approve/dispose acts as the time source; ",
+              "inEvidenceFile": true
+            }
+          ]
+        }
+      }
+    ],
+    "controls": [
+      {
+        "id": "K1",
+        "batch": "b1",
+        "evaluator": "evaluator",
+        "case": {
+          "sha256": "d851fec87b16c9b378b238bbfe7aea1b4f142c6def8b373da793210a3168fca3"
+        },
+        "expected": "conforms",
+        "outcome": "conforms",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/control-K1.json",
+            "sha256": "996584aa8436b275d0511edb4cd2feda4ac9268b4870d73ab272bebe9e0c1584"
+          },
+          "call": "harness-evaluator.log#no_untimeable_times#p1",
+          "at": "2026-11-08T03:54:33Z",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40"
+        }
+      },
+      {
+        "id": "K2",
+        "batch": "b1",
+        "evaluator": "evaluator",
+        "case": {
+          "sha256": "db8d832102316d10c0b23c97b452c6708991f09b00c0582b2c611335df8a494b"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform",
+        "x-plumbline": {
+          "evidence": {
+            "name": "custody/evidence/control-K2.json",
+            "sha256": "c13b362ba3928b5f29baaf69dc29ebc111a49792e51396052b3b862c94de1f48"
+          },
+          "call": "harness-evaluator.log#no_untimeable_times#p1",
+          "at": "2026-11-08T03:54:33Z",
+          "at_basis": "received_at",
+          "at_source": "harness-evaluator.log:40"
+        }
+      }
+    ],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [],
+    "retention": {
+      "where": "/home/jarbis1/tmp/plumbline-cl1-time-record-1"
+    },
+    "external": [
+      {
+        "requirement": "CL1-15",
+        "subject": "evaluator",
+        "evidence": {
+          "name": "harness-evaluator.log",
+          "sha256": "bbf55e6fcf19d24d7f20bfa7c883a084702e054b77457784e7512a0e18f57bb3"
+        },
+        "readBy": null
+      }
+    ],
+    "disposition": {
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "at": "2026-11-08T19:34:28Z",
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "2026-11-08-cl1-time-source",
+      "sources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[no_untimeable_times/no_untimeable_times].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3"
+      },
+      "events_log": {
+        "name": "inputs/custody-events.jsonl",
+        "sha256": "b401e74d4ed608bbcbbce04868b5d3c784f9b1323a3b605f4a526096917f76ce"
+      },
+      "terminal_state": "accepted",
+      "outcome": "accepted",
+      "verdict": "accept",
+      "iteration": 1,
+      "s5_record": {
+        "name": "iteration-1-eval-record.json",
+        "sha256": "6bd482e367f2cba6ba02a7fbedbb2cccb99e231e7a8b910b4c440fb7d0228eec"
+      },
+      "pass_rule": {
+        "T_accept": 1,
+        "T_dim": 1,
+        "mean": 1.0,
+        "min": 1,
+        "runs": 3,
+        "result": "accept"
+      },
+      "disposition_source": "packet.json disposition_state",
+      "packet": {
+        "name": "packet.json",
+        "sha256": "04207374a51d993c08d040fadb857c1e015040da7bce091bca00194e044bfdbe"
+      },
+      "disposition_at_source": "logged live (inputs/custody-events.jsonl)",
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "cf283e7",
+        "commit": "cf283e71acb9381cb0785a285f78318f5d386d98",
+        "tree": "2d3f679070c82a7867745465b42519cb94dd5184",
+        "dirty": false,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "harness log",
+        "producedAt": "harness log"
+      },
+      "timeSources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[no_untimeable_times/no_untimeable_times].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "harness-evaluator.log:40",
+        "controls[0].at": "harness-evaluator.log:40",
+        "controls[1].at": "harness-evaluator.log:40"
+      },
+      "time_sources": {
+        "bar.frozenAt": "inputs/custody-events.jsonl:1",
+        "startedAt": "harness-maker.log:1",
+        "producedAt": "harness-maker.log:1",
+        "checks[no_untimeable_times/no_untimeable_times].at": "harness-evaluator.log:40",
+        "controls[K1].at": "harness-evaluator.log:40",
+        "controls[K2].at": "harness-evaluator.log:40",
+        "disposition.at": "inputs/custody-events.jsonl:3",
+        "frozenAt": "inputs/custody-events.jsonl:1",
+        "checks[0].at": "harness-evaluator.log:40",
+        "controls[0].at": "harness-evaluator.log:40",
+        "controls[1].at": "harness-evaluator.log:40"
+      },
+      "emittedAt": "2026-11-08T19:34:33Z",
+      "schema": "plumbline/x-plumbline/v1",
+      "hand_times": [],
+      "generations": [],
+      "evaluations": [],
+      "relays": [],
+      "amendments": [],
+      "spend": {
+        "calls_sum_usd": 0.005654,
+        "key_delta_usd": 0.0,
+        "total_usd": 0.005654,
+        "tolerance_usd": 0.0001,
+        "source": null
+      },
+      "inputs": {
+        "disposition_words": "Given. Accepted with no gaps; the typed-time gate shipped in #20 and the record is the cleanest this program has produced.",
+        "disposition_event": {
+          "at": "2026-11-08T19:34:28Z",
+          "state": "given",
+          "by": "Steve Moitozo II",
+          "source": "inputs/custody-events.jsonl"
+        }
+      },
+      "gaps": [
+        {
+          "field": "bar.approvals[0].at",
+          "reason": "no RFC 3339 UTC time recorded",
+          "hard": true
+        },
+        {
+          "field": "bar.approvals[1].at",
+          "reason": "no RFC 3339 UTC time recorded",
+          "hard": true
+        }
+      ]
+    }
+  }
+}

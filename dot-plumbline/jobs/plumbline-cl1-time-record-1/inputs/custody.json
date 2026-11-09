@@ -1,0 +1,148 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "evidence_dir": "custody/evidence",
+  "subject": [
+    "kit/emit_packet.py"
+  ],
+  "levelClaimed": "CL1",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "bar": {
+    "file": "tests/test_packet_cl1_time_source.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "dimensions": [
+      {
+        "id": "no_untimeable_times",
+        "criterion": "a CL1 packet carries no typed time for approvals or disposition; times come from custody-events.jsonl stamped by the act",
+        "scale": {
+          "type": "count",
+          "threshold": 0
+        }
+      }
+    ],
+    "frozenAt": "2026-11-08T03:51:46Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "61a6902b3a29a5253cb9c8ff4f6e22c062c780a020c8b3cc0e9ea524034e935f"
+      }
+    ]
+  },
+  "instrument": {
+    "rubric_file": "tests/test_packet_cl1_time_source.py",
+    "runner_file": "custody/files/kit/emit_packet.py"
+  },
+  "maker": {
+    "role": "maker",
+    "name": "plumbline-maker",
+    "kind": "model",
+    "method": "aider, diff edit format, non-streaming",
+    "version": "aider via /home/jarbis1/.venvs/aider",
+    "method_file": "dispatch.json",
+    "model": {
+      "family": "deepseek",
+      "identifier": "deepseek-flash",
+      "endpoint": "api.deepseek.com",
+      "readOnly": false
+    },
+    "harness_log": "evidence/harness-maker.log",
+    "calls": [
+      "maker-1"
+    ],
+    "call_count": 1,
+    "cost_usd": 0.00353668
+  },
+  "evaluators": [
+    {
+      "id": "evaluator",
+      "who": "plumbline-eval",
+      "name": "plumbline-eval",
+      "kind": "model",
+      "harness_log": "custody/evidence/harness-evaluator.log",
+      "model": {
+        "family": "glm",
+        "identifier": "z-ai/glm-5.3-flash",
+        "endpoint": "api.z.ai",
+        "readOnly": true
+      },
+      "runs": 3
+    }
+  ],
+  "external": [
+    {
+      "requirement": "CL1-15",
+      "subject": "evaluator",
+      "evidence_file": "harness-evaluator.log"
+    }
+  ],
+  "controls": [
+    {
+      "id": "K1",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/cases/K1-emit_packet.py",
+      "expected": "conforms",
+      "outcome": "conforms",
+      "evidence_file": "custody/evidence/control-K1.json",
+      "call": "no_untimeable_times#p1"
+    },
+    {
+      "id": "K2",
+      "batch": "b1",
+      "evaluator": "evaluator",
+      "case_file": "custody/cases/K2-emit_packet.py",
+      "expected": "does_not_conform",
+      "outcome": "does_not_conform",
+      "evidence_file": "custody/evidence/control-K2.json",
+      "call": "no_untimeable_times#p1"
+    }
+  ],
+  "passes": {
+    "no_untimeable_times": {
+      "evaluator": "evaluator",
+      "call": "no_untimeable_times#p1",
+      "run": 1,
+      "batch": "b1",
+      "failureCondition": {
+        "no_untimeable_times": "a typed bar.approvals[].at or disposition.at in a CL1 packet is not reported as a gap"
+      },
+      "evidence": {
+        "no_untimeable_times": "verdict-no_untimeable_times-p1.json"
+      }
+    }
+  },
+  "retention": {
+    "where": "/home/jarbis1/tmp/plumbline-cl1-time-record-1"
+  },
+  "seats": {
+    "bar_authored_by": "moonshotai/kimi-k2.7-code (OpenRouter)",
+    "judged_by": "plumbline-eval (the Evaluator)"
+  },
+  "disposition": {
+    "state": "given",
+    "by": "Steve Moitozo II",
+    "at": "2026-11-08T19:34:28Z"
+  },
+  "x-plumbline": {
+    "disposition_words": "Given. Accepted with no gaps; the typed-time gate shipped in #20 and the record is the cleanest this program has produced.",
+    "disposition_event": {
+      "at": "2026-11-08T19:34:28Z",
+      "state": "given",
+      "by": "Steve Moitozo II",
+      "source": "inputs/custody-events.jsonl"
+    }
+  }
+}

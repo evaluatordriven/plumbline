@@ -1,0 +1,118 @@
+{
+  "job_id": "2026-11-08-loop-freeze-conditional",
+  "job_name": "the freeze runs only for a custody-bearing job, and fails closed when a declared bar is missing",
+  "entry": "A",
+  "instrument_profile": "full",
+  "mode": "scored",
+  "ratified": true,
+  "stage": "development",
+  "artifact": {
+    "repo": "plumbline",
+    "paths": ["kit/conductor_loop.py"]
+  },
+  "base": {
+    "ref": "b36da3a",
+    "branch": "feat/loop-freeze",
+    "pr": 17,
+    "note": "THIS JOB AMENDS THE UNMERGED FREEZE BUILD (#17). It is not a cut from main. Its base carries the very freeze_bar() the job changes: unconditional, hard-coded custody/bar.md, raising when absent. #17 stays open until this lands; when it does, #17 closes as superseded and the record says so."
+  },
+  "buyer": "Steve Moitozo II",
+  "specialist": "Steve Moitozo II",
+  "human_seat": "Steve Moitozo II",
+  "orchestrator": {"name": "plumbline-conductor", "aliases": ["conductor", "@plumbline-conductor"]},
+  "maker": {
+    "name": "plumbline-maker",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker",
+    "handoff": "rule12"
+  },
+  "evaluator": {
+    "name": "plumbline-eval",
+    "kind": "model",
+    "cmd": "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval",
+    "family": "glm",
+    "identifier": "z-ai/glm-5.3-flash",
+    "endpoint": "openrouter",
+    "runs": 3
+  },
+  "standard_ref": {"doc": "tests/test_loop_freeze_conditional.py", "version": "2c467111"},
+  "mandate_ref": {"doc": "EDI-MANDATE.md", "version": "a48a4645"},
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "cap": 3,
+    "budget": {"amount": 7, "unit": "USD", "time_hours_lt": 2}
+  },
+  "k": 4,
+  "x": 10,
+  "ground_truth": [
+    {
+      "source": "tests/test_loop_freeze_conditional.py",
+      "version": "2c467111",
+      "hardness": "INVARIANT",
+      "note": "the frozen bar is the ground truth: 4 tests over freeze_bar's custody-conditional behaviour"
+    }
+  ],
+  "escalation": {"route": "Owner"},
+  "proposed": {
+    "level_claimed_for_own_record": "CL1",
+    "drafted_by": "plumbline-conductor (Orchestrator), from the Architect's course and the bar it wrote"
+  },
+  "bar": {
+    "file": "tests/test_loop_freeze_conditional.py",
+    "author": "moonshotai/kimi-k2.7-code (Architect seat, OpenRouter)",
+    "frozenAt": "2026-11-08T13:40:17Z",
+    "dimensions": [
+      {
+        "id": "freeze_is_custody_conditional",
+        "criterion": "freeze_bar freezes a custody-bearing job's declared bar.file first and the convention path second, fails closed when a declared bar is missing, and skips the freeze for a caller that prepares no custody inputs",
+        "scale": {"type": "pass_fail", "threshold": 1}
+      }
+    ],
+    "approvals": [
+      {"role": "buyer", "by": "Steve Moitozo II", "kind": "person",
+       "barDigest": "2c467111b6fd2c4b7dbb2ec401298f29d5ed92805e556cc2d9083754be360c2d"},
+      {"role": "specialist", "by": "Steve Moitozo II", "kind": "person",
+       "barDigest": "2c467111b6fd2c4b7dbb2ec401298f29d5ed92805e556cc2d9083754be360c2d"}
+    ]
+  },
+  "disposition": "not_yet_given",
+  "disposition_by": "Steve Moitozo II",
+  "nine_suite_measurement": {
+    "claim": "no non-custody caller needs a fixture change",
+    "callers_of_loop": [
+      "test_conductor_align", "test_conductor_commit4", "test_conductor_gaps_align", "test_conductor_loop",
+      "test_conductor_rev2", "test_conductor_rev2_red", "test_escalate", "test_held_out_failopen",
+      "test_loop_custody_on_finish", "test_loop_custody_sources", "test_loop_freeze",
+      "test_loop_freeze_conditional", "test_loop_started_at"
+    ],
+    "mention_custody_inputs": [
+      "test_loop_custody_on_finish", "test_loop_custody_sources",
+      "test_loop_freeze", "test_loop_freeze_conditional"
+    ],
+    "declare_none": [
+      "test_conductor_align", "test_conductor_commit4", "test_conductor_gaps_align", "test_conductor_loop",
+      "test_conductor_rev2", "test_conductor_rev2_red", "test_escalate", "test_held_out_failopen",
+      "test_loop_started_at"
+    ],
+    "conclusion": "under a rule that freezes only for a custody-bearing job, none of the nine is refused and none needs a fixture change. The custody-bearing callers are the two suites Job 1 already fixed plus this job's own two bars.",
+    "measured_by": "Owner, read at b36da3a"
+  },
+  "read": ["tests/test_loop_freeze_conditional.py"],
+  "editable": ["kit/conductor_loop.py"],
+  "frozen": [
+    "tests/test_loop_freeze_conditional.py",
+    "tests/test_loop_freeze.py",
+    "tests/test_loop_custody_on_finish.py",
+    "tests/test_loop_custody_sources.py",
+    "kit/emit_packet.py",
+    "kit/emit_custody.py",
+    "kit/custody_history.py",
+    "kit/custody_ledger.py",
+    "schemas/instance-extensions.json",
+    "tools/pin.json"
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "acceptedRound": 1,
+  "accepted_round": 1,
+  "artifact": {
+    "base": "feat/plumbline-escalate @ 12df6238ec08676b9fd7dd5c0b410669e058232d",
+    "deliverable": "kit/escalate.py is in this tree. python3 tests/test_escalate.py exits 0. The frozen file is the bytes named in standard_ref. No file outside artifact.editable is part of the deliverable.",
+    "editable": [
+      "kit/escalate.py"
+    ],
+    "frozen": [
+      "tests/test_escalate.py"
+    ],
+    "ignore": [
+      ".git",
+      "__pycache__"
+    ],
+    "repo": "https://github.com/evaluatordriven/plumbline.git",
+    "test_cmd": [
+      "python3",
+      "tests/test_escalate.py"
+    ]
+  },
+  "bestRound": 1,
+  "best_round": 1,
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "budget": {
+      "amount": 7,
+      "note": "Owner, still in force: amount 7 USD, clock time_hours_lt 2. loop() reads time_hours_lt. The derived schema's closed budget shape cannot hold that key. The schema was not edited.",
+      "time_hours_lt": 2,
+      "unit": "USD"
+    },
+    "cap": 4,
+    "cap_counts": "generations"
+  },
+  "buyer": "S2 (the Owner)",
+  "cap": 4,
+  "commit": "12df6238ec08676b9fd7dd5c0b410669e058232d",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "cost": 0.057718317,
+  "dimensions": [
+    "module_is_public_kit_escalate",
+    "loop_does_not_call_the_architect",
+    "broken_or_incomplete_architect_delivers_nothing",
+    "delivers_architect_text_with_sha256_and_not_verified",
+    "retry_does_not_send_twice_or_rerun_rounds",
+    "transport_failure_is_not_sent_twice",
+    "broken_run_does_not_consume_the_send",
+    "decide_records_the_reply_and_does_not_touch_terminal_state",
+    "proposed_packet_ratified_is_not_delivered",
+    "proposed_packet_invalid_is_not_delivered",
+    "proposed_packet_unratified_is_delivered_and_not_run",
+    "null_proposed_packet_is_not_present"
+  ],
+  "disposition_state": "given",
+  "endedAt": "2026-11-06T18:30:21+00:00",
+  "ended_at": "2026-11-06T18:30:21+00:00",
+  "entry": "A",
+  "escalation": {
+    "classes": [
+      "artifact_missed_standard",
+      "standard_moved",
+      "dimension_unauthorized",
+      "frame_at_fault"
+    ],
+    "holders": {
+      "architect": "plumbline-architect",
+      "orchestrator": [
+        {
+          "does": "rounds",
+          "holder": "kit.conductor_loop.loop",
+          "kind": "script",
+          "tested": "not recorded"
+        },
+        {
+          "does": "escalations",
+          "holder": "plumbline-conductor",
+          "kind": "model",
+          "tested": "not recorded"
+        }
+      ]
+    },
+    "route": [
+      "Architect",
+      "Owner"
+    ]
+  },
+  "evaluator": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "held_out": [],
+    "kind": "model",
+    "runs": 3,
+    "who": "plumbline-eval"
+  },
+  "finish": {
+    "accepted_round": 1,
+    "best_round": 1,
+    "cap": 4,
+    "commit": "12df6238ec08676b9fd7dd5c0b410669e058232d",
+    "cost": 0.057718317,
+    "ended_at": "2026-11-06T18:30:21+00:00",
+    "outcome": "accepted",
+    "packet_sha256": "3d33005ea16f38fb2fdbb670269c3915589fd0da3b2167c1deb24dc8e0de0ec8",
+    "rounds": 1,
+    "rounds_sha256": [
+      "8e61a6da4ab0111c1dc4703930e595c0f2bdde4899931b5cfb5ab4de46d610c3"
+    ],
+    "separation_gaps": [],
+    "started_at": "2026-11-06T18:20:40+00:00",
+    "stop": "accepted",
+    "terminal_state": "accepted"
+  },
+  "ground_truth": [
+    {
+      "channel": "python3 tests/test_escalate.py",
+      "hardness": "DOCUMENT",
+      "source": "tests/test_escalate.py",
+      "version": "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
+    }
+  ],
+  "human_seat": "S2 (the Owner)",
+  "instrument_profile": "full",
+  "job_id": "2026-11-06-escalate",
+  "job_name": "kit/escalate.py meets the frozen escalate bar",
+  "job_to_be_done": {
+    "desired_future": "After loop() returns, the Owner receives the Architect's text, and the script did not invent that text.",
+    "pain_points": [
+      "kit/escalate.py is absent. The frozen bar imports kit.escalate. That import is the red.",
+      "loop() can run rounds. It does not call the Architect. The script that runs after loop() returns is not in this tree."
+    ],
+    "statement": "Build the escalation holder as a script in public kit/. One script, one job. loop() does not call the Architect. The script runs after loop() returns."
+  },
+  "k": 4,
+  "maker": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker"
+    ],
+    "engine": "not recorded",
+    "feedback_forms": [
+      "not recorded"
+    ],
+    "handoff": "rule12",
+    "task_classes": [
+      {
+        "class": "generation",
+        "shown_by": "not recorded"
+      },
+      {
+        "class": "revision",
+        "shown_by": "not recorded"
+      }
+    ],
+    "version": "not recorded"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "mode": "scored",
+  "notes": "NOT RUNNABLE. ratified is false. The Architect did not set it and did not run this file. Only a packet the Owner has ratified starts a loop. While ratified is false the schema requires bounds, specialist, and standard_ref to be absent; mode scored requires them present. They are present so the Owner can set ratified true without retyping them. Until that act, this file does not validate and loop() refuses it. The schema was not edited.\n\nThis seat is plumbline-architect. It is not loop(). It is not an Orchestrator holder. holders.architect is plumbline-architect. holders.orchestrator are kit.conductor_loop.loop and plumbline-conductor. This seat is not named as one of those.\n\nSeen before this write, disclosed in proposed.seen. The bar was written by the previous Architect seat. This seat did not edit it. kit/escalate.py is absent. This seat did not write it. Held-out file bytes: not seen. evaluator.held_out is empty. Harrison's draft file named in the memo was not read. Memo questions 1-7 are not encoded. No minimum option count. No clock arithmetic. No decision.json. No escalation.filled.json. No _held_out fix. The holder entries are the shape the source packet holds and the shape loop() checks. They are not a ruling on who the escalations holder is.\n\nValues copied from the source packet 4123887fc6304af2d3a8a0866659f3c1e86525f6add3a642955e19df1c413ee5, which the Owner said to reuse: mode scored; k 4; x 10; T_accept 1; T_dim 1; T_reject 0; cap 4; cap_counts generations; budget amount 7 unit USD; evaluator.runs 3; evaluator.who plumbline-eval; evaluator.cmd route-eval; maker.cmd route-maker; maker.handoff rule12; human_seat S2 (the Owner); buyer S2 (the Owner). mandate_ref version is that packet's value and is the commit named in tools/pin.json, which this seat read. The mandate file was not re-read.\n\nHow time_hours_lt is carried, this seat's act: inside bounds.budget, the key loop() and route-eval read. The derived plumblineBudget shape has additionalProperties false and does not list that key. The note key is allowed and holds the source packet's note, copied, not restated. The schema was not edited.\n\nmaker.cmd and maker.handoff are present because loop() refuses the packet without them. makerWithTaskClasses has additionalProperties false and does not list those keys. The schema was not edited. evaluator.kind is the string not recorded. The schema enum is person, model, script. That string is not in the enum. It was not replaced with one of those.\n\nLabels this seat chose: job_id 2026-11-06-escalate; job_name; entry A, because kit/escalate.py is absent and the bar is already the frozen file; instrument_profile full; stage development; disposition_state not_yet_given; cap_counts was on the source packet and loop() refuses any other value if the key is present; escalation.route [Architect, Owner], because loop() refuses any other; escalation.classes the four locators, because route-eval accepts only those; ground_truth hardness DOCUMENT; ignore .git and __pycache__; test_cmd python3 tests/test_escalate.py, the command the Orchestrator re-measured, not the source packet's suite command; dimension names, one per frozen test method, test_ removed, file order, because route-eval tells the Evaluator to use those names; artifact.editable is only kit/escalate.py, the file the bar fails in; artifact.frozen is only the bar; evaluator.held_out empty, because the bar names no held-out path. This path was chosen: dot-plumbline/jobs/2026-11-06-escalate/packet.json. A root packet.json was not written.\n\nroute-maker tells the Maker to read packet.json in the work tree. That path is not this file. This tree also holds dot-plumbline/jobs/2026-11-05-loop-started-at-2/packet.json, a different job. Deliver this path. A search can open the wrong packet.\n\nThis seat did not run loop(). This seat did not dispatch the Maker or the Evaluator. This seat did not edit the bar, kit/, or the schema.\n\nKEY-SHAPE REPAIR. This seat is plumbline-architect. It is not loop(). It is not an Orchestrator holder. It did not start a loop. It did not edit the schema, the bar, or kit/. kit/escalate.py remains absent. This seat did not write it. The paragraph above that says ratified is false describes the prior write. The Owner later set ratified true on source sha256 e8b4b7daa45eddf1a53258ceae2272415860b99efe962b0ec203dceddec396e9. This file keeps that flag. It does not set it back to false. These bytes are not that sha. Bounds are unchanged: T_accept 1, T_dim 1, T_reject 0, cap 4, cap_counts generations, budget amount 7 USD, time_hours_lt 2, k 4, x 10, evaluator.runs 3, mode scored.\n\nevaluator.kind was the string not recorded. The corpus gate rejects that string. The enum is person, model, script. This seat set kind to model. That is a classification of the seat, not an invented engine name. Measured this turn: evaluator.who is plumbline-eval. /home/jarbis1/.hermes/profiles/plumbline-eval/config.yaml sha256 9b2a25fdd7381dd59eca858bf5f18a3f95d8ef24abc540375a1445ffadb3a52e names Family GLM via OpenRouter, model.default z-ai/glm-5.3-flash, provider openrouter. route-eval sha256 027ef6d7316366bec30f429c0c24c6fb77aaa160c29976e983ba8cd8dda73c04 says the script does not score; it asks plumbline-eval to write the score. The seat is the model. The script is evaluator.cmd. kind was not set to script and not set to person. The 2026-11-05 packet's kind field was seen and was not the reason.\n\nmaker.cmd and maker.handoff were not moved and not omitted. Measured this turn: kit/conductor_loop.py sha256 86a5e8efff88f4937c3562b7e41c14381fb363242f24d2c4da858e34f6a1922d reads loaded maker cmd at the invocation and refuses a packet whose maker.handoff is not rule12. route-maker sha256 98ae2ca6f4be603979086468c879ee64de6933807dfe11b06c2c783eb3b5cb55 does not read maker.cmd from the packet. It is the command. A probe that moved those keys off maker left the runner unable to read them. The derived makerWithTaskClasses shape still rejects them. The schema was not edited.\n\nbounds.budget.time_hours_lt was not deleted. Measured this turn: no probed shape was valid against schemas/job-packet.schema.json sha256 dabce636b0b4c8a71c71c5a8f85cbeceb81964a5aada2f27cca3ce064ddf66b5 and still had maker.cmd, maker.handoff rule12, and a positive budget.time_hours_lt. loop() reads budget time_hours_lt. route-eval reads budget.time_hours_lt and fails without a positive number. The derived plumblineBudget shape still rejects the key. The schema was not edited. This file does not pretend those two keys pass the derived schema. The corpus schema sha256 5774604758ebcfeebceb0896acd5484878c2c84902d8b41e6216b0eb2764c953 admits them. The collision is the derived schema's. This seat did not edit it.",
+  "outcome": "accepted",
+  "packetSha256": "3d33005ea16f38fb2fdbb670269c3915589fd0da3b2167c1deb24dc8e0de0ec8",
+  "packet_sha256": "3d33005ea16f38fb2fdbb670269c3915589fd0da3b2167c1deb24dc8e0de0ec8",
+  "proposed": {
+    "drafted_by": "plumbline-architect",
+    "not_recorded": [
+      "specialist",
+      "maker.engine",
+      "maker.version",
+      "maker.feedback_forms",
+      "maker.task_classes.shown_by",
+      "holders.orchestrator.tested",
+      "x unit",
+      "memo questions 1-7",
+      "07:37 EST meeting",
+      "Steve address",
+      "Harrison draft file sha256"
+    ],
+    "seen": [
+      "tests/test_escalate.py sha256 40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af measured this turn. Previous Architect seat wrote it. This seat did not edit it.",
+      "/home/jarbis1/tmp/plumbline-escalate-brief/BRIEF.md sha256 6841845b7fd6d0e94216e1bf18654071e9856f79cc1e24984913824d0d83059c measured this turn",
+      "/home/jarbis1/tmp/MEMO-escalate-second-opinion.md sha256 ecf0e503ce84d58b881abf615d425f3caf2a39d41e0cc38765f1ec6fb747216e measured this turn. It quotes Harrison's draft. That draft file was not read. Its sha256 is not recorded.",
+      "/home/jarbis1/tmp/plumbline-custody-successor/dot-plumbline/jobs/2026-11-06-custody-agree/packet.json sha256 4123887fc6304af2d3a8a0866659f3c1e86525f6add3a642955e19df1c413ee5 measured this turn. Values reused from this file are named in notes. It is not this job.",
+      "dot-plumbline/constitution.json sha256 44bea1c4ee709e8bb02ee282a3224ffc6f9a964c95c272abf1ec86e8b3acbfc1 measured this turn. version 0.1.0, ratified true, buyer S2 (the Owner).",
+      "schemas/job-packet.schema.json sha256 dabce636b0b4c8a71c71c5a8f85cbeceb81964a5aada2f27cca3ce064ddf66b5 measured this turn. Not edited.",
+      "tools/pin.json sha256 a6e8d49afd0c432e7378bf9e21902ec76584f1da51d6af5f0d66193cb592fee6 measured this turn. commit field f8bfb7934dbbefe3b32bc146b4481dba1744bc53. The mandate file itself was not re-read this turn.",
+      "dot-plumbline/jobs/2026-11-05-loop-started-at-2/packet.json sha256 9cb9ae27044bebfc5059644fedcc9d0510b2cbec4cc35bb81d24bb8d9ed03235 measured this turn. First 80 lines read. specialist, engine, version, and evaluator.kind from that file were not copied.",
+      "kit/conductor_loop.py sha256 86a5e8efff88f4937c3562b7e41c14381fb363242f24d2c4da858e34f6a1922d measured this turn. Read for what loop() refuses and where it reads time_hours_lt. Not edited.",
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval sha256 027ef6d7316366bec30f429c0c24c6fb77aaa160c29976e983ba8cd8dda73c04 measured this turn",
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker sha256 98ae2ca6f4be603979086468c879ee64de6933807dfe11b06c2c783eb3b5cb55 measured this turn",
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/kit-pin sha256 d5370a1455aaeb277d56bb98189190751d7f4c3e0110a959ba2f642e8ea6139b measured this turn. sha 12df6238ec08676b9fd7dd5c0b410669e058232d. HEAD of this worktree matches. Measured this turn.",
+      "/home/jarbis1/plumbline/examples/2026-10-27-custody-emitter-gaps/packet.json sha256 26a0418f2b0559b56ce97caaf17aeb302ec749289fd6db04a15767d08014820b measured this turn. Field shape only. Not this job's values.",
+      "Key-shape repair, this seat, this turn. Source packet sha256 e8b4b7daa45eddf1a53258ceae2272415860b99efe962b0ec203dceddec396e9. eval config /home/jarbis1/.hermes/profiles/plumbline-eval/config.yaml sha256 9b2a25fdd7381dd59eca858bf5f18a3f95d8ef24abc540375a1445ffadb3a52e. route-eval sha256 027ef6d7316366bec30f429c0c24c6fb77aaa160c29976e983ba8cd8dda73c04. route-maker sha256 98ae2ca6f4be603979086468c879ee64de6933807dfe11b06c2c783eb3b5cb55. kit/conductor_loop.py sha256 86a5e8efff88f4937c3562b7e41c14381fb363242f24d2c4da858e34f6a1922d. derived schema sha256 dabce636b0b4c8a71c71c5a8f85cbeceb81964a5aada2f27cca3ce064ddf66b5. corpus schema sha256 5774604758ebcfeebceb0896acd5484878c2c84902d8b41e6216b0eb2764c953. corpus gate sha256 fe208df6c1849bcadcd81f4cd7a3478a77500b6065044bc50fcc9fb346230544. Harrison draft file was not read. Held-out bytes were not seen. The bar was not edited. kit/escalate.py was not written."
+    ],
+    "seen_drafts": true,
+    "status": "Owner ratified source packet sha256 e8b4b7daa45eddf1a53258ceae2272415860b99efe962b0ec203dceddec396e9 and set ratified true. This file keeps ratified true. It does not set it back to false. These bytes are a key-shape repair of that packet. They are not that sha. This seat does not start a loop. Bounds are unchanged."
+  },
+  "ratified": true,
+  "rounds": 1,
+  "roundsSha256": [
+    "8e61a6da4ab0111c1dc4703930e595c0f2bdde4899931b5cfb5ab4de46d610c3"
+  ],
+  "rounds_sha256": [
+    "8e61a6da4ab0111c1dc4703930e595c0f2bdde4899931b5cfb5ab4de46d610c3"
+  ],
+  "separation_gaps": [],
+  "specialist": "not recorded",
+  "stage": "development",
+  "standard_ref": {
+    "tests/test_escalate.py": "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
+  },
+  "startedAt": "2026-11-06T18:20:40+00:00",
+  "started_at": "2026-11-06T18:20:40+00:00",
+  "stop": "accepted",
+  "summary": {
+    "accepted_round": 1,
+    "best_round": 1,
+    "cap": 4,
+    "commit": "12df6238ec08676b9fd7dd5c0b410669e058232d",
+    "cost": 0.057718317,
+    "ended_at": "2026-11-06T18:30:21+00:00",
+    "outcome": "accepted",
+    "packet_sha256": "3d33005ea16f38fb2fdbb670269c3915589fd0da3b2167c1deb24dc8e0de0ec8",
+    "rounds": 1,
+    "rounds_sha256": [
+      "8e61a6da4ab0111c1dc4703930e595c0f2bdde4899931b5cfb5ab4de46d610c3"
+    ],
+    "separation_gaps": [],
+    "started_at": "2026-11-06T18:20:40+00:00",
+    "stop": "accepted",
+    "terminal_state": "accepted"
+  },
+  "terminalState": "accepted",
+  "terminal_state": "accepted",
+  "x": 10
+}

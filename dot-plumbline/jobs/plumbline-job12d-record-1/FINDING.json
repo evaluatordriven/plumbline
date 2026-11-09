@@ -1,0 +1,89 @@
+{
+  "job": "job14-allow-hand-times-boundary",
+  "opened": "2026-11-09",
+  "terminal_state": "needs_owner",
+  "outcome": "needs_owner",
+  "disposition_state": "not_yet_given",
+  "work_tree": "/home/jarbis1/tmp/plumbline-job12d",
+  "branch": "job12-on-0920",
+  "bar_commit": "851a07de09f89e2984d7a84f571a451be1a9b06e",
+  "tree_state_at_close": "clean at 851a07d, git status --porcelain empty, nothing pushed",
+  "target": "under --allow-hand-times an unsourced model-evaluator check time is still refused; a genuinely unstamped call is still named; the switch still does what it says for genuine hand-entered times",
+  "cap": {"maker_generations_charged": 0, "maker_generations_allowed": 2, "budget_usd": 0.20, "spend_measured": null,
+          "spend_note": "no cost file was written; run-aider writes it from Aider's session cost line and attempt 4 emitted none. Unrecorded, not zero."},
+
+  "fact_1_bar": {
+    "statement": "The bar is coherent and measured. Nothing about the target is in doubt.",
+    "tally": "132/139 PASSED — 7 FAILED",
+    "reds_ours": [
+      "custody · J14/A1 a model evaluator's check time is refused UNDER --allow-hand-times, naming the log (exit 3, [time], nothing written)",
+      "custody · J14/A2 the refusal cites the EVALUATOR path, not only the maker's (evaluator eval-a, [hand-time] listing harness-eval-a.log)",
+      "test_d13_switch_does_not_admit_an_unsourced_evaluator_time",
+      "test_d14_switch_refusal_names_every_unstamped_call"
+    ],
+    "reds_other_jobs": [
+      "the line-609 [time] refusal",
+      "the 59 s case",
+      "T2c",
+      "T3",
+      "E2"
+    ],
+    "discriminating_shape": "J14/A4 (the switch still admits a genuine hand-entered time) PASSES on the buggy emitter while J14/A1 FAILS on it — face 1 cannot be bought by disabling the switch, face 3 cannot be bought by breaking face 1",
+    "A3b_proof_by_construction": [
+      "row 1 — flag call present: A3b PASSES, 6/6 fields named",
+      "row 2 — flag_calls made a no-op: A3b FAILS with all six named as missing",
+      "row 3 — corrected emitter that refuses under the switch: A3b PASSES, 6/6 named, nothing written"
+    ],
+    "greens_at_close": ["J14/A3a", "J14/A3b", "J14/A4", "T7b/E3", "and every other green in both suites"],
+    "suite": "tests/test_evaluator_harness_log.py — Ran 15 tests, FAILED (failures=2) [D13, D14]",
+    "bar_sha256": "9770d6cd514b2d6cf29b5e7a39d56061163c7f37a5ca79da6e8767b27c9b626d"
+  },
+
+  "fact_2_roster": {
+    "statement": "The roster cannot speak Aider's protocol. The blocker is the edit format, not the reasoning — the seats understood the target and could not express the edit.",
+    "qwen36": "two diff-format responses on attempt 4 — one rejected ('The LLM did not conform to the edit format', '<<<<<<< SEARCH' with no filename before the fence), one a request to read the two editable files. Tokens: 2.6k sent/322 received; 2.8k sent/83 received.",
+    "ornith": "three turns: one narrative hand-off, one permission probe (qprobe.py, a bounds breach of 'no new files'), one upstream-archaeology claim about test/emitter version mismatch, unverified",
+    "total": "four attempts, zero changed lines"
+  },
+
+  "fact_3_route_defects": {
+    "statement": "Two route defects, measured, the Orchestrator's to fix before the next Maker job runs.",
+    "defect_a": "run-aider launched directly does not clear aider-exit.json, so exit codes go stale — attempt 4's exit code was never recorded; aider-exit.json still carries attempt 3's 14:58:38Z entry",
+    "defect_b": "run-aider writes no cost file when Aider emits no session cost line, so spend is unrecorded — a stale exit code and an unrecorded spend are the two quantities every future record would otherwise assert falsely"
+  },
+
+  "fact_4_accounting": {
+    "statement": "No generation was ever charged and nothing was pushed.",
+    "attempts": [
+      "attempt 1 — Ornith — environment: PLUMBLINE_MAKER_LOG unset; Aider refused to start, exit 2",
+      "attempt 2 — Ornith — environment: PLUMBLINE_MAKER_PROMPT_USD / PLUMBLINE_MAKER_COMPLETION_USD unset; Aider refused to start, exit 2; seat also left an inert declaration",
+      "attempt 3 — Ornith — stale dispatch (attempt 1's files never overwritten) plus a dirty tree from the seat's own inert line; engine ran, no diff",
+      "attempt 4 — qwen3.6 — engine ran, model failed Aider's diff edit format; no diff"
+    ],
+    "cap_charged": "0 of 2",
+    "budget": "$0.20 intact",
+    "nothing_pushed": true
+  },
+
+  "instrument_history": {
+    "note": "Job 14 cost four instrument turns and produced the coherent bar above. Recorded because a future reader must not conclude the instrument was the problem.",
+    "turns": [
+      "turn 1 — bar with three faces (J14/A1-A4, D13-D15), committed 5b900ad",
+      "turn 2 — A3 split into A3a (refusal names every call) and A3b (record lists all six fields); A3b's surface was wrong — under ruling (B) a corrected emitter writes no record, so it would have gone red on a CORRECT emitter; committed b61e5f0",
+      "turn 3 — A3b re-seated onto the refusal's published field set, proven red on a deleted flag call and green on a corrected emitter; committed 851a07d",
+      "turn 4 — the split's A3 tightening attempt, which failed to write and returned the measurement that made the re-seat possible"
+    ],
+    "brief_quality_findings": [
+      "the E3-only brief asserted a basis that was not E3-only — caught by the Architect, which measured instead of relabelling",
+      "conjunct 2 was specified against a surface that does not publish it (the refusal writes no record) — caught by the Architect",
+      "My findings for attempt 1 left AGENTS.md's 'committed tree' sentence ambiguous enough that the seat read the emitter as frozen; one wasted dispatch"
+    ],
+    "seat_finding_kept": "allow_unstamped='skip' is not the bypass: when flag_calls runs, skipping is safe because the flagging is what names the calls. The bypass is deleting the flag call, which is schema-visible as an empty hand_times."
+  },
+
+  "open_for_backlog_not_opened": {
+    "edit_format_probe": "the Owner will settle whether any edit format works for the local roster as tooling measurement; if one does, a new job is opened with the format pre-registered in the dispatch",
+    "dispose_read_job": "T3/E2: disposition block is null in both probe arms; adding decided_at to the dispose ledger line changed no byte; six of six real records carry a disposition block. Narrow claim: this dispose line shape is not read, and it drops without a refusal",
+    "notes": "no further dispatch on this job; no new loop opened"
+  }
+}

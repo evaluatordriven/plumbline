@@ -1,0 +1,25 @@
+{
+  "bar": {
+    "file": "tests/test_seat_move_notice_drain.py",
+    "sha256": "e143f8b6b71eb290462f4093b587e3178f70eab8552bb24f29e58549552a7bfa",
+    "frozen_at": "2026-11-08T18:23:54Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z"
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "at": "2026-11-08T18:23:55Z"
+      }
+    ]
+  },
+  "runner": {
+    "file": "kit/seat_move_drain.py",
+    "sha256": "7f73959d7cfebba9d38b54cfe73d053be9da4be9f207f855df6e4ad95a2a5197"
+  }
+}

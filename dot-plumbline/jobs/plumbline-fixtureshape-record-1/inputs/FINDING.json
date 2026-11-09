@@ -1,0 +1,61 @@
+{
+  "terminal_state": "needs_owner",
+  "outcome": "needs_owner",
+  "disposition_state": "not_yet_given",
+  "job": "2026-11-09-fixture-shape",
+  "branch": "feat/fixture-shape",
+  "head": "04b4ecf2ae7e0fde730453564afc9183a5c478b7",
+  "pushed": true,
+  "merged": false,
+  "reason": "The artifact under test was never wrong. The fixture was. job-emitted/ is a REJECTED job with logger times: its record says job_id 'fixture-rejected' and retention.location 'tests/fixtures/custody/job-rejected', and it carries a D2 violation -- 'The Risks section the brief names is empty.' The emitter correctly writes verdict=reject, terminal_state=rejected. Four validate_schemas cases that assert a CLEAN written record therefore cannot pass on this fixture by any repointing; the fixture is the defect, not the harness, not the emitter, not an assertion.",
+
+  "proven": [
+    "bar tests/test_fixture_shape.py sha256 b36bdd0523959a9b1de5177fcf8cae463a19f38af010b6ac51ec165b9c818a69a -- 10 tests, 0 failures, 0 skips; the two checks that skipped because job-emitted did not exist now RUN and PASS",
+    "capability bar tests/test_evaluator_harness_log.py -- 12/12; this job did not cost the capability",
+    "6f2a50e -- clean_emitter_tree() in tests/test_plumbline_verify.py copied a TYPED LIST of three kit modules while the emitter imported a fourth sibling (kit/evaluator_harness_log.py); the copied tree exited 1 where the test expected 3. Now copies the whole kit/ directory derived from the listing.",
+    "5e2eb3a -- _oracle_emitter() in tests/test_loop_custody_sources.py had the identical defect with a two-name list. Same repair. That suite's failure is gone.",
+    "04b4ecf -- copy_job() copied the refusal fixture, so the V3 and V5 cases in tests/test_plumbline_verify.py were handed a job whose harness log carries no logger times and the emitter refused it under D6/D7. Both cases assert that a record IS written and what it says, so they keep that meaning and take job-emitted. No assertion changed. Class (a) under the Owner's decision rule, NOT standard_moved.",
+    "The runtime-stamping mechanism is gone from tests/validate_schemas.py -- _stamp_logger_times, LOGGED, logger_stamped, job_copy_logged and job_copy_raw were removed by the Maker's generation 1 (b2442a9); emitted_copy() exists and every emit-path case already calls it, including the 59 s case, T3, E2 and T2c. Step 6 was already complete when it was authorised; there was nothing left to repoint."
+  ],
+
+  "blocked": [
+    {"checks": ["a hand time 59 s off is accepted, and the record carries the LOG's time", "T3 with --allow-hand-times the record is written and hand_times lists the hand fields with file:line", "E2 under --allow-hand-times the typed pass time is listed and the record carries the call's time"],
+     "needs": "a fixture whose job actually PASSED -- verdict=accept, no violations -- with logger-stamped logs. job-emitted as built is a rejected job with stamped times, so the record it writes says rejected and a clean-record assertion cannot hold on it.",
+     "measured": "exit 0 but terminal_state=rejected, x-plumbline.verdict=reject, 1 violation (D2 'The Risks section the brief names is empty')"},
+    {"checks": ["T2c a time typed into custody.json with no ledger line is named (disposition.at, its source)"],
+     "needs": "the same clean accepted job, plus a typed passes.<id>.at on it so the hand-time listing has something to list",
+     "measured": "refuses instead of naming"},
+    {"checks": ["T7b/E3 every evaluator call the logger did not stamp is named (harness-eval-a.log, server time)"],
+     "needs": "a ruling: this is correctly a REFUSAL on job-rejected, but it now exits 3 with 'inputs-no-ledger' instead of naming the unstamped evaluator calls. That is a refusal-ordering change in the emitter under D6/D7, and it is its own finding -- separate from the fixture.",
+     "measured": "exit 3: inputs-no-ledger"},
+    {"checks": ["alignment · the pin still matches the corpus on disk", "alignment · the vendored schemas and fixture battery are the corpus's bytes"],
+     "needs": "the corpus re-pin (3ea9e3fc0f812e5b) -- a separate deliberate act, explicitly out of this job's scope",
+     "measured": "corpus moved -- re-read the doctrine, then tools/build_schemas.py --repin"}
+  ],
+
+  "tally": {
+    "suite_no_corpus": "PLUMBLINE-TALLY pass=10 fail=2 skip=0 (validate_schemas 127/134, validate_audit)",
+    "validate_audit": "fails on this host for local tmp audit records; with PLUMBLINE_AUDIT_ROOT=/tmp/empty-audit-root it exits 0 and prints NO AUDIT RECORDS IN REACH. Host, not this job.",
+    "corpus_checks": "corpus.audit-equality, corpus.battery-equality, corpus.build-check, corpus.pin-on-disk, corpus.run-cases -- all pass"
+  },
+
+  "correction_recorded": "The Owner's superseding charge ('do not re-derive the fixture') arrived AFTER the real-record derivation had run, and it HAD overwritten job-emitted/. The work was stopped, the tree restored to 04b4ecf with git checkout, and the ten stray paths the copy left were removed -- all under tests/fixtures/custody/job-emitted/, nothing outside it. git status clean at 0 changes; the pushed sha is the fixture the Owner ordered kept. Recorded as the correct handling of a withdrawn order.",
+
+  "fixture_kept": "job-emitted/ is NOT reverted. It is wrong as an emit fixture, but it is a true fixture of a rejected job with stamped times and the bar's shape checks pass on it. It is superseded by Job 9, not deleted.",
+
+  "standing_limitation": "run-aider is a diff editor over tracked files. It cannot create a tree. Two Maker generations (gen 1 partial, gen 2 empty) failed on the tool, not the design. A fixture tree must be authored by the Architect (instruments) or derived from a real record; no Maker generation can build one.",
+
+  "known_conditions_for_the_next_job": [
+    "A test that copies a subset of the implementation is a test that silently stops covering the module it forgot. Third harness-not-artifact defect of the night; both copies are now directory-derived.",
+    "A bar that shells out to the emitter is green only on a COMMITTED tree -- and staged is not clean, only committed is. Measured: 10/12 uncommitted, 10/12 staged, 12/12 committed.",
+    "An emit fixture must represent a job that PASSED. Assembling one from a rejected job plus stamped times produces a fixture that emits a rejected record, and every clean-record assertion fails against it while the harness looks correct."
+  ],
+
+  "job_9_named_not_started": {
+    "name": "emit fixture from a real accepted job",
+    "why": "it is what makes PR 22 and this branch mergeable",
+    "source": "/home/jarbis1/tmp/plumbline-harnesslog-record-1 -- record 0a355bee1471ff89e3ca80facbad63df6b60ff13a1113f2f7fe919d2412ebd11, terminal_state accepted, verdict accept, gaps []",
+    "steps": ["copy", "anonymise machine-specific paths (three sites measured in the accepted record: the job dir, the deployed route-eval path, the aider venv path -- all narrative/command strings, none compared by the emitter)", "confirm the emitter accepts the copy", "repoint the four cases and re-measure"],
+    "budget_unspent": "0.37 of this job's 0.45 allocation"
+  }
+}

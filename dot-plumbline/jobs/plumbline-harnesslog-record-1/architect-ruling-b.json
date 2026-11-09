@@ -1,0 +1,11 @@
+{
+  "classification": "standard_moved",
+  "repair": "ii",
+  "reason": "Making the job-rejected fixture emittable under D6/D7 would require rewriting its evaluator log, maker log, custody inputs and event ledger so every hand-entered time matches a logged call, and it would still break the E3/T7b case that deliberately exercises missing logger times on that same fixture. Moving the emit-success checks to a fixture that already supplies real logger times localizes the break to one test file and preserves the existing refusal coverage.",
+  "editable_after_ruling": [
+    "tests/validate_schemas.py"
+  ],
+  "old_assertion": "A model evaluator with no harness log emits a record with a note external about the missing log.",
+  "new_assertion": "A model evaluator with no harness log refuses the record instead of taking check times from an unsourced or incomplete log.",
+  "ruling_ref": "tests/test_evaluator_harness_log.py D6 and D7, approved 2026-11-08"
+}

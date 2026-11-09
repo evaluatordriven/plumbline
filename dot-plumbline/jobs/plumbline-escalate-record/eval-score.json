@@ -1,0 +1,70 @@
+{
+  "dimensions": [
+    {
+      "name": "module_is_public_kit_escalate",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_module_is_public_kit_escalate ... ok (exit 0)"
+    },
+    {
+      "name": "loop_does_not_call_the_architect",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_loop_does_not_call_the_architect ... ok (exit 0)"
+    },
+    {
+      "name": "broken_or_incomplete_architect_delivers_nothing",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_broken_or_incomplete_architect_delivers_nothing ... ok (exit 0)"
+    },
+    {
+      "name": "delivers_architect_text_with_sha256_and_not_verified",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_delivers_architect_text_with_sha256_and_not_verified ... ok (exit 0)"
+    },
+    {
+      "name": "retry_does_not_send_twice_or_rerun_rounds",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_retry_does_not_send_twice_or_rerun_rounds ... ok (exit 0)"
+    },
+    {
+      "name": "transport_failure_is_not_sent_twice",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_transport_failure_is_not_sent_twice ... ok (exit 0)"
+    },
+    {
+      "name": "broken_run_does_not_consume_the_send",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_broken_run_does_not_consume_the_send ... ok (exit 0)"
+    },
+    {
+      "name": "decide_records_the_reply_and_does_not_touch_terminal_state",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_decide_records_the_reply_and_does_not_touch_terminal_state ... ok (exit 0)"
+    },
+    {
+      "name": "proposed_packet_ratified_is_not_delivered",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_proposed_packet_ratified_is_not_delivered ... ok (exit 0)"
+    },
+    {
+      "name": "proposed_packet_invalid_is_not_delivered",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_proposed_packet_invalid_is_not_delivered ... ok (exit 0)"
+    },
+    {
+      "name": "proposed_packet_unratified_is_delivered_and_not_run",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_proposed_packet_unratified_is_delivered_and_not_run ... ok (exit 0)"
+    },
+    {
+      "name": "null_proposed_packet_is_not_present",
+      "score": 1,
+      "observation": "python3 tests/test_escalate.py -v: test_null_proposed_packet_is_not_present ... ok (exit 0)"
+    }
+  ],
+  "violations": [],
+  "verdict": "accept",
+  "controls": {
+    "should_pass": "passed",
+    "should_fail": "failed"
+  }
+}

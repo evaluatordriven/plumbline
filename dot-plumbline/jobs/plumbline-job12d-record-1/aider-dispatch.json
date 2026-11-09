@@ -1,0 +1,15 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job12d-record-1/aider-prompt.md",
+  "files": [
+    "kit/emit_custody.py",
+    "kit/custody_history.py"
+  ],
+  "read": [
+    "tests/validate_schemas.py",
+    "tests/test_evaluator_harness_log.py",
+    "kit/evaluator_harness_log.py",
+    "docs/custody-emission.md",
+    "AGENTS.md"
+  ],
+  "test_cmd": "EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py; python3 tests/test_evaluator_harness_log.py"
+}

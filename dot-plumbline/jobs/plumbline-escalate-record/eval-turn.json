@@ -1,0 +1,32 @@
+{
+  "artifact": "/home/jarbis1/tmp/plumbline-escalate-record/round-01/editable",
+  "artifact_sha256": "44967bac530d67f903f89b56ee30a14802b1101749b4e7d9c0817e7d23b51b06",
+  "gate": {
+    "commit": "12df6238ec08676b9fd7dd5c0b410669e058232d",
+    "dispatched": true,
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [
+        "kit/__pycache__/conductor_loop.cpython-311.pyc",
+        "kit/__pycache__/conductor_run.cpython-311.pyc",
+        "kit/__pycache__/conductor_software.cpython-311.pyc",
+        "kit/__pycache__/escalate.cpython-311.pyc"
+      ],
+      "rules": [
+        ".git",
+        "__pycache__"
+      ]
+    },
+    "passed": true,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "c06bf90e6ffbaa9df86525b8bfa49207bf164130b1bdb9dee913baa2d113e086"
+    },
+    "rerun": {
+      "exit": 0,
+      "output_sha256": "84d8772355e571485804666521d02c4d9d3dc524b3389ba7950c37dc4c70d799"
+    }
+  },
+  "round": 1
+}

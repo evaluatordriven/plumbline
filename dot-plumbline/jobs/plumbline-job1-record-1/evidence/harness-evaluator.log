@@ -1,0 +1,632 @@
+[
+  {
+    "call": "fixture_pin_reproduced#p1",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `fixture_pin_reproduced`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION fixture_pin_reproduced\n\nCLAIM: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59) passed: `python3 tests/test_job1_fixture_pin.py` -> Ran 4 tests, OK, exit 0, run from the worktree root /home/jarbis1/tmp/plumbline-fixtures. Before the work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names.\n\n3. The diff is 3 insertions and 1 deletion across exactly the two editable files: _job() in test_loop_custody_on_finish.py writes custody/bar.md; _prepare() in test_loop_custody_sources.py does the same and PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; the bar file itself is untouched; no kit/ or schemas/ file was modified.\n\n4. All four suites pass on this tree: test_loop_custody_sources OK, test_loop_custody_on_finish OK, test_conductor_loop OK, test_loop_started_at OK.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after the change; the fixture bars are preparation for the later job that lands the freeze, not a repair of a red on this base.\n\nDecide: does the evidence show the fixture pin was reproduced as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T01:11:10.591625Z",
+    "received_at": "2026-11-08T01:11:23.361969Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 01:11:12 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=4,cfOrigin;dur=0,cfWorker;dur=1657",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794100270-VNDCcc1Y3o36RMOq70AD",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;20bc6cd9-29a0-4017-9835-e2bf7f95b1bf",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a570b3c409922073-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794100270-VNDCcc1Y3o36RMOq70AD",
+      "object": "chat.completion",
+      "created": 1794100270,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar tests/test_job1_fixture_pin.py passes from the worktree root (4 tests, OK, exit 0) and the predecessor file tests/test_loop_custody_on_finish.py hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, exactly the pin target the bar names, with the diff confined to the two editable fixture files and all four suites green on the tree.\"}",
+            "refusal": null,
+            "reasoning": "We need to evaluate the dimension `fixture_pin_reproduced`. The claim: fixtures plant `<work>/custody/bar.md` so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nThe frozen bar: tests/test_job1_fixture_pin.py (sha256 0f19cd...) passed, 4 tests OK, exit 0, run from worktree root /home/jarbis1/tmp/plumbline-fixtures. Before work it was FAILED (failures=4).\n\nEvidence 2: tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\nThe bar names a pin target — presumably PREDECESSOR_SHA in the bar's context, or the bar checks that the predecessor file's bytes hash to the target. The evidence says the file now hashes to the exact target the bar names. The bar's tests pass (4 tests, OK). So the frozen bar passes, and the predecessor file's bytes hash to the exact target the bar names.\n\nWe need to consider whether \"predecessor file\" refers to tests/test_loop_custody_on_finish.py. The evidence in point 3: PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. The bar names a target, and the file test_loop_custody_on_finish.py hashes to that target. So yes, the pin target is reproduced.\n\nThe bar passed after the work, from the worktree root. The sha of the bar is given but we have no tools to verify; we take the evidence as gathered before this call. The instruction: score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\n\nBar passes: yes (evidence 1). Predecessor file's bytes hash to exact target: evidence 2 says tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names. So score 1.\n\nDisclosed limit (evidence 5): main tree has no freeze build; suites green before and after. Does this undermine the claim? The claim is about fixtures planting bar.md so freeze build's suites will pass, and the predecessor file reproducing the pin target. The dimension is fixture_pin_reproduced — the bar tests the fixture pin reproduction. The bar passes. The disclosed limit doesn't change the bar passing or the hash match. The evaluator's criterion is strict: score 1 only if the frozen bar passes and predecessor file's bytes hash to exact target. Both conditions met per evidence.\n\nOne might quibble: the bar's tests passing is reported, not verified by us; but we have no tools, and the evidence is gathered before this call. The protocol says answer with a single JSON object.\n\nObservation: one sentence describing what was measured: \"The frozen bar tests/test_job1_fixture_pin.py passes (4 tests, OK, exit 0) and tests/test_loop_custody_on_finish.py hashes to 049808b1..., the exact pin target the bar names.\"\n\nOutput single JSON object, nothing else.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to evaluate the dimension `fixture_pin_reproduced`. The claim: fixtures plant `<work>/custody/bar.md` so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nThe frozen bar: tests/test_job1_fixture_pin.py (sha256 0f19cd...) passed, 4 tests OK, exit 0, run from worktree root /home/jarbis1/tmp/plumbline-fixtures. Before work it was FAILED (failures=4).\n\nEvidence 2: tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\nThe bar names a pin target — presumably PREDECESSOR_SHA in the bar's context, or the bar checks that the predecessor file's bytes hash to the target. The evidence says the file now hashes to the exact target the bar names. The bar's tests pass (4 tests, OK). So the frozen bar passes, and the predecessor file's bytes hash to the exact target the bar names.\n\nWe need to consider whether \"predecessor file\" refers to tests/test_loop_custody_on_finish.py. The evidence in point 3: PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. The bar names a target, and the file test_loop_custody_on_finish.py hashes to that target. So yes, the pin target is reproduced.\n\nThe bar passed after the work, from the worktree root. The sha of the bar is given but we have no tools to verify; we take the evidence as gathered before this call. The instruction: score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\n\nBar passes: yes (evidence 1). Predecessor file's bytes hash to exact target: evidence 2 says tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names. So score 1.\n\nDisclosed limit (evidence 5): main tree has no freeze build; suites green before and after. Does this undermine the claim? The claim is about fixtures planting bar.md so freeze build's suites will pass, and the predecessor file reproducing the pin target. The dimension is fixture_pin_reproduced — the bar tests the fixture pin reproduction. The bar passes. The disclosed limit doesn't change the bar passing or the hash match. The evaluator's criterion is strict: score 1 only if the frozen bar passes and predecessor file's bytes hash to exact target. Both conditions met per evidence.\n\nOne might quibble: the bar's tests passing is reported, not verified by us; but we have no tools, and the evidence is gathered before this call. The protocol says answer with a single JSON object.\n\nObservation: one sentence describing what was measured: \"The frozen bar tests/test_job1_fixture_pin.py passes (4 tests, OK, exit 0) and tests/test_loop_custody_on_finish.py hashes to 049808b1..., the exact pin target the bar names.\"\n\nOutput single JSON object, nothing else.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 537,
+        "completion_tokens": 787,
+        "total_tokens": 1324,
+        "cost": 0.00047405,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00047405,
+          "upstream_inference_prompt_cost": 8.055e-05,
+          "upstream_inference_completions_cost": 0.0003935
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 661,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 12429
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T01:11:10.733Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1492,
+        "moderation_latency": null,
+        "generation_time": 12429,
+        "tokens_prompt": 476,
+        "tokens_completion": 804,
+        "native_tokens_prompt": 537,
+        "native_tokens_completion": 787,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 661,
+        "native_tokens_cached": 0,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00047405,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794100270-NuhIIGawsg9OZajPljrg",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794100270-VNDCcc1Y3o36RMOq70AD",
+        "upstream_id": "202611080911118bdc2f2cd8db45a2",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "202611080911118bdc2f2cd8db45a2",
+            "is_byok": false,
+            "latency": 1492,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00047405,
+        "cache_discount": null,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T01:11:34.073952Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "fixture_pin_reproduced#p2",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `fixture_pin_reproduced`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION fixture_pin_reproduced\n\nCLAIM: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59) passed: `python3 tests/test_job1_fixture_pin.py` -> Ran 4 tests, OK, exit 0, run from the worktree root /home/jarbis1/tmp/plumbline-fixtures. Before the work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names.\n\n3. The diff is 3 insertions and 1 deletion across exactly the two editable files: _job() in test_loop_custody_on_finish.py writes custody/bar.md; _prepare() in test_loop_custody_sources.py does the same and PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; the bar file itself is untouched; no kit/ or schemas/ file was modified.\n\n4. All four suites pass on this tree: test_loop_custody_sources OK, test_loop_custody_on_finish OK, test_conductor_loop OK, test_loop_started_at OK.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after the change; the fixture bars are preparation for the later job that lands the freeze, not a repair of a red on this base.\n\nDecide: does the evidence show the fixture pin was reproduced as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T01:11:34.263248Z",
+    "received_at": "2026-11-08T01:11:50.826514Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 01:11:36 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=7,cfOrigin;dur=0,cfWorker;dur=1898",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794100294-tZl2vGuQPueFc35kK2VO",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;20bc6cd9-29a0-4017-9835-e2bf7f95b1bf",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a570b4577998a53a-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794100294-tZl2vGuQPueFc35kK2VO",
+      "object": "chat.completion",
+      "created": 1794100294,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59) passed with 4 tests OK and exit 0, and tests/test_loop_custody_on_finish.py hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, exactly the pin target the bar names.\"}",
+            "refusal": null,
+            "reasoning": "We need to evaluate the dimension `fixture_pin_reproduced`. The claim: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEvidence:\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd...) passed: 4 tests OK, exit 0, run from worktree root. Before work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\n3. Diff is 3 insertions and 1 deletion across exactly the two editable files; PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; bar file untouched; no kit/ or schemas/ modified.\n\n4. All four suites pass on this tree.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. Suites green before and after; fixture bars are preparation for later job, not repair of red on this base.\n\nThe instruction: Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\n\nEvidence 1: frozen bar passed (sha256 of the bar file matches, tests ran 4, OK, exit 0). Evidence 2: tests/test_loop_custody_on_finish.py hashes to 049808b1..., exactly the target the bar names.\n\nWait — \"the predecessor file's bytes hash to the exact target the bar names.\" The predecessor file here — which one? The bar names a target 049808b1..., and tests/test_loop_custody_on_finish.py hashes to that. But evidence 3 says PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. Hmm, so there are two files: the on_finish file itself hashes to 049808b1 (the target), and the sources file's PREDECESSOR_SHA constant now points to 049808b1.\n\nThe claim: \"the predecessor file's bytes reproduce the pin target the frozen bar names.\" The predecessor file — presumably the file that is a predecessor in the chain, i.e., test_loop_custody_on_finish.py, whose bytes should hash to the pin target named by the bar. Evidence 2 confirms: tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\nBoth conditions per the evaluator instruction: (a) frozen bar passes — yes, evidence 1. (b) predecessor file's bytes hash to exact target bar names — yes, evidence 2.\n\nThe disclosed limit (evidence 5): the tree is main, no freeze build; suites green before and after. Does this matter? The scoring rule says score 1 only if the frozen bar passes and predecessor file bytes hash to the exact target. Both conditions are met. The disclosure about no freeze build on this base doesn't negate either condition — the bar itself passed, and the file hash matches. The claim says fixtures plant <work>/custody/bar.md \"so the freeze build's suites will pass\" — the bar tests presumably check that the fixtures plant the bar file, and the pin reproduction. The bar passing includes 4 tests which presumably verify the plant and the pin.\n\nHmm, but should we be skeptical? The instruction is strict: score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names. Evidence shows both. The disclosed limit is about the base tree not carrying a freeze build — but that's a disclosed limitation, not a failure of either condition. The evaluator instruction doesn't require the freeze build to exist on this tree; it requires the frozen bar passes and hash matches. So score 1.\n\nOne sentence observation: \"Frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd…) ran 4 tests OK exit 0, and tests/test_loop_custody_on_finish.py hashes to 049808b1…, exactly the pin target the bar names.\"\n\nAnswer with single JSON object, nothing else.",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "We need to evaluate the dimension `fixture_pin_reproduced`. The claim: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEvidence:\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd...) passed: 4 tests OK, exit 0, run from worktree root. Before work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\n3. Diff is 3 insertions and 1 deletion across exactly the two editable files; PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; bar file untouched; no kit/ or schemas/ modified.\n\n4. All four suites pass on this tree.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. Suites green before and after; fixture bars are preparation for later job, not repair of red on this base.\n\nThe instruction: Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\n\nEvidence 1: frozen bar passed (sha256 of the bar file matches, tests ran 4, OK, exit 0). Evidence 2: tests/test_loop_custody_on_finish.py hashes to 049808b1..., exactly the target the bar names.\n\nWait — \"the predecessor file's bytes hash to the exact target the bar names.\" The predecessor file here — which one? The bar names a target 049808b1..., and tests/test_loop_custody_on_finish.py hashes to that. But evidence 3 says PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. Hmm, so there are two files: the on_finish file itself hashes to 049808b1 (the target), and the sources file's PREDECESSOR_SHA constant now points to 049808b1.\n\nThe claim: \"the predecessor file's bytes reproduce the pin target the frozen bar names.\" The predecessor file — presumably the file that is a predecessor in the chain, i.e., test_loop_custody_on_finish.py, whose bytes should hash to the pin target named by the bar. Evidence 2 confirms: tests/test_loop_custody_on_finish.py now hashes to 049808b1..., exactly the target the bar names.\n\nBoth conditions per the evaluator instruction: (a) frozen bar passes — yes, evidence 1. (b) predecessor file's bytes hash to exact target bar names — yes, evidence 2.\n\nThe disclosed limit (evidence 5): the tree is main, no freeze build; suites green before and after. Does this matter? The scoring rule says score 1 only if the frozen bar passes and predecessor file bytes hash to the exact target. Both conditions are met. The disclosure about no freeze build on this base doesn't negate either condition — the bar itself passed, and the file hash matches. The claim says fixtures plant <work>/custody/bar.md \"so the freeze build's suites will pass\" — the bar tests presumably check that the fixtures plant the bar file, and the pin reproduction. The bar passing includes 4 tests which presumably verify the plant and the pin.\n\nHmm, but should we be skeptical? The instruction is strict: score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names. Evidence shows both. The disclosed limit is about the base tree not carrying a freeze build — but that's a disclosed limitation, not a failure of either condition. The evaluator instruction doesn't require the freeze build to exist on this tree; it requires the frozen bar passes and hash matches. So score 1.\n\nOne sentence observation: \"Frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd…) ran 4 tests OK exit 0, and tests/test_loop_custody_on_finish.py hashes to 049808b1…, exactly the pin target the bar names.\"\n\nAnswer with single JSON object, nothing else.",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 537,
+        "completion_tokens": 1042,
+        "total_tokens": 1579,
+        "cost": 0.00054011,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 512,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00054011,
+          "upstream_inference_prompt_cost": 1.911e-05,
+          "upstream_inference_completions_cost": 0.000521
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 896,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 16331
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T01:11:34.327Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 1791,
+        "moderation_latency": null,
+        "generation_time": 16331,
+        "tokens_prompt": 476,
+        "tokens_completion": 1024,
+        "native_tokens_prompt": 537,
+        "native_tokens_completion": 1042,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 896,
+        "native_tokens_cached": 512,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00054011,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794100294-AqmySmOaalncv0Qxe4kn",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794100294-tZl2vGuQPueFc35kK2VO",
+        "upstream_id": "202611080911347b44c377bc224c1e",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "202611080911347b44c377bc224c1e",
+            "is_byok": false,
+            "latency": 1791,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00054011,
+        "cache_discount": 6.144e-05,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T01:12:01.481151Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  },
+  {
+    "call": "fixture_pin_reproduced#p3",
+    "seat": "evaluator",
+    "request": {
+      "method": "POST",
+      "url": "https://openrouter.ai/api/v1/chat/completions",
+      "headers": {
+        "Authorization": "Bearer [REDACTED]",
+        "Content-Type": "application/json",
+        "X-OpenRouter-Metadata": "enabled"
+      },
+      "body": {
+        "model": "z-ai/glm-5.3-flash",
+        "messages": [
+          {
+            "role": "system",
+            "content": "You are the Plumbline Evaluator for dimension `fixture_pin_reproduced`. Answer with a single JSON object and nothing else: {\"score\": 1 or 0, \"observation\": \"<what you measured, one sentence>\"}. Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names."
+          },
+          {
+            "role": "user",
+            "content": "DIMENSION fixture_pin_reproduced\n\nCLAIM: the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nEVIDENCE (gathered before this call; you have no tools here):\n\n1. The frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd5102f1b83e8309c30e3fddd451ea047f0a66dfaac0e04be57beaa9fe59) passed: `python3 tests/test_job1_fixture_pin.py` -> Ran 4 tests, OK, exit 0, run from the worktree root /home/jarbis1/tmp/plumbline-fixtures. Before the work it was FAILED (failures=4), exit 1.\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names.\n\n3. The diff is 3 insertions and 1 deletion across exactly the two editable files: _job() in test_loop_custody_on_finish.py writes custody/bar.md; _prepare() in test_loop_custody_sources.py does the same and PREDECESSOR_SHA moves from 6f13ae64 to 049808b1. Nothing else changed; the bar file itself is untouched; no kit/ or schemas/ file was modified.\n\n4. All four suites pass on this tree: test_loop_custody_sources OK, test_loop_custody_on_finish OK, test_conductor_loop OK, test_loop_started_at OK.\n\n5. Disclosed limit: this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after the change; the fixture bars are preparation for the later job that lands the freeze, not a repair of a red on this base.\n\nDecide: does the evidence show the fixture pin was reproduced as the bar requires?"
+          }
+        ],
+        "provider": {
+          "order": [
+            "z-ai/fp8"
+          ],
+          "allow_fallbacks": false,
+          "zdr": true
+        },
+        "max_tokens": 131072
+      }
+    },
+    "harness": {
+      "name": "tools/edi/or_call.py",
+      "sha256": "630b1c3f11ebff9dd5fdac4e3e55c9d0234ae92742143431864845107960775c"
+    },
+    "sent_at": "2026-11-08T01:12:01.647425Z",
+    "received_at": "2026-11-08T01:12:21.042843Z",
+    "response_status": 200,
+    "response_headers": {
+      "Date": "Sun, 08 Nov 2026 01:12:02 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "close",
+      "Server-Timing": "cfEdge;dur=11,cfOrigin;dur=0,cfWorker;dur=981",
+      "Access-Control-Allow-Origin": "*",
+      "X-Generation-Id": "gen-1794100321-htoqyk0BCH5vbmaXMnIu",
+      "access-control-expose-headers": "X-Generation-Id,x-openrouter-error-origin,x-openrouter-error-tool,X-Provider-Name,request-id,cf-ray",
+      "x-openrouter-release": "api;20bc6cd9-29a0-4017-9835-e2bf7f95b1bf",
+      "set-cookie": "[REDACTED]",
+      "Permissions-Policy": "payment=(self \"https://checkout.stripe.com\" \"https://connect-js.stripe.com\" \"https://js.stripe.com\" \"https://*.js.stripe.com\" \"https://hooks.stripe.com\")",
+      "Referrer-Policy": "no-referrer, strict-origin-when-cross-origin",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "a570b502adf57bf9-MIA",
+      "alt-svc": "h3=\":443\"; ma=86400"
+    },
+    "response": {
+      "id": "gen-1794100321-htoqyk0BCH5vbmaXMnIu",
+      "object": "chat.completion",
+      "created": 1794100321,
+      "model": "z-ai/glm-5.3-flash",
+      "provider": "Z.AI",
+      "system_fingerprint": null,
+      "service_tier": null,
+      "choices": [
+        {
+          "index": 0,
+          "logprobs": null,
+          "finish_reason": "stop",
+          "native_finish_reason": "stop",
+          "message": {
+            "role": "assistant",
+            "content": "{\"score\": 1, \"observation\": \"The frozen bar tests/test_job1_fixture_pin.py passed (4 tests OK, exit 0, previously FAILED with 4 failures), and the predecessor file tests/test_loop_custody_on_finish.py hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, exactly the pin target the bar names, with the diff confined to the two editable fixture files and the disclosed absence of a freeze build on main not affecting either required condition.\"}",
+            "refusal": null,
+            "reasoning": "Let me analyze this carefully.\n\nThe dimension is `fixture_pin_reproduced`. The claim: fixtures plant `<work>/custody/bar.md` so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nThe evaluator instruction: Score 1 only if the frozen bar passes AND the predecessor file's bytes hash to the exact target the bar names.\n\nEvidence:\n\n1. Frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd51...) passed: Ran 4 tests, OK, exit 0, run from worktree root /home/jarbis1/tmp/plumbline-fixtures. Before work it was FAILED (failures=4), exit 1. — So the bar passes. ✓\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names. — So the predecessor file (test_loop_custody_on_finish.py, apparently the file whose bytes must reproduce the pin) hashes to the exact target the bar names. ✓\n\nWait — which is the \"predecessor file\"? The diff mentions PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. The bar names target 049808b1... which matches test_loop_custody_on_finish.py's hash. Hmm, but PREDECESSOR_SHA in test_loop_custody_sources.py was updated to 049808b1 too. So the predecessor file's bytes hash to the target the bar names: evidence item 2 says tests/test_loop_custody_on_finish.py now hashes to 049808b1... which is exactly the target the bar names. So both conditions:\n\n- Frozen bar passes: yes (evidence 1).\n- Predecessor file's bytes hash to exact target the bar names: yes (evidence 2).\n\nEvidence 3: diff is minimal, only editable files changed, bar untouched, no kit/schemas modified. Good.\n\nEvidence 4: all four suites pass on this tree.\n\nEvidence 5: disclosed limit — this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after; fixture bars are preparation for the later job, not a repair of a red on this base.\n\nNow, the key question: does the disclosed limit in evidence 5 undermine the score? The instruction: \"Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\" Both conditions are met per evidence 1 and 2. The disclosed limit says the freeze build isn't present on this base — but the bar itself (test_job1_fixture_pin.py) passed, which presumably tests that the fixtures plant custody/bar.md and that the pin matches. The bar is the frozen bar; it passed. The condition is explicitly: bar passes + predecessor bytes hash to exact target. Both hold.\n\nThe disclosed limit doesn't violate the two conditions. The bar passing was verified on this tree, exit 0, 4 tests. The predecessor file hashes exactly to 049808b1... which is the target the bar names.\n\nOne might wonder: should the \"freeze build\" context matter? The dimension claim says \"the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass\". The bar tests presumably check that. The bar passed. The scoring rule is explicit and narrow: score 1 only if frozen bar passes AND predecessor file's bytes hash to the exact target. Both are satisfied. The disclosed limit is about the base not carrying a freeze build — but the rule doesn't require a freeze build to be present; it requires the bar to pass and the hash to match. The bar was run and passed on the worktree.\n\nHmm, but should I be suspicious that the bar passing on a tree without freeze build is not meaningful? The bar is named test_job1_fixture_pin.py — \"job1 fixture pin\". It presumably tests that fixtures plant the custody bar and the pin reproduces. It passed with 4 tests OK. Before the work it failed with 4 failures — so the bar does discriminate; it went from red to green due to the change. That's a genuine red→green transition on the bar.\n\nSo the answer: score 1, with observation summarizing.\n\nObservation: one sentence — e.g., \"The frozen bar test_job1_fixture_pin.py passed (4 tests OK, exit 0, red before), and tests/test_loop_custody_on_finish.py hashes to 049808b1...38e7d, exactly the pin target the bar names; the disclosed absence of a freeze build on main does not affect either condition.\"\n\nKeep it to one sentence JSON object only.\n\nOutput: {\"score\": 1, \"observation\": \"...\"}",
+            "reasoning_details": [
+              {
+                "type": "reasoning.text",
+                "text": "Let me analyze this carefully.\n\nThe dimension is `fixture_pin_reproduced`. The claim: fixtures plant `<work>/custody/bar.md` so the freeze build's suites will pass, and the predecessor file's bytes reproduce the pin target the frozen bar names.\n\nThe evaluator instruction: Score 1 only if the frozen bar passes AND the predecessor file's bytes hash to the exact target the bar names.\n\nEvidence:\n\n1. Frozen bar tests/test_job1_fixture_pin.py (sha256 0f19cd51...) passed: Ran 4 tests, OK, exit 0, run from worktree root /home/jarbis1/tmp/plumbline-fixtures. Before work it was FAILED (failures=4), exit 1. — So the bar passes. ✓\n\n2. tests/test_loop_custody_on_finish.py now hashes to 049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d, which is exactly the target the bar names. — So the predecessor file (test_loop_custody_on_finish.py, apparently the file whose bytes must reproduce the pin) hashes to the exact target the bar names. ✓\n\nWait — which is the \"predecessor file\"? The diff mentions PREDECESSOR_SHA moves from 6f13ae64 to 049808b1 in test_loop_custody_sources.py. The bar names target 049808b1... which matches test_loop_custody_on_finish.py's hash. Hmm, but PREDECESSOR_SHA in test_loop_custody_sources.py was updated to 049808b1 too. So the predecessor file's bytes hash to the target the bar names: evidence item 2 says tests/test_loop_custody_on_finish.py now hashes to 049808b1... which is exactly the target the bar names. So both conditions:\n\n- Frozen bar passes: yes (evidence 1).\n- Predecessor file's bytes hash to exact target the bar names: yes (evidence 2).\n\nEvidence 3: diff is minimal, only editable files changed, bar untouched, no kit/schemas modified. Good.\n\nEvidence 4: all four suites pass on this tree.\n\nEvidence 5: disclosed limit — this tree is main (cf283e71), which carries no freeze build. The suites are green here before and after; fixture bars are preparation for the later job, not a repair of a red on this base.\n\nNow, the key question: does the disclosed limit in evidence 5 undermine the score? The instruction: \"Score 1 only if the frozen bar passes and the predecessor file's bytes hash to the exact target the bar names.\" Both conditions are met per evidence 1 and 2. The disclosed limit says the freeze build isn't present on this base — but the bar itself (test_job1_fixture_pin.py) passed, which presumably tests that the fixtures plant custody/bar.md and that the pin matches. The bar is the frozen bar; it passed. The condition is explicitly: bar passes + predecessor bytes hash to exact target. Both hold.\n\nThe disclosed limit doesn't violate the two conditions. The bar passing was verified on this tree, exit 0, 4 tests. The predecessor file hashes exactly to 049808b1... which is the target the bar names.\n\nOne might wonder: should the \"freeze build\" context matter? The dimension claim says \"the fixtures plant <work>/custody/bar.md so the freeze build's suites will pass\". The bar tests presumably check that. The bar passed. The scoring rule is explicit and narrow: score 1 only if frozen bar passes AND predecessor file's bytes hash to the exact target. Both are satisfied. The disclosed limit is about the base not carrying a freeze build — but the rule doesn't require a freeze build to be present; it requires the bar to pass and the hash to match. The bar was run and passed on the worktree.\n\nHmm, but should I be suspicious that the bar passing on a tree without freeze build is not meaningful? The bar is named test_job1_fixture_pin.py — \"job1 fixture pin\". It presumably tests that fixtures plant the custody bar and the pin reproduces. It passed with 4 tests OK. Before the work it failed with 4 failures — so the bar does discriminate; it went from red to green due to the change. That's a genuine red→green transition on the bar.\n\nSo the answer: score 1, with observation summarizing.\n\nObservation: one sentence — e.g., \"The frozen bar test_job1_fixture_pin.py passed (4 tests OK, exit 0, red before), and tests/test_loop_custody_on_finish.py hashes to 049808b1...38e7d, exactly the pin target the bar names; the disclosed absence of a freeze build on main does not affect either condition.\"\n\nKeep it to one sentence JSON object only.\n\nOutput: {\"score\": 1, \"observation\": \"...\"}",
+                "format": "unknown",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 537,
+        "completion_tokens": 1183,
+        "total_tokens": 1720,
+        "cost": 0.00061061,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 512,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00061061,
+          "upstream_inference_prompt_cost": 1.911e-05,
+          "upstream_inference_completions_cost": 0.0005915
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1049,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "openrouter_metadata": {
+        "requested": "z-ai/glm-5.3-flash",
+        "strategy": "direct",
+        "region": "MIA",
+        "summary": "available=1, selected=Z.AI",
+        "attempt": 1,
+        "is_byok": false,
+        "endpoints": {
+          "total": 41,
+          "available": [
+            {
+              "provider": "Z.AI",
+              "model": "z-ai/glm-5.3-flash-20260826",
+              "selected": true
+            }
+          ]
+        },
+        "generation_time": 19237
+      }
+    },
+    "generation": {
+      "data": {
+        "created_at": "2026-11-08T01:12:01.714Z",
+        "model": "z-ai/glm-5.3-flash-20260826",
+        "app_id": null,
+        "external_user": null,
+        "streamed": true,
+        "cancelled": false,
+        "latency": 926,
+        "moderation_latency": null,
+        "generation_time": 19237,
+        "tokens_prompt": 476,
+        "tokens_completion": 1202,
+        "native_tokens_prompt": 537,
+        "native_tokens_completion": 1183,
+        "native_tokens_completion_images": null,
+        "native_tokens_reasoning": 1049,
+        "native_tokens_cached": 512,
+        "num_media_prompt": null,
+        "num_input_audio_prompt": null,
+        "num_media_completion": 0,
+        "num_search_results": null,
+        "num_fetches": null,
+        "web_search_engine": null,
+        "origin": "",
+        "is_byok": false,
+        "finish_reason": "stop",
+        "native_finish_reason": "stop",
+        "service_tier": null,
+        "usage": 0.00061061,
+        "router": null,
+        "user_agent": "Python-urllib/3.14",
+        "http_referer": null,
+        "request_id": "req-1794100321-B1LC9gTPWpK7WlwA9LWf",
+        "session_id": null,
+        "preset_id": null,
+        "api_type": "completions",
+        "id": "gen-1794100321-htoqyk0BCH5vbmaXMnIu",
+        "upstream_id": "20261108091201474449a642ee49fa",
+        "provider_responses": [
+          {
+            "endpoint_id": "8e9fe48b-2f91-41c3-a8a7-e4a93a8c4ff0",
+            "id": "20261108091201474449a642ee49fa",
+            "is_byok": false,
+            "latency": 926,
+            "model_permaslug": "z-ai/glm-5.3-flash-20260826",
+            "provider_name": "Z.AI",
+            "status": 200
+          }
+        ],
+        "total_cost": 0.00061061,
+        "cache_discount": 6.144e-05,
+        "upstream_inference_cost": 0,
+        "provider_name": "Z.AI",
+        "response_cache_source_id": null,
+        "data_region": "global",
+        "workspace_id": "9f0cf866-7385-574f-9406-7d143fbd6824"
+      }
+    },
+    "generation_status": 200,
+    "generation_fetched_at": "2026-11-08T01:12:31.643760Z",
+    "verdict": {
+      "pin": {
+        "tag": "z-ai/fp8",
+        "provider": "Z.AI"
+      },
+      "served_by": {
+        "response.provider": "Z.AI",
+        "openrouter_metadata.endpoints.selected": "Z.AI",
+        "generation.provider_name": "Z.AI"
+      },
+      "tried": [
+        "Z.AI"
+      ],
+      "ok": true,
+      "refusal": null,
+      "generation_reply": true
+    }
+  }
+]

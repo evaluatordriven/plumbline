@@ -1,0 +1,33 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "orchestrator": {
+    "name": "plumbline-conductor",
+    "kind": "agent",
+    "aliases": [
+      "conductor",
+      "@plumbline-conductor"
+    ]
+  },
+  "bar": {
+    "file": "custody/bar.md",
+    "frozenAt": "2026-11-09T00:23:47Z",
+    "approvals": [
+      {
+        "role": "buyer",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "b36bdd052395a9b1de5177fcf8cae463a19f38af010b6ac51ec165b9c818a69a",
+        "at": "2026-11-09T00:23:47Z",
+        "adopted": null
+      },
+      {
+        "role": "specialist",
+        "by": "Steve Moitozo II",
+        "kind": "person",
+        "barDigest": "b36bdd052395a9b1de5177fcf8cae463a19f38af010b6ac51ec165b9c818a69a",
+        "at": "2026-11-09T00:23:47Z",
+        "adopted": null
+      }
+    ]
+  }
+}

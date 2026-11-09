@@ -1,0 +1,47 @@
+{
+  "dimensions": [
+    {
+      "id": "drain_at_turn_start",
+      "observation": {
+        "observed": true,
+        "basis": "Measured: the frozen bar tests/test_seat_move_notice_drain.py passes 7/7 (the legacy 12-test bar also OK), and against the real conductor profile a live-enqueued notice (ebe0c6a5...) was staged by prepare_turn \u2014 mailbox emptied to exactly one inflight receipt with the context string returned \u2014 and removed by consume_turn, with empty-mailbox, corrupt-receipt, and stranded-inflight fail-closed behavior bar-covered; the uninstalled turn loop and the misdirected dispatch file list are disclosed out-of-scope gaps, not part of what this bar tests.",
+        "fresh": true
+      },
+      "scored": {
+        "runs": [
+          1,
+          1,
+          1
+        ],
+        "mean": 1.0,
+        "min": 1,
+        "threshold_accept": 1,
+        "threshold_dim": 1
+      },
+      "verdict": "pass"
+    },
+    {
+      "id": "announced_by_an_unscripted_turn",
+      "observation": {
+        "observed": false,
+        "basis": "UNPROVEN: no turn that the Orchestrator did not drive has run against the installed launcher"
+      },
+      "scored": null,
+      "verdict": "unproven"
+    }
+  ],
+  "controls": {
+    "K1": {
+      "id": "queued_notice_stages_and_consumes",
+      "result": "conforms"
+    },
+    "K2": {
+      "id": "drain_absent_before_the_work",
+      "result": "does_not_conform",
+      "note": "the pre-work tree had no kit/seat_move_drain.py, so no drain existed"
+    },
+    "name": "drain_at_turn_start"
+  },
+  "terminal_state_candidate": "needs_owner",
+  "terminal_state_reason": "dimension `announced_by_an_unscripted_turn` has no observation, which forces needs_owner: a dimension with no observation is never rejected and never averaged away"
+}

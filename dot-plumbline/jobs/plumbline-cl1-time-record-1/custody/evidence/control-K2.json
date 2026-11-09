@@ -1,0 +1,11 @@
+{
+  "id": "K2",
+  "batch": "b1",
+  "expected": "does_not_conform",
+  "result": "does_not_conform",
+  "tree": "/home/jarbis1/tmp/plumbline-baseline-audit",
+  "observed": {
+    "import": "failed",
+    "err": "cannot import name 'cl1_source_gaps' from 'kit.emit_packet'"
+  }
+}

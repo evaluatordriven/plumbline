@@ -1,0 +1,10 @@
+{
+  "files": [
+    "kit/seat_move_drain.py",
+    "deployment/plumbline-conductor/seat-move-notice.py",
+    "deployment/plumbline-conductor/README.md"
+  ],
+  "read": ["tests/test_seat_move_notice_drain.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-drain-record-1/message.md"
+}

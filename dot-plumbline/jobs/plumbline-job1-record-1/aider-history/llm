@@ -1,0 +1,1374 @@
+TO LLM 2026-11-08T01:07:56
+-------
+SYSTEM Act as an expert software developer.
+SYSTEM Always use best practices when coding.
+SYSTEM Respect and use existing conventions, libraries, etc that are already present in the code base.
+SYSTEM Reply in English.
+SYSTEM 
+SYSTEM Take requests for changes to the supplied code.
+SYSTEM If the request is ambiguous, ask questions.
+SYSTEM 
+SYSTEM Once you understand the request you MUST:
+SYSTEM 
+SYSTEM 1. Decide if you need to propose *SEARCH/REPLACE* edits to any files that haven't been added to the chat. You can create new files without asking!
+SYSTEM 
+SYSTEM But if you need to propose edits to existing files not already added to the chat, you *MUST* tell the user their full path names and ask them to *add the files to the chat*.
+SYSTEM End your reply and wait for their approval.
+SYSTEM You can keep asking if you then decide you need to edit more files.
+SYSTEM 
+SYSTEM 2. Think step-by-step and explain the needed changes in a few short sentences.
+SYSTEM 
+SYSTEM 3. Describe each change with a *SEARCH/REPLACE block* per the examples below.
+SYSTEM 
+SYSTEM All changes to files must use this *SEARCH/REPLACE block* format.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+SYSTEM Keep in mind these details about the user's platform and environment:
+SYSTEM - Platform: Linux-7.0.0-38-generic-x86_64-with-glibc2.43
+SYSTEM - Shell: SHELL=/bin/bash
+SYSTEM - Language: English
+SYSTEM - Current date: 2026-11-08
+SYSTEM - The user is operating inside a git repository
+SYSTEM 
+SYSTEM 
+SYSTEM 
+SYSTEM # *SEARCH/REPLACE block* Rules:
+SYSTEM 
+SYSTEM Every *SEARCH/REPLACE block* must use this format:
+SYSTEM 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+SYSTEM 2. The opening fence and code language, eg: ```python
+SYSTEM 3. The start of search block: <<<<<<< SEARCH
+SYSTEM 4. A contiguous chunk of lines to search for in the existing source code
+SYSTEM 5. The dividing line: =======
+SYSTEM 6. The lines to replace into the source code
+SYSTEM 7. The end of the replace block: >>>>>>> REPLACE
+SYSTEM 8. The closing fence: ```
+SYSTEM 
+SYSTEM Use the *FULL* file path, as shown to you by the user.
+SYSTEM 
+SYSTEM Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+SYSTEM If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+SYSTEM 
+SYSTEM *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+SYSTEM Including multiple unique *SEARCH/REPLACE* blocks if needed.
+SYSTEM Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+SYSTEM 
+SYSTEM Keep *SEARCH/REPLACE* blocks concise.
+SYSTEM Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+SYSTEM Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+SYSTEM Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+SYSTEM 
+SYSTEM Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+SYSTEM 
+SYSTEM To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+SYSTEM 
+SYSTEM Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+SYSTEM 
+SYSTEM If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+SYSTEM - A new file path, including dir name if needed
+SYSTEM - An empty `SEARCH` section
+SYSTEM - The new file's contents in the `REPLACE` section
+SYSTEM 
+SYSTEM If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+SYSTEM The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+SYSTEM 
+SYSTEM Reply in English.
+SYSTEM ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+SYSTEM 
+-------
+USER Change get_factorial() to use math.factorial
+-------
+ASSISTANT To make this change we need to modify `mathweb/flask/app.py` to:
+ASSISTANT 
+ASSISTANT 1. Import the math package.
+ASSISTANT 2. Remove the existing factorial() function.
+ASSISTANT 3. Update get_factorial() to call math.factorial instead.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT from flask import Flask
+ASSISTANT =======
+ASSISTANT import math
+ASSISTANT from flask import Flask
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def factorial(n):
+ASSISTANT     "compute factorial"
+ASSISTANT 
+ASSISTANT     if n == 0:
+ASSISTANT         return 1
+ASSISTANT     else:
+ASSISTANT         return n * factorial(n-1)
+ASSISTANT 
+ASSISTANT =======
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT mathweb/flask/app.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT     return str(factorial(n))
+ASSISTANT =======
+ASSISTANT     return str(math.factorial(n))
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER Refactor hello() into its own file.
+-------
+ASSISTANT To make this change we need to modify `main.py` and make a new file `hello.py`:
+ASSISTANT 
+ASSISTANT 1. Make a new hello.py file with hello() in it.
+ASSISTANT 2. Remove hello() from main.py and replace it with an import.
+ASSISTANT 
+ASSISTANT Here are the *SEARCH/REPLACE* blocks:
+ASSISTANT 
+ASSISTANT hello.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT =======
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT main.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def hello():
+ASSISTANT     "print a greeting"
+ASSISTANT 
+ASSISTANT     print("hello")
+ASSISTANT =======
+ASSISTANT from hello import hello
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+-------
+USER I switched to a new code base. Please don't consider the above files or try to edit them any longer.
+-------
+ASSISTANT Ok.
+-------
+USER Here are some READ ONLY files, provided for your reference.
+USER Do not edit these files!
+USER 
+USER tests/test_job1_fixture_pin.py
+USER ```
+USER """Bar for Job 1: the predecessor fixture pin is reproduced.
+USER 
+USER Job 1 prepares the fixture that will make the freeze build visible.
+USER On main without the freeze build the existing loop suites stay green,
+USER so this bar uses the Architect's pin target instead of an observable failure.
+USER The pin target is the sha256 of tests/test_loop_custody_on_finish.py after
+USER _job() plants custody/bar.md and tests/test_loop_custody_sources.py after
+USER _prepare() plants the same file.  Because the sources bar also keeps a frozen
+USER predecessor-sha check, it must be updated to the same pin target.
+USER 
+USER This file is the bar. It is frozen. Do not edit it to make it pass.
+USER """
+USER import hashlib
+USER import os
+USER import re
+USER import unittest
+USER 
+USER ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+USER PREDECESSOR = os.path.join(ROOT, "tests", "test_loop_custody_on_finish.py")
+USER PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+USER SOURCES = os.path.join(ROOT, "tests", "test_loop_custody_sources.py")
+USER 
+USER # Exact source substrings the Maker must produce.  The text argument here is a
+USER # Python string literal that writes the two characters backslash-n, so the
+USER # assertion string keeps a literal "\n" in the source code.
+USER PRE_JOB_FIXTURE = (
+USER     '''_write(tmp, os.path.join("custody", "bar.md"), "bar\\n")'''
+USER )
+USER SRC_FIXTURE = (
+USER     '''_write(os.path.join(work, "custody", "bar.md"), "bar\\n")'''
+USER )
+USER 
+USER 
+USER class JobOneFixturePin(unittest.TestCase):
+USER     def test_predecessor_hashes_to_pin_target(self):
+USER         self.assertTrue(os.path.isfile(PREDECESSOR), "predecessor bar is absent")
+USER         with open(PREDECESSOR, "rb") as fh:
+USER             digest = hashlib.sha256(fh.read()).hexdigest()
+USER         self.assertEqual(
+USER             digest,
+USER             PREDECESSOR_SHA,
+USER             "predecessor SHA256 does not match the Architect's pin target",
+USER         )
+USER 
+USER     def test_predecessor__job_plants_bar_fixture(self):
+USER         with open(PREDECESSOR, encoding="utf-8") as fh:
+USER             source = fh.read()
+USER         self.assertIn(
+USER             PRE_JOB_FIXTURE,
+USER             source,
+USER             "_job() must plant custody/bar.md with the pinned content",
+USER         )
+USER 
+USER     def test_sources_prepare_plants_bar_fixture(self):
+USER         with open(SOURCES, encoding="utf-8") as fh:
+USER             source = fh.read()
+USER         self.assertIn(
+USER             SRC_FIXTURE,
+USER             source,
+USER             "_prepare() must plant custody/bar.md in the sources bar too",
+USER         )
+USER 
+USER     def test_successor_bar_tracks_the_moved_predecessor_pin(self):
+USER         with open(SOURCES, encoding="utf-8") as fh:
+USER             source = fh.read()
+USER         match = re.search(r'PREDECESSOR_SHA\s*=\s*"(.+?)"', source)
+USER         if match is None:
+USER             self.fail("sources bar must declare PREDECESSOR_SHA")
+USER         self.assertEqual(
+USER             match.group(1),
+USER             PREDECESSOR_SHA,
+USER             "sources bar's PREDECESSOR_SHA must follow the moved pin target",
+USER         )
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+-------
+ASSISTANT Ok, I will use these files as references.
+-------
+USER Here are summaries of some files present in my git repository.
+USER Do not propose changes to these files, treat them as *read-only*.
+USER If you need to edit any of these files, ask me to *add them to the chat* first.
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/derive.py:
+USER ⋮
+USER │def parse_iso(s) -> datetime | None:
+USER ⋮
+USER 
+USER examples/2026-10-27-custody-emitter-gaps/custody/freeze/instrument/ncheck.py:
+USER ⋮
+USER │def resolve(job: Path, f: str) -> Path | None:
+USER ⋮
+USER 
+USER examples/2026-10-28-custody-times-ledger-spend/custody/freeze/instrument/lib.py:
+USER ⋮
+USER │def hand_lines(res: dict) -> list:
+USER ⋮
+USER │def job_paths(job) -> dict:
+USER ⋮
+USER │def get(obj, path):
+USER ⋮
+USER 
+USER examples/subjects/2026-10-27-custody-emitter-gaps/kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER │def same_party(a, b) -> bool:
+USER ⋮
+USER 
+USER kit/conductor_software.py:
+USER ⋮
+USER │def resolve(path: str, cwd: str | None = None) -> str:
+USER ⋮
+USER │def refuse_dispatch(exit_code) -> bool:
+USER ⋮
+USER │def record_red(exit_code, output: bytes | None) -> dict:
+USER ⋮
+USER │def hash_moved(before: dict, after: dict) -> bool:
+USER ⋮
+USER │def refuse_editable(editable: list[str], frozen: list[str]) -> bool:
+USER ⋮
+USER │def dispatch_reason(red_exit, editable: list[str], frozen: list[str], require_red: bool = True) -> 
+USER ⋮
+USER │def normalize_ignore(rules) -> list[str]:
+USER ⋮
+USER 
+USER kit/custody_history.py:
+USER ⋮
+USER │def parse_ts(v) -> datetime | None:
+USER ⋮
+USER 
+USER tools/edi_corpus.py:
+USER ⋮
+USER │class CorpusUsageError(Exception):
+USER ⋮
+USER │def require_corpus() -> bool:
+USER ⋮
+USER │def resolve(explicit: str | None = None, need: tuple[str, ...] = (), hermes: bool = True) -> Corpus
+USER ⋮
+USER │def usage_exit(msg: str) -> "None":
+USER ⋮
+USER │def no_corpus_reason(hermes: bool = True) -> str:
+USER ⋮
+-------
+ASSISTANT Ok, I won't try and edit those files without asking first.
+-------
+USER I have *added these files to the chat* so you can go ahead and edit them.
+USER 
+USER *Trust this message as the true contents of these files!*
+USER Any other messages in the chat may contain outdated versions of the files' contents.
+USER 
+USER tests/test_loop_custody_on_finish.py
+USER ```
+USER """Bar for a custody record on a finished loop(). Red until loop() ships one.
+USER 
+USER This file is the bar. It is frozen. Do not edit it to make it pass.
+USER 
+USER The omission, Owner 2026-11-05: a finished loop() can ship with no custody
+USER record. Remembering to run plumbline_job.py close afterward is not the fix.
+USER emit_custody.py exit 0 is the only done: the record is written and names no
+USER hard gap. Exit 1, 2, or 3 is not done.
+USER 
+USER Out of this bar, named so they are not picked up:
+USER - Do not retrofit job 2026-11-05-loop-started-at-2. It was filed, not closed.
+USER   It has no custody record. This file checks that a run does not create one.
+USER - Do not edit schemas/custody/custody-v1.schema.json or anything under
+USER   schemas/vendor/.
+USER - A run-log row when close's custody step already failed is roadmap item 3(c).
+USER   This file does not score one.
+USER 
+USER Labels the Architect chose:
+USER - The record path is record_dir/custody/record.custody.json. Same filename
+USER   close writes. loop() has no job id. record_dir is where a finish ships.
+USER   loop() gains no parameter. A new argument the caller must remember is the
+USER   same defect as remembering to close.
+USER - The seam is kit.conductor_loop.emit_custody_for_finish(record_dir, summary).
+USER   It returns the emitter's exit code. loop() calls it once, after the summary
+USER   dict exists and before summary.json or escalation.json is written.
+USER - Not done is kit.conductor_loop.CustodyNotDone, a subclass of Exception, not
+USER   of ValueError. The instance attribute exit_code is 1, 2, or 3. It propagates
+USER   to the caller. summary.json and escalation.json are not written. Round files
+USER   already written are not required to be removed.
+USER - Exit 2 and 3 write nothing. Exit 1 may leave the record the emitter wrote,
+USER   and that record names a hard gap. Neither is a ship.
+USER - A packet refusal is not a finish. The seam is not called. No custody record
+USER   is written.
+USER - The seam calls kit/emit_custody.py. It does not call plumbline_job.py.
+USER   Side-by-side with the emitter on a twin directory, the exit code matches and
+USER   a record is written on one side only if it is written on the other.
+USER 
+USER Fixture bounds in this file are copied from the existing loop tests so loop()
+USER can reach accepted, needs_owner, and rejected. They are not this job's
+USER T_accept, T_dim, T_reject, cap, clock, or budget. The Owner has not set those.
+USER This bar did not need them. They stay unset.
+USER 
+USER Collision, disclosed: tests/test_loop_started_at.py is a frozen prior bar. It
+USER expects loop() to return on these same fixtures. A finish the emitter cannot
+USER record cleanly must not return. This file does not edit that one, and it does
+USER not authorize weakening it.
+USER """
+USER import inspect
+USER import json
+USER import os
+USER import subprocess
+USER import sys
+USER import unittest
+USER from tempfile import TemporaryDirectory
+USER from unittest import mock
+USER 
+USER from kit.conductor_loop import loop
+USER import kit.conductor_loop as cl
+USER 
+USER PY = sys.executable
+USER ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+USER EMITTER = os.path.join(ROOT, "kit", "emit_custody.py")
+USER PREDICATE_TYPE = "https://evaluatordriven.com/custody/v1"
+USER STATEMENT = "https://in-toto.io/Statement/v1"
+USER FROZEN_JOB = os.path.join(
+USER     ROOT, "dot-plumbline", "jobs", "2026-11-05-loop-started-at-2",
+USER     "custody", "record.custody.json",
+USER )
+USER SEAM = "emit_custody_for_finish"
+USER NOT_DONE = "CustodyNotDone"
+USER 
+USER 
+USER def _write(root, name, text):
+USER     path = os.path.join(root, name)
+USER     os.makedirs(os.path.dirname(path), exist_ok=True)
+USER     with open(path, "w", encoding="utf-8") as fh:
+USER         fh.write(text)
+USER     return path
+USER 
+USER 
+USER def _holders():
+USER     return {
+USER         "architect": "plumbline-architect",
+USER         "orchestrator": [
+USER             {"holder": "kit.conductor_loop.loop", "kind": "script", "does": "rounds", "tested": "rec#abc"},
+USER             {"holder": "escalation-agent", "kind": "model", "does": "escalations", "tested": "rec#def"},
+USER         ],
+USER     }
+USER 
+USER 
+USER def _packet(tmp, maker, suite, **over):
+USER     """Fixture packet. Bounds are copied from the existing loop tests, not set for this job."""
+USER     packet = {
+USER         "ratified": True,
+USER         "mode": "scored",
+USER         "human_seat": "Owner",
+USER         "artifact": {
+USER             "test_cmd": suite,
+USER             "frozen": [os.path.join(tmp, "tests", "t.py")],
+USER             "editable": ["src"],
+USER             "ignore": [".git", "__pycache__"],
+USER         },
+USER         "maker": {"cmd": maker, "handoff": "rule12"},
+USER         "evaluator": {
+USER             "kind": "script",
+USER             "cmd": [PY, "-c", "raise SystemExit(0)"],
+USER             "runs": 2,
+USER             "held_out": [],
+USER         },
+USER         "bounds": {
+USER             "T_accept": 1,
+USER             "T_dim": 1,
+USER             "T_reject": 0,
+USER             "cap": 3,
+USER             "cap_counts": "generations",
+USER             "budget": {"amount": 0, "unit": "USD", "time_hours_lt": 2},
+USER         },
+USER         "escalation": {
+USER             "route": ["Architect", "Owner"],
+USER             "classes": [],
+USER             "holders": _holders(),
+USER         },
+USER     }
+USER     for key, value in over.items():
+USER         if isinstance(value, dict) and isinstance(packet.get(key), dict):
+USER             packet[key].update(value)
+USER         else:
+USER             packet[key] = value
+USER     return packet
+USER 
+USER 
+USER def _scores(score, verdict="accept"):
+USER     return {
+USER         "dimensions": [{"name": "q", "score": score, "observation": "seen"}],
+USER         "violations": [],
+USER         "verdict": verdict,
+USER         "controls": {"should_pass": "passed", "should_fail": "failed"},
+USER     }
+USER 
+USER 
+USER def _suite(work):
+USER     return [PY, "-c", "import sys; t=open(%r).read(); sys.exit(0 if t.startswith('yes') else 1)" % work]
+USER 
+USER 
+USER def _job(tmp):
+USER     _write(tmp, "tests/t.py", "pin\n")
+USER     _write(tmp, "src/w.txt", "no\n")
+USER     return os.path.join(tmp, "src", "w.txt")
+USER 
+USER 
+USER def _maker(work):
+USER     return [PY, "-c", "open(%r,'w').write('yes\\n')" % work]
+USER 
+USER 
+USER def _custody(record_dir):
+USER     return os.path.join(record_dir, "custody", "record.custody.json")
+USER 
+USER 
+USER def _clean_record():
+USER     return {
+USER         "_type": STATEMENT,
+USER         "predicateType": PREDICATE_TYPE,
+USER         "predicate": {"x-plumbline": {"gaps": []}},
+USER     }
+USER 
+USER 
+USER def _gapped_record():
+USER     return {
+USER         "_type": STATEMENT,
+USER         "predicateType": PREDICATE_TYPE,
+USER         "predicate": {"x-plumbline": {"gaps": [
+USER             {"field": "startedAt", "reason": "no source", "hard": True},
+USER         ]}},
+USER     }
+USER 
+USER 
+USER def _hard(body):
+USER     gaps = body["predicate"]["x-plumbline"]["gaps"]
+USER     return [row for row in gaps if row.get("hard")]
+USER 
+USER 
+USER def _dump(path, body):
+USER     os.makedirs(os.path.dirname(path), exist_ok=True)
+USER     with open(path, "w", encoding="utf-8") as fh:
+USER         json.dump(body, fh)
+USER         fh.write("\n")
+USER 
+USER 
+USER def _frozen_bytes():
+USER     if not os.path.isfile(FROZEN_JOB):
+USER         return None
+USER     with open(FROZEN_JOB, "rb") as fh:
+USER         return fh.read()
+USER 
+USER 
+USER def _not_done(test):
+USER     exc = getattr(cl, NOT_DONE, None)
+USER     if not isinstance(exc, type) or not issubclass(exc, Exception):
+USER         test.fail("kit.conductor_loop.CustodyNotDone is not bound")
+USER     if issubclass(exc, ValueError):
+USER         test.fail("CustodyNotDone must not be a ValueError; a packet refusal stays a ValueError")
+USER     return exc
+USER 
+USER 
+USER def _cases():
+USER     """The three terminal states close writes a custody record for."""
+USER     return (
+USER         ("accepted", "accepted", {"cap": 1}, 1, "accept"),
+USER         ("needs_owner", "cap reached", {"cap": 1}, 0.5, "regenerate"),
+USER         ("rejected", "rejected", {"cap": 1, "T_reject": 0.4}, 0.1, "reject"),
+USER     )
+USER 
+USER 
+USER class _Bar(unittest.TestCase):
+USER     def setUp(self):
+USER         self._frozen = _frozen_bytes()
+USER 
+USER     def tearDown(self):
+USER         self.assertEqual(_frozen_bytes(), self._frozen)
+USER 
+USER 
+USER class UnpatchedTests(_Bar):
+USER     def test_a_finish_does_not_ship_without_a_clean_record(self):
+USER         NotDone = getattr(cl, NOT_DONE, None)
+USER         for terminal, stop, bounds, score, verdict in _cases():
+USER             with self.subTest(terminal=terminal):
+USER                 tmp = TemporaryDirectory()
+USER                 rec_cm = TemporaryDirectory()
+USER                 self.addCleanup(tmp.cleanup)
+USER                 self.addCleanup(rec_cm.cleanup)
+USER                 work = _job(tmp.name)
+USER                 packet = _packet(tmp.name, _maker(work), _suite(work))
+USER                 packet["bounds"].update(bounds)
+USER                 try:
+USER                     summary = loop(
+USER                         packet, record_dir=rec_cm.name, cwd=tmp.name,
+USER                         evaluator_fn=lambda record, cwd, s=score, v=verdict: _scores(s, verdict=v),
+USER                     )
+USER                 except Exception as exc:
+USER                     if NotDone is None or not isinstance(exc, NotDone):
+USER                         self.fail("loop() raised %s, not CustodyNotDone: %s" % (type(exc).__name__, exc))
+USER                     self.assertIn(exc.exit_code, (1, 2, 3))
+USER                     self.assertFalse(os.path.exists(os.path.join(rec_cm.name, "summary.json")))
+USER                     self.assertFalse(os.path.exists(os.path.join(rec_cm.name, "escalation.json")))
+USER                     if exc.exit_code in (2, 3):
+USER                         self.assertFalse(os.path.exists(_custody(rec_cm.name)))
+USER                     continue
+USER                 path = _custody(rec_cm.name)
+USER                 self.assertTrue(os.path.isfile(path), "loop() returned with no custody record")
+USER                 body = json.load(open(path, encoding="utf-8"))
+USER                 self.assertEqual(body.get("predicateType"), PREDICATE_TYPE)
+USER                 self.assertEqual(_hard(body), [])
+USER                 self.assertEqual(summary["terminal_state"], terminal)
+USER                 self.assertEqual(summary["stop"], stop)
+USER                 on_disk = json.load(open(os.path.join(rec_cm.name, "summary.json"), encoding="utf-8"))
+USER                 self.assertEqual(on_disk["terminal_state"], terminal)
+USER 
+USER 
+USER class SeamTests(_Bar):
+USER     def test_signature_has_no_new_parameter(self):
+USER         self.assertEqual(set(inspect.signature(loop).parameters), {
+USER             "packet", "record_dir", "cwd", "timeout_s", "commit", "evaluator_fn",
+USER         })
+USER 
+USER     def test_seam_is_the_emitter_not_close(self):
+USER         fn = getattr(cl, SEAM, None)
+USER         if not callable(fn):
+USER             self.fail("kit.conductor_loop.emit_custody_for_finish is not bound")
+USER         source = inspect.getsource(fn)
+USER         self.assertIn("emit_custody", source)
+USER         self.assertNotIn("plumbline_job", source)
+USER         marker = b'{"preexisting": true}\n'
+USER         cases = (
+USER             None,
+USER             {"terminal_state": "open"},
+USER             {"terminal_state": "accepted", "outcome": "accepted"},
+USER         )
+USER         for packet in cases:
+USER             with self.subTest(packet=packet):
+USER                 with TemporaryDirectory() as left, TemporaryDirectory() as right:
+USER                     for side in (left, right):
+USER                         if packet is not None:
+USER                             _dump(os.path.join(side, "packet.json"), packet)
+USER                         _dump(_custody(side), {"preexisting": True})
+USER                         with open(_custody(side), "wb") as fh:
+USER                             fh.write(marker)
+USER                     code = fn(left, {"terminal_state": "accepted", "outcome": "accepted", "stop": "accepted"})
+USER                     twin = _emitter(right)
+USER                     self.assertEqual(code, twin)
+USER                     left_path = _custody(left)
+USER                     right_path = _custody(right)
+USER                     self.assertEqual(os.path.isfile(left_path), os.path.isfile(right_path))
+USER                     if twin in (2, 3):
+USER                         self.assertEqual(open(left_path, "rb").read(), marker)
+USER                         self.assertEqual(open(right_path, "rb").read(), marker)
+USER 
+USER 
+USER class PatchedTests(_Bar):
+USER     def _patch(self, fake):
+USER         return mock.patch.object(cl, SEAM, fake, create=True)
+USER 
+USER     def test_exit_0_ships_each_terminal_state(self):
+USER         for terminal, stop, bounds, score, verdict in _cases():
+USER             with self.subTest(terminal=terminal):
+USER                 seen = {"n": 0}
+USER 
+USER                 def fake(record_dir, summary, terminal=terminal, seen=seen):
+USER                     seen["n"] += 1
+USER                     seen["record_dir"] = record_dir
+USER                     seen["terminal_state"] = summary.get("terminal_state")
+USER                     seen["stop"] = summary.get("stop")
+USER                     self.assertFalse(os.path.exists(os.path.join(record_dir, "summary.json")))
+USER                     self.assertFalse(os.path.exists(os.path.join(record_dir, "escalation.json")))
+USER                     path = _custody(record_dir)
+USER                     _dump(path, _clean_record())
+USER                     seen["bytes"] = open(path, "rb").read()
+USER                     return 0
+USER 
+USER                 with TemporaryDirectory() as tmp, TemporaryDirectory() as rec:
+USER                     work = _job(tmp)
+USER                     packet = _packet(tmp, _maker(work), _suite(work))
+USER                     packet["bounds"].update(bounds)
+USER                     with self._patch(fake):
+USER                         summary = loop(
+USER                             packet, record_dir=rec, cwd=tmp,
+USER                             evaluator_fn=lambda record, cwd, s=score, v=verdict: _scores(s, verdict=v),
+USER                         )
+USER                     self.assertEqual(seen["n"], 1, "loop() finished without calling emit_custody_for_finish")
+USER                     self.assertEqual(os.path.realpath(seen["record_dir"]), os.path.realpath(rec))
+USER                     self.assertEqual(seen["terminal_state"], terminal)
+USER                     self.assertEqual(seen["stop"], stop)
+USER                     self.assertEqual(summary["terminal_state"], terminal)
+USER                     self.assertEqual(summary["stop"], stop)
+USER                     path = _custody(rec)
+USER                     self.assertEqual(open(path, "rb").read(), seen["bytes"])
+USER                     body = json.load(open(path, encoding="utf-8"))
+USER                     self.assertEqual(body.get("predicateType"), PREDICATE_TYPE)
+USER                     self.assertEqual(_hard(body), [])
+USER                     self.assertTrue(os.path.isfile(os.path.join(rec, "summary.json")))
+USER 
+USER     def test_exit_1_is_not_done(self):
+USER         self._not_a_ship(1, write=_gapped_record())
+USER 
+USER     def test_exit_2_is_not_done(self):
+USER         self._not_a_ship(2, write=None)
+USER 
+USER     def test_exit_3_is_not_done(self):
+USER         self._not_a_ship(3, write=None)
+USER 
+USER     def _not_a_ship(self, code, write):
+USER         NotDone = _not_done(self)
+USER         seen = {"n": 0}
+USER 
+USER         def fake(record_dir, summary):
+USER             seen["n"] += 1
+USER             self.assertFalse(os.path.exists(os.path.join(record_dir, "summary.json")))
+USER             if write is not None:
+USER                 _dump(_custody(record_dir), write)
+USER             return code
+USER 
+USER         with TemporaryDirectory() as tmp, TemporaryDirectory() as rec:
+USER             work = _job(tmp)
+USER             packet = _packet(tmp, _maker(work), _suite(work), bounds={"cap": 1})
+USER             with self._patch(fake):
+USER                 with self.assertRaises(NotDone) as caught:
+USER                     loop(
+USER                         packet, record_dir=rec, cwd=tmp,
+USER                         evaluator_fn=lambda record, cwd: _scores(1),
+USER                     )
+USER             self.assertEqual(seen["n"], 1, "loop() finished without calling emit_custody_for_finish")
+USER             self.assertEqual(caught.exception.exit_code, code)
+USER             self.assertFalse(os.path.exists(os.path.join(rec, "summary.json")))
+USER             self.assertFalse(os.path.exists(os.path.join(rec, "escalation.json")))
+USER             path = _custody(rec)
+USER             if write is None:
+USER                 self.assertFalse(os.path.exists(path))
+USER             else:
+USER                 body = json.load(open(path, encoding="utf-8"))
+USER                 self.assertNotEqual(_hard(body), [])
+USER 
+USER     def test_refusal_does_not_call_the_seam(self):
+USER         seen = {"n": 0}
+USER 
+USER         def fake(record_dir, summary):
+USER             seen["n"] += 1
+USER             return 0
+USER 
+USER         with TemporaryDirectory() as tmp, TemporaryDirectory() as rec:
+USER             work = _job(tmp)
+USER             packet = _packet(tmp, _maker(work), _suite(work))
+USER             packet["ratified"] = False
+USER             with self._patch(fake):
+USER                 with self.assertRaises(ValueError):
+USER                     loop(packet, record_dir=rec, cwd=tmp)
+USER             self.assertEqual(seen["n"], 0)
+USER             self.assertFalse(os.path.exists(os.path.join(rec, "summary.json")))
+USER             self.assertFalse(os.path.exists(_custody(rec)))
+USER 
+USER 
+USER def _emitter(job):
+USER     proc = subprocess.run(
+USER         [PY, EMITTER, "--job-dir", job],
+USER         capture_output=True, text=True,
+USER     )
+USER     return proc.returncode
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+USER 
+USER tests/test_loop_custody_sources.py
+USER ```
+USER """Bar: unheld facts are not hard gaps. The real emitter must exit 0.
+USER 
+USER Owner ruling, verbatim, binding this job:
+USER 
+USER A finish is certifiable from facts the run held. Unheld facts are not hard
+USER gaps. loop() writes the sources it actually has. The emitter exits 0 on that
+USER record. It does not invent an approval, a buyer, a specialist, retention, or
+USER a harness log. Schemas stay unedited. Both frozen bars stay frozen.
+USER 
+USER This file is the bar. It is not tests/test_loop_custody_on_finish.py and it
+USER is not tests/test_escalate.py. Those stay frozen. kit/conductor_loop.py stays
+USER frozen: the predecessor bar locks the seam, and the classification change is
+USER not in that file. schemas/custody stays unedited. The hard/soft decision is
+USER Python in kit/emit_custody.py, Gaps.add, default hard=True. The emitter does
+USER not read the schema to decide.
+USER 
+USER Red while that process, on a copy of what loop() wrote, does not exit 0, or
+USER names a hard gap. A hard gap for a fact the run did not hold is the
+USER classification change the ruling names. Do not clear it by inventing the
+USER fact. A hard gap for a fact the run did hold is a failure to read the source
+USER loop wrote. The oracle strips the seam's record and runs kit/emit_custody.py.
+USER A patched seam that returns 0 does not grade itself.
+USER 
+USER The oracle commits a throwaway copy of the kit files under test so an
+USER unrelated dirty worktree is not the red. Measured: this worktree's emitter
+USER exits 3 on a revision refusal before it classifies gaps; the clean pin
+USER exits 1 with 21 hard gaps. This file does not commit the user's repo.
+USER 
+USER Fixture numbers below are not this job's bounds. This seat chose them so
+USER loop() can be called. They are not the escalate job's bounds and not the
+USER predecessor bar's bounds.
+USER """
+USER from __future__ import annotations
+USER 
+USER import hashlib
+USER import json
+USER import os
+USER import shutil
+USER import subprocess
+USER import sys
+USER import unittest
+USER from datetime import datetime, timezone
+USER from tempfile import TemporaryDirectory
+USER from unittest import mock
+USER 
+USER PY = sys.executable
+USER RECORD_REL = "custody/record.custody.json"
+USER PREDECESSOR = "tests/test_loop_custody_on_finish.py"
+USER PREDECESSOR_SHA = "6f13ae649404c8a3ce6a9d7eaa4a2cbce30bad12fe222c9e770fe06ab713e969"
+USER ESCALATE_BAR = "tests/test_escalate.py"
+USER ESCALATE_BAR_SHA = "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
+USER LOOP_PY = "kit/conductor_loop.py"
+USER LOOP_SHA = "86a5e8efff88f4937c3562b7e41c14381fb363242f24d2c4da858e34f6a1922d"
+USER SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
+USER SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
+USER INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")
+USER DISPOSITIONS = ("given", "not_yet_given", "declined")
+USER 
+USER 
+USER def _repo():
+USER     here = os.path.dirname(os.path.abspath(__file__))
+USER     parent = os.path.dirname(here)
+USER     if os.path.isfile(os.path.join(parent, "kit", "conductor_loop.py")):
+USER         return parent
+USER     env = os.environ.get("PLUMBLINE_REPO", "")
+USER     if env and os.path.isfile(os.path.join(env, "kit", "conductor_loop.py")):
+USER         return os.path.realpath(env)
+USER     return parent
+USER 
+USER 
+USER REPO = _repo()
+USER sys.path.insert(0, REPO)
+USER 
+USER from kit.conductor_loop import loop  # noqa: E402
+USER import kit.conductor_loop as cl  # noqa: E402
+USER 
+USER 
+USER def _sha_file(path):
+USER     with open(path, "rb") as handle:
+USER         return hashlib.sha256(handle.read()).hexdigest()
+USER 
+USER 
+USER def _rel(root, full):
+USER     return os.path.relpath(full, root).replace(os.sep, "/")
+USER 
+USER 
+USER def _hash_tree(root):
+USER     out = {}
+USER     if not os.path.isdir(root):
+USER         return out
+USER     for dirpath, dirnames, filenames in os.walk(root):
+USER         dirnames.sort()
+USER         for name in sorted(filenames):
+USER             full = os.path.join(dirpath, name)
+USER             out[_rel(root, full)] = _sha_file(full)
+USER     return out
+USER 
+USER 
+USER def _schema_manifest(repo):
+USER     paths = []
+USER     for root in SCHEMA_ROOTS:
+USER         base = os.path.join(repo, root)
+USER         if not os.path.isdir(base):
+USER             continue
+USER         for dirpath, dirnames, filenames in os.walk(base):
+USER             dirnames.sort()
+USER             for name in sorted(filenames):
+USER                 paths.append(_rel(repo, os.path.join(dirpath, name)))
+USER     paths.sort()
+USER     outer = hashlib.sha256()
+USER     for rel in paths:
+USER         digest = _sha_file(os.path.join(repo, rel))
+USER         outer.update(("%s  %s\n" % (digest, rel)).encode("utf-8"))
+USER     return outer.hexdigest(), len(paths)
+USER 
+USER 
+USER def _write(path, text):
+USER     os.makedirs(os.path.dirname(path), exist_ok=True)
+USER     with open(path, "w", encoding="utf-8") as handle:
+USER         handle.write(text)
+USER     return path
+USER 
+USER 
+USER def _copy_except(src, dst, skip_rel):
+USER     for dirpath, dirnames, filenames in os.walk(src):
+USER         dirnames.sort()
+USER         for name in sorted(filenames):
+USER             full = os.path.join(dirpath, name)
+USER             rel = _rel(src, full)
+USER             if rel == skip_rel:
+USER                 continue
+USER             target = os.path.join(dst, rel)
+USER             os.makedirs(os.path.dirname(target), exist_ok=True)
+USER             shutil.copy2(full, target)
+USER 
+USER 
+USER def _fixture_packet(work, suite, maker):
+USER     """A packet loop() will run. Bounds here are fixture-only. Not the job's."""
+USER     return {
+USER         "ratified": True,
+USER         "mode": "scored",
+USER         "human_seat": "fixture-human-seat",
+USER         "artifact": {
+USER             "test_cmd": [PY, suite, os.path.join(work, "src", "w.txt")],
+USER             "frozen": [os.path.join(work, "tests", "t.py")],
+USER             "editable": ["src"],
+USER             "ignore": [".git", "__pycache__"],
+USER         },
+USER         "maker": {"cmd": [PY, maker, os.path.join(work, "src", "w.txt")], "handoff": "rule12"},
+USER         "evaluator": {
+USER             "kind": "script",
+USER             "cmd": [PY, "-c", "raise SystemExit('fixture evaluator_fn is the seat')"],
+USER             "runs": 2,
+USER             "held_out": [],
+USER         },
+USER         "bounds": {
+USER             "T_accept": 2,
+USER             "T_dim": 2,
+USER             "T_reject": 1,
+USER             "cap": 1,
+USER             "budget": {"amount": 1, "unit": "USD", "time_hours_lt": 1},
+USER         },
+USER         "escalation": {
+USER             "route": ["Architect", "Owner"],
+USER             "classes": [],
+USER             "holders": {
+USER                 "architect": "plumbline-architect",
+USER                 "orchestrator": [
+USER                     {
+USER                         "holder": "kit.conductor_loop.loop",
+USER                         "kind": "script",
+USER                         "does": "rounds",
+USER                         "tested": "fixture-not-a-job",
+USER                     },
+USER                     {
+USER                         "holder": "fixture-escalations",
+USER                         "kind": "script",
+USER                         "does": "escalations",
+USER                         "tested": "fixture-not-a-job",
+USER                     },
+USER                 ],
+USER             },
+USER         },
+USER     }
+USER 
+USER 
+USER def _scores():
+USER     return {
+USER         "dimensions": [{"name": "q", "score": 2, "observation": "seen"}],
+USER         "violations": [],
+USER         "verdict": "accept",
+USER         "controls": {"should_pass": "passed", "should_fail": "failed"},
+USER     }
+USER 
+USER 
+USER def _prepare(work):
+USER     _write(os.path.join(work, "tests", "t.py"), "pin\n")
+USER     _write(os.path.join(work, "src", "w.txt"), "no\n")
+USER     suite = _write(
+USER         os.path.join(work, "suite.py"),
+USER         "import pathlib, sys\n"
+USER         "text = pathlib.Path(sys.argv[1]).read_text(encoding='utf-8')\n"
+USER         "sys.exit(0 if text.startswith('yes') else 1)\n",
+USER     )
+USER     maker = _write(
+USER         os.path.join(work, "maker.py"),
+USER         "import json, os, pathlib, sys\n"
+USER         "pathlib.Path(sys.argv[1]).write_text('yes\\n', encoding='utf-8')\n"
+USER         "cost = os.environ.get('PLUMBLINE_COST')\n"
+USER         "if cost:\n"
+USER         "    pathlib.Path(cost).write_text(json.dumps({'amount': 0}) + '\\n', encoding='utf-8')\n",
+USER     )
+USER     return suite, maker
+USER 
+USER 
+USER def _load(path):
+USER     with open(path, encoding="utf-8") as handle:
+USER         return json.load(handle)
+USER 
+USER 
+USER def _instant(value):
+USER     if not isinstance(value, str) or not value.strip():
+USER         return None
+USER     text = value.strip()
+USER     if text.endswith("Z"):
+USER         text = text[:-1] + "+00:00"
+USER     try:
+USER         parsed = datetime.fromisoformat(text)
+USER     except ValueError:
+USER         return None
+USER     if parsed.tzinfo is None:
+USER         return None
+USER     return parsed.astimezone(timezone.utc).replace(microsecond=0)
+USER 
+USER 
+USER def _packet_of(job):
+USER     path = os.path.join(job, "packet.json")
+USER     if not os.path.isfile(path):
+USER         return {}
+USER     body = _load(path)
+USER     return body if isinstance(body, dict) else {}
+USER 
+USER 
+USER def _rounds(job):
+USER     out = []
+USER     if not os.path.isdir(job):
+USER         return out
+USER     for name in sorted(os.listdir(job)):
+USER         if name.startswith("round-") and name.endswith(".json"):
+USER             body = _load(os.path.join(job, name))
+USER             if isinstance(body, dict):
+USER                 out.append(body)
+USER     return out
+USER 
+USER 
+USER def _held(field, job, packet):
+USER     """True when this finish's files hold a source for the gap field.
+USER 
+USER     producedAt is the finish's ended_at. This seat chose that mapping. The
+USER     run writes ended_at, not a separate producedAt.
+USER     """
+USER     if field == "subject" or field.startswith("subject["):
+USER         return any("/editable/" in rel for rel in _hash_tree(job))
+USER     if field == "startedAt":
+USER         return _instant(packet.get("started_at") or packet.get("startedAt")) is not None
+USER     if field == "producedAt":
+USER         return _instant(packet.get("ended_at") or packet.get("endedAt") or packet.get("producedAt")) is not None
+USER     if field == "evaluators" or field.startswith("evaluators"):
+USER         if any(isinstance(row.get("evaluator"), list) and row.get("evaluator") for row in _rounds(job)):
+USER             return True
+USER         return isinstance(packet.get("evaluator"), dict) and bool(packet.get("evaluator"))
+USER     if field == "checks" or field.startswith("checks"):
+USER         for row in _rounds(job):
+USER             reading = row.get("reading") if isinstance(row.get("reading"), dict) else {}
+USER             if reading.get("dimensions"):
+USER                 return True
+USER             for ev in row.get("evaluator") or []:
+USER                 parsed = ev.get("parsed") if isinstance(ev, dict) else None
+USER                 if isinstance(parsed, dict) and parsed.get("dimensions"):
+USER                     return True
+USER         return False
+USER     if field in ("instrument.rubric", "instrument.runner"):
+USER         return packet.get("standard_ref") not in (None, "", {}, [])
+USER     if field.startswith("maker."):
+USER         maker = packet.get("maker") if isinstance(packet.get("maker"), dict) else {}
+USER         return bool(maker.get(field.split(".", 1)[1]))
+USER     if field == "disposition.state":
+USER         return packet.get("disposition_state") in DISPOSITIONS
+USER     return False
+USER 
+USER 
+USER def _invented(value, path="$"):
+USER     found = []
+USER     if isinstance(value, dict):
+USER         for key, item in value.items():
+USER             if key in INVENTED_KEYS and item not in (None, "", [], {}):
+USER                 found.append("%s.%s" % (path, key))
+USER             found.extend(_invented(item, "%s.%s" % (path, key)))
+USER     elif isinstance(value, list):
+USER         for index, item in enumerate(value):
+USER             found.extend(_invented(item, "%s[%d]" % (path, index)))
+USER     return found
+USER 
+USER 
+USER def _harness_logs(rels):
+USER     out = []
+USER     for rel in rels:
+USER         base = os.path.basename(rel)
+USER         if base.startswith("harness") and base.endswith(".log"):
+USER             out.append(rel)
+USER     return out
+USER 
+USER 
+USER def _editable_digests(job):
+USER     found = {}
+USER     for rel, digest in _hash_tree(job).items():
+USER         if "/editable/" in "/%s" % rel and os.path.isfile(os.path.join(job, rel)):
+USER             found[digest] = rel
+USER     return found
+USER 
+USER 
+USER def _content_failures(job, body, before):
+USER     failures = []
+USER     if not isinstance(body, dict):
+USER         return ["emitter wrote no record"]
+USER     packet = _packet_of(job)
+USER     pred = body.get("predicate") if isinstance(body.get("predicate"), dict) else {}
+USER     xp = pred.get("x-plumbline") if isinstance(pred.get("x-plumbline"), dict) else {}
+USER     gaps = xp.get("gaps") if isinstance(xp.get("gaps"), list) else []
+USER     hard = [row for row in gaps if isinstance(row, dict) and row.get("hard")]
+USER     unheld = []
+USER     unread = []
+USER     for row in hard:
+USER         field = row.get("field")
+USER         if _held(str(field), job, packet):
+USER             unread.append(str(field))
+USER         else:
+USER             unheld.append(str(field))
+USER     if unheld:
+USER         failures.append(
+USER             "classification: %d hard gap(s) for facts the run did not hold: %s. "
+USER             "The Owner ruled unheld facts are not hard gaps. Do not invent them."
+USER             % (len(unheld), ", ".join(unheld))
+USER         )
+USER     if unread:
+USER         failures.append(
+USER             "held fact not read: %s. The run wrote a source. Do not invent a different fact."
+USER             % ", ".join(unread)
+USER         )
+USER     if hard and not unheld and not unread:
+USER         failures.append("%d hard gap(s)" % len(hard))
+USER     editable = _editable_digests(job)
+USER     subject = body.get("subject")
+USER     if editable:
+USER         if not isinstance(subject, list) or not subject:
+USER             failures.append("subject names no artifact the run held under round-*/editable/")
+USER         else:
+USER             digests = []
+USER             for item in subject:
+USER                 digest = (item.get("digest") or {}).get("sha256") if isinstance(item, dict) else None
+USER                 if isinstance(digest, str):
+USER                     digests.append(digest)
+USER             if not any(digest in editable for digest in digests):
+USER                 failures.append("subject digest is not an editable file the run wrote")
+USER     started = _instant(packet.get("started_at") or packet.get("startedAt"))
+USER     produced = _instant(packet.get("ended_at") or packet.get("endedAt") or packet.get("producedAt"))
+USER     if started is not None and _instant(pred.get("startedAt")) != started:
+USER         failures.append("startedAt is not the instant packet started_at held")
+USER     if produced is not None and _instant(pred.get("producedAt")) != produced:
+USER         failures.append("producedAt is not the instant packet ended_at held")
+USER     invented = _invented(pred)
+USER     if invented:
+USER         failures.append("record names a fact the run did not hold: %s" % ", ".join(invented))
+USER     maker = pred.get("maker") if isinstance(pred.get("maker"), dict) else {}
+USER     packet_maker = packet.get("maker") if isinstance(packet.get("maker"), dict) else {}
+USER     for key in ("name", "kind", "version"):
+USER         value = maker.get(key)
+USER         if value not in (None, "") and value != packet_maker.get(key):
+USER             failures.append("maker.%s %r is not a value the packet held" % (key, value))
+USER     by = (pred.get("disposition") or {}).get("by") if isinstance(pred.get("disposition"), dict) else None
+USER     if by not in (None, "") and not packet.get("disposition_state"):
+USER         failures.append("disposition.by %r was not held" % by)
+USER     for key in ("rubric", "runner"):
+USER         block = (pred.get("instrument") or {}).get(key) if isinstance(pred.get("instrument"), dict) else None
+USER         pin = block.get("sha256") if isinstance(block, dict) else None
+USER         if isinstance(pin, str) and pin not in before.values() and pin not in _hash_tree(job).values():
+USER             failures.append("instrument.%s %s matches no file the run wrote" % (key, pin[:12]))
+USER     logs = _harness_logs(before)
+USER     if logs:
+USER         failures.append("run wrote a harness log the fixture did not hold: %s" % ", ".join(logs))
+USER     return failures
+USER 
+USER 
+USER def _git(repo, args):
+USER     return subprocess.run(
+USER         ["git", "-c", "user.email=bar@local", "-c", "user.name=bar", "-c", "commit.gpgsign=false", *args],
+USER         cwd=repo,
+USER         capture_output=True,
+USER         text=True,
+USER     )
+USER 
+USER 
+USER def _oracle_emitter(repo, keep):
+USER     """A clean throwaway commit of the kit files under test. Not the user's repo."""
+USER     root = TemporaryDirectory()
+USER     keep.append(root)
+USER     kit = os.path.join(root.name, "kit")
+USER     os.makedirs(kit)
+USER     for name in ("emit_custody.py", "custody_history.py"):
+USER         shutil.copy2(os.path.join(repo, "kit", name), os.path.join(kit, name))
+USER     init = _git(root.name, ["init"])
+USER     if init.returncode != 0:
+USER         raise RuntimeError(init.stderr or init.stdout)
+USER     add = _git(root.name, ["add", "kit"])
+USER     if add.returncode != 0:
+USER         raise RuntimeError(add.stderr or add.stdout)
+USER     commit = _git(root.name, ["commit", "-m", "oracle"])
+USER     if commit.returncode != 0:
+USER         raise RuntimeError(commit.stderr or commit.stdout)
+USER     return os.path.join(kit, "emit_custody.py")
+USER 
+USER 
+USER def certify(record_dir, repo, keep):
+USER     """Run the real emitter on a copy of what loop() wrote. Ignore the seam's record."""
+USER     with TemporaryDirectory() as fresh:
+USER         _copy_except(record_dir, fresh, RECORD_REL)
+USER         before = _hash_tree(fresh)
+USER         emitter = _oracle_emitter(repo, keep)
+USER         proc = subprocess.run(
+USER             [PY, emitter, "--job-dir", fresh],
+USER             capture_output=True,
+USER             text=True,
+USER         )
+USER         record_path = os.path.join(fresh, RECORD_REL)
+USER         body = _load(record_path) if os.path.isfile(record_path) else None
+USER         failures = []
+USER         if proc.returncode != 0:
+USER             failures.append("kit/emit_custody.py exit %s" % proc.returncode)
+USER         failures.extend(_content_failures(fresh, body, before))
+USER         return {
+USER             "certified": not failures,
+USER             "failures": failures,
+USER             "exit": proc.returncode,
+USER             "stdout": proc.stdout,
+USER             "stderr": proc.stderr,
+USER             "body": body,
+USER         }
+USER 
+USER 
+USER class LoopCustodySources(unittest.TestCase):
+USER     def setUp(self):
+USER         self._temps = []
+USER 
+USER     def tearDown(self):
+USER         for temp in self._temps:
+USER             temp.cleanup()
+USER 
+USER     def _dirs(self):
+USER         work = TemporaryDirectory()
+USER         record = TemporaryDirectory()
+USER         self._temps.extend([work, record])
+USER         return work.name, record.name
+USER 
+USER     def _run(self, record, work, seam=None):
+USER         suite, maker = _prepare(work)
+USER         packet = _fixture_packet(work, suite, maker)
+USER         if seam is not None:
+USER             patcher = mock.patch.object(cl, "emit_custody_for_finish", seam)
+USER             patcher.start()
+USER             self.addCleanup(patcher.stop)
+USER         try:
+USER             return loop(packet, record_dir=record, cwd=work, timeout_s=30, evaluator_fn=lambda turn, root: _scores())
+USER         except cl.CustodyNotDone:
+USER             return None
+USER         except ValueError as exc:
+USER             self.fail("packet refusal, seam not reached: %s" % exc)
+USER 
+USER     def test_frozen_files_stay(self):
+USER         path = os.path.join(REPO, PREDECESSOR)
+USER         self.assertTrue(os.path.isfile(path), "predecessor bar is absent")
+USER         self.assertEqual(_sha_file(path), PREDECESSOR_SHA)
+USER         escalate = os.path.join(REPO, ESCALATE_BAR)
+USER         if os.path.isfile(escalate):
+USER             self.assertEqual(_sha_file(escalate), ESCALATE_BAR_SHA)
+USER         loop_py = os.path.join(REPO, LOOP_PY)
+USER         self.assertTrue(os.path.isfile(loop_py), "kit/conductor_loop.py is absent")
+USER         self.assertEqual(_sha_file(loop_py), LOOP_SHA)
+USER         manifest, count = _schema_manifest(REPO)
+USER         self.assertEqual(count, 49)
+USER         self.assertEqual(manifest, SCHEMA_MANIFEST_SHA)
+USER 
+USER     def test_seam_record_is_not_the_oracle(self):
+USER         work, record = self._dirs()
+USER         marker = "invented-buyer-not-held"
+USER 
+USER         def seam(record_dir, summary):
+USER             body = {
+USER                 "_type": "https://in-toto.io/Statement/v1",
+USER                 "subject": [],
+USER                 "predicateType": "https://evaluatordriven.com/custody/v1",
+USER                 "predicate": {
+USER                     "buyer": marker,
+USER                     "x-plumbline": {"gaps": []},
+USER                 },
+USER             }
+USER             _write(os.path.join(record_dir, RECORD_REL), json.dumps(body))
+USER             return 0
+USER 
+USER         self._run(record, work, seam=seam)
+USER         result = certify(record, REPO, self._temps)
+USER         text = json.dumps(result.get("body"))
+USER         self.assertNotIn(marker, text, "certify graded the seam's record")
+USER 
+USER     def test_loop_finish_is_certifiable_without_inventing_unheld_facts(self):
+USER         work, record = self._dirs()
+USER         self._run(record, work)
+USER         self.assertTrue(os.path.isfile(os.path.join(record, "packet.json")), "loop() wrote no packet.json")
+USER         result = certify(record, REPO, self._temps)
+USER         if result["certified"]:
+USER             return
+USER         tail = (result["stdout"] or "") + (result["stderr"] or "")
+USER         self.fail(
+USER             "not certifiable\n%s\n--- emitter ---" % "\n".join(result["failures"])
+USER             + "\n"
+USER             + tail[-6000:]
+USER         )
+USER 
+USER 
+USER if __name__ == "__main__":
+USER     unittest.main()
+USER ```
+-------
+ASSISTANT Ok, any changes I propose will be to those files.
+-------
+USER The frozen bar is tests/test_job1_fixture_pin.py. Run it:
+USER 
+USER     python3 tests/test_job1_fixture_pin.py
+USER 
+USER It is red: Ran 4 tests, FAILED (failures=4). The failures name what is wanted:
+USER 
+USER   - tests/test_loop_custody_on_finish.py _job() must write custody/bar.md into the temp dir
+USER   - tests/test_loop_custody_sources.py _prepare() must write custody/bar.md into the work dir
+USER   - the sources suite's PREDECESSOR_SHA must follow the moved pin target
+USER   - the predecessor file's bytes must hash to the target the bar names
+USER 
+USER The bar states the exact bytes and the exact hash it wants. Read it — it is in the tree at
+USER tests/test_job1_fixture_pin.py and it is frozen.
+USER 
+USER Edit ONLY these two files:
+USER   tests/test_loop_custody_on_finish.py
+USER   tests/test_loop_custody_sources.py
+USER 
+USER Do not edit the bar, kit/, schemas/, or any other file.
+USER 
+USER 
+USER # *SEARCH/REPLACE block* Rules:
+USER 
+USER Every *SEARCH/REPLACE block* must use this format:
+USER 1. The *FULL* file path alone on a line, verbatim. No bold asterisks, no quotes around it, no escaping of characters, etc.
+USER 2. The opening fence and code language, eg: ```python
+USER 3. The start of search block: <<<<<<< SEARCH
+USER 4. A contiguous chunk of lines to search for in the existing source code
+USER 5. The dividing line: =======
+USER 6. The lines to replace into the source code
+USER 7. The end of the replace block: >>>>>>> REPLACE
+USER 8. The closing fence: ```
+USER 
+USER Use the *FULL* file path, as shown to you by the user.
+USER 
+USER Every *SEARCH* section must *EXACTLY MATCH* the existing file content, character for character, including all comments, docstrings, etc.
+USER If the file contains code or other data wrapped/escaped in json/xml/quotes or other containers, you need to propose edits to the literal contents of the file, including the container markup.
+USER 
+USER *SEARCH/REPLACE* blocks will *only* replace the first match occurrence.
+USER Including multiple unique *SEARCH/REPLACE* blocks if needed.
+USER Include enough lines in each SEARCH section to uniquely match each set of lines that need to change.
+USER 
+USER Keep *SEARCH/REPLACE* blocks concise.
+USER Break large *SEARCH/REPLACE* blocks into a series of smaller blocks that each change a small portion of the file.
+USER Include just the changing lines, and a few surrounding lines if needed for uniqueness.
+USER Do not include long runs of unchanging lines in *SEARCH/REPLACE* blocks.
+USER 
+USER Only create *SEARCH/REPLACE* blocks for files that the user has added to the chat!
+USER 
+USER To move code within a file, use 2 *SEARCH/REPLACE* blocks: 1 to delete it from its current location, 1 to insert it in the new location.
+USER 
+USER Pay attention to which filenames the user wants you to edit, especially if they are asking you to create a new file.
+USER 
+USER If you want to put code in a new file, use a *SEARCH/REPLACE block* with:
+USER - A new file path, including dir name if needed
+USER - An empty `SEARCH` section
+USER - The new file's contents in the `REPLACE` section
+USER 
+USER If the user just says something like "ok" or "go ahead" or "do that" they probably want you to make SEARCH/REPLACE blocks for the code changes you just proposed.
+USER The user will say when they've applied your edits. If they haven't explicitly confirmed the edits have been applied, they probably want proper SEARCH/REPLACE blocks.
+USER 
+USER Reply in English.
+USER ONLY EVER RETURN CODE IN A *SEARCH/REPLACE BLOCK*!
+USER 
+LLM RESPONSE 2026-11-08T01:09:41
+ASSISTANT The bar prescribes one exact source line per fixture and one exact `PREDECESSOR_SHA`. I'll add the `custody/bar.md` write to `_job()` in the predecessor suite (at the end of its fixture writes, before the return) and to `_prepare()` in the sources suite (after the two setup writes), then repoint the successor bar's pin to the Architect's target.
+ASSISTANT 
+ASSISTANT Note: the predecessor's SHA256 must equal the pinned constant, so the inserted line's position matters. After applying, run `python3 tests/test_job1_fixture_pin.py`; if `test_predecessor_hashes_to_pin_target` is the only remaining failure, tell me and I'll move the line to the other insertion point (immediately after the `tests/t.py` write).
+ASSISTANT 
+ASSISTANT tests/test_loop_custody_on_finish.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def _job(tmp):
+ASSISTANT     _write(tmp, "tests/t.py", "pin\n")
+ASSISTANT     _write(tmp, "src/w.txt", "no\n")
+ASSISTANT     return os.path.join(tmp, "src", "w.txt")
+ASSISTANT =======
+ASSISTANT def _job(tmp):
+ASSISTANT     _write(tmp, "tests/t.py", "pin\n")
+ASSISTANT     _write(tmp, "src/w.txt", "no\n")
+ASSISTANT     _write(tmp, os.path.join("custody", "bar.md"), "bar\n")
+ASSISTANT     return os.path.join(tmp, "src", "w.txt")
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT tests/test_loop_custody_sources.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT def _prepare(work):
+ASSISTANT     _write(os.path.join(work, "tests", "t.py"), "pin\n")
+ASSISTANT     _write(os.path.join(work, "src", "w.txt"), "no\n")
+ASSISTANT     suite = _write(
+ASSISTANT =======
+ASSISTANT def _prepare(work):
+ASSISTANT     _write(os.path.join(work, "tests", "t.py"), "pin\n")
+ASSISTANT     _write(os.path.join(work, "src", "w.txt"), "no\n")
+ASSISTANT     _write(os.path.join(work, "custody", "bar.md"), "bar\n")
+ASSISTANT     suite = _write(
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```
+ASSISTANT 
+ASSISTANT tests/test_loop_custody_sources.py
+ASSISTANT ```python
+ASSISTANT <<<<<<< SEARCH
+ASSISTANT PREDECESSOR_SHA = "6f13ae649404c8a3ce6a9d7eaa4a2cbce30bad12fe222c9e770fe06ab713e969"
+ASSISTANT =======
+ASSISTANT PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+ASSISTANT >>>>>>> REPLACE
+ASSISTANT ```

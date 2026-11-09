@@ -1,0 +1,37 @@
+Two files written and verified; the work tree is untouched by me.
+
+    /home/jarbis1/tmp/plumbline-job25-record-1/aider-prompt.md
+    /home/jarbis1/tmp/plumbline-job25-record-1/aider-dispatch.json
+
+What I did this generation:
+
+- Read only the packet at /home/jarbis1/tmp/plumbline-job25-record-1/packet.json.
+  test_cmd: EDI_CORPUS=/tmp/doctrine-f8bfb79/contracts python3 tests/validate_schemas.py;
+  frozen: tests/validate_schemas.py, tests/fixtures/**; editable: kit/emit_custody.py,
+  kit/custody_history.py.
+- Ran the packet's test command from the work tree and saw its red at 31ffb42:
+  137/141 PASSED — 4 FAILED (JOB25 b1, b2, c1, d1). a1–a4 green.
+- This is a multi-file kit change against a frozen suite, so I wrote no implementation.
+- The two files were already present from the prior turn. I read both in full, verified
+  their claims against the tree, and made two narrow improvements:
+  - the prompt now locates the JOB 25 section precisely (line 1090 heading; hl_case cases
+    1152–1244) and no longer paraphrases fixture instants it would have to restate — it
+    points Aider at the log bytes instead. It still names the failing tests as the spec,
+    names the frozen paths as do-not-edit, and prescribes no solution.
+  - the dispatch's read list now also carries tests/fixtures/custody/job-rejected/inputs/custody.json.
+    Files remain the two editable paths only; test_cmd is the packet's command verbatim;
+    message is the prompt path. JSON parses (lint ok).
+
+Two facts for the Orchestrator, not for me to act on:
+
+1. The aider-engine.log in the record directory is from 19:01 and reads
+   "PLUMBLINE_MAKER_LOG is unset; refusing to start Aider", and aider-exit.json records
+   exit 2 at 19:01:29Z. I did not launch Aider and did not retry it — that launch is
+   route-maker's, after this turn.
+2. The work tree is clean (git status empty), so the JOB 25 bar is already committed
+   at 31ffb42 — the earlier turn's worry that the bar sat uncommitted no longer applies.
+
+Cost: not recorded — I made no paid model calls and wrote no cost file. Not scored, no
+pass declared.
+
+session_id: 20261109_190628_df8c9e

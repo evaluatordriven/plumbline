@@ -1,0 +1,25 @@
+{
+  "pass_id": "fixture_pin_reproduced",
+  "status": "filed",
+  "channel": "model",
+  "provider": "Z.AI",
+  "model": "z-ai/glm-5.3-flash",
+  "family": "glm",
+  "scores": [
+    {
+      "dimension": "fixture_pin_reproduced",
+      "score": 1,
+      "run": 1
+    },
+    {
+      "dimension": "fixture_pin_reproduced",
+      "score": 1,
+      "run": 2
+    },
+    {
+      "dimension": "fixture_pin_reproduced",
+      "score": 1,
+      "run": 3
+    }
+  ]
+}

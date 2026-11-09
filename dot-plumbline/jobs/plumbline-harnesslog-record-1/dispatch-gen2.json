@@ -1,0 +1,6 @@
+{
+  "files": ["kit/emit_custody.py", "tests/validate_schemas.py"],
+  "read": ["tests/test_evaluator_harness_log.py", "kit/conductor_loop.py"],
+  "edit_format": "diff",
+  "message": "/home/jarbis1/tmp/plumbline-harnesslog-record-1/message-gen2.md"
+}
