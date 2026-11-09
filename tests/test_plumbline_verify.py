@@ -138,8 +138,14 @@ def clean_emitter_tree(tmp: Path) -> Path:
     """A throwaway clean git checkout of kit/: the emitter records its own revision and refuses a dirty tree."""
     d = tmp / "emitter-tree"
     (d / "kit").mkdir(parents=True)
-    for name in ("emit_custody.py", "custody_history.py", "custody_ledger.py"):
-        shutil.copy2(ROOT / "kit" / name, d / "kit" / name)
+    # Copy the WHOLE kit directory, not a typed list of modules. A test that copies a subset of the implementation
+    # silently stops covering the module it forgot: measured 2026-11-09, this list named three modules while the
+    # emitter imported a fourth sibling, and the copied tree exited 1 where the test expected 3. Derived from the
+    # directory, the list cannot go stale when a new sibling appears.
+    for src in sorted((ROOT / "kit").iterdir()):
+        if src.name == "__pycache__" or src.suffix == ".pyc" or not src.is_file():
+            continue
+        shutil.copy2(src, d / "kit" / src.name)
     # With bytecode on (PYTHONDONTWRITEBYTECODE unset), running the emitter writes kit/__pycache__/ into this tree,
     # and the emitter then refuses it as dirty. The repo's own .gitignore does not reach this throwaway tree, so the
     # tree carries its own: the tree stays clean whether or not bytecode is written.
