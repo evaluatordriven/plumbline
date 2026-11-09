@@ -407,8 +407,11 @@ def _oracle_emitter(repo, keep):
     keep.append(root)
     kit = os.path.join(root.name, "kit")
     os.makedirs(kit)
-    for name in ("emit_custody.py", "custody_history.py"):
-        shutil.copy2(os.path.join(repo, "kit", name), os.path.join(kit, name))
+    # Copy the whole kit: a curated subset breaks every time kit/ gains a module
+    # (measured 2026-11-09: evaluator_harness_log.py landed and this tree never received it).
+    for name in sorted(os.listdir(os.path.join(repo, "kit"))):
+        if name.endswith(".py"):
+            shutil.copy2(os.path.join(repo, "kit", name), os.path.join(kit, name))
     init = _git(root.name, ["init"])
     if init.returncode != 0:
         raise RuntimeError(init.stderr or init.stdout)

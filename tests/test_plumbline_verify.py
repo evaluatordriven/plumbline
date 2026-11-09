@@ -138,8 +138,12 @@ def clean_emitter_tree(tmp: Path) -> Path:
     """A throwaway clean git checkout of kit/: the emitter records its own revision and refuses a dirty tree."""
     d = tmp / "emitter-tree"
     (d / "kit").mkdir(parents=True)
-    for name in ("emit_custody.py", "custody_history.py", "custody_ledger.py"):
-        shutil.copy2(ROOT / "kit" / name, d / "kit" / name)
+    # Copy the whole kit, not a hand-maintained subset: the tree under test is meant to be a
+    # working checkout of the emitter, and a subset silently breaks every time kit/ gains a
+    # module (measured 2026-11-09: evaluator_harness_log.py landed and four verify tests died
+    # with ModuleNotFoundError on a tree that had never been given the file).
+    for src in sorted((ROOT / "kit").glob("*.py")):
+        shutil.copy2(src, d / "kit" / src.name)
     # With bytecode on (PYTHONDONTWRITEBYTECODE unset), running the emitter writes kit/__pycache__/ into this tree,
     # and the emitter then refuses it as dirty. The repo's own .gitignore does not reach this throwaway tree, so the
     # tree carries its own: the tree stays clean whether or not bytecode is written.
