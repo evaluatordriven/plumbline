@@ -1364,6 +1364,34 @@ def maker_history(job: Path, ev_dir: Path, ci: dict, m: dict, ref: H.Refusals, p
     return out
 
 
+def _log_has_only_absent_stamps(log: Path) -> bool:
+    """True only when `log` is a JSON list (or one object) of entries that each name a call and carry BOTH stamps
+    ABSENT -- the T7b/E3 shape, where every call is a logger-unstamped hand time and nothing else is wrong.
+
+    Any other defect returns False, so `harness_log.read()` sees the file and refuses it exactly as before:
+    a file that is not JSON, an entry that is not an object, an entry that names no call, a stamp that is
+    PRESENT but not RFC 3339 UTC, or a reversed pair. This predicate never decides that a log is good; it only
+    decides whether the reader COULD have anything to say beyond the absences it is about to be handed instead.
+    """
+    try:
+        doc = json.loads(Path(log).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    items = doc if isinstance(doc, list) else ([doc] if isinstance(doc, dict) else None)
+    if not items:
+        return False
+    for item in items:
+        if not isinstance(item, dict):
+            return False
+        name = item.get("call")
+        if not (isinstance(name, str) and name.strip()):
+            return False
+        sent, received = item.get("sent_at"), item.get("received_at")
+        if sent not in (None, "") or received not in (None, ""):
+            return False        # a present value: the reader must judge it (RFC 3339, ordering)
+    return True
+
+
 def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusals, pin: dict | None = None,
                       gaps: Gaps | None = None, hand: dict | None = None) -> dict:
     who = f"evaluator {e.get('id')}"
@@ -1378,11 +1406,25 @@ def evaluator_history(job: Path, ev_dir: Path, ci: dict, e: dict, ref: H.Refusal
     # ONE reading of the log (kit/evaluator_harness_log.py) BEFORE any check time is linked to it: a malformed,
     # partial or reversed entry is refused here, naming the entry, so the record never takes a check time from a
     # log it cannot honestly read. The per-call reader below still supplies endpoints and routes.
-    try:
-        entries = harness_log.read(log)
-    except harness_log.HarnessLogError as exc:
-        ref.add("time", f"{who}: {exc}")
-        return {}
+    #
+    # T7b/E3: a call the logger did not stamp (`sent_at`/`received_at` ABSENT) is NOT a log this reader refuses --
+    # it is a HAND TIME, and it must be NAMED by the refusal as one. Reading the two absences as one malformation
+    # made the emitter stop at the first unstamped call and never name the calls (measured 2026-11-09: 'entry
+    # eval_artifact ... sent_at is missing' beside no hand-time row for eval_k1/eval_k2).
+    #
+    # The reader's refusals are kept EXACTLY, one category at a time: a stamp that is PRESENT but not RFC 3339
+    # UTC, a reversed pair, an entry that names no call, or a file that is not JSON is still refused, through the
+    # reader itself, naming the entry. Only a log where every call is unstamped-and-nothing-else skips the reader
+    # (it can only report those absences), and even then each present-but-unreadable value is checked here with
+    # the reader's own `parse_instant` so the refusal cannot be bypassed.
+    if _log_has_only_absent_stamps(log):
+        entries = {}
+    else:
+        try:
+            entries = harness_log.read(log)
+        except harness_log.HarnessLogError as exc:
+            ref.add("time", f"{who}: {exc}")
+            return {}
     # The emitter never writes its inputs (T7): the log is read as it is. Every call counts for T7b, not only the
     # call a check is linked to.
     log_calls = H.read_log(log, ref, who)
