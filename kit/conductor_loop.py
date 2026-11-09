@@ -11,10 +11,10 @@ packet is loaded; each written round record carries its own ``started_at`` at
 the top of its round and an ``ended_at`` taken when that record is written,
 inside the job window and in order across rounds.
 
-A finish is filed by this module or not filed at all. ``loop()`` writes
+A finish is written by this module or not written at all. ``loop()`` writes
 ``summary.json`` with what the finish says and, for a stop a human must see,
-``escalation.json`` beside it, and returns the summary. It files nothing and
-raises ``CustodyNotDone`` for the one finish it cannot file cleanly: a run
+``escalation.json`` beside it, and returns the summary. It raises
+``CustodyNotDone`` for the one finish it cannot write cleanly: a run
 whose clock was replaced took stamps that are not this module's readings.
 ``datetime`` is the clock seam, so a replaced clock is visible here; nothing
 replaces it in a real run, so a real finish is always filed. ``CustodyNotDone``
@@ -50,12 +50,28 @@ Any other code is not a done finish: ``loop()`` raises ``CustodyNotDone`` with
 that code and writes neither ``summary.json`` nor ``escalation.json``. A packet
 refusal is not a finish: the seam is not called and no custody record is
 written.
+
+A clean finish is then closed and filed by ``file_finish(record_dir, halt)``,
+the last act of ``loop()``: it writes ``custody/status.json`` into the job
+folder (``custody`` or ``missing``, with the record's sha256 and the terminal
+state), and copies the folder into ``$PLUMBLINE_FILE_INTO`` — the instance's
+``dot-plumbline`` — through ``plumbline_job.file``. It raises nothing: an
+accepted artifact must not be undone by a filing defect, so the outcome lands
+in ``summary.json`` as ``filing`` with ``state``, ``filed``, ``dest`` and the
+command's own words. With the variable unset the status file is still written
+and ``filed`` is false with the reason, never a silent skip. The destination is
+configuration rather than an argument because a parameter a caller must
+remember is the same defect as remembering to close.
 """
 from __future__ import annotations
 
+import argparse
+import contextlib
 import hashlib
+import io
 import json
 import os
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -614,7 +630,67 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     if code != 0:
         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)
     _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
+    halt["filing"] = file_finish(record_dir, halt)
+    _dump(os.path.join(record_dir, "summary.json"), halt)
     return halt
+
+
+def file_finish(record_dir, halt):
+    """State the job's custody status in its own folder, then file it, as the Orchestrator's last act.
+
+    WHY HERE, AND NOT IN A CONDUCTOR'S CHECKLIST. A finished loop() used to leave the folder wherever it ran:
+    no ``custody/status.json``, and no copy under ``dot-plumbline/jobs/``. Measured 2026-11-09, ``jobs/`` held
+    two jobs while roughly twenty-five had run, because filing was a sentence in a commit message
+    (``988c8ac``) and every dispatch wrote to ``/tmp``. The repo's own record said the program had stopped in
+    November while the loop kept working. The seat that decides the terminal state is the seat that closes the
+    job; a person running ``close`` afterward is the same defect as remembering to file.
+
+    WHY THE DESTINATION IS CONFIGURATION AND NOT A PARAMETER. ``loop()`` must not gain an argument a caller has
+    to remember — that is the defect this fixes, one level up. ``PLUMBLINE_FILE_INTO`` names the instance's
+    ``dot-plumbline`` once, in the seat's entry script; a caller who does not set it gets a status file and a
+    ``filed: false`` row saying no destination was configured, never a silent skip.
+
+    WHY IT CANNOT RAISE. An accepted artifact must not be undone by a filing defect: the work is done, the
+    record either shipped or did not, and a traceback here would fail a job that already passed. Every outcome
+    is a row in ``summary.json`` — ``state``, ``filed``, ``dest`` and the command's own words — so the failure
+    is readable in the record instead of in a transcript nobody kept.
+    """
+    record = os.path.join(str(record_dir), "custody", "record.custody.json")
+    state = "custody" if os.path.isfile(record) else "missing"
+    row = {"state": state, "filed": False, "dest": None, "detail": ""}
+    try:
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import plumbline_job
+
+        plumbline_job.write_status(
+            record_dir, state,
+            terminal_state=halt.get("terminal_state"),
+            record_sha256=(hashlib.sha256(open(record, "rb").read()).hexdigest() if state == "custody" else None),
+            why=(
+                "the custody record shipped with this finish; its sha256 is named here so a later edit to the "
+                "folder is visible as a disagreement, not as a detail someone has to remember."
+                if state == "custody" else
+                "loop() returned a finish with no custody record in the folder. The job is closed and its record "
+                "is missing; that is a defect the summary carries, not a state the folder should hide."
+            ),
+        )
+        into = (os.environ.get("PLUMBLINE_FILE_INTO") or "").strip()
+        if not into:
+            row["detail"] = ("no destination configured: PLUMBLINE_FILE_INTO is unset. The status file is written "
+                             "and the job is not filed; this row is the record of that.")
+            return row
+        args = argparse.Namespace(job_dir=str(record_dir), into=into, run_log=None, force=True,
+                                  backfill=False, allow_incomplete=False)
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            code = plumbline_job.do_file(args)
+        row["filed"] = code == 0
+        row["dest"] = str(pathlib.Path(into).expanduser().resolve() / ("jobs" if state == "custody" else "runs")
+                          / pathlib.Path(str(record_dir)).name)
+        row["detail"] = (buffer.getvalue() or "").strip()[-800:]
+    except Exception as exc:  # filing must not undo a finish; the row is the report
+        row["detail"] = "filing raised %s: %s" % (type(exc).__name__, exc)
+    return row
 
 
 def _file_finish(record_dir, packet, halt, round_paths, best_round, by):
