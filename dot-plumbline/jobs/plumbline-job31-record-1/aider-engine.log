@@ -1,0 +1,1 @@
+run-aider: PLUMBLINE_MAKER_LOG is unset; refusing to start Aider (an unset log path books nothing, and a silent zero is not a measurement)

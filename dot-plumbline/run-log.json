@@ -156,6 +156,19 @@
       "terminal_state": "accepted",
       "unfiled_backfill": true,
       "packet_job_id": "2026-11-08-job1-fixture-pin"
+    },
+    {
+      "job_id": "plumbline-job31-record-1",
+      "date": "2026-11-09",
+      "event": "filed",
+      "kind": "job",
+      "record_state": "custody",
+      "kit_close": false,
+      "source": "/home/jarbis1/tmp/plumbline-job31-record-1",
+      "files": 13,
+      "packet_sha256": "b2639385d51e73cd8621ff93af07643d25a24fbd2f40e3b072f4d76367ee4d53",
+      "terminal_state": "needs_owner",
+      "packet_job_id": "2026-11-09-audit-root-own-repo"
     }
   ]
 }

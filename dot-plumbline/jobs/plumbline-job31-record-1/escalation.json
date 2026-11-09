@@ -1,0 +1,50 @@
+{
+  "best": null,
+  "by": "loop()",
+  "decision": null,
+  "diagnosis": null,
+  "ended_at": "2026-11-09T21:41:46+00:00",
+  "escalation_kind": "other",
+  "holders": {
+    "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored this packet, its bar and its scope; does not ratify it and does not run the loop",
+    "not_holders": "The Architect does not hold the orchestrator seat here, and no holder above equals the Architect: holders.architect is 'Architect (Hermes plumbline-architect profile)', which is not an entry in holders.orchestrator.",
+    "orchestrator": [
+      {
+        "carries": "dispatch, the pass rule, the cap, the clock, the budget, the round records, the filing",
+        "does": "rounds",
+        "holder": "plumbline-conductor round runner",
+        "kind": "script",
+        "tested": "loop() of kit/conductor_loop.py at base 6793e53 has run to a filed finish under the kit's own end-to-end tests: tests/test_loop_freeze.py, tests/test_loop_custody_on_finish.py, tests/test_loop_custody_sources.py, tests/test_loop_started_at.py, tests/test_loop_filing.py, all named in artifact.frozen. Its refusals are the base's _problems(), read by the Architect before this packet was written. NOT yet shown by a run against this packet: loop() refuses this packet until the Owner sets ratified to true."
+      },
+      {
+        "carries": "the escalation record and the relay of the Owner's decision; the Architect writes the options and the recommendation",
+        "does": "escalations",
+        "holder": "escalation-delivery holder (the conductor profile's escalation route)",
+        "kind": "script",
+        "tested": "plumbline-escalate at the base: its refusals and its writer are exercised by tests/test_escalate.py; it writes escalation.json from loop()'s facts and relays the Owner's decision. It writes none of the content."
+      }
+    ]
+  },
+  "human_seat": "S2 (the Owner)",
+  "options": null,
+  "outcome": "no_artifact",
+  "problems": [],
+  "proposed_packet": null,
+  "question": null,
+  "recommendation": null,
+  "route": [
+    "Architect",
+    "Owner"
+  ],
+  "started_at": "2026-11-09T21:40:49+00:00",
+  "stop": "no artifact",
+  "terminal_state": "needs_owner",
+  "tried": [
+    {
+      "record": "/home/jarbis1/tmp/plumbline-job31-record-1/round-01.json",
+      "record_sha256": "aba81f9d5d8c8f172ca6cf9d07ef6e1405c0a63162c12058e10ce3eaf576d29f",
+      "round": 1
+    }
+  ],
+  "why_unobservable": null
+}

@@ -1,0 +1,295 @@
+{
+  "acceptedRound": null,
+  "accepted_round": null,
+  "artifact": {
+    "base": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35",
+    "deliverable": "a work branch in which tests/validate_audit.py resolves its audit root from the repo it is run in, with $PLUMBLINE_AUDIT_ROOT still honoured as the override, and nothing else in the suite's grading logic changed",
+    "editable": [
+      "tests/validate_audit.py"
+    ],
+    "frozen": [
+      "schemas/job-packet.schema.json",
+      "schemas/evaluator-record.schema.json",
+      "schemas/audit-record.schema.json",
+      "schemas/compliance-checklist.json",
+      "schemas/custody-record.schema.json",
+      "tools/pin.json",
+      "tools/build_schemas.py",
+      "tools/edi_corpus.py",
+      "tests/validate_schemas.py",
+      "tests/validate_constitution.py",
+      "tests/validate_pin_prose.py",
+      "tests/run_all.py",
+      "tests/test_conductor_loop.py",
+      "tests/test_validate_audit_root.py"
+    ],
+    "repo": "https://github.com/evaluatordriven/plumbline.git",
+    "scope": {
+      "allowed": "the suite resolves its audit root from the repo it is run in; $PLUMBLINE_AUDIT_ROOT, when set, still names the root explicitly and wins",
+      "carried_as_given": {
+        "defect_sites_at_base": [
+          "tests/validate_audit.py:46",
+          "tests/validate_audit.py:113"
+        ]
+      },
+      "not_allowed": [
+        "a refactor of the audit runner, or any change outside tests/validate_audit.py",
+        "a re-pin, or any change under schemas/",
+        "any change to tests/validate_audit.py's grading logic beyond resolving its own root"
+      ]
+    },
+    "test_cmd": [
+      "python3",
+      "tests/test_validate_audit_root.py"
+    ]
+  },
+  "bestRound": null,
+  "best_round": null,
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "budget": {
+      "amount": 0.15,
+      "note": "Owner's bounds, carried as given: strictly under US$0.15 of all model/API spend and under 2 h wall, first Maker dispatch to disposition; either breach -> needs_owner. T_accept 1 and T_dim 1 mean every dimension must score 1, so one unmet check at the cap ends needs_owner, never accepted.",
+      "time_hours_lt": 2,
+      "unit": "USD"
+    },
+    "cap": 2,
+    "cap_counts": "generations"
+  },
+  "buyer": "S2 (the Owner)",
+  "cap": 2,
+  "commit": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "cost": 0.0,
+  "defect": {
+    "code": "DEVSPACE = Path(os.environ.get(\"PLUMBLINE_AUDIT_ROOT\") or REPO.parent).expanduser()",
+    "fix_boundary": "Resolve the suite's own root from the repo it is run in. NOT a refactor of the audit runner, NOT a re-pin, nothing under schemas/, and no change to the grading logic beyond resolving its own root. $PLUMBLINE_AUDIT_ROOT, when set, still names the root and wins.",
+    "measured": "With PLUMBLINE_AUDIT_ROOT unset, REPO.parent is the directory holding the checkout; at line 113 the suite globs <parent>/*/dot-plumbline/audits, so a sibling checkout's audit census is read as this tree's. Job 25 and Job 13 on 2026-11-09 read /home/jarbis1/tmp's census this way and were re-run under PLUMBLINE_AUDIT_ROOT=/tmp/empty-audit-root.",
+    "site": "tests/validate_audit.py:46 at base 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35"
+  },
+  "discoverability": {
+    "attempted": [
+      "Read tests/validate_audit.py:39-52 (docstring) and :105-129 (discovery and the no-records branch) at the base",
+      "Read README.md:157-160, which states the plain-clone behaviour",
+      "Ran the base through git archive into a clean parent: 'NO AUDIT RECORDS IN REACH'",
+      "Ran the base in the same subject with a record in a sibling directory: reads the sibling's record",
+      "Ran the base with PLUMBLINE_AUDIT_ROOT=<empty dir> in the sibling case: 'NO AUDIT RECORDS IN REACH'"
+    ],
+    "classification": "undecidable",
+    "options": [
+      "A \u2014 exit 0 in that case, naming the homes that were not read (README and docstring behaviour preserved; the bar asserts exit 0 and that the sibling's record is not named as checked).",
+      "B \u2014 exit 1 in that case (a stricter reading of 'a validator that silently checks nothing is worse than none'; the bar asserts exit 1 and that the sibling's record is not named as checked).",
+      "C \u2014 the same exit code the suite gives today when handed an explicit empty root through PLUMBLINE_AUDIT_ROOT, so the suite behaves the same whether the root is implied or named."
+    ],
+    "question": "Does a checkout that ships no dot-plumbline/audits/ of its own, but sits beside one that does, exit 0 while naming what it could not read, or exit 1 because it found nothing?",
+    "recommendation": "C, which reduces to A today: an implied root and a named empty root must read alike. B is defensible doctrine but would make the same tree read differently depending only on whether the caller typed the override \u2014 the two-standards defect this job exists to remove. The Owner decides; the bar's assertions depend on it.",
+    "why_no_observable_answer": "The base cannot answer it: the only way to observe the sibling case today is the convention under test, REPO.parent. Every measurement of this case either sets PLUMBLINE_AUDIT_ROOT (and then it is not the case) or measures the defect itself. The exit code is a value the Owner sets."
+  },
+  "endedAt": "2026-11-09T21:41:46+00:00",
+  "ended_at": "2026-11-09T21:41:46+00:00",
+  "entry": "A",
+  "escalation": {
+    "classes": [
+      "cap_reached",
+      "budget_breach",
+      "time_breach",
+      "artifact_missed_standard",
+      "tampered_out_of_scope",
+      "evaluator_split",
+      "held_out_unreadable",
+      "frame_at_fault"
+    ],
+    "classes_source": "The five owner-set names (cap_reached, budget_breach, time_breach, artifact_missed_standard, tampered_out_of_scope) are the Owner's vocabulary as carried in the brief. evaluator_split and held_out_unreadable are loop()'s own stop constants (kit/conductor_loop.py at the base). frame_at_fault is the Architect's, used only when the bar itself is shown wrong. Class labels chosen by the Architect; no threshold in them.",
+    "holders": {
+      "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored this packet, its bar and its scope; does not ratify it and does not run the loop",
+      "not_holders": "The Architect does not hold the orchestrator seat here, and no holder above equals the Architect: holders.architect is 'Architect (Hermes plumbline-architect profile)', which is not an entry in holders.orchestrator.",
+      "orchestrator": [
+        {
+          "carries": "dispatch, the pass rule, the cap, the clock, the budget, the round records, the filing",
+          "does": "rounds",
+          "holder": "plumbline-conductor round runner",
+          "kind": "script",
+          "tested": "loop() of kit/conductor_loop.py at base 6793e53 has run to a filed finish under the kit's own end-to-end tests: tests/test_loop_freeze.py, tests/test_loop_custody_on_finish.py, tests/test_loop_custody_sources.py, tests/test_loop_started_at.py, tests/test_loop_filing.py, all named in artifact.frozen. Its refusals are the base's _problems(), read by the Architect before this packet was written. NOT yet shown by a run against this packet: loop() refuses this packet until the Owner sets ratified to true."
+        },
+        {
+          "carries": "the escalation record and the relay of the Owner's decision; the Architect writes the options and the recommendation",
+          "does": "escalations",
+          "holder": "escalation-delivery holder (the conductor profile's escalation route)",
+          "kind": "script",
+          "tested": "plumbline-escalate at the base: its refusals and its writer are exercised by tests/test_escalate.py; it writes escalation.json from loop()'s facts and relays the Owner's decision. It writes none of the content."
+        }
+      ]
+    },
+    "route": [
+      "Architect",
+      "Owner"
+    ]
+  },
+  "evaluator": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "held_out": [],
+    "kind": "model",
+    "name": "plumbline-eval via route-eval",
+    "note": "loop() sets PLUMBLINE_TURN and PLUMBLINE_COST and reads JSON from stdout; route-eval scores nothing itself. Two runs, as bounded; the pass rule needs every dimension at 1 (T_accept 1, T_dim 1), and a split across the two runs is evaluator_split, not an average.",
+    "read_only": true,
+    "runs": 2,
+    "who": "plumbline-eval (model Evaluator seat)"
+  },
+  "finish": {
+    "accepted_round": null,
+    "best_round": null,
+    "cap": 2,
+    "commit": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35",
+    "cost": 0.0,
+    "ended_at": "2026-11-09T21:41:46+00:00",
+    "outcome": "no_artifact",
+    "packet_sha256": "b7a399ddfdd31701c3c03a77e29d2447b5cf09b9de4ecaa3fc873157ca9b79c5",
+    "rounds": 1,
+    "rounds_sha256": [
+      "aba81f9d5d8c8f172ca6cf9d07ef6e1405c0a63162c12058e10ce3eaf576d29f"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-09T21:40:49+00:00",
+    "stop": "no artifact",
+    "terminal_state": "needs_owner"
+  },
+  "ground_truth": [
+    {
+      "channel": "python3 tests/test_validate_audit_root.py",
+      "hardness": "DOCUMENT",
+      "source": "tests/test_validate_audit_root.py",
+      "version": "the frozen bar file; this packet names its path, and its sha256 is recorded at freeze \u2014 not known to the Architect at authoring time, because the Architect has not written the bar yet"
+    },
+    {
+      "channel": "python3 tests/validate_audit.py run in the subject tree, with and without PLUMBLINE_AUDIT_ROOT",
+      "hardness": "INVARIANT",
+      "source": "tests/validate_audit.py at base 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35: DEVSPACE = Path(os.environ.get(\"PLUMBLINE_AUDIT_ROOT\") or REPO.parent).expanduser() (line 46) and homes = [p for p in sorted(DEVSPACE.glob(\"*/dot-plumbline/audits\")) if p.is_dir()] (line 113). Measured 2026-11-09 by the Architect: a git archive of that commit into <parent>/subject, with a record placed at <parent>/neighbour/dot-plumbline/audits/, exits non-zero and names the neighbour's record as read; the same subject under PLUMBLINE_AUDIT_ROOT=<empty dir> reports no records in reach.",
+      "version": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35"
+    },
+    {
+      "hardness": "DOCUMENT",
+      "source": "tests/validate_audit.py line 14 (module docstring): 'The search root is the directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT.' \u2014 the stated behaviour the code at line 46 does not keep",
+      "version": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35"
+    },
+    {
+      "hardness": "INVARIANT",
+      "source": "dot-plumbline/constitution.json principles: 'The instrument does not edit its own readings'; 'State the limit'; 'Extend, never shrink' \u2014 a suite that reports a neighbour's census as its own fails 'State the limit'.",
+      "version": "0.1.0"
+    }
+  ],
+  "human_seat": "S2 (the Owner)",
+  "instrument_profile": "full",
+  "job_id": "2026-11-09-audit-root-own-repo",
+  "job_name": "tests/validate_audit.py resolves its audit root from the repo it is run in, not the checkout beside it",
+  "job_to_be_done": {
+    "desired_future": "Running python3 tests/validate_audit.py in a checkout reads that checkout's dot-plumbline/audits/ and, absent one, says so by name; a record placed in a sibling directory of the subject is not read; the env override still names the root when set.",
+    "pain_points": [
+      "A validator that reads a sibling checkout reports a neighbour's state as this tree's state, and the report cannot be told apart from a true reading.",
+      "A workaround that must be remembered before every run is a second standard: every run without the env var is measured against a different tree than the run beside it.",
+      "The miscount cost re-runs of Job 25 and Job 13 on the night of 2026-11-09."
+    ],
+    "statement": "tests/validate_audit.py must measure the tree it is run in. At base 6793e53ddc5071aa252be10f2c0fc18c5a5b0b35, tests/validate_audit.py:46 sets DEVSPACE = Path(os.environ.get(\"PLUMBLINE_AUDIT_ROOT\") or REPO.parent), so with PLUMBLINE_AUDIT_ROOT unset the suite globs <parent>/*/dot-plumbline/audits (line 113) and reads a sibling checkout's audit census as its own. Job 25 and Job 13 on 2026-11-09 were mis-measured this way (11/12 against the clean-parent 12/12) and were re-run under PLUMBLINE_AUDIT_ROOT=/tmp/empty-audit-root. The fix is confined to how the suite resolves its own root; $PLUMBLINE_AUDIT_ROOT stays as an explicit override."
+  },
+  "maker": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker"
+    ],
+    "engine": "aider via route-maker (DeepSeek, per the conductor profile's maker route at the base)",
+    "feedback_forms": [
+      "failing test output (the bar's own assertions, verbatim)",
+      "diff (aider's edit format)"
+    ],
+    "handoff": "rule12",
+    "task_classes": [
+      {
+        "class": "generation",
+        "shown_by": "not recorded \u2014 no completed generation run of this route has been shown to the Architect; the Maker is not claimed to hold it"
+      },
+      {
+        "class": "revision",
+        "shown_by": "plumbline-job25-record-1 and plumbline-job13-record-1 under /home/jarbis1/tmp: completed multi-generation runs of route-maker through loop() on 2026-11-09, each with maker-gen1..genN logs and a re-run suite"
+      }
+    ],
+    "version": "the conductor profile's route-maker at base 6793e53; the model id is recorded in each maker log, not re-derived here"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "mode": "scored",
+  "notes": "PRE-RATIFICATION SHAPE, filed 2026-11-09, following the programme's precedent of 2026-11-06 (examples/2026-10-27-custody-emitter-gaps/packet.json): ratified false, mode 'readings', maker and evaluator as strings at top level, and the scored frame carried in the top-level 'proposed' block. The order is: author unratified -> Owner ratifies THIS FILE'S sha256 -> the Architect promotes the values out of 'proposed' -> run. The Architect does not set ratified, does not promote on its own, and does not run the loop. Measured with ratified forced true in memory only, the promoted shape gives loop()'s _problems() 0 problems (see the return accompanying this file). The Architect has not yet written tests/test_validate_audit_root.py; the frozen entry for it is the bar's path and its sha256 is recorded at freeze.",
+  "outcome": "no_artifact",
+  "packetSha256": "b7a399ddfdd31701c3c03a77e29d2447b5cf09b9de4ecaa3fc873157ca9b79c5",
+  "packet_sha256": "b7a399ddfdd31701c3c03a77e29d2447b5cf09b9de4ecaa3fc873157ca9b79c5",
+  "promotion_plan": {
+    "defect_in_the_previous_plan": "The plan as first written claimed constitution_ref and constitution_version were 'already promoted at top level'. They were NOT: they sat in 'proposed'. A plan that describes a promotion it does not perform is the same class of defect as a record that describes a filing it does not make. This plan names them among the keys it promotes.",
+    "executed": "yes \u2014 performed 2026-11-09 on the ratified bytes; see 'executed_sha256'. The two constitution keys are at top level in the promoted file.",
+    "executed_sha256": "27e21d1991cfcae605c4de71c64171cdd866aeeca5d91e1acace6aab11e622c5",
+    "measured": "Measured 2026-11-09, in memory, no loop run: the promoted shape gives loop()'s _problems() 0 problems with a record_dir outside cwd. The frozen schema reports 3 errors on the promoted shape \u2014 bounds.budget.time_hours_lt (which loop() reads at conductor_loop.py:412 and _problems() requires at :803), discoverability.recommendation (the closed object allows attempted/why_no_observable_answer/options only), and maker.cmd/handoff (the scored maker is closed to engine/version/feedback_forms/task_classes). 32 of 56 filed packets carry time_hours_lt. The worked example examples/2026-10-27-custody-emitter-gaps/packet.json has 8 schema errors, time_hours_lt among them. So the two instruments have never agreed on these fields. Not fixed here: the Owner ratified these bytes, and folding them would be the Architect changing the bar. Recorded as a discoverability ledger item.",
+    "plan": "On the Owner setting ratified:true on the ratified file's sha256, the Architect promotes out of 'proposed' to top level: specialist, constitution_ref, constitution_version, maker (object, replacing the string), evaluator (object, replacing the string), standard_ref, bounds, threshold_mapping, ground_truth, mandate_ref, escalation, defect, discoverability; sets mode to 'scored'; and strips 'proposed' to a status line.",
+    "schema_divergence": {
+      "answered": "loop()-clean, carried as filed, and the divergence recorded. Reason: time_hours_lt is the Owner's bound; the schema's plumblineBudget is closed to {amount, unit, note}, so a strictly schema-clean packet would either drop the wall-clock bound or fold it into the free-text note \u2014 a rewrite of a value the Owner set. The other two are the packet's own shape and evidence the schema's maker def is narrower than the loop's; that is a ledger item against the schema, not this job's defect.",
+      "classification": "discoverable",
+      "question": "Should the promoted packet be schema-clean, or loop()_clean, when the frozen schema and loop() disagree on bounds.budget.time_hours_lt, maker.cmd/handoff and discoverability.recommendation?",
+      "recommendation": "ledger item; see discoverability.recommendation (unchanged, as filed)."
+    }
+  },
+  "proposed": {
+    "drafted_by": "Architect (Hermes plumbline-architect profile), 2026-11-09",
+    "entry_reason": "Entry A: the fix does not exist yet and the bar is written before anything is made, so this is commissioned work. The defect-revealing reads were made by the Architect against a git archive of the base in a scratch parent, outside the pin checkout.",
+    "status": "PROMOTED 2026-11-09 by the Architect from the file the Owner ratified, preserved at packet.ratified.bak. Promoted to top level: specialist, constitution_ref, constitution_version, mode='scored', maker (object), evaluator (object), standard_ref, bounds, threshold_mapping, ground_truth, mandate_ref, escalation, defect, discoverability. This block is a status line only; the promoted values above are authoritative."
+  },
+  "ratified": true,
+  "rounds": 1,
+  "roundsSha256": [
+    "aba81f9d5d8c8f172ca6cf9d07ef6e1405c0a63162c12058e10ce3eaf576d29f"
+  ],
+  "rounds_sha256": [
+    "aba81f9d5d8c8f172ca6cf9d07ef6e1405c0a63162c12058e10ce3eaf576d29f"
+  ],
+  "separation_gaps": [
+    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+  ],
+  "specialist": "The E-DI corpus, quoted and versioned at tools/pin.json commit f8bfb7934dbbefe3b32bc146b4481dba1744bc53 (EDI-MACHINE-CONTRACTS.md 1.27.0), held by S2 as its Author",
+  "stage": "development",
+  "standard_ref": {
+    "doc": "tests/test_validate_audit_root.py",
+    "version": "49e605ae"
+  },
+  "startedAt": "2026-11-09T21:40:49+00:00",
+  "started_at": "2026-11-09T21:40:49+00:00",
+  "stop": "no artifact",
+  "summary": {
+    "accepted_round": null,
+    "best_round": null,
+    "cap": 2,
+    "commit": "6793e53ddc5071aa252be10f2c0fc18c5a5b0b35",
+    "cost": 0.0,
+    "ended_at": "2026-11-09T21:41:46+00:00",
+    "outcome": "no_artifact",
+    "packet_sha256": "b7a399ddfdd31701c3c03a77e29d2447b5cf09b9de4ecaa3fc873157ca9b79c5",
+    "rounds": 1,
+    "rounds_sha256": [
+      "aba81f9d5d8c8f172ca6cf9d07ef6e1405c0a63162c12058e10ce3eaf576d29f"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-09T21:40:49+00:00",
+    "stop": "no artifact",
+    "terminal_state": "needs_owner"
+  },
+  "terminalState": "needs_owner",
+  "terminal_state": "needs_owner",
+  "threshold_mapping": "Binary scale per dimension: 1 = the check PASSes, 0 = it does not. pass = mean >= T_accept(1) AND min >= T_dim(1), i.e. every check PASS. Any 0 with iterations < cap -> regenerate; at cap -> needs_owner. T_reject 0 means the algebra never rejects. k = 2 iteration bound (= cap); x = 10 (% of budget) B.1.2 discovery window; x is NOT a spend allowance \u2014 the budget stays strictly < US$0.15."
+}
