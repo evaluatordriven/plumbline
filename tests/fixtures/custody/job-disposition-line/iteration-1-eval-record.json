@@ -1,0 +1,46 @@
+{
+  "job_id": "fixture-rejected",
+  "iteration": 1,
+  "passes": [
+    {
+      "pass_id": "pass-a",
+      "kind": "scored",
+      "status": "filed",
+      "artifact": "passes/pass-a.json"
+    }
+  ],
+  "dimensions": [
+    {
+      "name": "correctness",
+      "score": 10,
+      "scale": "1-10",
+      "observation": "figures match"
+    },
+    {
+      "name": "completeness",
+      "score": 4,
+      "scale": "1-10",
+      "observation": "Risks section empty"
+    }
+  ],
+  "pass_rule": {
+    "accept": 9.5,
+    "dimension_floor": 9.0,
+    "reject": 7.0,
+    "cap": 4
+  },
+  "violations": [
+    {
+      "id": "V1",
+      "class": "artifact_missed_standard",
+      "observation": "The Risks section the brief names is empty."
+    }
+  ],
+  "verdict": "reject",
+  "instrument_in_force": {
+    "version": "fixture",
+    "rubric_sha256": "fb6867ec998add67787a2a5dfe78968e1dedb64b79caf0eeb5d1e815f5f445b4",
+    "code_sha256": "3e950569ef0cc7e9353f1f4c4b1b26f67aca6f47aeb83feb89d2c9bee4341919"
+  },
+  "note": "SYNTHETIC FIXTURE"
+}

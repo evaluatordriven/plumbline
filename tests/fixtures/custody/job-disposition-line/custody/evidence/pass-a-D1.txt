@@ -1,0 +1,1 @@
+SYNTHETIC evaluator reading, pass-a, D1. Quote: "Revenue was 12.4 in Q3, as in the source table." Matches. Score 10.
