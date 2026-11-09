@@ -483,6 +483,12 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
                     "PLUMBLINE_FINDINGS": findings_path,
                     "PLUMBLINE_COST": cost_path,
                 },
+                # A detached engine must be waited for, not sampled: route-maker exits 0 the
+                # moment it detaches, so measuring the tree on its return reads a Maker that
+                # has not finished (measured 2026-11-09, Job 31 record-3: the fix landed 56 s
+                # after the loop had already written "no artifact").
+                await_exit_file=os.path.join(record_dir, "aider-exit.json"),
+                await_dispatch_file=os.path.join(record_dir, "aider-dispatch.json"),
             )
         except ValueError as exc:
             if number == 1:

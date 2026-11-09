@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import signal
 import subprocess
+import time
 
 try:  # imported as part of the kit package
     from . import conductor_software
@@ -40,6 +41,8 @@ def run(
     ignore: list[str] | None = None,
     require_red: bool = True,
     maker_env: dict | None = None,
+    await_exit_file: str | None = None,
+    await_dispatch_file: str | None = None,
 ) -> dict:
     """Run one turn and return the gate's verdict plus the recorded arms and commit.
 
@@ -120,12 +123,14 @@ def run(
     maker_exit = None
     maker_output = None
     changes: list[str] = []
+    waited = None
     if dispatched:
         env = None
         if maker_env is not None:
             env = os.environ.copy()
             env.update({str(key): str(value) for key, value in maker_env.items()})
         maker_exit, maker_output = _run(maker_cmd, root, timeout_s, env=env)
+        waited = _await_engine(await_exit_file, await_dispatch_file, timeout_s)
         changes = conductor_software.changed_paths(
             before, conductor_software.snapshot(root)
         )
@@ -161,7 +166,34 @@ def run(
     result["rerun"] = conductor_software.record_arm(rerun_exit, rerun_output)
     result["ignored"] = ignored
     result["commit"] = conductor_software.record_field(commit)
+    result["awaited_engine"] = waited
     return result
+
+
+def _await_engine(exit_file: str | None, dispatch_file: str | None, timeout_s: float | None) -> dict | None:
+    """Wait for a detached Maker engine's own exit record before the tree is measured.
+
+    ``route-maker`` puts the engine in its own session and exits 0 as soon as it has
+    detached, so ``_run(maker_cmd, ...)`` returns while the engine is still writing.
+    Measuring there reads a tree the Maker has not finished with: measured 2026-11-09 on
+    Job 31, the loop declared ``no artifact`` at 21:58:43 and the engine wrote its exit
+    record ``{"exit": 0}`` and a +16/-6 diff at 21:59:39 — a real fix recorded as no work
+    at all. The wait is only for a route that detached (a dispatch file exists); a route
+    that ran in the foreground has already finished and is not delayed. The bound is the
+    turn's own timeout, so a stalled engine still cannot outlive the packet.
+    """
+    if not exit_file or not dispatch_file or not os.path.isfile(dispatch_file):
+        return None
+    if os.path.isfile(exit_file):
+        return {"waited": False, "seconds": 0.0, "reason": "exit record already written"}
+    started = time.monotonic()
+    while time.monotonic() - started < (timeout_s if timeout_s is not None else DEFAULT_TIMEOUT_S):
+        time.sleep(0.25)
+        if os.path.isfile(exit_file):
+            return {"waited": True, "seconds": round(time.monotonic() - started, 3),
+                    "reason": "engine exit record appeared"}
+    return {"waited": True, "seconds": round(time.monotonic() - started, 3),
+            "reason": "engine exit record never appeared within the turn's timeout"}
 
 
 def _run(cmd: list[str], cwd: str, timeout_s: float | None, env: dict | None = None) -> tuple[int | str, bytes]:
