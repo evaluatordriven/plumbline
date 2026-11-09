@@ -1,0 +1,13 @@
+{
+  "schema": "plumbline-instance-custody-status-v1",
+  "not_a_record": true,
+  "job": "2026-11-07-loop-freeze",
+  "state": "open",
+  "record": "custody/record.custody.json",
+  "record_present": false,
+  "record_sha256": null,
+  "written_at": "2026-11-09T20:28:27Z",
+  "written_by": "kit/plumbline_job.py",
+  "terminal_state": null,
+  "why": "state read from the folder itself when the status file was introduced; the job had no record because it never reached a terminal state."
+}
