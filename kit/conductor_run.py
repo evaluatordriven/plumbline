@@ -126,8 +126,8 @@ def run(
     waited = None
     if dispatched:
         env = None
+        env = _bar_env()
         if maker_env is not None:
-            env = os.environ.copy()
             env.update({str(key): str(value) for key, value in maker_env.items()})
         maker_exit, maker_output = _run(maker_cmd, root, timeout_s, env=env)
         waited = _await_engine(await_exit_file, await_dispatch_file, timeout_s)
@@ -205,10 +205,10 @@ def _await_engine(exit_file: str | None, dispatch_file: str | None, timeout_s: f
 
 
 def _bar_env() -> dict:
-    """The environment a BAR is run in: bytecode writing off.
+    """The environment every command of a turn is run in: bytecode writing off.
 
-    A bar that imports the repo's own modules (as the derived-schema bars must) has
-    Python write ``__pycache__/*.pyc`` into the tree it is measuring. The snapshot
+    A bar or a Maker's tooling that imports the repo's own modules (as the derived-schema
+    bars must) has Python write ``__pycache__/*.pyc`` into the tree it is measuring. The snapshot
     then sees files that appeared during the turn, outside the editable set, and the
     gate refuses the turn as an edit outside the editable set. Measured 2026-11-10,
     Job 32 record-6: two ``tools/__pycache__/*.cpython-314.pyc`` files, written by the
