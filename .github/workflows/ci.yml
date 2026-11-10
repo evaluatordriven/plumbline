@@ -54,11 +54,15 @@ jobs:
           HOME: ${{ runner.temp }}/home
         run: python tests/run_all.py
 
+      - name: Read the pinned custody commit
+        id: custody_pin
+        run: python -c "import json;print('sha='+json.load(open('tools/pin.json'))['custody']['commit'])" >> "$GITHUB_OUTPUT"
+
       - name: Check out the custody corpus at its pinned commit
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: evaluatordriven/custody
-          ref: 3e3ca58de5631bdc58291564303a2e9d25a8653e
+          ref: ${{ steps.custody_pin.outputs.sha }}
           path: custody-upstream
 
       - name: Compare the vendored custody schema with upstream
