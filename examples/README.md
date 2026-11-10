@@ -3,7 +3,7 @@
 These are two of Plumbline's own jobs, copied exactly as they were closed. Nothing in a job folder has been
 edited for publication.
 
-| Job | What it did | Subject commit | Public custody checker @ `3e3ca58` |
+| Job | What it did | Subject commit | Checked with custody `3e3ca58` (v0.9.6) |
 |---|---|---|---|
 | `2026-10-27-custody-emitter-gaps` | Closed gaps in the custody/v1 emitter | `c7db5b0` | `OK`, `CL1`, 19/19 |
 | `2026-10-28-custody-times-ledger-spend` | Added custody times, ledger commands, fixture modes and spend caps | `912828a` | `OK`, `CL1`, 19/19 |
@@ -24,7 +24,7 @@ edited for publication.
 
 ```sh
 git clone https://github.com/evaluatordriven/custody
-git -C custody checkout 3e3ca58de5631bdc58291564303a2e9d25a8653e
+git -C custody checkout 8a6bf1e7dddab3aafee1b31911783995b20c1ca2
 cd examples/2026-10-27-custody-emitter-gaps
 python3 ../../custody/checker/check.py custody/record.custody.json \
   --files ../subjects/2026-10-27-custody-emitter-gaps \
@@ -51,3 +51,8 @@ python3 kit/plumbline_verify.py --record examples/$J/custody/record.custody.json
 Expected result for both: **exit 4**. The custody layer passes; the Plumbline layer then reports `FAIL schema`
 lines for `x-plumbline.schema` and `x-plumbline.hand_times`, because these records were written before the
 current `x-plumbline-v1` schema. Exit 3 would mean a custody-layer failure; neither record gives it.
+
+**Re-checking today uses the pinned checkout (v0.9.8).** Each record pins the emitter digest it was
+written against, so CL1-14 reports a mismatch against a newer `kit/emit_custody.py` — that is the pin
+working, not the record failing. Measured 2026-11-10: every other requirement reads identically under
+the 0.9.8 checker.

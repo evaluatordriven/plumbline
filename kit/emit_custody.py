@@ -85,7 +85,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import custody_history as H                      # noqa: E402
 
-SPEC_VERSION = "0.9.6"
+SPEC_VERSION = "0.9.8"
 STATEMENT = "https://in-toto.io/Statement/v1"
 PREDICATE_TYPE = "https://evaluatordriven.com/custody/v1"
 TERMINALS = ("accepted", "needs_owner", "rejected")

@@ -6,6 +6,23 @@ cited by its commit.
 
 ## Unreleased
 
+**Changed**
+- **The custody pin moves 0.9.6 → 0.9.8** (`3e3ca58` → `8a6bf1e7`). `schema/custody-v1.schema.json` is
+  **byte-identical** between the two releases, so no record shape changes and no vendored byte changes; the
+  derived `custody-record.schema.json` changes only in the pin it names. What moved is `checker/check.py`
+  (a `bool` is no longer accepted as an `int`; a malformed `checks[]` entry defers to CR-2 instead of failing
+  the first CL1 rule it reaches; a control with an all-zero case digest is refused) and `SPEC.md` (CL2-3
+  recast, G1.2/G1.3/G2.3, the N6 hunk map).
+  - **Re-read class:** CL1. Measured 2026-11-10: the verifier suite runs **28/28** against the 0.9.8 checker,
+    and the two published example records produce **identical requirement outcomes** under both checkers. No
+    fixture expectation moved. **No CL2 record exists**, so the CL2-3 recast invalidates nothing — a future
+    CL2 claim would be a new job under C30, not a correction.
+  - `kit/emit_custody.py` `SPEC_VERSION` moves with the pin, so a record no longer stamps 0.9.6 while the
+    repository verifies against 0.9.8. `tools/check_version_claims.py` now compares the two and fails if they
+    ever diverge.
+  - Also fixed in this change: `--custody --repin` wrote `commit` and every digest and left `specVersion`
+    untouched (see #43); the version is now read from the checkout's `SPEC.md`.
+
 **Added**
 - `kit/conductor_loop.py`: a multi-round loop driver. It calls `run()`; it does not reimplement the gate. It dispatches the Maker and the Evaluator, applies the pass rule, and writes a record for each round. It does not score, diagnose, or decide, and it sends nothing. It files its own finish: `summary.json` with what the finish says, and `escalation.json` beside it for a stop a human must see, and it returns the summary. It files no custody/v1 record. The conductor is still unbuilt.
 - `kit/conductor_loop.CustodyNotDone`: a finish this module does not file does not return. `datetime` is the module's clock seam, so a run whose `now` was replaced took stamps that are not its readings; that finish raises this exception instead of returning a summary. It is an `Exception` and not a `ValueError`; its `exit_code` is 1 (the work was accepted and the finish cannot be filed), 2 (the work was rejected, below the floor) or 3 (every stop a human must see); and neither `summary.json` nor `escalation.json` is written. The exception's `halt` carries what the record would have said — the stop, its terminal state and outcome, the stamps, the rounds, the cap, the best round, the spend, the separation gaps, the round hashes, the packet hash and the commit. A written file is not a substitute for a returned summary. A packet refusal is not a finish and is unchanged: `ValueError`, the same `escalation.json` with `started_at` and `refused_at`, and no `ended_at`.

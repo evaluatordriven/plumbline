@@ -66,6 +66,25 @@ def claims(root: Path) -> list[tuple[str, str, str]]:
     for ref in sorted(set(re.findall(r"custody[^.\n]{0,40}\bv(\d+\.\d+\.\d+)", readme))):
         out.append(("README custody version", "v" + ref, "v" + spec_version))
 
+    # 6. The version the emitter stamps into every record is the version this repository pins.
+    emitter = root / "kit" / "emit_custody.py"
+    if emitter.is_file() and spec_version:
+        match = re.search(r'^SPEC_VERSION\s*=\s*"(\d+\.\d+\.\d+)"', emitter.read_text(encoding="utf-8"),
+                          re.M)
+        if match:
+            out.append(("kit/emit_custody.py SPEC_VERSION", "v" + match.group(1), "v" + spec_version))
+
+    # 7. A workflow that checks out a pinned repository reads its ref from the pin, not from a literal.
+    #    Measured 2026-11-10: ci.yml hardcoded the custody commit, so a re-pin left CI comparing the
+    #    vendored schema against the wrong upstream and every test job failed while the pin was correct.
+    pinned_commits = {str(doctrine), str(custody)} - {""}
+    for wf in sorted((root / ".github" / "workflows").glob("*.y*ml")):
+        text = wf.read_text(encoding="utf-8")
+        for ref in sorted(set(re.findall(r"^\s*ref:\s*([0-9a-f]{40})\s*$", text, re.M))):
+            if ref in pinned_commits:
+                out.append(("workflow hardcodes a pinned ref instead of reading the pin",
+                            "ref: " + ref[:12], "read it from tools/pin.json"))
+
     return out
 
 
