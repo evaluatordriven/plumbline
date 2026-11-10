@@ -1,0 +1,27 @@
+{
+  "_comment": "A frozen verdict per published record, with the exact command that produces it. Any checker change must reproduce every row. A record whose inputs are not published cannot be frozen and is listed under `unfreezable` with the reason - never silently omitted.",
+  "custodyCommit": "8a6bf1e7dddab3aafee1b31911783995b20c1ca2",
+  "rows": [
+    {
+      "job": "examples/2026-10-27-custody-emitter-gaps",
+      "record": "custody/record.custody.json",
+      "files": "../subjects/2026-10-27-custody-emitter-gaps",
+      "evidence": "custody/evidence",
+      "bar": "custody/bar.md",
+      "custodyCommit": "8a6bf1e7dddab3aafee1b31911783995b20c1ca2",
+      "command": "cd examples/2026-10-27-custody-emitter-gaps && python3 <custody@8a6bf1e>/checker/check.py custody/record.custody.json --files ../subjects/2026-10-27-custody-emitter-gaps --evidence custody/evidence --bar custody/bar.md",
+      "expect": { "verdict": "OK", "levelAchieved": "CL1", "failed": [] }
+    },
+    {
+      "job": "examples/2026-10-28-custody-times-ledger-spend",
+      "record": "custody/record.custody.json",
+      "files": "../subjects/2026-10-28-custody-times-ledger-spend",
+      "evidence": "custody/evidence",
+      "bar": "custody/bar.md",
+      "custodyCommit": "8a6bf1e7dddab3aafee1b31911783995b20c1ca2",
+      "command": "cd examples/2026-10-28-custody-times-ledger-spend && python3 <custody@8a6bf1e>/checker/check.py custody/record.custody.json --files ../subjects/2026-10-28-custody-times-ledger-spend --evidence custody/evidence --bar custody/bar.md",
+      "expect": { "verdict": "OK", "levelAchieved": "CL1", "failed": [] }
+    }
+  ],
+  "unfreezable": []
+}
