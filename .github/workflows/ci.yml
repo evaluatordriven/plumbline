@@ -77,6 +77,12 @@ jobs:
           CUSTODY_DIR: ${{ github.workspace }}/custody-upstream
         run: python -m unittest -v tests.test_plumbline_verify.VerifierKindTests.test_clean_against_real_checker
 
+      - name: Published records still read as published (frozen verdict table)
+        env:
+          HOME: ${{ runner.temp }}/home
+          CUSTODY_DIR: ${{ github.workspace }}/custody-upstream
+        run: python3 tools/check_verdicts.py
+
   corpus:
     runs-on: ubuntu-26.04
     steps:
