@@ -977,6 +977,15 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
                 missing = True
             else:
                 costs.append(one)
+        # Keep the evaluator's own bytes. Measured 2026-11-10, Job 32 record-10: exit 1,
+        # no score file, no reply file, and the record held only the output hash — so the
+        # reader could not tell the seat from the route's shape check from a spent turn.
+        if output:
+            keep_dir = os.path.join(record_dir, "evidence")
+            os.makedirs(keep_dir, exist_ok=True)
+            with open(os.path.join(keep_dir, "eval-%02d-%d.log" % (number, index)),
+                      "wb") as fh:
+                fh.write(output)
         after = conductor_software.snapshot(root)
         changed = [
             path for path in conductor_software.changed_paths(before, after)
