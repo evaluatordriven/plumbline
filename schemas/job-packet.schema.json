@@ -858,6 +858,11 @@
         },
         "note": {
           "type": "string"
+        },
+        "time_hours_lt": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "INSTANCE-SPECIFIC. The wall-clock half of the budget: kit/conductor_loop.py:412 derives the deadline as time_hours_lt * 3600 seconds, and :816 refuses a packet whose value is not a positive number. The corpus fixes no budget shape (its bounds declares only cap_counts, with no additionalProperties, and the root is additionalProperties: true), so this shape is the instance's. Optional here, required by the loop: a packet that omits it is refused at :816 by field name, never a bare KeyError at :412."
         }
       }
     },
@@ -912,6 +917,20 @@
               }
             }
           }
+        },
+        "cmd": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "INSTANCE-SPECIFIC. The command the Orchestrator runs to dispatch the Maker; kit/conductor_loop.py:799 refuses it unless it is a non-empty list of strings. The corpus accepts the maker as an object or a bare string and fixes no command field, so this shape is the instance's. Optional here, required by the loop: a packet that omits it is refused at :799 by field name."
+        },
+        "handoff": {
+          "type": "string",
+          "minLength": 1,
+          "description": "INSTANCE-SPECIFIC. The handoff protocol the Maker speaks; kit/conductor_loop.py:801 refuses any value other than rule12. Kept as a non-empty string rather than a const because the loop, not the schema, is the ruler that names the value: C2 asserts on the green side that the loop still refuses a packet without it, so the schema must admit the field without duplicating the check."
         }
       }
     }
