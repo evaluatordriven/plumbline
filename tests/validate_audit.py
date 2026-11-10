@@ -11,7 +11,9 @@ WHERE RECORDS LIVE (this changed on 2026-09-29 — see dot-plumbline/README.md)
     That means: wsww's audits live in wsww's repo, Plumbline's audits of itself live in this repo's
     dot-plumbline/audits/, and a program with no local checkout keeps its records in its Drive
     project folder — which this script cannot read, so it says so rather than passing silently.
-    The search root is the directory holding this checkout, or $PLUMBLINE_AUDIT_ROOT.
+    By default this script searches only THIS checkout's own dot-plumbline/audits/, so a sibling
+    checkout that happens to sit beside it is never read as this tree's; $PLUMBLINE_AUDIT_ROOT
+    names an explicit root whose immediate subdirectories are searched as checkouts.
 
 Four things are asserted, and each one can fail:
 
@@ -42,8 +44,11 @@ REPO = Path(__file__).resolve().parent.parent
 SHIP = REPO / "schemas"
 LEGACY = SHIP / "legacy"
 PIN = json.loads((REPO / "tools" / "pin.json").read_text(encoding="utf-8"))
-# Sibling checkouts are searched for <repo>/dot-plumbline/audits/. Override with $PLUMBLINE_AUDIT_ROOT.
-DEVSPACE = Path(os.environ.get("PLUMBLINE_AUDIT_ROOT") or REPO.parent).expanduser()
+# With no override this checkout measures ITSELF (REPO/dot-plumbline/audits/), never REPO.parent, so a
+# sibling that ships its own census is not read as this tree's. An explicit $PLUMBLINE_AUDIT_ROOT names a
+# directory whose immediate children are searched as checkouts (<root>/*/dot-plumbline/audits).
+_AUDIT_ROOT_OVERRIDE = os.environ.get("PLUMBLINE_AUDIT_ROOT")
+DEVSPACE = Path(_AUDIT_ROOT_OVERRIDE).expanduser() if _AUDIT_ROOT_OVERRIDE else REPO
 
 GENERATIONS = [
     ("2026-09-20", LEGACY, "pre-observation vocabulary (evidence/evidence_channel, needs_human)"),
@@ -110,10 +115,18 @@ ext_req = [c for c in live_audit.get("allOf", []) if "instance_extensions" in js
 print(f"[ok] audit schema requires {len(ext_req)} named instance_extensions entries")
 
 # --- discover records under the convention ------------------------------------------
-homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+# No override: only this checkout's own dot-plumbline/audits/ is searched. Override: the immediate
+# children of the named root are searched as checkouts.
+if _AUDIT_ROOT_OVERRIDE:
+    homes = [p for p in sorted(DEVSPACE.glob("*/dot-plumbline/audits")) if p.is_dir()]
+    scope = f"{DEVSPACE}/*/dot-plumbline/audits/"
+else:
+    own = REPO / "dot-plumbline" / "audits"
+    homes = [own] if own.is_dir() else []
+    scope = f"{REPO}/dot-plumbline/audits/"
 records = [(home.parent.parent.name, f) for home in homes for f in sorted(home.glob("*.json"))]
 
-print(f"\nhomes discovered under {DEVSPACE.name}/*/dot-plumbline/audits/ :")
+print(f"\nhomes discovered under {scope} :")
 for home in homes:
     n = len(list(home.glob('*.json')))
     print(f"  {home.parent.parent.name:<24} {n} record(s)")
