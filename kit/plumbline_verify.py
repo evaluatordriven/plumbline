@@ -800,6 +800,38 @@ def _find_checker(custody: Path):
     return p if p.is_file() else None
 
 
+def check_control_evidence(rec: dict, job: Path, evidence: Path) -> list[dict]:
+    """A control's cited evidence, re-hashed.
+
+    SPEC §4: `x-` keys are not read by any requirement, so the standard layer cannot hold an emitter to what
+    it cited on a control. This layer can, and does: a digest that disagrees with the file, or a citation to a
+    file that is not in the job, is a failure rather than a skip - a silent pass is what this check exists to
+    stop. A control with no citation is not a failure here; whether it must cite one is the standard's
+    question, not this verifier's.
+    """
+    out: list[dict] = []
+    pred = rec.get("predicate") or rec
+    for i, k in enumerate(pred.get("controls") or []):
+        e = (k.get("x-plumbline") or {}).get("evidence")
+        if not isinstance(e, dict) or not e.get("name"):
+            continue
+        named = Path(str(e["name"]))
+        cands = [job / named, evidence / named, evidence / named.name]
+        f = next((c for c in cands if c.is_file()), None)
+        field = f"controls[{i}].evidence"
+        if f is None:
+            out.append({"kind": "control-evidence", "field": field, "file": str(e["name"]), "line": 0,
+                        "message": f"control {k.get('id')!r} cites evidence {e['name']!r}, which is not in "
+                                   f"the job; a control's evidence is not optional once it is cited"})
+            continue
+        got = file_sha(f)
+        want = str(e.get("sha256") or "").lower()
+        if got != want:
+            out.append({"kind": "control-evidence", "field": field, "file": str(f), "line": 0,
+                        "message": f"control {k.get('id')!r} cites sha256 {want or '(none)'} but {f} is {got}"})
+    return out
+
+
 def standard_check(record: Path, files: Path, evidence: Path, custody: Path, bar: Path | None):
     """Run the pinned checker once: `check.py RECORD --files FILES --evidence EVIDENCE --bar BAR` (V1).
 
@@ -961,6 +993,7 @@ def main(argv=None) -> int:
     failures += check_events(job, ledger, rec, calls_by_seat)
     failures += check_spend(job, ledger, rec, all_calls)
     failures += check_shadow(job, ledger, rec, all_calls, hand, calls_by_seat)
+    failures += check_control_evidence(rec, job, evidence)
 
     after = snapshot([record, files, evidence, ledger])
     if before != after:
