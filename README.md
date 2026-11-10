@@ -24,7 +24,17 @@ or a hook instead.
 
 ## Quickstart
 
-You need `python3` (tested on 3.13) and `git`.
+## Requirements
+
+- **`python3` 3.11+** (tested on 3.13) and **`git`**. No network access; `jsonschema` is the only dependency.
+- **A non-root user.** Two tests measure what happens when a file cannot be read, by chmod-ing it to
+  mode `000`. Root reads it anyway, so both are skipped under root rather than silently passing — a run as
+  root reports them as skipped, and the suite is weaker than the one the tally describes.
+- **A custody checkout, only for verification.** `kit/plumbline_verify.py` runs custody's own checker
+  first and refuses to run without one (`--custody`, or `$CUSTODY_DIR`); everything else in the suites
+  uses the vendored copy and needs nothing.
+
+Docker images usually run as root: add `--user "$(id -u):$(id -g)"`, or the two permission tests skip.
 
 ```sh
 git clone <this repository> plumbline && cd plumbline
