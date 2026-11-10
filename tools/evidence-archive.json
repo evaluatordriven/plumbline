@@ -1,0 +1,34 @@
+{
+ "release": "evidence-2026-11-10",
+ "note": "Harness logs too large for the working tree. Each file keeps the sha256 recorded in the example record; fetch it back byte-for-byte before verifying that record.",
+ "files": [
+  {
+   "path": "examples/2026-10-27-custody-emitter-gaps/custody/evidence/harness-maker-deepseek.log",
+   "asset": "harness-maker-deepseek.log",
+   "sha256": "48fe3c24020fa1ac072886e28527392b512397cda8b0a17a025c40fa2dde2c85",
+   "bytes": 7959138,
+   "url": "https://github.com/evaluatordriven/plumbline/releases/download/evidence-2026-11-10/harness-maker-deepseek.log"
+  },
+  {
+   "path": "examples/2026-10-28-custody-times-ledger-spend/custody/evidence/harness-maker-deepseek.log",
+   "asset": "custody--harness-maker-deepseek.log",
+   "sha256": "882ee4e61a13fe614dfb4cbe12c3f6e228e1e8581dde23ca837471a062edc48a",
+   "bytes": 7808305,
+   "url": "https://github.com/evaluatordriven/plumbline/releases/download/evidence-2026-11-10/custody--harness-maker-deepseek.log"
+  },
+  {
+   "path": "dot-plumbline/runs/plumbline-job12d-record-1/aider-history/llm",
+   "asset": "llm",
+   "sha256": "0487cb13d7cf9218951cd2724c92af736561bf81d8beb5b970e37f1c2f20b3a1",
+   "bytes": 3754111,
+   "url": "https://github.com/evaluatordriven/plumbline/releases/download/evidence-2026-11-10/llm"
+  },
+  {
+   "path": "examples/2026-10-28-custody-times-ledger-spend/custody/evidence/harness-eval-glm-b1.log",
+   "asset": "harness-eval-glm-b1.log",
+   "sha256": "63e756da6a52c5c7985862e61a2d164c1a7ac577dda5190b61e9e686a10055c6",
+   "bytes": 1304887,
+   "url": "https://github.com/evaluatordriven/plumbline/releases/download/evidence-2026-11-10/harness-eval-glm-b1.log"
+  }
+ ]
+}
