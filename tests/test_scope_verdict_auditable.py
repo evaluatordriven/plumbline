@@ -177,5 +177,27 @@ class TheMakerWritesNoBytecodeEither(unittest.TestCase):
         self.assertEqual(sorted(p.name for p in root.rglob("*.pyc")), [], "bytecode left in the subject")
 
 
+class TheEvaluatorWritesNoBytecodeEither(unittest.TestCase):
+    """Measured 2026-11-10, Job 32 record-8: a PASSING Maker turn was followed by
+    `stop: "tampered"` because the Evaluator's own run left files in the tree, and the
+    round named neither the paths nor which seat's turn had done it."""
+
+    def test_the_evaluator_turn_carries_the_turn_and_writes_no_bytecode(self):
+        from kit import conductor_loop
+
+        env = conductor_loop._evaluator_env({"round": 1}, "/tmp/cost.json")
+        self.assertEqual(env.get("PYTHONDONTWRITEBYTECODE"), "1")
+        self.assertIn("PLUMBLINE_TURN", env)
+        self.assertEqual(env.get("PLUMBLINE_COST"), "/tmp/cost.json")
+        self.assertEqual(json.loads(env["PLUMBLINE_TURN"]), {"round": 1})
+
+    def test_a_changed_tree_is_attributed_and_named(self):
+        from kit import conductor_loop
+
+        source = Path(conductor_loop.__file__).read_text(encoding="utf-8")
+        self.assertIn('"changed": [os.path.relpath(path, root) for path in changed]', source,
+                      "the evaluator's tamper verdict must name the paths that produced it")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -62,7 +62,7 @@ LOOP_PY = "kit/conductor_loop.py"
 # could not say how it was filed (measured on Job 31's first close).
 # This re-pin: loop() now waits for a detached engine's own exit record before it measures the tree — after
 # Job 31 record-3 booked a real +16/-6 fix as "no artifact" 56 seconds before the engine wrote it.
-LOOP_SHA = "b24fbd15a801cbed360a06d63eed18329a2504c8523fcaa5b48c0d661421c318"
+LOOP_SHA = "3d677d2a91f69da1b1e6f5e9a4e5eb4a45b0044dd67ce3beb3d0df79f6988921"
 SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
 SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
 INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")

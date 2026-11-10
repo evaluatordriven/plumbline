@@ -89,7 +89,7 @@ from datetime import datetime as _datetime
 from datetime import timezone
 
 from kit import conductor_software
-from kit.conductor_run import _run, run
+from kit.conductor_run import _bar_env, _run, run
 
 ACCEPTED = "accepted"
 REJECTED = "rejected"
@@ -929,6 +929,20 @@ def _classify(result, clock_cut):
     return None, None
 
 
+def _evaluator_env(turn: dict, cost_path: str) -> dict:
+    """The environment the Evaluator's turn is run in.
+
+    It carries the turn and the cost path, and it inherits the no-bytecode setting of
+    the other arms: an evaluator that imports the artifact it is judging must not leave
+    ``__pycache__`` inside it. Measured 2026-11-10, Job 32 record-8: a passing Maker turn
+    was followed by TAMPERED because the evaluator's own python wrote into the tree.
+    """
+    env = _bar_env()
+    env["PLUMBLINE_TURN"] = json.dumps(turn)
+    env["PLUMBLINE_COST"] = cost_path
+    return env
+
+
 def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, evaluator_fn, record_dir):
     rows = []
     costs = []
@@ -956,9 +970,7 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
                 rows.append({"exit": "error", "output_sha256": conductor_software.NOT_RECORDED, "parsed": None})
                 return EVALUATOR_FAILED, None, rows, None, False, None, costs, missing
         else:
-            env = os.environ.copy()
-            env["PLUMBLINE_TURN"] = json.dumps(turn)
-            env["PLUMBLINE_COST"] = cost_path
+            env = _evaluator_env(turn, cost_path)
             exit_code, output = _run(packet["evaluator"]["cmd"], root, bound, env=env)
             one = _take_cost(cost_path)
             if one is None:
@@ -971,7 +983,14 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
             if not conductor_software.matches_ignore(os.path.relpath(path, root), ignore)
         ]
         if changed:
-            rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": parsed})
+            # Name the paths. Measured 2026-11-10, Job 32 record-8: the round said
+            # "tampered" with `passed: true` and no attribution, and the reader could
+            # not tell that the MAKER's turn had passed and the EVALUATOR's own run had
+            # written into the tree. A verdict that does not name its cause costs a round.
+            rows.append(conductor_software.record_arm(exit_code, output) | {
+                "parsed": parsed,
+                "changed": [os.path.relpath(path, root) for path in changed],
+            })
             return TAMPERED, "evaluator", rows, None, False, None, costs, missing
         if exit_code == conductor_software.TIMEOUT or exit_code != 0:
             rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": None})
