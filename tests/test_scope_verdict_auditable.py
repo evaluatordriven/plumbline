@@ -139,6 +139,43 @@ class ABarLeavesNoBytecodeBehind(unittest.TestCase):
         self.assertEqual(result["changes"], ["subject.json"], result["changes"])
         self.assertEqual(list(root.rglob("*.pyc")), [], "the bar wrote bytecode into its subject")
 
+class TheMakerWritesNoBytecodeEither(unittest.TestCase):
+    """Measured 2026-11-10, Job 32 record-7: the loop's own imports (311) and a Maker's
+    tooling (314) both wrote .pyc into the tree, alongside the two the bar wrote."""
+
+    def test_neither_arm_leaves_bytecode_in_the_tree(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        (root / "lib").mkdir()
+        (root / "lib" / "__init__.py").write_text("", encoding="utf-8")
+        (root / "lib" / "helper.py").write_text("VALUE = 1\n", encoding="utf-8")
+        (root / "subject.json").write_text("{}\n", encoding="utf-8")
+        (root / "bar.py").write_text(
+            "import sys, pathlib\n"
+            "from lib import helper\n"
+            "body = pathlib.Path('subject.json').read_text()\n"
+            "sys.exit(0 if (helper.VALUE == 1 and 'x' in body) else 1)\n",
+            encoding="utf-8",
+        )
+        # A Maker whose own tooling imports the repo, exactly as aider does when it runs a build.
+        maker = (
+            "python3 -c 'import sys; sys.path.insert(0, \".\"); from lib import helper' ; "
+            "printf '{\"x\": 1}\\n' > subject.json"
+        )
+        result = conductor_run.run(
+            cwd=str(root),
+            test_cmd=[sys.executable, "bar.py"],
+            maker_cmd=["sh", "-c", maker],
+            editable=["subject.json"],
+            freeze_paths=["bar.py", "lib/helper.py"],
+            commit=None,
+            timeout_s=120,
+        )
+        self.assertEqual(result["reason"], conductor_software.OK, result)
+        self.assertEqual(result["changes"], ["subject.json"], result["changes"])
+        self.assertEqual(sorted(p.name for p in root.rglob("*.pyc")), [], "bytecode left in the subject")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

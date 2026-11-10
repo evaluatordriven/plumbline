@@ -65,6 +65,15 @@ remember is the same defect as remembering to close.
 """
 from __future__ import annotations
 
+import sys as _sys
+
+# The loop imports the tree's own modules (tools/build_schemas, tools/edi_corpus) while
+# it measures that tree. CPython writes a ``__pycache__/*.pyc`` for each import, the
+# snapshot sees new files outside the editable set, and a correct repair is refused as
+# an edit outside it. Measured 2026-11-10, Job 32 record-7: three ``kit/*.cpython-311.pyc``
+# files written by THIS process. The instrument may not write into its own subject.
+_sys.dont_write_bytecode = True
+
 import argparse
 import contextlib
 import hashlib
