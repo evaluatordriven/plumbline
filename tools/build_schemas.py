@@ -384,6 +384,35 @@ def custody_commit(d: Path) -> str:
         return ""
 
 
+def custody_spec_version(d: Path) -> str:
+    """The version a custody checkout's SPEC.md declares, or "" when it cannot be read.
+
+    Read from the SPEC's own header (`**Version 0.9.8 · candidate · …**`) rather than typed anywhere:
+    measured 2026-11-10, `--custody --repin` moved `commit` and every file digest and left
+    `specVersion` at the old value, so a pin could name 0.9.8's bytes and 0.9.6's version at once.
+    """
+    spec = d / "SPEC.md"
+    if not spec.is_file():
+        return ""
+    match = re.search(r"\*\*Version\s+(\d+\.\d+\.\d+)", spec.read_text(encoding="utf-8", errors="replace"))
+    return match.group(1) if match else ""
+
+
+def repinned_custody(cpin: dict, cdir: Path) -> dict | None:
+    """The pin a `--repin` would write, or None when the checkout cannot support one.
+
+    One place decides what a re-pin means: a new commit, the version that commit's SPEC.md declares,
+    and the digests of every file the pin names. Measured 2026-11-10: the version was the one field the
+    old code did not touch, so a re-pin could name 0.9.8's bytes and 0.9.6's version at once.
+    """
+    head = custody_commit(cdir)
+    version = custody_spec_version(cdir)
+    if not head or not version:
+        return None
+    return {**cpin, "commit": head, "specVersion": version,
+            "files": {f: sha256(cdir / f) for f in cpin["files"]}}
+
+
 def derive_custody(pinned_bytes: bytes, inst: dict, cpin: dict) -> dict:
     """custody/v1 as Plumbline emits it: allOf(the pinned schema, embedded verbatim, + the instance rules).
 
@@ -447,6 +476,10 @@ def custody_main(args) -> int:
             head = custody_commit(cdir)
             if head and head != cpin["commit"]:
                 problems.append(f"custody commit {cpin['commit'][:12]} -> {head[:12]}")
+            live_version = custody_spec_version(cdir)
+            if live_version and live_version != cpin.get("specVersion"):
+                problems.append(f"custody specVersion {cpin.get('specVersion')} -> {live_version} "
+                                f"(the checkout's SPEC.md says {live_version})")
             if not head:
                 notes.append(f"{cdir} is not a git checkout: commit not compared, file digests only")
             for f, h in cpin["files"].items():
@@ -499,11 +532,13 @@ def custody_main(args) -> int:
         print("Re-read the changed custody SPEC/schema, then re-run with --custody --repin.")
         return 1
     if args.repin:
-        head = custody_commit(cdir)
-        if not head:
-            print("REFUSING TO RE-PIN: the custody checkout is not a git checkout, so no commit can be pinned")
+        repinned = repinned_custody(cpin, cdir)
+        if repinned is None:
+            print(f"REFUSING TO RE-PIN: {cdir} is not a git checkout, or its SPEC.md states no "
+                  f"`**Version X.Y.Z**`, so the pin would carry the old specVersion "
+                  f"{cpin.get('specVersion')!r} beside a new commit")
             return 1
-        cpin = {**cpin, "commit": head, "files": {f: sha256(cdir / f) for f in cpin["files"]}}
+        cpin = repinned
     CUSTODY_VENDORED.parent.mkdir(parents=True, exist_ok=True)
     CUSTODY_VENDORED.write_bytes((cdir / CUSTODY_SCHEMA_REL).read_bytes())
     derived = derive_custody(CUSTODY_VENDORED.read_bytes(), inst, cpin)
