@@ -104,5 +104,41 @@ class TheTurnRecordsWhatItJudged(unittest.TestCase):
             self.assertEqual(result["editable"], ["schemas/instance-extensions.json"])
 
 
+
+
+class ABarLeavesNoBytecodeBehind(unittest.TestCase):
+    """Measured 2026-11-10, Job 32 record-6: the bar's own imports wrote two .pyc files
+    into the tree, outside the editable set, and a correct repair read as `tampered`."""
+
+    def test_the_bars_bytecode_is_not_judged_as_the_makers_edit(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = Path(tmp.name)
+        (root / "lib").mkdir()
+        (root / "lib" / "__init__.py").write_text("", encoding="utf-8")
+        (root / "lib" / "helper.py").write_text("VALUE = 1\n", encoding="utf-8")
+        (root / "subject.json").write_text("{}\n", encoding="utf-8")
+        (root / "bar.py").write_text(
+            "import sys, pathlib\n"
+            "from lib import helper\n"
+            "body = pathlib.Path('subject.json').read_text()\n"
+            "sys.exit(0 if (helper.VALUE == 1 and 'x' in body) else 1)\n",
+            encoding="utf-8",
+        )
+        maker = "printf '{\"x\": 1}\\n' > subject.json"
+        result = conductor_run.run(
+            cwd=str(root),
+            test_cmd=[sys.executable, "bar.py"],
+            maker_cmd=["sh", "-c", maker],
+            editable=["subject.json"],
+            freeze_paths=["bar.py", "lib/helper.py"],
+            commit=None,
+            timeout_s=120,
+        )
+        self.assertEqual(result["reason"], conductor_software.OK, result)
+        self.assertEqual(result["changes"], ["subject.json"], result["changes"])
+        self.assertEqual(list(root.rglob("*.pyc")), [], "the bar wrote bytecode into its subject")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

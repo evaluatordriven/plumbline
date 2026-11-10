@@ -109,7 +109,7 @@ def run(
 
     editable_paths = [conductor_software.resolve(path, root) for path in editable]
 
-    red_exit, red_output = _run(test_cmd, root, timeout_s)
+    red_exit, red_output = _run(test_cmd, root, timeout_s, env=_bar_env())
     frozen = conductor_software.freeze(frozen_paths)
     before = conductor_software.snapshot(root)
 
@@ -149,7 +149,7 @@ def run(
     rerun_exit = None
     rerun_output = None
     if dispatched:
-        rerun_exit, rerun_output = _run(test_cmd, root, timeout_s)
+        rerun_exit, rerun_output = _run(test_cmd, root, timeout_s, env=_bar_env())
 
     result = conductor_software.gate(
         frozen=frozen,
@@ -202,6 +202,26 @@ def _await_engine(exit_file: str | None, dispatch_file: str | None, timeout_s: f
                     "reason": "engine exit record appeared"}
     return {"waited": True, "seconds": round(time.monotonic() - started, 3),
             "reason": "engine exit record never appeared within the turn's timeout"}
+
+
+def _bar_env() -> dict:
+    """The environment a BAR is run in: bytecode writing off.
+
+    A bar that imports the repo's own modules (as the derived-schema bars must) has
+    Python write ``__pycache__/*.pyc`` into the tree it is measuring. The snapshot
+    then sees files that appeared during the turn, outside the editable set, and the
+    gate refuses the turn as an edit outside the editable set. Measured 2026-11-10,
+    Job 32 record-6: two ``tools/__pycache__/*.cpython-314.pyc`` files, written by the
+    bar's own imports, made a correct Maker repair read as ``tampered``.
+
+    The cure is at the source rather than in the comparison: an instrument may not
+    move the subject it measures (tests/test_bar_leaves_subject_clean.py), and its own
+    bytecode is the instrument's footprint, not the Maker's edit. Nothing is ignored
+    on the Maker's behalf by this: a file the MAKER writes is judged as it always was.
+    """
+    env = os.environ.copy()
+    env["PYTHONDONTWRITEBYTECODE"] = "1"
+    return env
 
 
 def _run(cmd: list[str], cwd: str, timeout_s: float | None, env: dict | None = None) -> tuple[int | str, bytes]:
