@@ -161,7 +161,15 @@ def run(
         maker_exit=maker_exit,
         changes=judged,
         require_red=require_red,
+        root=root,
     )
+    # A scope verdict must be auditable. Measured 2026-11-10, Job 32 record-4: the
+    # round said "edit outside editable" and named no path, so neither the
+    # Orchestrator nor the Owner could tell whether the Maker had written outside
+    # its set or the check had resolved its two sides against different bases.
+    # Every judged path is recorded in the round, relative to the tree.
+    result["changes"] = [os.path.relpath(path, root) for path in judged]
+    result["editable"] = [os.path.relpath(path, root) for path in editable_paths]
     result["maker"] = conductor_software.record_arm(maker_exit, maker_output)
     result["rerun"] = conductor_software.record_arm(rerun_exit, rerun_output)
     result["ignored"] = ignored

@@ -181,9 +181,18 @@ def matches_ignore(rel: str, rules) -> bool:
     return False
 
 
-def outside_editable(changes: list[str], editable: list[str]) -> list[str]:
-    """The changed paths that no editable path names or contains."""
-    roots = [resolve(path) for path in editable]
+def outside_editable(changes: list[str], editable: list[str], root: str | None = None) -> list[str]:
+    """The changed paths that no editable path names or contains.
+
+    ``root`` is the tree the editable entries are relative to. Passing it is not
+    optional in practice: without it a relative entry resolves against THIS
+    process's directory, so the answer depends on where the loop happened to be
+    started. Measured 2026-11-10 on Job 32 record-4 — one changed file, inside the
+    declared set, reported outside it because the caller's directory was not the
+    tree. The changes are already absolute; the editable entries are not.
+    """
+    base = os.path.realpath(root) if root else None
+    roots = [resolve(path, base) for path in editable]
     return [
         path
         for path in changes
@@ -211,6 +220,7 @@ def gate(
     maker_exit=None,
     changes: list[str] | None = None,
     require_red: bool = True,
+    root: str | None = None,
 ) -> dict:
     """Decide whether a turn counts, from the recordings it was handed.
 
@@ -250,7 +260,7 @@ def gate(
         return _verdict(True, TIMEOUT, red, hashes_unchanged)
     if maker_exit != 0:
         return _verdict(True, MAKER_FAILED, red, hashes_unchanged)
-    if outside_editable(changes or [], editable):
+    if outside_editable(changes or [], editable, root):
         return _verdict(True, EDIT_OUTSIDE_EDITABLE, red, hashes_unchanged)
     if not changes:
         return _verdict(True, NO_ARTIFACT, red, hashes_unchanged)
