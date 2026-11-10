@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "urn:plumbline:schemas:custody-record",
   "title": "Plumbline custody/v1 record (DERIVED \u2014 do not hand-edit; run tools/build_schemas.py --custody)",
-  "description": "Derived by tools/build_schemas.py from custody https://github.com/evaluatordriven/custody@3e3ca58de563 (schema/custody-v1.schema.json sha256 ad03af92b47eaa8079f1d2a8e759daa91148aac6f39d8935c22a92ba10199f9f) plus schemas/instance-extensions.json `custody_record` (instance-specific). Every record valid here is valid against the pinned custody schema: this layer only adds constraints.",
+  "description": "Derived by tools/build_schemas.py from custody https://github.com/evaluatordriven/custody@8a6bf1e7ddda (schema/custody-v1.schema.json sha256 ad03af92b47eaa8079f1d2a8e759daa91148aac6f39d8935c22a92ba10199f9f) plus schemas/instance-extensions.json `custody_record` (instance-specific). Every record valid here is valid against the pinned custody schema: this layer only adds constraints.",
   "x-derivedFrom": {
     "custody": {
       "source": "https://github.com/evaluatordriven/custody",
-      "commit": "3e3ca58de5631bdc58291564303a2e9d25a8653e",
+      "commit": "8a6bf1e7dddab3aafee1b31911783995b20c1ca2",
       "schema_sha256": "ad03af92b47eaa8079f1d2a8e759daa91148aac6f39d8935c22a92ba10199f9f"
     },
     "instance_layer": "schemas/instance-extensions.json#custody_record"

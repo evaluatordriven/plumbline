@@ -5,7 +5,7 @@
 - **Custody.** Plumbline writes [custody/v1](https://github.com/evaluatordriven/custody) records for a job's
   work (`kit/emit_custody.py`, fed by the append-only ledger in `kit/custody_ledger.py`) and verifies them at
   two layers (`kit/plumbline_verify.py`: custody's own checker first, then Plumbline's `x-plumbline` block), which
-  needs a checkout of custody at its pinned commit `3e3ca58` (`--custody`; the verifier will not run without it).
+  needs a checkout of custody at its pinned commit `8a6bf1e7` (`--custody`; the verifier will not run without it).
 - **E-DI kit.** It carries software work through Evaluator-Driven Iteration: every stage transition is gated by
   an evaluator independent of whoever produced the work. Jobs open and close through `kit/plumbline_job.py`;
   `kit/plumbline.py` runs the doctrine's own checkers over a deployment's records.
@@ -107,7 +107,7 @@ checkers), `kit/cases/run_cases.py` (with no corpus it prints `SKIP[corpus] corp
 
 ```sh
 git clone https://github.com/evaluatordriven/custody
-git -C custody checkout 3e3ca58de5631bdc58291564303a2e9d25a8653e
+git -C custody checkout 8a6bf1e7dddab3aafee1b31911783995b20c1ca2
 export CUSTODY_DIR=$PWD/custody
 python3 tools/build_schemas.py --custody --check   # now also compares the upstream pin
 ```
@@ -173,7 +173,7 @@ schema checks and says, by name, that no records were in reach.
 
 `examples/` holds two of Plumbline's own E-DI jobs exactly as they were closed, each with its custody/v1 record:
 `2026-10-27-custody-emitter-gaps` and `2026-10-28-custody-times-ledger-spend`. Both re-check `OK`, `CL1`, 19/19
-with custody's public checker at `3e3ca58`; `examples/README.md` gives the commands.
+with custody's public checker at `8a6bf1e7`; `examples/README.md` gives the commands.
 
 **Provenance.** These records are frozen evidence and are not rewritten. Each record's digests bind the bytes
 of its files, so the files keep the paths, user names and machine names of the environment that produced them
@@ -215,9 +215,9 @@ tests/      the suites
 - **Hand-entered times.** The emitter refuses a hand-entered time by default (exit 3, kind `hand-time`). Under
   `--allow-hand-times` it records each one in `x-plumbline.hand_times[]` and never verifies it. Records made
   before the ledger existed may carry flagged hand times. Details: `docs/custody-emission.md`.
-- **Custody's real checker.** `kit/plumbline_verify.py` always needs a custody checkout at `3e3ca58` (`--custody`
+- **Custody's real checker.** `kit/plumbline_verify.py` always needs a custody checkout at `8a6bf1e7` (`--custody`
   is required, and the `x-plumbline` layer runs only after custody's checker passes). With `CUSTODY_DIR` set to
-  custody @ `3e3ca58`, the real-checker test runs the
+  custody @ `8a6bf1e7`, the real-checker test runs the
   `tests/fixtures/custody/verify/real/` fixture (a synthetic job and the record `kit/emit_custody.py` emitted
   for it, its hand times flagged) through custody's real `checker/check.py`, directly and through the verifier,
   and passes. The shared `clean/` fixture's record is a stand-in that only the stand-in checker accepts. Without

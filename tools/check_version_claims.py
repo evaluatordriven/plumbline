@@ -66,6 +66,14 @@ def claims(root: Path) -> list[tuple[str, str, str]]:
     for ref in sorted(set(re.findall(r"custody[^.\n]{0,40}\bv(\d+\.\d+\.\d+)", readme))):
         out.append(("README custody version", "v" + ref, "v" + spec_version))
 
+    # 6. The version the emitter stamps into every record is the version this repository pins.
+    emitter = root / "kit" / "emit_custody.py"
+    if emitter.is_file() and spec_version:
+        match = re.search(r'^SPEC_VERSION\s*=\s*"(\d+\.\d+\.\d+)"', emitter.read_text(encoding="utf-8"),
+                          re.M)
+        if match:
+            out.append(("kit/emit_custody.py SPEC_VERSION", "v" + match.group(1), "v" + spec_version))
+
     return out
 
 
