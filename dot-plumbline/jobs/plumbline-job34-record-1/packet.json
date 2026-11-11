@@ -1,0 +1,306 @@
+{
+  "acceptedRound": null,
+  "accepted_round": null,
+  "artifact": {
+    "base": "8590496 (the job tree's own root commit; tree /home/jarbis1/tmp/plumbline-job34-tree, porcelain EMPTY at authoring)",
+    "deliverable": "a work tree in which kit/emit_custody.py stamps predicate.specVersion with the version the job's attested custody document declares, refuses (exit 3, naming spec-version, writing no record) when it can resolve neither a document nor an override, keeps --spec-version available as an explicit override that the record names, moves no published verdict, and leaves tools/check_version_claims.py still publishing a claim about the version the emitter stamps (a claim that agrees with tools/pin.json, at 6 or 7 total claims)",
+    "editable": [
+      "kit/emit_custody.py",
+      "tools/check_version_claims.py"
+    ],
+    "frozen": [
+      "tests/test_emit_spec_version.py",
+      "kit/custody_history.py",
+      "tools/pin.json",
+      "tests/fixtures/custody/job-rejected/README.md",
+      "tests/fixtures/custody/job-rejected/packet.json",
+      "tests/fixtures/custody/job-rejected/iteration-1-eval-record.json",
+      "tests/fixtures/custody/job-rejected/inputs/custody.json",
+      "tests/fixtures/custody/job-rejected/inputs/custody-events.jsonl",
+      "tests/fixtures/custody/job-rejected/inputs/run-1.json",
+      "tests/fixtures/custody/job-rejected/passes/pass-a.json",
+      "tests/fixtures/custody/job-rejected/custody/bar.md",
+      "tests/fixtures/custody/job-rejected/custody/method.md",
+      "tests/fixtures/custody/job-rejected/custody/controls/K1-clean.md",
+      "tests/fixtures/custody/job-rejected/custody/controls/K2-planted.md",
+      "tests/fixtures/custody/job-rejected/custody/evidence/control-K1.txt",
+      "tests/fixtures/custody/job-rejected/custody/evidence/control-K2.txt",
+      "tests/fixtures/custody/job-rejected/custody/evidence/harness-eval-a.log",
+      "tests/fixtures/custody/job-rejected/custody/evidence/harness-maker-fixture.log",
+      "tests/fixtures/custody/job-rejected/custody/evidence/pass-a-D1.txt",
+      "tests/fixtures/custody/job-rejected/custody/evidence/pass-a-D2.txt",
+      "tests/fixtures/custody/job-rejected/custody/files/artifact.md",
+      "tests/fixtures/custody/job-rejected/custody/instrument/rubric.md",
+      "tests/fixtures/custody/job-rejected/custody/instrument/runner.py",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/packet.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/packet.pre-close.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/terminal-state.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/iteration-1-eval-record.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/inputs/custody.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/inputs/custody-events.jsonl",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/inputs/run-1.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/custody/bar.md",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/custody/status.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/passes/no_untimeable_times.json",
+      "dot-plumbline/jobs/plumbline-cl1-time-record-1/tests/test_packet_cl1_time_source.py",
+      "dot-plumbline/jobs/plumbline-drain-record-1/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-escalate-record/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-harnesslog-record-1/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-job1-record-1/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-job31-record-1/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-job31-record-2/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-job31-record-3/custody/record.custody.json",
+      "dot-plumbline/jobs/plumbline-job31-record-5/custody/record.custody.json",
+      "examples/2026-10-27-custody-emitter-gaps/custody/record.custody.json",
+      "examples/2026-10-28-custody-times-ledger-spend/custody/record.custody.json",
+      "examples/subjects/2026-10-28-custody-times-ledger-spend/tests/fixtures/custody/verify/clean/record.custody.json",
+      "tests/fixtures/custody/verify/clean/record.custody.json",
+      "tests/fixtures/custody/verify/real/record.custody.json"
+    ],
+    "paths": [
+      "kit/emit_custody.py"
+    ],
+    "repo": "https://github.com/evaluatordriven/plumbline.git",
+    "scope": {
+      "allowed": "the emitter resolves its spec version from the document the job attests, or from --spec-version, or refuses; the two paths that stamp the literal today (kit/emit_custody.py:594 round path, :1179 inputs path) are both taught the same resolution; and tools/check_version_claims.py keeps publishing a claim about the version kit/emit_custody.py stamps, agreeing with tools/pin.json, rather than silently dropping it",
+      "carried_as_given": {
+        "defect_sites_at_base": [
+          "kit/emit_custody.py:88",
+          "kit/emit_custody.py:594",
+          "kit/emit_custody.py:1179"
+        ],
+        "document_requirement": "custody/tools/count.py:153-161 requires a record named custody-v<version>.json to carry predicate.specVersion == <version>"
+      },
+      "not_allowed": [
+        "any edit outside the editable set (kit/emit_custody.py, tools/check_version_claims.py); the frozen set is not widened by the Maker",
+        "re-stamping or rewriting any stored *.custody.json, or moving tools/pin.json",
+        "a fall-back from an unreadable/absent document to the override or to a literal (the bar grades refusal)"
+      ]
+    },
+    "test_cmd": [
+      "python3",
+      "tests/test_emit_spec_version.py"
+    ]
+  },
+  "bestRound": 1,
+  "best_round": 1,
+  "bounds": {
+    "T_accept": 1.0,
+    "T_dim": 1.0,
+    "T_reject": 0.0,
+    "budget": {
+      "amount": 0.25,
+      "note": "Owner's bounds, carried as given then raised to 0.25 on the Owner's edit: strictly under US$0.25 of all model/API spend and under 2 h wall, first Maker dispatch to disposition; either breach -> needs_owner. The raise from 0.15 is arithmetic, not preference: 0.15 was below the measured upper bound of two generations (0.16), so it could not fund the retry its own cap:2 permits; and the editable set grew from one file to two that must agree, which raises the chance a first generation needs a repair. cap 1 would spend the slack on nothing (a single failure would end the job with money unspent). T_accept 1 and T_dim 1 mean every dimension must score 1, so one unmet check at the cap ends needs_owner, never accepted.",
+      "time_hours_lt": 2,
+      "unit": "USD"
+    },
+    "cap": 2,
+    "cap_counts": "generations"
+  },
+  "buyer": "Steve Moitozo II (S2)",
+  "cap": 2,
+  "commit": "859049657734c7083abfec9ba81116f55ebe1d52",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "cost": 0.1,
+  "endedAt": "2026-11-11T02:30:58+00:00",
+  "ended_at": "2026-11-11T02:30:58+00:00",
+  "entry": "A",
+  "escalation": {
+    "classes": [
+      "cap_reached",
+      "budget_breach",
+      "time_breach",
+      "artifact_missed_standard",
+      "tampered_out_of_scope",
+      "evaluator_split",
+      "held_out_unreadable",
+      "frame_at_fault"
+    ],
+    "classes_source": "The five owner-set names (cap_reached, budget_breach, time_breach, artifact_missed_standard, tampered_out_of_scope) are the Owner's vocabulary as carried in the brief. evaluator_split and held_out_unreadable are loop()'s own stop constants. frame_at_fault is the Architect's, used only when the bar itself is shown wrong. Class labels chosen by the Architect; no threshold in them.",
+    "holders": {
+      "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored JOB 34's bar and this packet; does not ratify, does not run the loop, does not dispatch",
+      "not_holders": "The Architect does not hold the orchestrator seat here, and no holder below equals the Architect: holders.architect is 'Architect (Hermes plumbline-architect profile)', which is not an entry in holders.orchestrator.",
+      "orchestrator": [
+        {
+          "carries": "dispatch, the pass rule, the cap, the clock, the budget, the round records, the filing",
+          "does": "rounds",
+          "holder": "plumbline-conductor round runner",
+          "kind": "script",
+          "tested": "loop() of kit/conductor_loop.py at base 8590496 has run to a filed finish under the kit's own end-to-end tests. Its refusals are the base's _problems(), which the Architect read before this packet was written. NOT yet shown by a run against this packet: loop() refuses this packet until the Owner sets ratified to true."
+        },
+        {
+          "carries": "the escalation record and the relay of the Owner's decision; the Architect writes the options and the recommendation",
+          "does": "escalations",
+          "holder": "escalation-delivery holder (the conductor profile's escalation route)",
+          "kind": "script",
+          "tested": "plumbline-escalate at the base: its refusals and its writer are exercised by tests/test_escalate.py; it writes escalation.json from loop()'s facts and relays the Owner's decision. It writes none of the content."
+        }
+      ]
+    },
+    "route": [
+      "Architect",
+      "Owner"
+    ]
+  },
+  "evaluator": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "held_out": [],
+    "kind": "model",
+    "name": "plumbline-eval via route-eval",
+    "note": "loop() sets PLUMBLINE_TURN and PLUMBLINE_COST and reads JSON from stdout; route-eval scores nothing itself. Two runs, as bounded; the pass rule needs every dimension at 1 (T_accept 1, T_dim 1), and a split across the two runs is evaluator_split, not an average.",
+    "read_only": true,
+    "runs": 2,
+    "who": "plumbline-eval (model Evaluator seat)"
+  },
+  "finish": {
+    "accepted_round": null,
+    "best_round": 1,
+    "cap": 2,
+    "commit": "859049657734c7083abfec9ba81116f55ebe1d52",
+    "cost": 0.1,
+    "ended_at": "2026-11-11T02:30:58+00:00",
+    "outcome": "no_artifact",
+    "packet_sha256": "8774de8f2a15b6ec7b244be40ec2c780ab01f517bf79943f16967d76b00031e6",
+    "rounds": 2,
+    "rounds_sha256": [
+      "cd52c7f713f112989fdaeac67d8c339b6bded6afbb608b9e7f784f46e98efdbc",
+      "0691c86c07ea3e252d7c2278be346f7dde8b92943a3baedd2a3f303a30bf2377"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-11T02:25:39+00:00",
+    "stop": "no artifact",
+    "terminal_state": "needs_owner"
+  },
+  "ground_truth": [
+    {
+      "channel": "python3 tests/test_emit_spec_version.py",
+      "hardness": "INVARIANT",
+      "source": "tests/test_emit_spec_version.py",
+      "version": "sha256 5a9f84c97b6ebe20fc9b7f855d12e04d5a45a3e3399073a013b2baa077715bf4 (committed at bfc05f1 in the job tree; supersedes the committed 9c06e3867e6722a87ae183df1bc178f92c4e6cd5d55c8cdbf39ca8cf8c87e7f8 / 72b258e); 9 cases"
+    },
+    {
+      "channel": "measured by the Architect on the final nine-case bar at base 8590496 (exit code and counts read from this run's own output)",
+      "hardness": "INVARIANT",
+      "source": "the bar's own RED measurement at base: exit 1, Ran 9 tests, FAILED (failures=3) \u2014 RED: version_is_read_from_the_custody_document, no_document_no_override_refuses, the_override_is_honoured; ok: the_override_does_not_collide_with_the_document, every_published_verdict_is_byte_for_byte_unchanged, the_bar_leaves_its_subject_clean, the_claim_about_the_emitter_survives_the_emitter_changing, the_claims_tool_selftest_runs_and_keeps_its_rule_set, a_deleted_selftest_rule_is_caught. The tree was clean (porcelain empty) before and after the run. Covers 9 cases, not the earlier 7.",
+      "version": "5a9f84c97b6ebe20fc9b7f855d12e04d5a45a3e3399073a013b2baa077715bf4"
+    },
+    {
+      "hardness": "DOCUMENT",
+      "source": "the custody document contract: custody/tools/count.py:153-161 requires a record named custody-v<version>.json to carry predicate.specVersion == <version>",
+      "version": "8590496"
+    },
+    {
+      "hardness": "DOCUMENT",
+      "source": "the re-pin's same property, learned 2026-11-10: tests/test_repin_spec_version.py and tools/build_schemas.py:custody_spec_version read the version from the checkout's own SPEC.md and refuse the re-pin when they cannot",
+      "version": "8590496"
+    }
+  ],
+  "human_seat": "Steve Moitozo II (S2)",
+  "instrument_profile": "full",
+  "job_id": "2026-11-10-emit-spec-version",
+  "job_name": "kit/emit_custody.py resolves predicate.specVersion from the custody document it attests, or refuses",
+  "job_to_be_done": {
+    "desired_future": "An emitter run against a checkout whose SPEC.md declares 0.9.9 emits a record that says 0.9.9 and names the SPEC.md it read by digest; with no document and no override it exits 3 naming spec-version and writes no record; --spec-version is honoured and the record says so; no published verdict moves.",
+    "gains": [
+      "The emitted record's specVersion can be trusted against the document it claims to attest.",
+      "The re-pin's property and the emitter's property agree, so the two instruments no longer disagree on how the version is resolved."
+    ],
+    "pain_points": [
+      "A record that attests a document and stamps a different version is a self-contradiction the document itself rejects.",
+      "The defect sits on two paths (:594 and :1179) that each stamp the literal separately, so a fix that teaches one path leaves the other red.",
+      "There is no refusal path: an unreadable or absent document must not fall back to the override or to the literal."
+    ],
+    "statement": "kit/emit_custody.py must stamp predicate.specVersion with the version the custody document the job attests declares. At base 8590496 kit/emit_custody.py:88 holds SPEC_VERSION = \"0.9.8\" \u2014 a literal \u2014 and both paths that write a record stamp it (:594 round, :1179 inputs). With no resolution and no refusal, a job that attests custody at any other version emits a record the document refuses (custody/tools/count.py:153-161), and the emitter cannot notice: it never reads a document in order to say what version it attests. The fix confines itself to how the emitter resolves its spec version; --spec-version stays as an explicit override."
+  },
+  "k": 2,
+  "maker": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker"
+    ],
+    "engine": "aider via route-maker (the conductor profile's maker route)",
+    "feedback_forms": [
+      "failing test output (the bar's own assertions, verbatim)",
+      "diff (aider's edit format)"
+    ],
+    "handoff": "rule12",
+    "task_classes": [
+      {
+        "class": "generation",
+        "shown_by": "not recorded \u2014 no completed generation run of this route has been shown to the Architect for this job; the Maker is not claimed to hold it"
+      },
+      {
+        "class": "revision",
+        "shown_by": "not recorded \u2014 no completed multi-generation run of route-maker through loop() has been shown to the Architect for this job; the Maker is not claimed to hold it"
+      }
+    ],
+    "version": "the conductor profile's route-maker; the model id is recorded in each maker log, not re-derived here"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "mode": "scored",
+  "notes": "The bar this packet cites is sha256 5a9f84c97b6ebe20fc9b7f855d12e04d5a45a3e3399073a013b2baa077715bf4, 9 cases, committed at bfc05f1 as tests/test_emit_spec_version.py in the job tree /home/jarbis1/tmp/plumbline-job34-tree. That value was printed by `sha256sum` on the file after its last write, and the Orchestrator re-computed it on the committed bytes and re-ran the base reading on them. Base reading on the committed tree: exit 1, Ran 9 tests, FAILED (failures=3) \u2014 RED version_is_read_from_the_custody_document, no_document_no_override_refuses, the_override_is_honoured; the other six green; porcelain empty before and after. This revision changes ONE thing in the bar's logic: case 7 now reads a PRESENT-but-disagreeing claim in a new (a0) branch BEFORE the agreement assertion, so the LIE sentence the docstring has always promised is actually printed (measured: `the claim about kit/emit_custody.py LIES: kit/emit_custody.py SPEC_VERSION claims 'v0.9.5' while the pin holds 'v0.9.8'`), and a vanished claim still reports VANISHED \u2014 the two are measured not to swap. It also removes a stale sha (`6014a1c0\u2026`) from the bar's own docstring, which matched no file and was the same defect as this packet's former citation. Bounds, editable set, scope, thresholds, k=2, x=10 and the pre-ratification shape are unchanged.",
+  "outcome": "no_artifact",
+  "packetSha256": "8774de8f2a15b6ec7b244be40ec2c780ab01f517bf79943f16967d76b00031e6",
+  "packet_sha256": "8774de8f2a15b6ec7b244be40ec2c780ab01f517bf79943f16967d76b00031e6",
+  "proposed": {
+    "status": "promoted on the Owner's \"Ratified.\" 2026-11-11; source bytes sha256 9a3aa3017b1dea4d45a2b32fe65fdb95829090d6caa7731fbc96e2ec234b65f2"
+  },
+  "ratified": true,
+  "rounds": 2,
+  "roundsSha256": [
+    "cd52c7f713f112989fdaeac67d8c339b6bded6afbb608b9e7f784f46e98efdbc",
+    "0691c86c07ea3e252d7c2278be346f7dde8b92943a3baedd2a3f303a30bf2377"
+  ],
+  "rounds_sha256": [
+    "cd52c7f713f112989fdaeac67d8c339b6bded6afbb608b9e7f784f46e98efdbc",
+    "0691c86c07ea3e252d7c2278be346f7dde8b92943a3baedd2a3f303a30bf2377"
+  ],
+  "separation_gaps": [
+    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+  ],
+  "specialist": "Steve Moitozo II (S2) \u2014 Owner AND Specialist. Not the Evaluator.",
+  "stage": "development",
+  "standard_ref": {
+    "doc": "tests/test_emit_spec_version.py",
+    "version": "5a9f84c97b6ebe20fc9b7f855d12e04d5a45a3e3399073a013b2baa077715bf4 (committed at bfc05f1, tests/test_emit_spec_version.py in the job tree; 9 cases)"
+  },
+  "startedAt": "2026-11-11T02:25:39+00:00",
+  "started_at": "2026-11-11T02:25:39+00:00",
+  "stop": "no artifact",
+  "summary": {
+    "accepted_round": null,
+    "best_round": 1,
+    "cap": 2,
+    "commit": "859049657734c7083abfec9ba81116f55ebe1d52",
+    "cost": 0.1,
+    "ended_at": "2026-11-11T02:30:58+00:00",
+    "outcome": "no_artifact",
+    "packet_sha256": "8774de8f2a15b6ec7b244be40ec2c780ab01f517bf79943f16967d76b00031e6",
+    "rounds": 2,
+    "rounds_sha256": [
+      "cd52c7f713f112989fdaeac67d8c339b6bded6afbb608b9e7f784f46e98efdbc",
+      "0691c86c07ea3e252d7c2278be346f7dde8b92943a3baedd2a3f303a30bf2377"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-11T02:25:39+00:00",
+    "stop": "no artifact",
+    "terminal_state": "needs_owner"
+  },
+  "terminalState": "needs_owner",
+  "terminal_state": "needs_owner",
+  "threshold_mapping": "Binary scale per dimension: 1 = the check PASSes, 0 = it does not. pass = mean >= T_accept(1) AND min >= T_dim(1), i.e. every check PASS. Any 0 with iterations < cap -> regenerate; at cap -> needs_owner. T_reject 0 means the algebra never rejects. k = 2 iteration bound (= cap); x = 10 (% of budget) B.1.2 discovery window; x is NOT a spend allowance \u2014 the budget stays strictly < US$0.25.",
+  "x": 10
+}

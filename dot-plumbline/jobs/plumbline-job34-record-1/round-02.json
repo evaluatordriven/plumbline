@@ -1,0 +1,51 @@
+{
+  "best_round": 1,
+  "cost": 0.02,
+  "ended_at": "2026-11-11T02:30:58+00:00",
+  "evaluator": [],
+  "findings_sha256": "47f0ebd33effb5f463d0d558141a805e36ae79cd36a817b76a8db2ec0918836c",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": null,
+  "reading": {},
+  "round": 2,
+  "run": {
+    "awaited_engine": {
+      "reason": "engine exit record appeared",
+      "seconds": 14.768,
+      "waited": true
+    },
+    "changes": [],
+    "commit": "859049657734c7083abfec9ba81116f55ebe1d52",
+    "dispatched": true,
+    "editable": [
+      "kit/emit_custody.py",
+      "tools/check_version_claims.py"
+    ],
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "maker": {
+      "exit": 0,
+      "output_sha256": "e31a3a8042dad232e934d26d2bd6b0aaac757b7c3c13d3fdafed27647ccde0d8"
+    },
+    "passed": false,
+    "reason": "no artifact",
+    "red": {
+      "exit": 1,
+      "output_sha256": "a7c0af78a49debe5befcbe98470b7a64d306c24064bf4be428c82ae6c28f1e0c"
+    },
+    "rerun": {
+      "exit": 1,
+      "output_sha256": "518c6bd5c48380a2085fba744de21265948dd60886b29041a26a6466c55937a3"
+    }
+  },
+  "started_at": "2026-11-11T02:29:46+00:00",
+  "stop": "no artifact",
+  "verdict_mismatch": false
+}

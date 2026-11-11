@@ -1,0 +1,66 @@
+{
+  "best_round": 1,
+  "cost": 0.08,
+  "ended_at": "2026-11-11T02:29:46+00:00",
+  "evaluator": [],
+  "findings_sha256": "8f2c057684cf620c31ace7457c285cecd9ab36eead0e16f09e6aa63188ab0d74",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": "regenerate",
+  "reading": {
+    "dimensions": [],
+    "from": "gate",
+    "verdict": "regenerate",
+    "violations": [
+      {
+        "class": "artifact_missed_standard",
+        "dimension": null,
+        "id": "gate",
+        "observation": "rerun exit 1 sha256 1a953be5c4359b9419db7c619b18ac9cbacc3e7f13b371239cc5bf2c7c672a91"
+      }
+    ]
+  },
+  "round": 1,
+  "run": {
+    "awaited_engine": {
+      "reason": "engine exit record appeared",
+      "seconds": 209.541,
+      "waited": true
+    },
+    "changes": [
+      "kit/emit_custody.py",
+      "tools/check_version_claims.py"
+    ],
+    "commit": "859049657734c7083abfec9ba81116f55ebe1d52",
+    "dispatched": true,
+    "editable": [
+      "kit/emit_custody.py",
+      "tools/check_version_claims.py"
+    ],
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "maker": {
+      "exit": 0,
+      "output_sha256": "84ba040a9254858b18a38a6e016cb659e8d6ffebe63eb8e97ed8914db7bec05a"
+    },
+    "passed": false,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "ce539b743ed9e903793085d21ee38027607724efe9ddd4c4db1d3c7c3280cda0"
+    },
+    "rerun": {
+      "exit": 1,
+      "output_sha256": "1a953be5c4359b9419db7c619b18ac9cbacc3e7f13b371239cc5bf2c7c672a91"
+    }
+  },
+  "started_at": "2026-11-11T02:25:39+00:00",
+  "stop": null,
+  "verdict_mismatch": false
+}

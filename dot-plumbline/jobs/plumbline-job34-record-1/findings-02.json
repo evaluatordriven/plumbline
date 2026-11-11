@@ -1,0 +1,19 @@
+{
+  "best": {
+    "editable": "/home/jarbis1/tmp/plumbline-job34-record-1/round-01/editable",
+    "round": 1,
+    "sha256": "0f17145a9a475aca34b102ceb5e9e9080426dc7303e0a85956de4e0108d8e894"
+  },
+  "cap": 2,
+  "defects": [
+    {
+      "class": "artifact_missed_standard",
+      "dimension": null,
+      "id": "gate",
+      "observation": "rerun exit 1 sha256 1a953be5c4359b9419db7c619b18ac9cbacc3e7f13b371239cc5bf2c7c672a91",
+      "round": 1
+    }
+  ],
+  "round": 2,
+  "solutions": []
+}

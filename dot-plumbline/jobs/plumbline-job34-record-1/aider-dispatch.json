@@ -1,0 +1,16 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job34-record-1/aider-prompt.md",
+  "files": [
+    "kit/emit_custody.py",
+    "tools/check_version_claims.py"
+  ],
+  "read": [
+    "tests/test_emit_spec_version.py",
+    "kit/custody_history.py",
+    "tools/pin.json"
+  ],
+  "test_cmd": [
+    "python3",
+    "tests/test_emit_spec_version.py"
+  ]
+}
