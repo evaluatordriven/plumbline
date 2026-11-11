@@ -66,7 +66,10 @@ def claims(root: Path) -> list[tuple[str, str, str]]:
     for ref in sorted(set(re.findall(r"custody[^.\n]{0,40}\bv(\d+\.\d+\.\d+)", readme))):
         out.append(("README custody version", "v" + ref, "v" + spec_version))
 
-    # 6. The version the emitter stamps into every record is the version this repository pins.
+    # 6. The version the emitter declares it was cut against (`SPEC_VERSION`) is the version this repository
+    #    pins. A record's own predicate.specVersion is resolved from the custody document the job attests
+    #    (kit/emit_custody.py: resolve_spec_version), so this compares the declared baseline -- and still goes
+    #    red when the two disagree.
     emitter = root / "kit" / "emit_custody.py"
     if emitter.is_file() and spec_version:
         match = re.search(r'^SPEC_VERSION\s*=\s*"(\d+\.\d+\.\d+)"', emitter.read_text(encoding="utf-8"),
