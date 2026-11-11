@@ -98,6 +98,7 @@ EVALUATOR_FAILED = "evaluator failed"
 NO_OBSERVATION = "no observation"
 INSTRUMENT_FAILED = "instrument failed"
 EVALUATOR_SPLIT = "evaluator split"
+SCORING_SET = "scoring set"
 CAP_REACHED = "cap reached"
 ESCALATION_CLASS = "escalation class"
 TAMPERED = "tampered"
@@ -119,6 +120,7 @@ _STATES = {
     NO_OBSERVATION: ("needs_owner", "no_observation"),
     INSTRUMENT_FAILED: ("needs_owner", "no_observation"),
     EVALUATOR_SPLIT: ("needs_owner", "no_observation"),
+    SCORING_SET: ("needs_owner", "needs_owner"),
     CAP_REACHED: ("needs_owner", "needs_owner"),
     ESCALATION_CLASS: ("needs_owner", "needs_owner"),
     TAMPERED: ("needs_owner", "needs_owner"),
@@ -826,6 +828,22 @@ def _problems(packet, record_dir, root, evaluator_fn) -> list[str]:
         problems.append("budget.time_hours_lt is not a positive number")
     if not _number(budget.get("amount")) or budget.get("amount") < 0:
         problems.append("budget.amount is not a number of 0 or more")
+    # The scope of a scored job is declared, never inferred. It is required where the
+    # gate's suite is a bar FILE in the tree — that is the Job 35 shape, where sixteen
+    # dimensions were scored and a case the Maker bar does not collect turned an accept
+    # into a regenerate. A suite that is an inline program names no bar and collects no
+    # cases, so it has no bar scope to declare; that path is left exactly as it was.
+    bar = _bar_file(packet, root)
+    if bar is not None:
+        trouble = _scoring_set_problems(bounds.get("scoring_set"))
+        problems.extend(trouble)
+        if not trouble:
+            omitted = _missing_cases(_scored_set(bounds), _collected_cases(bar, root))
+            if omitted:
+                problems.append(
+                    "bounds.scoring_set omits a case the Maker bar collects: %s"
+                    % ", ".join(omitted)
+                )
     if escalation.get("route") != ["Architect", "Owner"]:
         problems.append("escalation.route is not ['Architect', 'Owner']")
     if not isinstance(escalation.get("classes"), list):
@@ -873,6 +891,167 @@ def _strings(value) -> bool:
 
 def _number(value) -> bool:
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _scored_set(bounds) -> list[str]:
+    """The dimension names ``bounds.scoring_set`` declares, in the order it gives them.
+
+    This is the packet's declaration and nothing else. An absent, empty or malformed
+    block answers ``[]`` — a packet with no set never means "score everything" — and
+    whether the declaration may be admitted at all is ``_problems``' question, so this
+    reader does not judge it. ``_evaluate`` builds the dict ``_pass_rule`` sees from
+    this list, which is how the set the rule reads is the set the record can name.
+    """
+    if not isinstance(bounds, dict):
+        return []
+    declared = bounds.get("scoring_set")
+    if not isinstance(declared, list):
+        return []
+    return [name for name in declared if isinstance(name, str) and name.strip()]
+
+
+def _scoring_set_problems(declared) -> list[str]:
+    """Why ``bounds.scoring_set`` cannot be admitted, or ``[]`` when it can.
+
+    A scored packet whose gate suite is a bar file must name the cases it is scored
+    over: the absent case is the Job 35 defect itself. The set is a non-empty list of
+    non-empty strings with no duplicate. A string is refused rather than iterated as
+    characters (``"nope"`` would score over ``n``, ``o``, ``p``, ``e`` and score
+    nothing — a silent green), an empty list is refused rather than read as "score
+    everything", and a duplicate is refused because two names for one case make the
+    set's order meaningless.
+    """
+    if declared is None:
+        return [
+            "bounds.scoring_set is not declared: a scored job must name the dimension "
+            "set it is scored over, and an absent set is not 'score everything'"
+        ]
+    if not isinstance(declared, list) or not declared:
+        return [
+            "bounds.scoring_set is not a non-empty list of dimension names: %r" % (declared,)
+        ]
+    problems = []
+    seen = set()
+    for name in declared:
+        if not isinstance(name, str) or not name.strip():
+            problems.append(
+                "bounds.scoring_set holds an entry that is not a non-empty string: %r" % (name,)
+            )
+        elif name in seen:
+            problems.append("bounds.scoring_set names %s twice" % name)
+        else:
+            seen.add(name)
+    return problems
+
+
+def _missing_cases(declared, collected) -> list[str]:
+    """The cases the Maker bar collects that ``declared`` leaves out.
+
+    A declared set may be a superset of what the bar collects — naming a case the bar
+    drops is admitted — but it may not drop one the bar keeps: a case outside the set
+    is a case nothing measures.
+    """
+    held = set(declared)
+    return [name for name in collected if name not in held]
+
+
+def _bar_file(packet, root):
+    """The Maker bar the packet's gate suite names, or None when it names no file.
+
+    ``artifact.test_cmd`` names the bar as the first argument after the interpreter
+    (``[python3, "tests/bar.py"]``); that file is what ``load_tests``, if the bar has
+    one, collects cases from. A suite that runs an inline program or a module
+    (``[python3, "-c", ...]``, ``[python3, "-m", ...]``) names no bar, so there is no
+    collected set to declare and none is required.
+
+    The bar is read from the command's shape, not from the tree: the path is returned
+    whether or not it exists under ``root``. The packet names the bar it means to run,
+    and a suite whose file is missing is a failure the run itself reports. Requiring
+    the file to be present here would make whether a job must declare its scope depend
+    on which tree a reply happens to be admitted in — and an absent set is the defect
+    this job exists to stop, not one to re-open when the bar cannot be found.
+    """
+    artifact = packet.get("artifact") if isinstance(packet.get("artifact"), dict) else {}
+    cmd = artifact.get("test_cmd")
+    if not _strings(cmd):
+        return None
+    program = os.path.basename(cmd[0]).lower()
+    if not (program in ("py", "pyw") or program.startswith("python")):
+        return _bar_path(cmd[0], root)
+    for part in cmd[1:]:
+        if not isinstance(part, str) or not part:
+            continue
+        if part.startswith("-"):
+            return None
+        return _bar_path(part, root)
+    return None
+
+
+def _bar_path(part, root):
+    """The bar path a ``test_cmd`` argument names, read relative to ``root``."""
+    return part if os.path.isabs(part) else os.path.realpath(os.path.join(root, part))
+
+
+_COLLECT_SCRIPT = r"""
+import importlib.util as _u
+import json as _json
+import sys as _sys
+import unittest as _unittest
+
+_spec = _u.spec_from_file_location("plumbline_bar_under_test", _sys.argv[1])
+_module = _u.module_from_spec(_spec)
+_sys.modules["plumbline_bar_under_test"] = _module
+_spec.loader.exec_module(_module)
+_names = []
+
+
+def _walk(test):
+    if isinstance(test, _unittest.TestSuite):
+        for _one in test:
+            _walk(_one)
+    else:
+        _name = test.id().rsplit(".", 1)[-1]
+        if _name.startswith("test_"):
+            _name = _name[len("test_"):]
+        _names.append(_name)
+
+
+_walk(_unittest.defaultTestLoader.loadTestsFromModule(_module))
+_sys.stdout.write(_json.dumps(_names))
+"""
+
+
+def _collected_cases(path, root) -> list[str]:
+    """The dimension names the Maker bar collects, read by running its own ``load_tests``.
+
+    "Collected" is what ``unittest`` collects from the bar, so where the bar defines a
+    ``load_tests`` that drops a class, those cases are not collected — which is exactly
+    how the Job 35 bar came to have fourteen cases while sixteen were scored. The names
+    are the test method names with ``test_`` removed, the same spelling a dimension
+    carries. The collection runs in a child, with bytecode writing off, so importing a
+    bar cannot leave a ``__pycache__`` in the tree being measured or pollute the loop's
+    own process. A bar that cannot be imported collects nothing to compare against: an
+    unreadable bar is a failure the suite itself will report, never a reason to invent a
+    scope here.
+    """
+    try:
+        proc = subprocess.run(
+            [sys.executable, "-B", "-c", _COLLECT_SCRIPT, path],
+            capture_output=True,
+            text=True,
+            env=_bar_env(),
+            cwd=root,
+            timeout=120,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return []
+    if proc.returncode != 0:
+        return []
+    try:
+        names = json.loads(proc.stdout)
+    except ValueError:
+        return []
+    return [name for name in names if isinstance(name, str)]
 
 
 def _inside(child, parent) -> bool:
@@ -948,6 +1127,15 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
     costs = []
     missing = False
     ignore = packet["artifact"].get("ignore") or []
+    # The scope is the packet's, taken once, before any reply is read. A set inferred
+    # from what the Evaluator sent would score whatever it was handed, which is the Job
+    # 35 defect wearing a declaration's clothes. A bar-file packet that declares no set
+    # is refused here too, so the refusal does not depend on the caller having gone
+    # through _problems first.
+    bounds = packet.get("bounds") if isinstance(packet.get("bounds"), dict) else {}
+    declared = _scored_set(bounds)
+    if not declared and _bar_file(packet, root) is not None:
+        return SCORING_SET, None, rows, None, False, None, costs, missing
     turn = {
         "round": number,
         "artifact": editable_copy,
@@ -1010,20 +1198,42 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
             except (json.JSONDecodeError, UnicodeDecodeError):
                 rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": None})
                 return EVALUATOR_FAILED, None, rows, None, False, None, costs, missing
-        shape = _shape(parsed)
+        shape = _shape(parsed, bounds)
         rows.append(conductor_software.record_arm(exit_code, output) | {"parsed": parsed})
         if shape:
-            return shape, None, rows, None, False, None, costs, missing
+            # A refusal that names a dimension is a scope refusal, not one of the closed
+            # stop words. Its own words are kept on the row so the reader can tell which
+            # case was outside the declaration, and the round carries a stop it can name.
+            rows[-1]["shape"] = shape
+            return (shape if shape in _STATES else SCORING_SET), None, rows, None, False, None, costs, missing
     parsed_rows = _parsed(rows)
     if _split(parsed_rows):
         return EVALUATOR_SPLIT, None, rows, None, False, None, costs, missing
-    scores = {item["name"]: item["score"] for item in parsed_rows[0]["dimensions"]}
+    found = {item["name"]: item["score"] for item in parsed_rows[0]["dimensions"]}
+    # Declared order, exactly the declared set: a reader must be able to tell a case
+    # that scored from a case that was never scored, and the rule must be handed
+    # nothing the packet did not name.
+    scores = (
+        {name: found[name] for name in declared}
+        if declared and all(name in found for name in declared)
+        else found
+    )
     fired = _class_fired(parsed_rows, packet["escalation"]["classes"])
     mismatch = _mismatch(parsed_rows[0].get("verdict"), scores, packet["bounds"], fired)
     return None, None, rows, scores, mismatch, fired, costs, missing
 
 
-def _shape(parsed):
+def _shape(parsed, bounds):
+    """Why the Evaluator's reply cannot be admitted, or None when it can.
+
+    ``bounds`` is the packet's, so the declared ``scoring_set`` — never the reply —
+    decides the scope. A dimension outside the set and a declared case the reply omits
+    are both refused by name: a case outside the set is not scored, and a case the set
+    declares is not silently averaged over the rest, because fifteen of sixteen passing
+    still leaves one case unmeasured. A packet that declares no set has no scope to
+    enforce here and the reply is judged by the shape checks alone, which is the
+    behaviour every existing caller already relies on.
+    """
     if not isinstance(parsed, dict):
         return EVALUATOR_FAILED
     dims = parsed.get("dimensions")
@@ -1047,6 +1257,19 @@ def _shape(parsed):
     for item in violations:
         if not isinstance(item, dict) or item.get("class") not in _CLASSES:
             return EVALUATOR_FAILED
+    declared = _scored_set(bounds)
+    if declared:
+        scope = set(declared)
+        named = [item.get("name") for item in dims]
+        for name in named:
+            if name not in scope:
+                return "%s: %r is not a case bounds.scoring_set declares" % (SCORING_SET, name)
+        held = set(named)
+        for name in declared:
+            if name not in held:
+                return "%s: the reply omits %r, which bounds.scoring_set declares" % (
+                    SCORING_SET, name,
+                )
     return None
 
 
