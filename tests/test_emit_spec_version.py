@@ -343,6 +343,18 @@ class CaseFailure(AssertionError):
     """A property did not hold. Named with the case id and the clause it measures."""
 
 
+# The tree's state before the bar runs a single case. Case 6 measures the bar's own footprint against
+# this, not against empty: inside the loop the tree necessarily holds the Maker's uncommitted work, and
+# a control that reports the subject's dirt as the instrument's dirt cannot be satisfied by any correct
+# fix (Job 34: the artifact passed 9/9 committed and was refused uncommitted).
+BAR_START = ""
+
+
+def setUpModule():
+    global BAR_START
+    BAR_START = _porcelain(REPO)
+
+
 def die(msg: str) -> None:
     """The bar could not reach its assertion. That is an ERROR (exit 2), never a red."""
     print(f"bar emit_spec_version: ERROR {msg}", file=sys.stderr)
@@ -787,16 +799,22 @@ class EmitterResolvesSpecVersion(unittest.TestCase):
     def test_the_bar_leaves_its_subject_clean(self):
         """PROCESS · baseline 8590496: was GREEN (a control): the bar writes nothing into its subject. Historical label, not the verdict — see the ok/FAIL beside this line.
 
-        (a) the source tree is clean, with this bar tracked, after every case above; (b) the committed
+        (a) the source tree is byte-for-byte in the state it was in before the bar ran (dirt the
+        subject brought is the subject's; the bar adds none); (b) the committed
         copy is clean the moment it is committed (so a case cannot be reddened by the emitter's own
         revision refusal); (c) a planted file appears in (a)'s measurement — (a) can fail, which is
         what makes it a measurement.
         """
         status = _porcelain(REPO)
-        self.assertEqual(status, "",
-                         "the bar dirtied the tree it was run from. `git status --porcelain` must be empty. "
-                         "If it names this bar, the bar is untracked: the Orchestrator commits it into the "
-                         f"job tree, and a bar that is untracked reddens its own control case.\n{status[:1500]}")
+        added = [ln for ln in status.splitlines() if ln not in BAR_START.splitlines()]
+        removed = [ln for ln in BAR_START.splitlines() if ln not in status.splitlines()]
+        self.assertEqual(
+            (added, removed), ([], []),
+            "the bar changed the tree it was run from. `git status --porcelain` must be exactly what it "
+            "was before the bar ran: the Maker's uncommitted work belongs to the subject, not to the "
+            "instrument, and a control that reports the subject's dirt as the instrument's dirt cannot "
+            "be satisfied by any correct fix.\n"
+            f"added:\n{chr(10).join(added)[:1200]}\nremoved:\n{chr(10).join(removed)[:1200]}")
 
         stray = self.sp.clean_after_commit()
         self.assertEqual(stray, "",
