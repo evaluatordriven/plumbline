@@ -153,7 +153,10 @@ def clean_emitter_tree(tmp: Path) -> Path:
 
 
 def run_emit(job: Path, out: Path, tree: Path, allow_hand: bool = True):
-    cmd = [sys.executable, str(tree / "kit" / "emit_custody.py"), "--job-dir", str(job), "--out", str(out)]
+    # These fixtures are plumbline jobs, not custody checkouts, so the version is stated explicitly:
+    # since Job 34 the emitter resolves specVersion from the document it attests or refuses (exit 3).
+    cmd = [sys.executable, str(tree / "kit" / "emit_custody.py"), "--job-dir", str(job), "--out", str(out),
+           "--spec-version", "0.9.8"]
     if allow_hand:
         cmd.append("--allow-hand-times")
     return subprocess.run(cmd, capture_output=True, text=True)

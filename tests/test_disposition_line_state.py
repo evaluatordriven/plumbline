@@ -128,7 +128,7 @@ class Tree:
         out = os.path.join(self.root, out_name)
         r = subprocess.run(
             [PY, os.path.join(self.tree, EMITTER_REL), "--job-dir", job, "--out", out,
-             "--allow-hand-times"],
+             "--allow-hand-times", "--spec-version", "0.9.8"],
             cwd=self.tree, capture_output=True, text=True,
         )
         rec = None
