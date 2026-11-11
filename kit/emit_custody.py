@@ -21,6 +21,14 @@ WHAT IT WILL NOT DO.
   - It needs no corpus, no ~/.hermes and no credentials: stdlib only.
   - It never writes its inputs (T7): a harness log is read, never rewritten.
 
+SPEC VERSION. predicate.specVersion is the version of the custody document the job attests: the checkout
+named by `inputs/custody.json: custody_spec`, whose SPEC.md `**Version X.Y.Z**` line is read, digested and
+recorded under x-plumbline.spec_version {source, path, sha256, origin}. A job whose artifact is not a
+custody tree carries `--spec-version X.Y.Z` (origin "--spec-version"). With neither, or with a document
+that cannot be read or declares no version, the emitter REFUSES (kind `spec-version`, exit 3) and writes
+nothing: it never falls back to the flag, to a literal, or to a guess. If both are given and disagree, it
+refuses rather than choose.
+
 HAND TIMES. A time in the record whose only source is a hand is a HAND TIME: a ledger line (inputs/
 custody-events.jsonl) with `writer: "hand"` or with no `writer` at all, a time typed into inputs/custody.json with
 no ledger line behind it, or a server-set time from a harness log call with no logger `sent_at`/`received_at` (the
@@ -62,7 +70,7 @@ SOURCES, in order of authority:
                                     call's received_at, each with its file:line source
 
     emit_custody.py --job-dir <job> [--inputs inputs/custody.json] [--out FILE | --out-dir DIR] [--print-only]
-                    [--allow-hand-times]
+                    [--allow-hand-times] [--spec-version X.Y.Z]
 
 Default output: <job>/custody/record.custody.json. --out-dir DIR writes DIR/<job_id>.custody.json.
 Exit: 0 written with no hard gap · 1 written, but a field the custody schema requires had no source (named in
@@ -71,8 +79,9 @@ x-plumbline.gaps and printed) · 2 refused (no packet, unreadable inputs, the jo
 harness log contradicts, a hand time with no --allow-hand-times, a relay counted as a buyer approval, events out of
 order or dated after the close/emission, an endpoint that is a router or a guess (an aggregator call needs a
 provider pin declared before the seat's first call, every call must be served by that provider alone, and the
-/api/v1/generation reply must NAME it), an approval by the orchestrating agent or a model, or an emitter tree that
-is dirty or not the stated revision. A routing request that did not ask OpenRouter for the pin alone with no
+/api/v1/generation reply must NAME it), an approval by the orchestrating agent or a model, a predicate.specVersion
+with neither a custody document nor --spec-version behind it, or an emitter tree that is dirty or not the stated
+revision. A routing request that did not ask OpenRouter for the pin alone with no
 fallback and ZDR is a hard gap (exit 1), not a refusal: the record is still true, and it shows what was asked.
 Nothing is written on 2 or 3; an existing record is left as it was.
 """
@@ -85,6 +94,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import custody_history as H                      # noqa: E402
 
+# The version this emitter was cut against. It is NOT what a record stamps: predicate.specVersion is read from
+# the custody document the job attests (resolve_spec_version), because a literal here would stamp a version the
+# document does not declare. It stays as the emitter's declared baseline so tools/check_version_claims.py can go
+# on comparing it with tools/pin.json -- a claim that must be able to disagree.
 SPEC_VERSION = "0.9.8"
 STATEMENT = "https://in-toto.io/Statement/v1"
 PREDICATE_TYPE = "https://evaluatordriven.com/custody/v1"
@@ -264,6 +277,103 @@ def line_in(path: Path, value, key: str | None = None) -> int | None:
     return hits[0] if hits else None
 
 
+VERSION_RE = re.compile(r"^\d+\.\d+\.\d+$")
+SPEC_DECL_RE = re.compile(r"\*\*Version\s+(\d+\.\d+\.\d+)\b")
+
+
+def spec_md_version(spec_md: Path) -> tuple[str | None, int | None]:
+    """The version a custody `SPEC.md` declares (its `**Version X.Y.Z · ...**` line) and that line's number."""
+    try:
+        lines = spec_md.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return None, None
+    for n, ln in enumerate(lines, 1):
+        hit = SPEC_DECL_RE.search(ln)
+        if hit:
+            return hit.group(1), n
+    return None, None
+
+
+def _git_out(args, cwd: Path) -> str | None:
+    try:
+        return subprocess.run(["git", "-C", str(cwd), *args], capture_output=True, text=True,
+                              check=True).stdout.strip() or None
+    except (OSError, subprocess.CalledProcessError):
+        return None
+
+
+def checkout_head(checkout: Path, ref: H.Refusals) -> None:
+    """A checkout that names its own commit must be the commit its work tree is at (R2)."""
+    own = _git_out(["rev-parse", "HEAD"], checkout)
+    if not own:
+        return
+    top = _git_out(["rev-parse", "--show-toplevel"], checkout)
+    if not top:
+        return
+    head = _git_out(["rev-parse", "HEAD"], Path(top))
+    if head and head != own:
+        ref.add("spec-version", f"the custody checkout {checkout} names commit {own[:12]} but the work tree at "
+                                f"{top} is at {head[:12]}: a SPEC.md read beside the wrong commit is not the "
+                                f"document the job attests")
+
+
+def resolve_spec_version(job: Path, ci: dict | None, override: str | None,
+                         ref: H.Refusals) -> tuple[str | None, dict]:
+    """The version this record attests: the custody document the job names, else --spec-version, else a refusal.
+
+    R1: `inputs/custody.json: custody_spec` points at a custody checkout; the record carries the version its
+    SPEC.md declares, digested, with the line that declares it. R3: `--spec-version` is the fallback for a job
+    whose artifact is not a custody tree. R2: with neither, or with a document that cannot be read, the emitter
+    REFUSES (kind `spec-version`) rather than fall back to the flag or to a literal. Both are given and they
+    disagree: refused, because a record can attest only one version.
+    """
+    given = (ci or {}).get("custody_spec")
+    doc_version, block = None, {}
+    if given:
+        checkout = Path(str(given)).expanduser()
+        if not checkout.is_absolute():
+            checkout = job / checkout
+        spec_md = checkout / "SPEC.md"
+        if not checkout.is_dir():
+            ref.add("spec-version", f"inputs/custody.json custody_spec {str(given)!r} is not a directory "
+                                    f"({checkout}): the document the job attests cannot be read")
+        elif not spec_md.is_file():
+            ref.add("spec-version", f"the custody checkout {checkout} carries no SPEC.md: the version the job "
+                                    f"attests cannot be read")
+        else:
+            doc_version, line = spec_md_version(spec_md)
+            block = {"origin": "document", "path": str(checkout),
+                     "source": f"{spec_md}:{line}" if line else str(spec_md),
+                     "sha256": file_digest(spec_md)}
+            if doc_version is None:
+                ref.add("spec-version", f"{spec_md} declares no `**Version X.Y.Z**`: the version the job attests "
+                                        f"cannot be read")
+            else:
+                checkout_head(checkout, ref)
+    if given and doc_version is None:
+        return None, block                     # a named document that cannot be read never falls back (R2)
+    if override:
+        version = str(override).strip()
+        if not VERSION_RE.match(version):
+            ref.add("spec-version", f"--spec-version {override!r} is not an X.Y.Z version")
+            return None, block
+        if doc_version is not None:
+            if version != doc_version:
+                ref.add("spec-version", f"--spec-version {version!r} disagrees with the document "
+                                        f"{block.get('path')}/SPEC.md, which declares {doc_version!r}: the record "
+                                        f"can attest only one version, and the emitter will not choose silently")
+                return None, block
+            return doc_version, block
+        return version, {"origin": "--spec-version", "path": None,
+                         "source": "--spec-version", "sha256": None}
+    if doc_version is not None:
+        return doc_version, block
+    ref.add("spec-version", "the job names no custody document (inputs/custody.json: custody_spec) and no "
+                            "--spec-version was given: predicate.specVersion would have no source, and the "
+                            "emitter refuses rather than guess")
+    return None, {}
+
+
 def load(p: Path):
     return json.loads(p.read_text(encoding="utf-8"))
 
@@ -405,7 +515,8 @@ def _editable_files(job: Path, number: int | None = None) -> list[tuple[str, Pat
 
 
 def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: datetime,
-                 expect: str | None, allow_hand: bool = False) -> tuple[dict, Gaps, list[str]]:
+                 expect: str | None, allow_hand: bool = False, ci: dict | None = None,
+                 override: str | None = None) -> tuple[dict, Gaps, list[str]]:
     """A custody/v1 record for a finish loop() filed, from the files loop() wrote.
 
     loop() writes packet.json (the finish's stamps and the ratified packet's own
@@ -419,6 +530,7 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
     """
     xp: dict = {"job_id": packet.get("job_id") or job.name, "sources": {}}
     rev = H.revision(HERE, job, expect or os.environ.get("PLUMBLINE_EXPECT_REVISION") or None, ref)
+    version, version_block = resolve_spec_version(job, ci or {}, override, ref)
     rounds = round_records(job)
     packet_path = job / "packet.json"
 
@@ -591,7 +703,7 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
     if level not in ("CL1", "CL2", "CL3", "baseline"):
         level = "CL1"
     pred = {
-        "specVersion": SPEC_VERSION,
+        "specVersion": version,
         "levelClaimed": level,
         "bar": bar,
         "maker": maker,
@@ -611,6 +723,8 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
     if xp.get("terminal_state") not in TERMINALS:
         gaps.add("x-plumbline.terminal_state", f"packet terminal_state is {xp.get('terminal_state')!r}")
     xp["schema"] = "plumbline/x-plumbline/v1"
+    if version_block:
+        xp["spec_version"] = version_block
     xp["emitter"] = {"name": "kit/emit_custody.py", "kit_revision": (rev.get("commit") or "")[:7] or None,
                      "commit": rev.get("commit"), "tree": rev.get("tree"), "dirty": rev.get("dirty"),
                      "statedRevision": rev.get("stated")}
@@ -628,14 +742,24 @@ def build_finish(job: Path, packet: dict, gaps: Gaps, ref: H.Refusals, now: date
 
 
 def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: datetime | None = None,
-          expect: str | None = None, allow_hand: bool = False) -> tuple[dict, Gaps, list[str]]:
+          expect: str | None = None, allow_hand: bool = False,
+          spec_version: str | None = None) -> tuple[dict, Gaps, list[str]]:
     gaps, notes = Gaps(), []
     ref = ref if ref is not None else H.Refusals()
     now = now or datetime.now(timezone.utc).replace(microsecond=0)
     packet = load(job / "packet.json")
-    if is_loop_finish(packet, job):
-        return build_finish(job, packet, gaps, ref, now, expect, allow_hand)
     have_inputs = inputs_path.is_file()
+    if is_loop_finish(packet, job):
+        # The round path reads the custody inputs for one thing only: the document the job attests. A malformed
+        # inputs file is not this path's to police (it was never read here before), so it is treated as absent.
+        round_ci = None
+        if have_inputs:
+            try:
+                round_ci = load(inputs_path)
+            except (ValueError, OSError):
+                round_ci = None
+        return build_finish(job, packet, gaps, ref, now, expect, allow_hand,
+                            ci=round_ci if isinstance(round_ci, dict) else None, override=spec_version)
     ci = load(inputs_path) if have_inputs else None
     if ci is None:
         gaps.add("inputs/custody.json", f"no custody inputs at {inputs_path.relative_to(job) if inputs_path.is_relative_to(job) else inputs_path}: "
@@ -659,6 +783,7 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
 
     # ---- the emitter's own revision (refused when dirty or not the stated revision) ----
     rev = H.revision(HERE, job, expect or os.environ.get("PLUMBLINE_EXPECT_REVISION") or ci.get("emitter_revision"), ref)
+    version, version_block = resolve_spec_version(job, ci, spec_version, ref)
 
     # ---- terminal state, verdict, disposition (three separate facts, three separate sources) ----
     xp["terminal_state"] = packet.get("terminal_state")
@@ -1176,7 +1301,7 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
 
     level = ci.get("levelClaimed") or "CL1"
     pred = {
-        "specVersion": SPEC_VERSION, "levelClaimed": level, "bar": bar, "maker": maker,
+        "specVersion": version, "levelClaimed": level, "bar": bar, "maker": maker,
         "startedAt": ts(mk.get("startedAt") or ci.get("startedAt"), "startedAt", gaps),
         "producedAt": ts(mk.get("producedAt") or ci.get("producedAt"), "producedAt", gaps),
         "instrument": instrument, "evaluators": evs, "checks": checks, "controls": controls,
@@ -1207,6 +1332,8 @@ def build(job: Path, inputs_path: Path, ref: H.Refusals | None = None, now: date
     xp["emittedAt"] = H.iso(now)
     # ---- the versioned block, hand times, the F1 arrays, spend and the inputs' own x-plumbline ----
     xp["schema"] = "plumbline/x-plumbline/v1"
+    if version_block:
+        xp["spec_version"] = version_block
     xp["hand_times"] = [hand[k] for k in hand]
     if hand and allow_hand:
         xp["allowances"] = {"hand_times": {"switch": "--allow-hand-times", "writer": emitter_stamp(),
@@ -1525,6 +1652,9 @@ def main(argv=None) -> int:
     ap.add_argument("--allow-hand-times", action="store_true",
                     help="write the record with the hand-entered times listed in x-plumbline.hand_times[] and the "
                          "allowance recorded (default: refuse them, exit 3)")
+    ap.add_argument("--spec-version", help="the custody spec version (X.Y.Z) the record attests when the job "
+                                           "names no custody document (inputs/custody.json: custody_spec); the "
+                                           "record says so under x-plumbline.spec_version.origin")
     ap.add_argument("--expect-revision", help="the emitter revision (commit or tree, >= 7 hex) this record must "
                                               "be written by; also $PLUMBLINE_EXPECT_REVISION")
     a = ap.parse_args(argv)
@@ -1543,7 +1673,8 @@ def main(argv=None) -> int:
     inputs = Path(a.inputs).expanduser() if a.inputs else job / "inputs" / "custody.json"
     ref = H.Refusals()
     try:
-        record, gaps, _ = build(job, inputs, ref, expect=a.expect_revision, allow_hand=a.allow_hand_times)
+        record, gaps, _ = build(job, inputs, ref, expect=a.expect_revision, allow_hand=a.allow_hand_times,
+                                spec_version=a.spec_version)
     except (ValueError, OSError) as exc:
         print(f"REFUSED: could not read the job's files ({exc})"); return 2
     if ref:

@@ -40,6 +40,17 @@
       "required": ["schema", "hand_times"],
       "properties": {
         "job_id": {"type": "string"},
+        "spec_version": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["origin", "path", "source", "sha256"],
+          "properties": {
+            "origin": {"enum": ["document", "--spec-version"]},
+            "path": {"type": ["string", "null"]},
+            "source": {"type": "string"},
+            "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
         "sources": {"type": "object", "additionalProperties": {"type": "string"}},
         "events_log": {"type": "object", "additionalProperties": true},
         "terminal_state": {"type": ["string", "null"]},

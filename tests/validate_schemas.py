@@ -425,8 +425,13 @@ SNAP = clean_checkout(TMP / "tree-clean")
 
 def emit(job, out, tree=None, extra=(), allow_hand=True):
     """Emit a record. Synthetic fixtures are hand-typed by design, so they run with --allow-hand-times (the
-    emitter refuses hand times by default; the T2 cases below drive the no-switch path)."""
-    args = [str((tree or SNAP) / "kit" / "emit_custody.py"), "--job-dir", str(job), "--out", str(out), *extra]
+    emitter refuses hand times by default; the T2 cases below drive the no-switch path).
+
+    Since Job 34 the emitter resolves predicate.specVersion from the custody document the job attests, or
+    refuses. These synthetic jobs are not custody checkouts, so the version is stated explicitly and the
+    record says so under x-plumbline.spec_version.origin."""
+    args = [str((tree or SNAP) / "kit" / "emit_custody.py"), "--job-dir", str(job), "--out", str(out),
+            "--spec-version", "0.9.8", *extra]
     if allow_hand:
         args.append("--allow-hand-times")
     return run_py(args)

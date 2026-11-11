@@ -440,7 +440,7 @@ def certify(record_dir, repo, keep):
         before = _hash_tree(fresh)
         emitter = _oracle_emitter(repo, keep)
         proc = subprocess.run(
-            [PY, emitter, "--job-dir", fresh],
+            [PY, emitter, "--job-dir", fresh, "--spec-version", "0.9.8"],
             capture_output=True,
             text=True,
         )
