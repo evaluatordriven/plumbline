@@ -816,6 +816,13 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)
     _file_finish(record_dir, loaded, halt, round_paths, best_round, by)
     halt["filing"] = file_finish(record_dir, halt)
+    # Dual gates (2026-11-12 delight): instrument finish ≠ custody release record.
+    # terminal_state stays doctrine-pure; finish_kind / gates name the human truth.
+    try:
+        from kit.delight import attach_gates
+        halt = attach_gates(halt, record_dir, loaded if isinstance(loaded, dict) else None)
+    except Exception as _delight_err:  # noqa: BLE001 — finish must still file
+        halt["gates_error"] = "%s: %s" % (type(_delight_err).__name__, _delight_err)
     _dump(os.path.join(record_dir, "summary.json"), halt)
     # The folder was copied BEFORE this row existed, so the filed copy could not say how it was filed.
     # Measured 2026-11-09 on Job 31's first close: the filed summary carried `filing: null` while the live one
