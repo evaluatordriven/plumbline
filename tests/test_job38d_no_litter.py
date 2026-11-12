@@ -316,6 +316,17 @@ def _finish(into, packet=None, job_id=None):
         after = {"jobs": _listing(os.path.join(into, "jobs")),
                  "runs": _listing(os.path.join(into, "runs")),
                  "manifest": _manifest(into)}
+        # Read the record the emitter wrote BEFORE `record` is cleaned up in the `finally`
+        # below. A finish with no job id is not filed, so this record is not copied anywhere:
+        # it lives at `record_dir/custody/record.custody.json` and dies with the temp dir. Case
+        # 00 asserts against this evidence rather than the filed copy, which for such a finish
+        # does not exist.
+        record_path = os.path.join(record.name, "custody", "record.custody.json")
+        record_evidence = {"path": record_path, "exists": os.path.isfile(record_path),
+                           "sha256": None}
+        if record_evidence["exists"]:
+            with open(record_path, "rb") as handle:
+                record_evidence["sha256"] = hashlib.sha256(handle.read()).hexdigest()
         return {
             "halt": halt,
             "refusal": refusal,
@@ -324,6 +335,7 @@ def _finish(into, packet=None, job_id=None):
             "before": before,
             "after": after,
             "record_dir": record.name,
+            "record": record_evidence,
             "into": into,
         }
     finally:
@@ -356,9 +368,15 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
         measuring nothing at all — the failure mode this control exists to stop.
 
         Asserted: the loop returned a halt (it did not raise), the halt says `accepted`, the
-        packet the job was handed carried no `job_id`, and the job folder reached the emitter
-        (its custody record exists). If any of these is false, cases 1 and 2 are not measuring
-        filing and must not report a verdict on it.
+        packet the job was handed carried no `job_id`, and the job reached the emitter — the
+        emitter's record exists and has bytes. If any of these is false, cases 1 and 2 are not
+        measuring filing and must not report a verdict on it.
+
+        The record is read from `record_dir` (`_finish` captures it before the temporary
+        directory is cleaned up), NOT from a filed copy. A finish whose packet carries no job
+        id is not filed — `filing.filed` is false and `dest` is null — so there is no copy: the
+        record lives only in the record directory and is the evidence that the emitter ran.
+        Asserting against a filed copy asserts against something such a finish never produces.
         """
         with TemporaryDirectory() as into:
             got = _finish(into)
@@ -372,24 +390,16 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
         self.assertNotIn("job_id", got["handed"],
                          "this bar's fixture packet carries a job_id; the defect under "
                          "measurement is the one where it does not: %r" % (got["handed"],))
-        job_dir = got["record_dir"]
-        # Where the record the finish ships actually lands. A finish is filed by COPYING the
-        # record directory into the destination, so the record this control can see in the
-        # source is not the one that was accepted: the emitter writes its record, the copy
-        # carries it, and the source is left as it was. So the evidence that the emitter ran
-        # clean is read from whichever of the two holds a record — and if neither does, the
-        # finish reached no record at all.
-        placed = [os.path.join(job_dir, "custody", "record.custody.json")]
-        for name in got["after"]["jobs"] + got["after"]["runs"]:
-            for parent in ("jobs", "runs"):
-                placed.append(os.path.join(got["into"], parent, name,
-                                           "custody", "record.custody.json"))
+        record = got["record"]
         self.assertTrue(
-            any(os.path.isfile(p) for p in placed),
-            "the fixture finish reached no custody record anywhere — not in the record "
-            "directory and not in the filed copy — so the emitter never wrote one and the "
-            "filing path under test was reached only as a refusal. halt.filing=%r"
-            % (halt.get("filing"),))
+            record["exists"],
+            "the fixture finish left no custody record at %r after an accepted halt, so the "
+            "emitter never wrote one and the filing path under test was reached only as a "
+            "refusal. halt.filing=%r" % (record["path"], halt.get("filing")),
+        )
+        self.assertRegex(record["sha256"] or "", r"^[0-9a-f]{64}$",
+                         "the fixture finish's custody record has no sha256 — it exists but was "
+                         "not read: %r" % (record,))
 
     # 1 ------------------------------------------------------------------
     def test_01_a_finish_with_no_job_id_leaves_jobs_byte_identical(self):
