@@ -46,7 +46,7 @@ from unittest import mock
 PY = sys.executable
 RECORD_REL = "custody/record.custody.json"
 PREDECESSOR = "tests/test_loop_custody_on_finish.py"
-PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+PREDECESSOR_SHA = "3480290de595fca616e5724c39354ce2c515a5ea16c464cd478c643e5fe87511"
 ESCALATE_BAR = "tests/test_escalate.py"
 ESCALATE_BAR_SHA = "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
 LOOP_PY = "kit/conductor_loop.py"

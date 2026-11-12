@@ -17,7 +17,7 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PREDECESSOR = os.path.join(ROOT, "tests", "test_loop_custody_on_finish.py")
-PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+PREDECESSOR_SHA = "3480290de595fca616e5724c39354ce2c515a5ea16c464cd478c643e5fe87511"
 SOURCES = os.path.join(ROOT, "tests", "test_loop_custody_sources.py")
 
 # Exact source substrings the Maker must produce.  The text argument here is a

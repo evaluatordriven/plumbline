@@ -7,6 +7,17 @@ record. Remembering to run plumbline_job.py close afterward is not the fix.
 emit_custody.py exit 0 is the only done: the record is written and names no
 hard gap. Exit 1, 2, or 3 is not done.
 
+AMENDED, Owner 2026-11-03, ruling "update-test". The claim "the seam is the
+emitter, not close" was enforced as `seam exit == a no-document twin's exit`.
+That equality held while the seam could supply nothing; it is false by design
+now that the seam names the pinned custody document (Job 38), because the
+no-document twin is refused (exit 3, kind spec-version) while the seam reaches
+the emitter (exit 1 on this fixture, gaps and all). The Owner ruled that the
+frozen test does not supersede the filing fix and that this test and its
+sibling pins be updated so the approved seam is the law. The property is NOT
+relaxed: `test_seam_is_the_emitter_not_close` still fails a private closer and
+still fails a seam that emits anything its twin does not.
+
 Out of this bar, named so they are not picked up:
 - Do not retrofit job 2026-11-05-loop-started-at-2. It was filed, not closed.
   It has no custody record. This file checks that a run does not create one.
@@ -32,8 +43,12 @@ Labels the Architect chose:
 - A packet refusal is not a finish. The seam is not called. No custody record
   is written.
 - The seam calls kit/emit_custody.py. It does not call plumbline_job.py.
-  Side-by-side with the emitter on a twin directory, the exit code matches and
-  a record is written on one side only if it is written on the other.
+  Side-by-side with the emitter, the seam's exit code matches, and the record
+  on disk matches, the emitter's on a twin given the SAME document. Naming the
+  custody document the job attests is the seam's whole difference from a bare
+  emitter run: it supplies `custody_spec` and then adds nothing. A twin given
+  no document is refused by the emitter (kind spec-version) and is no longer
+  the comparison.
 
 Fixture bounds in this file are copied from the existing loop tests so loop()
 can reach accepted, needs_owner, and rejected. They are not this job's
@@ -48,6 +63,7 @@ not authorize weakening it.
 import inspect
 import json
 import os
+import shutil
 import subprocess
 import sys
 import unittest
@@ -60,6 +76,7 @@ import kit.conductor_loop as cl
 PY = sys.executable
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EMITTER = os.path.join(ROOT, "kit", "emit_custody.py")
+PIN = os.path.join(ROOT, "tools", "pin.json")
 PREDICATE_TYPE = "https://evaluatordriven.com/custody/v1"
 STATEMENT = "https://in-toto.io/Statement/v1"
 FROZEN_JOB = os.path.join(
@@ -264,13 +281,53 @@ class SeamTests(_Bar):
         })
 
     def test_seam_is_the_emitter_not_close(self):
+        """The seam names the source; it does not close instead of emitting.
+
+        AMENDED under the Owner's "update-test" ruling. The old form ran the seam and a
+        twin on the same directory with NO document and required equal exit codes. Under
+        document supply the two differ by design (the bare twin refused for spec-version,
+        the seam reaching the emitter), so equal exits measured the supply, not the property.
+        It is replaced, not deleted.
+
+        What is held, each a property a private closer cannot satisfy:
+
+        1. SOURCE. The seam's source names the emitter and not the close command.
+
+        2. THE SAME FIXTURE, THE SAME DOCUMENT. The twin is a byte-copy of the job directory
+           exactly as it stood BEFORE the seam ran, and it is handed the SAME custody document
+           the seam supplies (`inputs/custody.json: custody_spec`, from the pin). Both sides
+           therefore reach the emitter's version resolution: the comparison measures the seam's
+           behaviour, not whether a version was found. The only field in a record that the job
+           directory's name reaches is `x-plumbline.job_id` (the emitter's one path-derived
+           value), so each record is compared after that name is rewritten to one placeholder
+           (`_sanitise`). Nothing else may differ.
+
+        3. NOT A CLOSER: THE RECORD IS THE EMITTER'S. Where the bare emitter emits (0, or 1
+           with named gaps), the seam's exit equals the twin's and its record, name-sanitised,
+           is identical to the twin's: the seam supplies the document and adds no behaviour the
+           emitter lacks. Where the bare emitter refuses (2 or 3), it writes nothing, the
+           pre-existing record — a sentinel the emitter can never write — must survive
+           byte-for-byte, and the seam's exit must be a refusal too.
+
+        4. A CLOSER THAT RAN THE EMITTER. A closer that emits and then overwrites the record
+           with its own bytes is caught by 3: its bytes are not the twin's. A closer that never
+           reaches the emitter is caught by 1 and by the surviving sentinel.
+
+        A plant reddens this: a closer that writes its own record instead of the emitter's bytes
+        fails the byte comparison in 3; a closer that never reaches the emitter fails 1 and leaves
+        the sentinel test in 3 unsatisfied. A seam that supplies the document and runs the emitter
+        is green. The plant and its failure text are recorded in the JOB 38b record.
+        """
         fn = getattr(cl, SEAM, None)
         if not callable(fn):
             self.fail("kit.conductor_loop.emit_custody_for_finish is not bound")
         source = inspect.getsource(fn)
         self.assertIn("emit_custody", source)
         self.assertNotIn("plumbline_job", source)
-        marker = b'{"preexisting": true}\n'
+        # A sentinel the emitter never writes: it is not a statement, and it holds no predicate.
+        marker = json.dumps({"preexisting": True}, sort_keys=True).encode() + b"\n"
+        self.assertNotIn(PREDICATE_TYPE.encode(), marker)
+        checkout = _pinned_checkout()
         cases = (
             None,
             {"terminal_state": "open"},
@@ -278,22 +335,46 @@ class SeamTests(_Bar):
         )
         for packet in cases:
             with self.subTest(packet=packet):
-                with TemporaryDirectory() as left, TemporaryDirectory() as right:
+                with TemporaryDirectory() as root:
+                    left = os.path.join(root, "aaaaaaaa")
+                    right = os.path.join(root, "aaaaaaab")
                     for side in (left, right):
                         if packet is not None:
                             _dump(os.path.join(side, "packet.json"), packet)
                         _dump(_custody(side), {"preexisting": True})
                         with open(_custody(side), "wb") as fh:
                             fh.write(marker)
+                    # 2. The twin is the job dir BEFORE the seam, byte for byte, with its own name.
+                    for base, dirs, files in os.walk(left):
+                        rel = os.path.relpath(base, left)
+                        dest = os.path.join(right, rel) if rel != "." else right
+                        os.makedirs(dest, exist_ok=True)
+                        for name in files:
+                            shutil.copyfile(os.path.join(base, name), os.path.join(dest, name))
                     code = fn(left, {"terminal_state": "accepted", "outcome": "accepted", "stop": "accepted"})
-                    twin = _emitter(right)
-                    self.assertEqual(code, twin)
-                    left_path = _custody(left)
-                    right_path = _custody(right)
-                    self.assertEqual(os.path.isfile(left_path), os.path.isfile(right_path))
-                    if twin in (2, 3):
-                        self.assertEqual(open(left_path, "rb").read(), marker)
-                        self.assertEqual(open(right_path, "rb").read(), marker)
+                    # 3. The twin gets the SAME document the seam supplies: emitter against emitter.
+                    twin = _emitter(right, checkout)
+                    left_bytes = _read(_custody(left))
+                    twin_bytes = _read(_custody(right))
+                    if twin in (2, 3) or twin_bytes == marker:
+                        # The bare emitter refused (2 or 3) and wrote nothing: the sentinel survives,
+                        # and the seam did not turn the refusal into a ship.
+                        self.assertEqual(left_bytes, marker,
+                                         "the seam wrote a record where the bare emitter refuses: it closed")
+                        self.assertNotEqual(code, 0,
+                                            "the seam returned 0 where the bare emitter refuses")
+                    else:
+                        # The bare emitter emitted (0, or 1 with named gaps): the seam must be that
+                        # emitter, byte for byte, up to the job-directory name the record carries.
+                        self.assertEqual(code, twin,
+                                         "seam exit %r != the emitter's %r on the same fixture" % (code, twin))
+                        self.assertIsNotNone(left_bytes, "the seam wrote no record where the emitter did")
+                        self.assertEqual(_sanitise(left_bytes, left), _sanitise(twin_bytes, right),
+                                         "the seam's record is not the emitter's on the same fixture")
+                        self.assertEqual(
+                            (json.loads(left_bytes) if left_bytes else {}).get("predicateType"),
+                            PREDICATE_TYPE,
+                            "the seam left a record that is not a custody statement")
 
 
 class PatchedTests(_Bar):
@@ -398,9 +479,80 @@ class PatchedTests(_Bar):
             self.assertFalse(os.path.exists(_custody(rec)))
 
 
-def _emitter(job):
+def _read(path):
+    """The file's bytes, or None when it is absent."""
+    if not os.path.isfile(path):
+        return None
+    with open(path, "rb") as fh:
+        return fh.read()
+
+
+def _sanitise(body, job):
+    """`body` with the job directory's name rewritten to one placeholder.
+
+    The emitter's record carries the job directory's basename in exactly one place —
+    `predicate.x-plumbline.job_id` (the only path-derived value it writes; see
+    kit/emit_custody.py, `job_id = packet.get("job_id") or job.name`). Rewriting that
+    basename, and the absolute job path should one ever appear, lets the seam's record and
+    the twin's be compared byte for byte while naming exactly which bytes are allowed to
+    differ: the job's own name, and nothing else.
+    """
+    if body is None:
+        return None
+    name = os.path.basename(os.path.abspath(job)).encode()
+    body = body.replace(os.path.abspath(job).encode(), b"<JOB>")
+    if name:
+        body = body.replace(b'"' + name + b'"', b'"<JOB>"')
+    return body
+
+
+def _pinned_checkout():
+    """The custody checkout the seam attests: `$PLUMBLINE_CUSTODY`, else `<repo>/custody`, at the pin's commit.
+
+    This is the document the seam supplies as `inputs/custody.json: custody_spec` (from
+    tools/pin.json, the field kit/emit_custody.py reads). A twin given the SAME document is the
+    comparison that measures the seam against the emitter rather than against the supply: both
+    reach the emitter's version resolution, so a difference in the record is a difference in
+    behaviour, not in whether a version was found. Returns None when no checkout at the pin's
+    commit is present, in which case the twin is a bare run and the seam's supply is the only
+    difference — the refuse branch below.
+    """
+    try:
+        with open(PIN, encoding="utf-8") as fh:
+            commit = json.load(fh)["custody"]["commit"]
+    except (OSError, ValueError, KeyError):
+        return None
+    candidates = []
+    env = (os.environ.get("PLUMBLINE_CUSTODY") or "").strip()
+    if env:
+        candidates.append(env)
+    candidates.append(os.path.join(os.path.dirname(ROOT), "custody"))
+    candidates.append(os.path.join(ROOT, "custody"))
+    for candidate in candidates:
+        checkout = os.path.abspath(os.path.expanduser(candidate))
+        if not os.path.isfile(os.path.join(checkout, "SPEC.md")):
+            continue
+        proc = subprocess.run(["git", "-C", checkout, "rev-parse", "HEAD"],
+                              capture_output=True, text=True)
+        if proc.returncode == 0 and (proc.stdout or "").strip() == commit:
+            return checkout
+    return None
+
+
+def _emitter(job, checkout=None):
+    """Run kit/emit_custody.py over `job` exactly as a bare run would: `--job-dir`, no other flag.
+
+    When `checkout` is given the twin is handed the SAME custody document the seam supplies, by
+    writing `inputs/custody.json: custody_spec` — the field the emitter already reads — so the
+    comparison is emitter against emitter on one fixture, and the only bytes allowed to differ
+    between the two records are the job's own name (see `_sanitise`). When it is not, the twin
+    is a bare run: it is given no document, so whether it emits or refuses is the emitter's own
+    answer on that directory.
+    """
+    if checkout is not None:
+        _dump(os.path.join(job, "inputs", "custody.json"), {"custody_spec": checkout})
     proc = subprocess.run(
-        [PY, EMITTER, "--job-dir", job],
+        [PY, EMITTER, "--job-dir", str(job)],
         capture_output=True, text=True,
     )
     return proc.returncode
