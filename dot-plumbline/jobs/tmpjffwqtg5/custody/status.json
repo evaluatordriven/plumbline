@@ -1,0 +1,14 @@
+{
+  "schema": "plumbline-instance-custody-status-v1",
+  "not_a_record": true,
+  "job": "tmpjffwqtg5",
+  "state": "custody",
+  "record": "custody/record.custody.json",
+  "record_present": true,
+  "record_sha256": "e71054e08d7c776484ac661afd8c5c5d88fd5e8a6dab42a75a899df36e4a5b8d",
+  "written_at": "2026-11-12T00:55:50Z",
+  "written_by": "kit/plumbline_job.py",
+  "terminal_state": "accepted",
+  "filed_from": "/tmp/tmpjffwqtg5",
+  "why": "state read from the filed folder itself at the moment of filing: a custody record is present only when the job had ended and the emitter wrote one."
+}

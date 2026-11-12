@@ -1,0 +1,51 @@
+{
+  "best": {
+    "editable": "/tmp/tmp9ov0vt67/round-01/editable",
+    "round": 1,
+    "sha256": "dc87747fe42f63dc988670c52563ff418a144d2ae019110eef99b32da61754c7"
+  },
+  "by": "loop()",
+  "decision": null,
+  "diagnosis": null,
+  "ended_at": "2026-11-12T00:58:43+00:00",
+  "escalation_kind": "cap_reached",
+  "holders": {
+    "architect": "plumbline-architect",
+    "orchestrator": [
+      {
+        "does": "rounds",
+        "holder": "kit.conductor_loop.loop",
+        "kind": "script",
+        "tested": "rec#abc"
+      },
+      {
+        "does": "escalations",
+        "holder": "escalation-agent",
+        "kind": "model",
+        "tested": "rec#def"
+      }
+    ]
+  },
+  "human_seat": "Owner",
+  "options": null,
+  "outcome": "needs_owner",
+  "problems": [],
+  "proposed_packet": null,
+  "question": null,
+  "recommendation": null,
+  "route": [
+    "Architect",
+    "Owner"
+  ],
+  "started_at": "2026-11-12T00:58:43+00:00",
+  "stop": "cap reached",
+  "terminal_state": "needs_owner",
+  "tried": [
+    {
+      "record": "/tmp/tmp9ov0vt67/round-01.json",
+      "record_sha256": "75b20563ea843ff35ede7ffa8c50ebc0e6c5dc0be1cb13e968ebaaf9120f7b52",
+      "round": 1
+    }
+  ],
+  "why_unobservable": null
+}

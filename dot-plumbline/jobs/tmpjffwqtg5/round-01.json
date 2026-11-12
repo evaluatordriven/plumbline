@@ -1,0 +1,101 @@
+{
+  "best_round": 1,
+  "cost": 0.0,
+  "ended_at": "2026-11-12T00:55:50+00:00",
+  "evaluator": [
+    {
+      "exit": 0,
+      "output_sha256": "36f8cf4b1a9331b73cdc46a6b1c0e653b866a50cad6e932d68fd945b35c3b8e0",
+      "parsed": {
+        "controls": {
+          "should_fail": "failed",
+          "should_pass": "passed"
+        },
+        "dimensions": [
+          {
+            "name": "q",
+            "observation": "seen",
+            "score": 2
+          }
+        ],
+        "verdict": "accept",
+        "violations": []
+      }
+    },
+    {
+      "exit": 0,
+      "output_sha256": "36f8cf4b1a9331b73cdc46a6b1c0e653b866a50cad6e932d68fd945b35c3b8e0",
+      "parsed": {
+        "controls": {
+          "should_fail": "failed",
+          "should_pass": "passed"
+        },
+        "dimensions": [
+          {
+            "name": "q",
+            "observation": "seen",
+            "score": 2
+          }
+        ],
+        "verdict": "accept",
+        "violations": []
+      }
+    }
+  ],
+  "findings_sha256": "c14af1ba28cadf79164bdfa0c61e30c09451fcef2f142ec1661181ca8f6623ae",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": "accepted",
+  "reading": {
+    "dimensions": [
+      {
+        "name": "q",
+        "observation": "seen",
+        "score": 2
+      }
+    ],
+    "from": "evaluator",
+    "verdict": "accept",
+    "violations": []
+  },
+  "round": 1,
+  "run": {
+    "awaited_engine": null,
+    "changes": [
+      "src/w.txt"
+    ],
+    "commit": "not recorded",
+    "dispatched": true,
+    "editable": [
+      "src"
+    ],
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": [
+        ".git",
+        "__pycache__"
+      ]
+    },
+    "maker": {
+      "exit": 0,
+      "output_sha256": "not recorded"
+    },
+    "passed": true,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "not recorded"
+    },
+    "rerun": {
+      "exit": 0,
+      "output_sha256": "not recorded"
+    }
+  },
+  "started_at": "2026-11-12T00:55:50+00:00",
+  "stop": "accepted",
+  "verdict_mismatch": false
+}
