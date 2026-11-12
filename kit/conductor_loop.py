@@ -828,22 +828,28 @@ def _problems(packet, record_dir, root, evaluator_fn) -> list[str]:
         problems.append("budget.time_hours_lt is not a positive number")
     if not _number(budget.get("amount")) or budget.get("amount") < 0:
         problems.append("budget.amount is not a number of 0 or more")
-    # The scope of a scored job is declared, never inferred. It is required where the
-    # gate's suite is a bar FILE in the tree — that is the Job 35 shape, where sixteen
-    # dimensions were scored and a case the Maker bar does not collect turned an accept
-    # into a regenerate. A suite that is an inline program names no bar and collects no
-    # cases, so it has no bar scope to declare; that path is left exactly as it was.
+    # The scope of a scored job is declared or it is legacy — never inferred. A packet
+    # that declares bounds.scoring_set is scored over that set, and a declared set that
+    # drops a case the Maker bar collects is refused: that is the Job 35 shape, where
+    # sixteen dimensions were scored and a case the bar does not collect turned an accept
+    # into a regenerate. A packet that declares nothing is the packet every caller wrote
+    # before Job 36: it is admitted and scored exactly as it was, because an absent set is
+    # neither a refusal nor a licence to score everything (Job 37's compat rule). A set
+    # that is PRESENT is validated wherever it appears, so an empty or malformed
+    # declaration can never pass itself off as a legacy packet. A suite that is an inline
+    # program names no bar and collects no cases, so it has no bar scope to compare
+    # against; that path is left exactly as it was.
     bar = _bar_file(packet, root)
-    if bar is not None:
-        trouble = _scoring_set_problems(bounds.get("scoring_set"))
-        problems.extend(trouble)
-        if not trouble:
-            omitted = _missing_cases(_scored_set(bounds), _collected_cases(bar, root))
-            if omitted:
-                problems.append(
-                    "bounds.scoring_set omits a case the Maker bar collects: %s"
-                    % ", ".join(omitted)
-                )
+    declared = bounds.get("scoring_set")
+    trouble = _scoring_set_problems(declared)
+    problems.extend(trouble)
+    if declared is not None and not trouble and bar is not None:
+        omitted = _missing_cases(_scored_set(bounds), _collected_cases(bar, root))
+        if omitted:
+            problems.append(
+                "bounds.scoring_set omits a case the Maker bar collects: %s"
+                % ", ".join(omitted)
+            )
     if escalation.get("route") != ["Architect", "Owner"]:
         problems.append("escalation.route is not ['Architect', 'Owner']")
     if not isinstance(escalation.get("classes"), list):
@@ -897,10 +903,12 @@ def _scored_set(bounds) -> list[str]:
     """The dimension names ``bounds.scoring_set`` declares, in the order it gives them.
 
     This is the packet's declaration and nothing else. An absent, empty or malformed
-    block answers ``[]`` — a packet with no set never means "score everything" — and
-    whether the declaration may be admitted at all is ``_problems``' question, so this
-    reader does not judge it. ``_evaluate`` builds the dict ``_pass_rule`` sees from
-    this list, which is how the set the rule reads is the set the record can name.
+    block answers ``[]``, so a caller can tell a declaration from its absence; whether
+    an ``[]`` may be admitted at all is ``_problems``' question and this reader does not
+    judge it — an absent set is the legacy packet, a present empty one is refused.
+    ``_evaluate`` builds the dict ``_pass_rule`` sees from this list when a set is
+    declared, which is how the set the rule reads is the set the record can name; with
+    no set declared the whole reply is scored, as it was before Job 36.
     """
     if not isinstance(bounds, dict):
         return []
@@ -913,19 +921,17 @@ def _scored_set(bounds) -> list[str]:
 def _scoring_set_problems(declared) -> list[str]:
     """Why ``bounds.scoring_set`` cannot be admitted, or ``[]`` when it can.
 
-    A scored packet whose gate suite is a bar file must name the cases it is scored
-    over: the absent case is the Job 35 defect itself. The set is a non-empty list of
-    non-empty strings with no duplicate. A string is refused rather than iterated as
-    characters (``"nope"`` would score over ``n``, ``o``, ``p``, ``e`` and score
-    nothing — a silent green), an empty list is refused rather than read as "score
-    everything", and a duplicate is refused because two names for one case make the
-    set's order meaningless.
+    An ABSENT set is the legacy packet and is admitted (Job 37's compat rule): it is
+    neither a refusal nor a licence to score everything, and ``_scored_set`` answers
+    ``[]`` for it so the caller can tell the two apart. A set that is PRESENT is
+    validated: a non-empty list of non-empty strings with no duplicate. A string is
+    refused rather than iterated as characters (``"nope"`` would score over ``n``,
+    ``o``, ``p``, ``e`` and score nothing — a silent green), an empty list is refused
+    rather than read as "score everything", and a duplicate is refused because two
+    names for one case make the set's order meaningless.
     """
     if declared is None:
-        return [
-            "bounds.scoring_set is not declared: a scored job must name the dimension "
-            "set it is scored over, and an absent set is not 'score everything'"
-        ]
+        return []
     if not isinstance(declared, list) or not declared:
         return [
             "bounds.scoring_set is not a non-empty list of dimension names: %r" % (declared,)
@@ -1129,12 +1135,14 @@ def _evaluate(packet, result, number, editable_copy, root, deadline, timeout_s, 
     ignore = packet["artifact"].get("ignore") or []
     # The scope is the packet's, taken once, before any reply is read. A set inferred
     # from what the Evaluator sent would score whatever it was handed, which is the Job
-    # 35 defect wearing a declaration's clothes. A bar-file packet that declares no set
-    # is refused here too, so the refusal does not depend on the caller having gone
-    # through _problems first.
+    # 35 defect wearing a declaration's clothes. A PRESENT set that cannot be admitted —
+    # an empty list, a string, a name that is not a name — is refused here too, so the
+    # refusal does not depend on the caller having gone through _problems first. An
+    # ABSENT set is the legacy packet: no refusal, and every dimension in the reply is
+    # scored, exactly as it was before Job 36 (Job 37's compat rule).
     bounds = packet.get("bounds") if isinstance(packet.get("bounds"), dict) else {}
     declared = _scored_set(bounds)
-    if not declared and _bar_file(packet, root) is not None:
+    if _scoring_set_problems(bounds.get("scoring_set")) and _bar_file(packet, root) is not None:
         return SCORING_SET, None, rows, None, False, None, costs, missing
     turn = {
         "round": number,
