@@ -111,9 +111,10 @@ SCORING_SET = (
     "00_the_finish_these_cases_measure_is_accepted_and_reached_the_emitter",
     "01_a_finish_with_no_job_id_leaves_jobs_byte_identical",
     "02_a_finish_with_no_job_id_does_not_give_the_packet_an_identity",
-    "03_a_finish_that_has_a_job_id_still_files_under_that_name",
-    "04_the_job_38c_and_job_37_bars_still_pass",
-    "05_this_bars_scoring_set_is_what_the_cases_are",
+    "03_a_finish_with_no_job_id_still_reaches_the_instance_record",
+    "04_a_finish_that_has_a_job_id_still_files_under_that_name",
+    "05_the_job_38c_and_job_37_bars_still_pass",
+    "06_this_bars_scoring_set_is_what_the_cases_are",
 )
 
 _SKIP_NO_CHECKOUT = (
@@ -497,7 +498,102 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
                          "was handed." % (differed,))
 
     # 3 ------------------------------------------------------------------
-    def test_03_a_finish_that_has_a_job_id_still_files_under_that_name(self):
+    def test_03_a_finish_with_no_job_id_still_reaches_the_instance_record(self):
+        """BRAKE. The litter fix must not buy case 1 by never filing — the standing law
+        "a finish lands in the instance record" outranks the litter case, not the reverse.
+
+        Owner, 2026-11-12: an id-less finish is honest as `filed: false` WITH A REASON, or as
+        a folder under `runs/`, or with a real job id. Silent non-filing is none of the three:
+        it is the litter green and the law red.
+
+        A finish whose packet carries no `job_id` is not a job and has no name, so it may not
+        go under `jobs/` — case 1 still holds it to byte-identical. What it MAY NOT do is
+        evaporate. This case reads the halt the loop returned, and requires that the finish
+        can be picked up out of the instance record by a reader who has only the destination:
+
+          (a) `filing.dest` is a directory that exists, and it is NOT under `jobs/` — the
+              honest home for a nameless finish is `runs/`, where nothing reads it as a job;
+          (b) that directory carries the custody record the emitter wrote, byte for byte what
+              the record directory held (sha256 equal), so a reader of the destination can see
+              the job ended and what it produced;
+          (c) the halt says so: `filing.filed` is true for that copy, or — if the fix instead
+              refuses — `filing.filed` is false AND `filing.detail` carries a non-empty reason.
+              Silent is the one shape (a) and (b) fail to reach and this forbids.
+
+        The plant that reddens it: a fix that returns `{"filed": False, "dest": None,
+        "detail": "NOT FILED: ... is neither a job packet ..."}` — the f0033ab shape measured
+        today — leaves nothing under `runs/` and fails (a) and (b). A fix that files the record
+        and then blames nobody also passes; that is intentional. A fix that deletes the
+        destination after copying to make case 1's manifest equal passes (a) only if the
+        destination survives; it will not, and reddens (a) — which is the point.
+        """
+        with TemporaryDirectory() as into:
+            got = _finish(into)
+            self.assertIsNone(got["refusal"],
+                              "the fixture finish did not complete (%r)." % (got["refusal"],))
+            halt = got["halt"] or {}
+            self.assertEqual(halt.get("terminal_state"), "accepted",
+                             "the fixture finish ended %r, not accepted"
+                             % (halt.get("terminal_state"),))
+            filing = halt.get("filing") or {}
+            dest = str(filing.get("dest") or "")
+            record = got["record"]
+
+            # (c) FIRST: a refusal must SAY something; silent non-filing is not a choice.
+            if not filing.get("filed"):
+                self.assertTrue((filing.get("detail") or "").strip(),
+                                "an id-less finish was not filed and gave NO reason: %r. "
+                                "`filed: false` with a reason is honest; `filed: false` with an "
+                                "empty detail is the silent non-filing the Owner forbade."
+                                % (filing,))
+
+            # (a) the finish is reachable under the destination, outside jobs/.
+            jobs_dir = os.path.join(into, "jobs")
+            runs_dir = os.path.join(into, "runs")
+            jobs_now = _listing(jobs_dir)
+            runs_now = _listing(runs_dir)
+            self.assertTrue(
+                dest and os.path.isdir(dest),
+                "the id-less finish names no destination that exists: filing=%r. After an "
+                "ACCEPTED finish with a custody record in hand, the record must be readable "
+                "from the instance record; it lived only in the runner's temp dir and died "
+                "with it. jobs/=%r runs/=%r. The honest destinations are runs/ (a nameless "
+                "finish is not a job) or a job id the Owner chose; vanishing is not one."
+                % (filing, jobs_now, runs_now),
+            )
+            self.assertFalse(
+                os.path.abspath(dest).startswith(os.path.abspath(jobs_dir) + os.sep),
+                "the id-less finish was filed under jobs/ at %r — case 1 forbids any entry "
+                "there. jobs/=%r" % (dest, jobs_now),
+            )
+            self.assertTrue(
+                os.path.abspath(dest).startswith(os.path.abspath(runs_dir) + os.sep),
+                "the id-less finish landed at %r, which is under neither jobs/ (forbidden by "
+                "case 1) nor runs/ (where evidence belongs). jobs/=%r runs/=%r"
+                % (dest, jobs_now, runs_now),
+            )
+
+            # (b) the destination carries the emitter's record, byte for byte.
+            if record["exists"]:
+                filed_record = os.path.join(dest, "custody", "record.custody.json")
+                self.assertTrue(
+                    os.path.isfile(filed_record),
+                    "the finish was filed at %r but carries no custody/record.custody.json. "
+                    "The record the emitter wrote is at %r (sha256 %s); a destination that "
+                    "does not contain it is a folder, not a record of the finish."
+                    % (dest, record["path"], record["sha256"]),
+                )
+                with open(filed_record, "rb") as handle:
+                    filed_sha = hashlib.sha256(handle.read()).hexdigest()
+                self.assertEqual(
+                    filed_sha, record["sha256"],
+                    "the filed record differs from the one the emitter wrote: filed sha256 %s "
+                    "vs emitter %s. A copy that is not byte-identical is not the record."
+                    % (filed_sha, record["sha256"]),
+                )
+
+    # 4 ------------------------------------------------------------------
+    def test_04_a_finish_that_has_a_job_id_still_files_under_that_name(self):
         """BRAKE. Green at base — measured. The fix must not buy case 1 by never filing.
 
         A finish whose packet DOES carry a job id must still land at `<into>/jobs/<job_id>`, or
@@ -545,8 +641,8 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
                              "a finish that has a job id also wrote into runs/: %r. A job is "
                              "not evidence." % (_listing(os.path.join(into, "runs")),))
 
-    # 4 ------------------------------------------------------------------
-    def test_04_the_job_38c_and_job_37_bars_still_pass(self):
+    # 5 ------------------------------------------------------------------
+    def test_05_the_job_38c_and_job_37_bars_still_pass(self):
         """BRAKE. Green at base — measured. The Owner's own words: "the two brakes that must
         stay green: the Job 38c bar and the Job 37 bar pass unchanged".
 
@@ -586,8 +682,8 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
                           "the %s bar reported no OK line.\n--- tail ---\n%s"
                           % (label, text[-2000:]))
 
-    # 5 ------------------------------------------------------------------
-    def test_05_this_bars_scoring_set_is_what_the_cases_are(self):
+    # 6 ------------------------------------------------------------------
+    def test_06_this_bars_scoring_set_is_what_the_cases_are(self):
         """The packet's `bounds.scoring_set` must be these ids, in this order.
 
         Job 35 taught this instance what a scope that drifts from the bar costs: sixteen
