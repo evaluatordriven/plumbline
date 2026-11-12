@@ -14,6 +14,9 @@
 # evaluatordriven/doctrine at that commit, and runs tests/run_all.py with the corpus REQUIRED, so a pin that no
 # longer matches the derived schemas, the vendored copy or the doctrine's own files fails the run:
 #   PLUMBLINE-TALLY pass=12 fail=0 skip=0 skipped=-
+#
+# Corpus checkouts live under .ci-deps/ (gitignored). actions/checkout requires path under github.workspace;
+# putting them at the worktree root dirties porcelain and the emitter refuses [revision] dirty (PR #51).
 name: ci
 
 "on":
@@ -58,9 +61,8 @@ jobs:
         with:
           repository: evaluatordriven/custody
           ref: ${{ steps.custody_pin.outputs.sha }}
-          # OUTSIDE github.workspace — an in-tree path dirties porcelain and the
-          # emitter refuses [revision] dirty (PR #51 / 2026-11-12).
-          path: ${{ runner.temp }}/custody-upstream
+          # Under workspace (checkout requirement) but gitignored (.ci-deps/) so porcelain stays clean.
+          path: .ci-deps/custody-upstream
 
       # PLUMBLINE_CUSTODY names a custody checkout at the commit tools/pin.json holds. The finish seam reads the
       # spec version from that document rather than from a literal (`kit/conductor_loop.py`, `_pinned_custody` /
@@ -70,25 +72,25 @@ jobs:
       - name: Run every suite (no doctrine corpus; corpus checks SKIP by name)
         env:
           HOME: ${{ runner.temp }}/home
-          PLUMBLINE_CUSTODY: ${{ runner.temp }}/custody-upstream
+          PLUMBLINE_CUSTODY: ${{ github.workspace }}/.ci-deps/custody-upstream
         run: python tests/run_all.py
 
       - name: Compare the vendored custody schema with upstream
         env:
           HOME: ${{ runner.temp }}/home
-          CUSTODY_DIR: ${{ runner.temp }}/custody-upstream
+          CUSTODY_DIR: ${{ github.workspace }}/.ci-deps/custody-upstream
         run: python tools/build_schemas.py --custody --check
 
       - name: Run the real-checker test against upstream custody
         env:
           HOME: ${{ runner.temp }}/home
-          CUSTODY_DIR: ${{ runner.temp }}/custody-upstream
+          CUSTODY_DIR: ${{ github.workspace }}/.ci-deps/custody-upstream
         run: python -m unittest -v tests.test_plumbline_verify.VerifierKindTests.test_clean_against_real_checker
 
       - name: Published records still read as published (frozen verdict table)
         env:
           HOME: ${{ runner.temp }}/home
-          CUSTODY_DIR: ${{ runner.temp }}/custody-upstream
+          CUSTODY_DIR: ${{ github.workspace }}/.ci-deps/custody-upstream
         run: python3 tools/check_verdicts.py
 
   corpus:
@@ -119,14 +121,14 @@ jobs:
         with:
           repository: evaluatordriven/doctrine
           ref: ${{ steps.pin.outputs.commit }}
-          path: ${{ runner.temp }}/doctrine-upstream
+          path: .ci-deps/doctrine-upstream
 
       - name: Check out the custody corpus at its pinned commit (the finish seam reads its SPEC.md)
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           repository: evaluatordriven/custody
           ref: ${{ steps.pin.outputs.custody }}
-          path: ${{ runner.temp }}/custody-upstream
+          path: .ci-deps/custody-upstream
 
       - name: Make an empty HOME (no ~/.hermes, no user config)
         run: mkdir -p "${{ runner.temp }}/home"
@@ -134,7 +136,7 @@ jobs:
       - name: Run every suite with the corpus required (nothing may SKIP)
         env:
           HOME: ${{ runner.temp }}/home
-          EDI_CORPUS: ${{ runner.temp }}/doctrine-upstream/${{ steps.pin.outputs.path }}
+          EDI_CORPUS: ${{ github.workspace }}/.ci-deps/doctrine-upstream/${{ steps.pin.outputs.path }}
           PLUMBLINE_REQUIRE_CORPUS: "1"
-          PLUMBLINE_CUSTODY: ${{ runner.temp }}/custody-upstream
+          PLUMBLINE_CUSTODY: ${{ github.workspace }}/.ci-deps/custody-upstream
         run: python tests/run_all.py
