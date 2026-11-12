@@ -71,7 +71,7 @@ LOOP_PY = "kit/conductor_loop.py"
 # THE VALUE BELOW MUST COME FROM THE FILE IT PINS. Re-pin it with `sha256sum kit/conductor_loop.py` after this
 # job's change is applied; a digest cannot be written from anywhere but the bytes it names, so a typed guess
 # here would be the very drift this constant exists to catch.
-LOOP_SHA = "f089d686c33ddfb8d405406c55114e7088c95738f1f50ec25839c5352f546b6f"
+LOOP_SHA = "bdfaa08bda2d5defba7596d0116f0d9dac4ab818159830427bab9d71b706ef5f"
 SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
 SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
 INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")
