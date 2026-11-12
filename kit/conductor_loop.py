@@ -299,14 +299,21 @@ def _git_head(path):
 
 
 def _custody_checkout(pin):
-    """A custody checkout at exactly the pinned commit, or None.
+    """A custody checkout that IS the pinned document, or None.
 
     Looked for where the pin can be honoured: ``$PLUMBLINE_CUSTODY``, a ``custody/`` beside this
     repo, then one inside it — the places the seat already looks, so no path is typed here and
-    the convention is not overridden by a guess. The commit is compared with the checkout's own
-    ``HEAD`` and the document with the digest the pin records, so a checkout at another revision,
-    or one whose SPEC.md moved after it was pinned, is not the document the job attests and is
-    not used. Nothing is derived from the pin when no checkout matches.
+    the convention is not overridden by a guess.
+
+    The document's own bytes are the AUTHORITY: a checkout whose ``SPEC.md`` hashes to the digest
+    the pin records IS the document the job attests, whether or not ``git`` can be asked about it.
+    A ``git`` that answers nothing must not veto a correct document — a checkout on a runner the
+    seat does not own, or one archived without its history, is still the pinned bytes — so a
+    silent HEAD is tolerated. The commit is BELT-AND-BRACES: a ``git`` that answers with another
+    commit is evidence the work tree is at the wrong revision, and the checkout is refused. A
+    checkout whose digest does not match is refused outright, so tolerating a silent git never
+    becomes tolerating bytes that are not the document. Nothing is derived from the pin when no
+    checkout matches.
     """
     candidates = []
     env = (os.environ.get("PLUMBLINE_CUSTODY") or "").strip()
@@ -319,13 +326,14 @@ def _custody_checkout(pin):
         spec = os.path.join(checkout, "SPEC.md")
         if not os.path.isfile(spec):
             continue
-        if _git_head(checkout) != pin["commit"]:
-            continue
         try:
             digest = _sha_file(spec)
         except OSError:
             continue
         if pin["spec_sha256"] and digest != pin["spec_sha256"]:
+            continue
+        head = _git_head(checkout)
+        if head is not None and head != pin["commit"]:
             continue
         return checkout
     return None
@@ -401,7 +409,7 @@ def emit_custody_for_finish(record_dir, summary):
     return proc.returncode
 
 
-def _custody_packet(packet, halt):
+def _custody_packet(packet, halt, job_id=None):
     """The ``packet.json`` a finish leaves for the emitter to read.
 
     The emitter reads the finish out of the job directory, so before the seam is
@@ -414,8 +422,19 @@ def _custody_packet(packet, halt):
     reader that expects the summary as an object finds it. The ratified packet's
     own fields are kept alongside so the record's subject can be drawn from
     them.
+
+    The descriptor also carries a ``job_id``. ``plumbline_job.do_file()`` files a
+    folder under ``jobs/`` only when its packet carries one — a folder under
+    ``jobs/`` with no id is a job no reader can read — and the ratified packet
+    need not carry one, so the finish supplies the record directory's own name,
+    which is what the filed folder will be called. ``job_id`` is passed in rather
+    than typed here; a packet that already names one keeps it.
     """
     descriptor = dict(packet) if isinstance(packet, dict) else {}
+    if not (isinstance(descriptor.get("job_id"), str) and descriptor["job_id"].strip()):
+        fallback = job_id if isinstance(job_id, str) else ""
+        if fallback.strip():
+            descriptor["job_id"] = fallback.strip()
     finish = {
         "terminal_state": halt["terminal_state"],
         "outcome": halt["outcome"],
@@ -784,7 +803,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     }
     if not _own_clock():
         raise CustodyNotDone(halt, _exit_code(stop))
-    _dump(os.path.join(record_dir, "packet.json"), _custody_packet(loaded, halt))
+    _dump(os.path.join(record_dir, "packet.json"),
+          _custody_packet(loaded, halt, os.path.basename(os.path.abspath(str(record_dir)))))
     code = emit_custody_for_finish(record_dir, halt)
     if code != 0:
         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)

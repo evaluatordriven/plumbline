@@ -370,18 +370,21 @@ def do_file(a) -> int:
         return 2
     if doc.get("job_id"):
         kind = "job"
-    elif "finish" in doc and doc.get("terminalState"):
-        # A finish descriptor IS a job. `_custody_packet()` starts from the ratified packet, and the corpus's
-        # packet schema has no `job_id` — that is a Plumbline instance field — so a real finish carries no job id
-        # and was filed as "unclassified" the first time loop() tried to file one (measured 2026-11-09). What a
-        # finish always carries is its terminal state; no dispatch packet has one.
-        kind = "job"
     elif {"artifact", "bounds", "job"} <= set(doc) or ("job" in doc and ("target" in doc or "maker_cmd" in doc)):
         kind = "run"
     else:
+        # A `finish` + `terminalState` folder with NO job_id used to be filed as a job here, so that a finish
+        # descriptor from loop() — whose ratified packet need not carry the instance-only `job_id` — could be
+        # filed. Measured 2026-11-12 (Job 38c): the arm then filed a no-id finish under `jobs/`, and a jobs/
+        # folder whose packet carries no job_id is exactly the pair `test_jobs_carry_a_job_packet_and_runs_do_not`
+        # refuses. The seam now gives a real finish its job id (`_custody_packet()`), so the arm is gone: a folder
+        # under `jobs/` always carries a job id, and an ID-LESS finish is refused rather than filed as a job no
+        # reader can read. Refusing, filing under `runs/`, and giving the finish an id are all honest; filing it
+        # as an unreadable job is not.
         print(f"NOT FILED: {packet_src} is neither a job packet (no `job_id`) nor a dispatch packet "
-              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`). Filing an unclassified folder "
-              f"would make a reader guess.")
+              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`); a finish with no job id is a "
+              f"job no reader can read, so it is not filed as one. Filing an unclassified folder would make a "
+              f"reader guess.")
         return 2
     root = Path(a.into).expanduser().resolve() if a.into else (HERE.parent / "dot-plumbline").resolve()
     into = root / ("jobs" if kind == "job" else "runs")
