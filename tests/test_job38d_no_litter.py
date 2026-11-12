@@ -411,12 +411,14 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
         Two assertions, because either alone is passable by a fix that is wrong:
           (a) the LISTING of `jobs/` after equals the listing before, as a set — a new name is
               the litter, whatever it is called and wherever the name was minted;
-          (b) the RECURSIVE MANIFEST of the whole destination is unchanged — a fix that files
-              over an existing job, or edits a packet in place under a name that was already
-              there, changes bytes without changing the listing.
+          (b) the RECURSIVE MANIFEST of `jobs/` only is unchanged — a fix that files over an
+              existing job, or edits a packet in place under a name that was already there,
+              changes bytes without changing the listing.
 
-        The message names both listings and both manifest diffs, so a red says which name
-        appeared and which bytes moved rather than only that something is not equal.
+        Owner A (2026-11-12): an id-less finish files under `runs/finish-<started_at>`. Case 03
+        requires that. This case measures `jobs/` only — never the whole destination — so a
+        honest runs/ filing does not redden the litter case. Measured: whole-into manifest made
+        case 01 and case 03 mutually exclusive.
         """
         with TemporaryDirectory() as into:
             got = _finish(into)
@@ -445,13 +447,21 @@ class NoLitterForAFinishWithNoJobId(unittest.TestCase):
             % (dropped, before["jobs"], after["jobs"]),
         )
 
-        changed = sorted(k for k in set(before["manifest"]) | set(after["manifest"])
-                         if before["manifest"].get(k) != after["manifest"].get(k))
+        # jobs/ only — runs/ is case 03's surface (Owner A: finish-<started_at> under runs/).
+        def _jobs_only(manifest):
+            out = {}
+            for k, v in (manifest or {}).items():
+                if k == "jobs" or k.startswith("jobs/"):
+                    out[k] = v
+            return out
+        before_j, after_j = _jobs_only(before["manifest"]), _jobs_only(after["manifest"])
+        changed = sorted(k for k in set(before_j) | set(after_j)
+                         if before_j.get(k) != after_j.get(k))
         self.assertEqual(
             changed, [],
-            "a finish whose packet carries no job_id changed %d file(s) in the destination "
+            "a finish whose packet carries no job_id changed %d file(s) under jobs/ "
             "without changing the listing:\n%s\n"
-            "The destination is compared byte for byte, not by name: re-filing over an existing "
+            "jobs/ is compared byte for byte, not by name: re-filing over an existing "
             "job, or rewriting a packet in place, is the same defect wearing a name that was "
             "already there."
             % (len(changed), "\n".join(

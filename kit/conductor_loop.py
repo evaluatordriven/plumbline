@@ -827,8 +827,8 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     return halt
 
 
-def _filed_name(record_dir):
-    """The folder name a finish is filed under: the packet's own ``job_id``, or None.
+def _filed_name(record_dir, halt=None):
+    """The folder name a finish is filed under.
 
     A job is filed under the identity its packet names — never under the scratch
     directory it happened to run in. ``loop()`` cannot pass ``job_id`` to
@@ -836,24 +836,38 @@ def _filed_name(record_dir):
     not the caller's. So the name is read back from the ``packet.json`` this
     finish wrote, which is the same file ``do_file()`` classifies from.
 
-    None is the honest answer for a finish whose packet names no id: it has no job
-    name a reader could use, so nothing lands under ``jobs/``. It is not refused:
-    the finish is filed as a run under ``runs/``, keeping the folder name it
-    already has, so the evidence of a finish outlives the scratch directory it ran
-    in. Inventing a job name from the record directory is the thing neither
-    reading does.
+    Owner ruling 2026-11-12 ("A"): a finish whose packet names no id is filed
+    under ``runs/finish-<started_at>`` from the halt — stable, not a scratch
+    basename, and nothing reads ``runs/`` as a job. Inventing a ``job_id`` on the
+    packet is forbidden; vanishing is forbidden.
     """
     try:
         with open(os.path.join(str(record_dir), "packet.json"), encoding="utf-8") as handle:
             doc = json.load(handle)
     except (OSError, ValueError):
-        return None
-    if not isinstance(doc, dict):
-        return None
-    name = doc.get("job_id")
-    if isinstance(name, str) and name.strip():
-        return name.strip()
-    return None
+        doc = None
+    if isinstance(doc, dict):
+        name = doc.get("job_id")
+        if isinstance(name, str) and name.strip():
+            return name.strip()
+    # no job_id → finish-<started_at> (Owner A). Filesystem-safe: drop ":" and
+    # fold the offset so the name is one path component.
+    started = ""
+    if isinstance(halt, dict):
+        raw = halt.get("started_at") or halt.get("startedAt") or ""
+        if isinstance(raw, str):
+            started = raw.strip()
+    if started:
+        safe = (
+            started.replace(":", "")
+            .replace("+", "p")
+            .replace("/", "-")
+        )
+        # keep a compact readable form: finish-2026-11-12T141045p0000
+        return "finish-%s" % safe
+    # last resort: still not a jobs/ mint from the scratch dir name alone —
+    # do_file will place this under runs/ as kind=run.
+    return "finish-unknown"
 
 
 def file_finish(record_dir, halt):
@@ -910,7 +924,15 @@ def file_finish(record_dir, halt):
             row["detail"] = ("no destination configured: PLUMBLINE_FILE_INTO is unset. The status file is written "
                              "and the job is not filed; this row is the record of that.")
             return row
-        name = _filed_name(record_dir)
+        name = _filed_name(record_dir, halt)
+        # packet job_id → jobs/<id>; no id → runs/finish-<started_at> (Owner A).
+        try:
+            with open(os.path.join(str(record_dir), "packet.json"), encoding="utf-8") as handle:
+                _pkt = json.load(handle)
+        except (OSError, ValueError):
+            _pkt = {}
+        _has_id = isinstance((_pkt or {}).get("job_id"), str) and (_pkt.get("job_id") or "").strip()
+        _bucket = "jobs" if _has_id else "runs"
         args = argparse.Namespace(job_dir=str(record_dir), into=into, run_log=None, force=True,
                                   backfill=False, allow_incomplete=False, name=name)
         buffer = io.StringIO()
@@ -919,15 +941,11 @@ def file_finish(record_dir, halt):
         row["filed"] = code == 0
         if row["filed"]:
             # Say where the filer ACTUALLY wrote. A row that names a folder which is not there
-            # sends a reader to nothing, and whether a record exists (`state`) is not what
-            # decides which directory a folder belongs in: a JOB is a packet with a `job_id`
-            # and lands under `jobs/<id>`, while an id-less finish is the EVIDENCE of a run and
-            # lands under `runs/` — the same choice `do_file()` makes from the same packet, read
-            # back here so the summary can describe its own filing.
+            # sends a reader to nothing. JOB → jobs/<job_id>; id-less finish → runs/finish-<started_at>.
             row["dest"] = str(
                 pathlib.Path(into).expanduser().resolve()
-                / ("jobs" if name else "runs")
-                / (name or pathlib.Path(str(record_dir)).name)
+                / _bucket
+                / name
             )
         row["detail"] = (buffer.getvalue() or "").strip()[-800:]
     except Exception as exc:  # filing must not undo a finish; the row is the report
