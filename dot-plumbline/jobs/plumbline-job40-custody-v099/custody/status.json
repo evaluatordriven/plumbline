@@ -5,10 +5,10 @@
   "state": "custody",
   "record": "custody/record.custody.json",
   "record_present": true,
-  "record_sha256": "37768dad05720374da5fb7ce0e182d2efb35dbd654a5954dac48e1f97d240b73",
-  "written_at": "2026-11-12T17:50:09Z",
+  "record_sha256": "cc56458e0609f4534d35f3072950157260ec2f777cc9e246401b35674d31a1e5",
+  "written_at": "2026-11-12T18:05:25Z",
   "written_by": "kit/plumbline_job.py",
-  "terminal_state": "needs_owner",
-  "filed_from": "/home/jarbis1/tmp/plumbline-job40-record-3",
+  "terminal_state": "accepted",
+  "filed_from": "/home/jarbis1/tmp/plumbline-job40-record-4",
   "why": "state read from the filed folder itself at the moment of filing: a custody record is present only when the job had ended and the emitter wrote one."
 }

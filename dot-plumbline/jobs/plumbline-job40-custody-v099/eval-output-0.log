@@ -1,16 +1,23 @@
 --- stdout
   ⟳ compacting context…
-Evaluation complete. Score written to `/home/jarbis1/tmp/plumbline-job40-record-3/eval-score.json` (verified JSON, 7466 bytes). No cost file — I measured no cost.
+Eval turn complete. Report to the Orchestrator:
 
-What I ran in the job root `/home/jarbis1/tmp/custody-job40b`:
+**Verdict: accept** — score written to `/home/jarbis1/tmp/plumbline-job40-record-4/eval-score.json` (7,792 bytes, parsed and shape-validated after writing).
 
-1. `python3 tests/test_v099_instrument1.py` — exit 0, "Ran 14 tests in 2.047s", OK. All 14 collected cases green.
-2. `python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v` (by name) — exit 1, FAILED (failures=1): test_12 ok; test_12b failed with the bar's own predicted Instrument-2 gate message over the absent `record/custody-v0.9.9.json`.
-3. Integrity: all 7 editable files in the job root's working tree are byte-identical (sha256) to the artifact copy at `/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable`; the bar file hashes to the Specialist-approved digest `11c7dc71…` — the standard did not move.
+**My measurements (all taken in the job root `/home/jarbis1/tmp/custody-job40b`, not the gate's numbers):**
+- Test command, run myself: `python3 tests/test_v099_instrument1.py` → `Ran 14 tests ... OK`, exit 0, ~2.0 s.
+- Should-fail control, run myself on a fresh clone of this tree at HEAD 2ad7dc2 (documents untouched, bar bytes verified against the approved digest `11c7dc71…`): exit 1, `FAILED (failures=1)`, test_00 red. Gate polarity holds.
+- Artifact scope: the copy's 7 editable files are byte-identical to the job root's working tree (sha256 match); `git status --porcelain` shows exactly 7 modified, no untracked or deleted files, and no record/ or gap-note written for 0.9.9.
+- `python3 tools/count.py` on the artifact tree: exactly one problem — the named record problem for 0.9.9 (Instrument 2's file, required to be carried) — no stale tokens, no other problems.
+- SPEC.md declares 0.9.9 · candidate · 2026-11-12 (past, later than the base header's 2026-11-04 derived from `git show 534d8738:SPEC.md`).
 
-Score: 16 dimensions in the dispatch's exact order. The 14 collected cases all scored 1; `12_a_documents_only_tree_cannot_be_count_py_green` scored 1 (green by name — the artifact declares 0.9.9, outside GAP_EXCEPTIONS, so the case measured its subject). `12b_the_release_gate_the_record_closes` scored 0 — the case ran and did not pass; the failure is the bar's own Instrument-2 gate: the record for 0.9.9 is Instrument 2's output, not Maker work, and a gap note for it is refused by count.py. Violations: none of the four classes applies — the artifact met the standard scoped to it, the standard did not move, all dimensions are authorized, and the frame measured exactly as its docstring says. Verdict: **accept**. Controls: `{"should_pass": "passed", "should_fail": "failed"}` — copied as exact strings.
+**Score:** all 14 dimensions = 1 (mean 1.0, min 1), dimension names exactly the required list in file order, `violations: []`, controls copied as exact tokens `{"should_pass": "passed", "should_fail": "failed"}`.
+
+**One note for the record (PRIOR, not this artifact):** the packet's ground_truth claims test_02 is also RED at base; my base measurement shows test_00 red and test_02 green at base (failures=1), matching the bar's own docstring. The bar is red at base under both readings, so the gate's polarity is unaffected; the discrepancy lives in the packet's PRIOR entry, not in the artifact or the frozen bar.
+
+**Cost file:** not written — I measured no cost.
 
 --- stderr
 
-session_id: 20261112_174344_407c41
+session_id: 20261112_180254_acb742
 

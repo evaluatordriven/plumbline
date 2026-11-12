@@ -1,53 +1,53 @@
 # Draft Note — v0.9.9 (candidate)
 
-This note describes one change: the version is cut across the seven release documents. No requirement
-moved, no field changed shape, and no file outside those seven was touched.
-
 ## 1. Hunk inventory (N6)
 
-Seven files moved, and nothing else:
+1. `CHANGELOG.md` (+18 -0) — the 0.9.9 entry, saying no requirement changed — `release mechanics`
+2. `CONTRIBUTING.md` (+8 -5) — retire the stale version token, carry the cadence amendment — `release mechanics`
+3. `DRAFT-NOTE.md` (+52 -49) — this note — `release mechanics`
+4. `README.md` (+1 -1) — the status line names the release — `release mechanics`
+5. `SPEC.md` (+1 -1) — the header, and the version example in the field table — `release mechanics`
+6. `examples/minimal/inputs.json` (+1 -1) — declare the release — `release mechanics`
+7. `examples/minimal/record.json` (+1 -1) — declare the release — `release mechanics`
 
-1. `SPEC.md` — the header's version and date, and the `specVersion` example value in section 4.
-2. `CHANGELOG.md` — this release's entry, added above the previous release's.
-3. `CONTRIBUTING.md` — the sentence that explains the earlier release's missing record now names that
-   release in words rather than by a version token, and the cadence sentence in "Releases" gains the
-   Owner's amendment.
-4. `README.md` — the status line.
-5. `DRAFT-NOTE.md` — this note.
-6. `examples/minimal/inputs.json` — `specVersion`, which must name the release.
-7. `examples/minimal/record.json` — `specVersion`, which must name the release.
+## 2. Record verdicts (G5.4)
 
-Line counts are not quoted: two of these changes re-wrap a paragraph, so a count would measure where the
-author's line broke rather than what moved. The diff against the base commit is the record.
-
-## 2. No verdict moved
-
-The reference checker, the schema, the fixtures and the test runner are the base commit's, byte for byte,
-so no record's reading can have changed: `examples/minimal/record.json` reads `OK` / `CL1`, and every
-fixture reads what it read before. The only bytes that differ between this tree and the base commit are
-the seven files in section 1.
+Run at the base commit and at this commit, comparing `(verdict, levelAchieved, failing requirements)`
+produced zero differences: no record's verdict changed, because no requirement changed. The minimal
+example reads `OK` / `CL1` at both commits, and every fixture still reads as its expected outcome says.
 
 ## 3. What changed and what did not
 
-The version moved and nothing else did. `SPEC.md`'s header names this release and carries a date later
-than the header it replaces; the example value in section 4 names the same release; `CHANGELOG.md` gains
-this release's entry; `README.md`'s status line names this release; this note describes it; and the two
-example files declare it. Every requirement row in SPEC.md section 5 is the base commit's, id for id and
-text for text, and section 4's field table is the base commit's cell for cell apart from the example
-value. Signing, the schema and the kept records are untouched.
+This release is documents only. The header of `SPEC.md` names the release and the field table of section 4
+follows it; nothing else in that document moved, and every requirement row is byte for byte the earlier
+release's. `CHANGELOG.md` carries the release's entry, which says no requirement changed.
+`CONTRIBUTING.md` stops naming the earlier release by a bare version token — the sentence still says
+which release shipped without a record, and where its note is kept — and its Releases section carries
+the cadence amendment. `README.md` states the new status, and both files under the minimal example
+declare the release. We deliberately left the verifier, the counting tool, the schema, the fixtures and
+everything under `record/` untouched.
 
 ## 4. Where to look hardest
 
-Two sentences carry the risk, because each states a fact a reader relies on and each is rewritten here.
-The first is in `CONTRIBUTING.md`: it explains that an earlier release shipped without a record. It no
-longer names that release by a version token — the repository's own agreement check refuses a current
-document that names a version other than this one — so it names the release in words and points at the
-note that explains it. A reviewer should check that the sentence still says which release it is about
-and where the note is kept. The second is the cadence sentence in the same document's Releases section,
-which now carries the Owner's amendment in the Owner's words; a reviewer should check that the amendment
-reads as a sentence in that section, not as a citation of one.
-## 5. What is not claimed
+The field table of `SPEC.md` section 4 is the place to look first. Its example cell is the only cell in
+that table a release may move, and here only the version token inside it moved: the prose around the
+token, the type cell, and the required cell are the earlier release's, word for word. Read
+`CONTRIBUTING.md`'s Releases section next, then the release's entry in `CHANGELOG.md`. Each states a
+claim a reviewer can check against the release's own documents, and none of them asks a reader to trust
+a claim the documents do not carry.
+## Hunk map
 
-This note makes no claim about code: no file outside the seven named in section 1 differs from the base
-commit, so nothing about a reader's behaviour, a fixture's reading or a record's verdict can have
-changed. Nothing here certifies the quality of any work; it says only which version this tree declares.
+Every hunk, by file. This release touches the documents named below and nothing else: no path the job
+freezes appears here, because no frozen path moved.
+
+| file | hunks | item |
+|---|---|---|
+| `CHANGELOG.md` | 1 | release mechanics |
+| `CONTRIBUTING.md` | 2 | release mechanics |
+| `DRAFT-NOTE.md` | 1 | release mechanics |
+| `README.md` | 1 | release mechanics |
+| `SPEC.md` | 2 | release mechanics |
+| `examples/minimal/inputs.json` | 1 | release mechanics |
+| `examples/minimal/record.json` | 1 | release mechanics |
+
+Total: 9 hunks across 7 files.

@@ -1,6 +1,6 @@
 {
-  "acceptedRound": null,
-  "accepted_round": null,
+  "acceptedRound": 1,
+  "accepted_round": 1,
   "artifact": {
     "base": "dd64e06 (job40-v099 worktree at /home/jarbis1/tmp/custody-job40; porcelain EMPTY at authoring except the untracked bar tests/test_v099_instrument1.py, copied in for this job and never committed)",
     "deliverable": "a work tree in which the release documents all name one release later than the base 0.9.8, dated later than the base header, with no RECORD-GAP note carrying the release's name; the requirement set unchanged; the two example files declaring the release; and all 14 collected cases of tests/test_v099_instrument1.py green. The Maker writes documents only. It does not write record/custody-v0.9.9.json: that file is Instrument 2's, and Instrument 2 is not this bar and not this job's Maker work.",
@@ -84,11 +84,11 @@
   "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
   "constitution_ref": "dot-plumbline/constitution.json",
   "constitution_version": "0.1.0",
-  "cost": 0.095788335,
+  "cost": 0.19263175000000002,
   "disposition": null,
   "disposition_state": "not_yet_given",
-  "endedAt": "2026-11-12T17:50:09+00:00",
-  "ended_at": "2026-11-12T17:50:09+00:00",
+  "endedAt": "2026-11-12T18:05:25+00:00",
+  "ended_at": "2026-11-12T18:05:25+00:00",
   "entry": "A",
   "escalation": {
     "carries": "shortfalls",
@@ -141,25 +141,22 @@
     "who": "plumbline-eval (model Evaluator seat)"
   },
   "finish": {
-    "accepted_round": null,
+    "accepted_round": 1,
     "best_round": 1,
     "cap": 2,
     "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
-    "cost": 0.095788335,
-    "ended_at": "2026-11-12T17:50:09+00:00",
-    "outcome": "needs_owner",
+    "cost": 0.19263175000000002,
+    "ended_at": "2026-11-12T18:05:25+00:00",
+    "outcome": "accepted",
     "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
     "rounds": 1,
     "rounds_sha256": [
-      "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
+      "d9bbfea41e00514d881b12e61c25684df7c72b72e847b8ae83eb700159c71d84"
     ],
-    "separation_gaps": [
-      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
-      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
-    ],
-    "started_at": "2026-11-12T17:40:37+00:00",
-    "stop": "scoring set",
-    "terminal_state": "needs_owner"
+    "separation_gaps": [],
+    "started_at": "2026-11-12T17:54:59+00:00",
+    "stop": "accepted",
+    "terminal_state": "accepted"
   },
   "ground_truth": [
     {
@@ -243,7 +240,7 @@
   },
   "mode": "scored",
   "notes": "WHY THIS JOB EXISTS. Job 35's run never finished: round 1 ended pass_rule regenerate, round 2 was killed and the loop stopped 'tampered', and emit_custody refuses its record with `[order] producedAt 20:35:43Z is after checks.at 20:12:33Z` because producedAt comes from packet.json ended_at, which the loop wrote after round 2. A fresh run that ACCEPTS and FILES gives Instrument 2 a producedAt that belongs to the artifact the checks measured. Job 35 is closed as incomplete and its packet and record dir are not reused. WHAT IS CARRIED FROM IT. Only the seven document files of its round-1 green tree, named as ground_truth and as the Maker's starting artifact at /home/jarbis1/tmp/plumbline-job35-tree; they are to be carried forward into this job's tree, not regenerated. The Maker starts from those bytes. THE BASE READING DISCREPANCY, disclosed: the bar's docstring (line 102) says 'exit 1, 1 RED \u2014 test_00 \u2014 and 13 GREEN'. The Architect measured, on this tree and these bytes, Ran 14 / FAILED (failures=2), with test_02 also red. The docstring is stale or was written for a different tree; the packet's ground_truth carries the measurement, not the docstring. The Architect does not reword the bar. THE BAR IS NOT TOUCHED: it is the Specialist-approved digest 11c7dc71\u2026, copied byte for byte, and it is frozen. If the bar is wrong, that is frame_at_fault and the Owner's, not a Maker edit. THE RECORD IS NOT MAKER WORK: record/custody-v0.9.9.json is Instrument 2's file; test_12/test_12b are Instrument 2's cases and are not in this job's 14. The instrument 2 holds the Maker bar clean of byte: route-eval's dimension list is derived by regex from `def test_` lines and yields the same 14.",
-  "outcome": "needs_owner",
+  "outcome": "accepted",
   "packetSha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
   "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
   "proposed": {
@@ -263,46 +260,40 @@
   "ratified": true,
   "rounds": 1,
   "roundsSha256": [
-    "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
+    "d9bbfea41e00514d881b12e61c25684df7c72b72e847b8ae83eb700159c71d84"
   ],
   "rounds_sha256": [
-    "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
+    "d9bbfea41e00514d881b12e61c25684df7c72b72e847b8ae83eb700159c71d84"
   ],
-  "separation_gaps": [
-    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
-    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
-  ],
+  "separation_gaps": [],
   "specialist": "Steve Moitozo II (S2) \u2014 the Specialist who approved the bar at sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16. Carried from the approval: this packet does not newly name a Specialist, and the Architect did not author the bar.",
   "stage": "revision",
   "standard_ref": {
     "doc": "tests/test_v099_instrument1.py",
     "version": "sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16 \u2014 the Specialist-approved digest, copied into /home/jarbis1/tmp/custody-job40 byte for byte; 14 collected cases, 2 uncollected Instrument 2 cases"
   },
-  "startedAt": "2026-11-12T17:40:37+00:00",
-  "started_at": "2026-11-12T17:40:37+00:00",
-  "stop": "scoring set",
+  "startedAt": "2026-11-12T17:54:59+00:00",
+  "started_at": "2026-11-12T17:54:59+00:00",
+  "stop": "accepted",
   "summary": {
-    "accepted_round": null,
+    "accepted_round": 1,
     "best_round": 1,
     "cap": 2,
     "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
-    "cost": 0.095788335,
-    "ended_at": "2026-11-12T17:50:09+00:00",
-    "outcome": "needs_owner",
+    "cost": 0.19263175000000002,
+    "ended_at": "2026-11-12T18:05:25+00:00",
+    "outcome": "accepted",
     "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
     "rounds": 1,
     "rounds_sha256": [
-      "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
+      "d9bbfea41e00514d881b12e61c25684df7c72b72e847b8ae83eb700159c71d84"
     ],
-    "separation_gaps": [
-      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
-      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
-    ],
-    "started_at": "2026-11-12T17:40:37+00:00",
-    "stop": "scoring set",
-    "terminal_state": "needs_owner"
+    "separation_gaps": [],
+    "started_at": "2026-11-12T17:54:59+00:00",
+    "stop": "accepted",
+    "terminal_state": "accepted"
   },
-  "terminalState": "needs_owner",
-  "terminal_state": "needs_owner",
+  "terminalState": "accepted",
+  "terminal_state": "accepted",
   "x": 10
 }

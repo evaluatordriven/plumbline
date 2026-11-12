@@ -1,27 +1,24 @@
 {
-  "accepted_round": null,
+  "accepted_round": 1,
   "best_round": 1,
   "cap": 2,
   "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
-  "cost": 0.095788335,
-  "ended_at": "2026-11-12T17:50:09+00:00",
+  "cost": 0.19263175000000002,
+  "ended_at": "2026-11-12T18:05:25+00:00",
   "filing": {
     "dest": "/home/jarbis1/plumbline-records/dot-plumbline/jobs/plumbline-job40-custody-v099",
-    "detail": "run-log: appended the filed row for plumbline-job40-custody-v099 (30 rows)\nfiled (job/custody): /home/jarbis1/plumbline-records/dot-plumbline/jobs/plumbline-job40-custody-v099  (30 files, packet sha256 3616aecdf4d1)",
+    "detail": "run-log: appended the filed row for plumbline-job40-custody-v099 (30 rows)\nfiled (job/custody): /home/jarbis1/plumbline-records/dot-plumbline/jobs/plumbline-job40-custody-v099  (31 files, packet sha256 a9381488426f)",
     "filed": true,
     "state": "custody"
   },
-  "outcome": "needs_owner",
+  "outcome": "accepted",
   "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
   "rounds": 1,
   "rounds_sha256": [
-    "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
+    "d9bbfea41e00514d881b12e61c25684df7c72b72e847b8ae83eb700159c71d84"
   ],
-  "separation_gaps": [
-    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
-    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
-  ],
-  "started_at": "2026-11-12T17:40:37+00:00",
-  "stop": "scoring set",
-  "terminal_state": "needs_owner"
+  "separation_gaps": [],
+  "started_at": "2026-11-12T17:54:59+00:00",
+  "stop": "accepted",
+  "terminal_state": "accepted"
 }

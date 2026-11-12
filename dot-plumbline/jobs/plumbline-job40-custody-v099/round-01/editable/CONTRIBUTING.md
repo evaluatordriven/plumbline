@@ -24,10 +24,11 @@ now refuses a release that neither carries a record nor declares its absence.
 
 ## Releases
 
-At most one release a month while the version starts with 0, quarterly after 1.0; a release that changes
-no requirement does not count toward the monthly cadence. Versions follow Semantic Versioning 2.0.0;
-`SPEC.md` section 8 says what counts as a major change. Every release is a git tag, and is cited by its
-commit.
+At most one release a month while the version starts with 0, quarterly after 1.0. Versions follow
+Semantic Versioning 2.0.0; `SPEC.md` section 8 says what counts as a major change. Every release is a
+git tag, and is cited by its commit.
+
+In the Owner's words: a release that changes no requirement does not count toward the monthly cadence.
 
 ## Before you open a pull request
 

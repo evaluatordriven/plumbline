@@ -373,10 +373,10 @@
       "kind": "job",
       "record_state": "custody",
       "kit_close": false,
-      "source": "/home/jarbis1/tmp/plumbline-job40-record-3",
-      "files": 30,
-      "packet_sha256": "3616aecdf4d1169e4ca926f2ec5d55a26282883a737d71fdb33a137e9d645c09",
-      "terminal_state": "needs_owner"
+      "source": "/home/jarbis1/tmp/plumbline-job40-record-4",
+      "files": 31,
+      "packet_sha256": "a9381488426fab403f1f33406edb21863403581d9cc257a3a4aa2c09a37c2360",
+      "terminal_state": "accepted"
     }
   ]
 }

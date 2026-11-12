@@ -1,10 +1,10 @@
 {
-  "artifact": "/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable",
-  "artifact_sha256": "f36e95229386918216bed929f90c9898452853dd84fa78ce5ef717d3b26ac6aa",
+  "artifact": "/home/jarbis1/tmp/plumbline-job40-record-4/round-01/editable",
+  "artifact_sha256": "edde03a6459a17e92acecb3b38a2a9fbf0e5bc1902292dfb58b110f4f05a4ed7",
   "gate": {
     "awaited_engine": {
       "reason": "engine exit record appeared",
-      "seconds": 139.451,
+      "seconds": 161.73,
       "waited": true
     },
     "changes": [
@@ -36,11 +36,11 @@
     "reason": "ok",
     "red": {
       "exit": 1,
-      "output_sha256": "5fbdb00c1d03ca91595d76f4950f408084ecd6a872e5dac6d98f9f055e597070"
+      "output_sha256": "4ca9afa05c2a9321bd7b0981b759f9608eacb7a43a1f898ff66a1c5c5f5e408b"
     },
     "rerun": {
       "exit": 0,
-      "output_sha256": "33fc1396e65c637838b7eb749768fd1a6d2478a4f2983524889cae1f831111e9"
+      "output_sha256": "5355186420a56799095b76d62f889860d80a6c1f7ab88b1c82fb3af4ed88e605"
     }
   },
   "round": 1
