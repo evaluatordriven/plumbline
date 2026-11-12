@@ -70,9 +70,19 @@ class FinishFilesItself(unittest.TestCase):
             summary, record_dir = _finish(tmp, into=repo)
             filing = summary.get("filing") or {}
             self.assertTrue(filing.get("filed"), "loop() returned without filing the job: %r" % (filing,))
-            name = os.path.basename(record_dir)
-            dest = os.path.join(repo, "jobs", name)
-            self.assertTrue(os.path.isdir(dest), "no filed folder at %s" % dest)
+            # Owner A (2026-11-12): id-less finish -> runs/finish-<started_at>, not jobs/<scratch>.
+            dest = str(filing.get("dest") or "")
+            self.assertTrue(dest and os.path.isdir(dest), "no filed folder at %s (filing=%r)" % (dest, filing))
+            self.assertTrue(
+                os.path.abspath(dest).startswith(os.path.abspath(os.path.join(repo, "runs")) + os.sep),
+                "id-less finish must land under runs/, got %r" % (dest,),
+            )
+            self.assertFalse(
+                os.path.abspath(dest).startswith(os.path.abspath(os.path.join(repo, "jobs")) + os.sep),
+                "id-less finish must not land under jobs/, got %r" % (dest,),
+            )
+            self.assertTrue(os.path.basename(dest).startswith("finish-"),
+                            "Owner A: dest basename is finish-<started_at>, got %r" % (os.path.basename(dest),))
             self.assertTrue(os.path.isfile(os.path.join(dest, "custody", "status.json")),
                             "the filed folder states no custody status")
             status = json.load(open(os.path.join(dest, "custody", "status.json")))
