@@ -1,0 +1,47 @@
+{
+  "artifact": "/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable",
+  "artifact_sha256": "f36e95229386918216bed929f90c9898452853dd84fa78ce5ef717d3b26ac6aa",
+  "gate": {
+    "awaited_engine": {
+      "reason": "engine exit record appeared",
+      "seconds": 139.451,
+      "waited": true
+    },
+    "changes": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
+    "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+    "dispatched": true,
+    "editable": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "passed": true,
+    "reason": "ok",
+    "red": {
+      "exit": 1,
+      "output_sha256": "5fbdb00c1d03ca91595d76f4950f408084ecd6a872e5dac6d98f9f055e597070"
+    },
+    "rerun": {
+      "exit": 0,
+      "output_sha256": "33fc1396e65c637838b7eb749768fd1a6d2478a4f2983524889cae1f831111e9"
+    }
+  },
+  "round": 1
+}

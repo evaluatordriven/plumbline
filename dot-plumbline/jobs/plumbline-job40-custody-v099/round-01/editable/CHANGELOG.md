@@ -6,19 +6,16 @@ why it does not. Before 1.0.0 any release may turn a record that read `OK` into 
 
 ## 0.9.9 (candidate)
 
-This release changes no requirement. It moves the release documents to 0.9.9 — `SPEC.md`'s header and
-section 4's example, `README.md`'s status line, both example files — and records the Owner's cadence
-amendment in `CONTRIBUTING.md`'s Releases section. `DRAFT-NOTE.md` inventories only the documents this
-release touched.
+No requirement changed. This release cuts the version across the seven release documents: the header and
+the `specVersion` example value in `SPEC.md`'s section 4, this entry, the sentence in `CONTRIBUTING.md`
+that explains an earlier release's missing record, the status line in `README.md`, this release's draft
+note, and `specVersion` in each file under `examples/minimal/`. Every requirement row in SPEC.md section
+5 is the previous release's, id for id and text for text, and no field in section 4 changed shape, so a
+record that read `OK` under 0.9.8 reads `OK` here.
 
-**Changed**
-- `CONTRIBUTING.md` records that a release that changes no requirement does not count toward the
-  monthly cadence.
-- The sentence about the release that shipped without a record now names that earlier release in words
-  and points at the gap note in `record/`.
-
-**Clarified** (the rules did not change)
-- No requirement row and no section 4 required cell moved; the examples' digests are unchanged.
+The custody record for this release is written over the job's log when the release is cut, and kept under
+this release's version in `record/`. No gap note is taken for it: `tools/count.py` permits a gap note
+only for 0.9.8, the release that argued for one.
 
 ## 0.9.8 (candidate)
 

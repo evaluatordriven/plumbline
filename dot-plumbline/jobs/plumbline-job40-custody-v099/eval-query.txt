@@ -1,0 +1,53 @@
+You are dispatched by the Orchestrator. This is not a chat.
+
+Job root: /home/jarbis1/tmp/custody-job40b
+Artifact under test: /home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable
+Turn file, with the gate's own numbers: /home/jarbis1/tmp/plumbline-job40-record-3/eval-turn.json
+Write the score JSON to: /home/jarbis1/tmp/plumbline-job40-record-3/eval-score.json
+Cost file, only if you measured a cost: /home/jarbis1/tmp/plumbline-job40-record-3/cost-01-eval-0.json
+
+Packet: /home/jarbis1/tmp/plumbline-job40/packet.job40.ratified.json
+Test command, run this yourself IN THE JOB ROOT before you score: python3 tests/test_v099_instrument1.py
+(the artifact copy holds only the editable file(s); the bar and the rest of the tree are in the job root)
+Frozen standard, read these files and no other bar:
+  tests/test_v099_instrument1.py
+  checker/check.py
+  tools/count.py
+  tools/check_verdicts.py
+  schema/custody-v1.schema.json
+  fixtures/expected.json
+  tests/example_version_check.py
+
+
+The gate's numbers in the turn file are the Orchestrator's, not your measurement. Score the artifact as you find it.
+
+The score object must have dimensions (name, score, observation), violations (class is one of artifact_missed_standard, standard_moved, dimension_unauthorized, frame_at_fault), verdict (accept, regenerate, needs_owner, reject), and controls {"should_pass": "passed", "should_fail": "failed"}.
+Those two control values are exact tokens. Copy them. Do not explain them, do not write none, and do not describe the suite in their place. Any other string fails the instrument even when every dimension is 1.
+Dimension names are fixed by the frozen tests, not chosen by you. Use one dimension per test method in the file the test command runs, named exactly the method name with the leading 'test_' removed, in file order. They are listed here so that nothing is inferred:
+  - 00_the_release_lands
+  - 01_spec_header_is_the_release_with_a_real_past_date
+  - 02_count_py_green_except_the_record
+  - 03_count_py_maker_problems_are_gone
+  - 04_every_example_declares_the_release
+  - 05_no_requirement_changed
+  - 06_cadence_amendment_and_the_no_requirement_claim
+  - 07_contributing_names_v098_and_carries_no_token_count_py_reads
+  - 08_readme_contributing_draft_note_are_consistent
+  - 09_every_current_document_is_clean
+  - 10_footprint_the_bar_writes_only_inside_its_own_temp_root
+  - 11_bytes_move_no_stored_record_changes_while_the_bar_runs
+  - 13_every_green_at_base_case_bites
+  - 14_the_version_is_read_from_the_document_and_never_from_a_flag
+  - 12_a_documents_only_tree_cannot_be_count_py_green
+  - 12b_the_release_gate_the_record_closes
+A name not on this list, or a different order, refuses the run.
+The controls are two STRINGS, not booleans: {"should_pass": "passed", "should_fail": "failed"}. `true`/`false` refuses the run.
+Every run of this job must produce the same dimension names; the Orchestrator compares runs by name, so a name you invent makes the two runs a split even when they agree.
+Do not edit the artifact. Do not invent a measurement. If you did not observe a dimension, do not score it.
+
+THE DISPATCH, RESTATED (these are absolute; use them exactly, and do not go looking for a relative packet.json):
+  job root   : /home/jarbis1/tmp/custody-job40b
+  artifact   : /home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable
+  turn file  : /home/jarbis1/tmp/plumbline-job40-record-3/eval-turn.json
+  score file : /home/jarbis1/tmp/plumbline-job40-record-3/eval-score.json
+Writing the score file is the act that ends this turn. Measured 2026-11-09: a turn read the frozen standard (84k tokens), ran the bar green in 3 s, then searched for packet.json relatively and ended with 'I was not provided with a valid job root' while no score file existed. The brief does not survive being buried under the standard, so it is restated here.

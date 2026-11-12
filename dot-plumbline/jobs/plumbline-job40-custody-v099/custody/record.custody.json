@@ -4,19 +4,19 @@
     {
       "name": "round-01/editable/CHANGELOG.md",
       "digest": {
-        "sha256": "94fa22658558ecb31e16c9042a697d59eba65f08b652962f731883ee460acb23"
+        "sha256": "9da66fd5fe043873c0fc634531ffbf65a1b93291bdd86f239b3d88014787b8fb"
       }
     },
     {
       "name": "round-01/editable/CONTRIBUTING.md",
       "digest": {
-        "sha256": "67a1415481e8904a8d4c0c831f9bbfc2605bf8afba74c0bc5e3a9673f6a6f499"
+        "sha256": "76d6bae11730cd0343e5363e29c97ae8bc1c164417fb5125052d40d3d9c79551"
       }
     },
     {
       "name": "round-01/editable/DRAFT-NOTE.md",
       "digest": {
-        "sha256": "c9c18404295222eec0d32aab5f7ec77a3e2301ea0bd1932f6f5df9ed7894f0d8"
+        "sha256": "fc3254845021e59987e9c3afa9a619b80fa8fd79600a53613895a60f84b3a5a9"
       }
     },
     {
@@ -65,8 +65,8 @@
       "method": null,
       "model": null
     },
-    "startedAt": "2026-11-12T17:09:25Z",
-    "producedAt": "2026-11-12T17:10:10Z",
+    "startedAt": "2026-11-12T17:40:37Z",
+    "producedAt": "2026-11-12T17:50:09Z",
     "instrument": {
       "rubric": null,
       "runner": null
@@ -80,7 +80,344 @@
         "script": null
       }
     ],
-    "checks": [],
+    "checks": [
+      {
+        "dimension": "00_the_release_lands",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "Ran the full bar in the job root: 'Ran 14 tests in 2.047s' — OK. All 14 collected cases green, no skip, no error; this case included.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "01_spec_header_is_the_release_with_a_real_past_date",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. Artifact SPEC.md line 3 reads 'Version 0.9.9 · candidate · 2026-11-12'; the bar accepts the header as the release with a real past date.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "02_count_py_green_except_the_record",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. The artifact tree's only count.py problem is the release record for 0.9.9 (no record/custody-v0.9.9.json and no permitted gap note); every other check count.py runs is green.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "03_count_py_maker_problems_are_gone",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. No maker-attributable count.py failure remains: no stale version token count.py reads, no refused release text, no cleanliness failure — only the record problem of case 02.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "04_every_example_declares_the_release",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. examples/minimal/inputs.json has specVersion \"0.9.9\" and examples/minimal/record.json has predicate.specVersion \"0.9.9\" — both declare the release (read in the artifact; also enforced by tests/example_version_check.py against SPEC.md's header).",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "05_no_requirement_changed",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. SPEC.md section 5's requirement rows match the base commit id-for-id and text-for-text; the release is a version cut, not a rule change.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "06_cadence_amendment_and_the_no_requirement_claim",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. CHANGELOG.md's 0.9.9 entry states 'No requirement changed'; CONTRIBUTING.md's Releases section carries the amended cadence sentence ('a release that changes no requirement does not count toward the monthly cadence') in place, reading as a sentence of the section.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "07_contributing_names_v098_and_carries_no_token_count_py_reads",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. CONTRIBUTING.md's missing-record sentence names the earlier release in words — 'The release before this one shipped without one — the gap note in `record/` says why' — and carries no version token count.py would treat as a stale reference.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "08_readme_contributing_draft_note_are_consistent",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. README.md's status line reads 'Status: v0.9.9, candidate'; DRAFT-NOTE.md inventories exactly the seven moved files; header, changelog, examples and note all name the same release.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "09_every_current_document_is_clean",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. The cleanliness pass over the current documents (verdict-tool and count.py cleanliness checks) reports nothing to fix in any document a reader touches today.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "10_footprint_the_bar_writes_only_inside_its_own_temp_root",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. The footprint check passed: the bar's writes stayed inside its own temp root; nothing outside it was created, moved or modified by the run.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "11_bytes_move_no_stored_record_changes_while_the_bar_runs",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. Digests of stored records (record/, fixtures/, checker outputs) are unchanged by the bar run; no kept record's bytes moved.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "13_every_green_at_base_case_bites",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. Every green-at-base check was shown to bite: planted defects at the base commit make each check fail, so the greens are earned, not vacuous.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "14_the_version_is_read_from_the_document_and_never_from_a_flag",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok. The bar parses the release version from SPEC.md's header; a flag-supplied version does not override it, and the checks keyed to the release held under that reading.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "12_a_documents_only_tree_cannot_be_count_py_green",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 1,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "ok when run by name (python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v): the artifact declares 0.9.9, outside count.py's GAP_EXCEPTIONS {0.9.8}, so the case measured its subject — the documents-only tree reports the record problem, a gap note for 0.9.9 is refused, record+gap-note together are refused, and with the record present the record problem clears.",
+          "at_source": "round-01.json:4"
+        }
+      },
+      {
+        "dimension": "12b_the_release_gate_the_record_closes",
+        "evaluator": "plumbline-eval via route-eval",
+        "run": 1,
+        "batch": null,
+        "at": "2026-11-12T17:50:09Z",
+        "outcome": null,
+        "score": 0,
+        "failureCondition": null,
+        "evidence": null,
+        "unobserved": null,
+        "x-plumbline": {
+          "round": 1,
+          "record": "round-01.json",
+          "pass_rule": null,
+          "verdict": "accept",
+          "stop": "scoring set",
+          "observation": "FAILED by name, with the bar's own predicted Instrument-2 gate message: count.py reports 'release 0.9.9 has no record/custody-v0.9.9.json and no record/RECORD-GAP-v0.9.9.md saying why'. The bar itself states this release cannot be count.py green until record/custody-v0.9.9.json exists, that the record is Instrument 2's output (the Orchestrator's kit/emit_custody.py over the job's log) and not Maker work, and that a gap note for 0.9.9 is refused by tools/count.py. This is the standard's own designed sequencing state for a documents-only artifact — the gate standing open for the record to close — not a Maker shortfall: the case is not collected in the bar's 14-case Maker run, its failure names 'not a Maker failure', and no file in the Maker's editable set failed anything. Recorded 0 because the case ran and did not pass.",
+          "at_source": "round-01.json:4"
+        }
+      }
+    ],
     "controls": [],
     "disagreements": [],
     "violations": [],
@@ -104,19 +441,25 @@
       },
       "terminal_state": "needs_owner",
       "outcome": "needs_owner",
-      "verdict": null,
-      "stop": "maker failed",
+      "verdict": "accept",
+      "stop": "scoring set",
       "round_count": 1,
       "rounds": [
         {
           "round": 1,
           "record": "round-01.json",
-          "sha256": "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+          "sha256": "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294"
         }
       ],
-      "evaluator_runs": [],
+      "evaluator_runs": [
+        {
+          "round": 1,
+          "exit": 0,
+          "output_sha256": "d84d4d0ed1c0b907db8d870a60c38c2570cd22cf4944ae1bba8044a26878ee02"
+        }
+      ],
       "spend": {
-        "rounds_cost_usd": 0.0,
+        "rounds_cost_usd": 0.095788,
         "source": "round-*.json cost"
       },
       "schema": "plumbline/x-plumbline/v1",
@@ -142,13 +485,45 @@
       "hand_times": [],
       "timeSources": {
         "startedAt": "packet.json:160",
-        "producedAt": "packet.json:91"
+        "producedAt": "packet.json:91",
+        "checks[0].at": "round-01.json:4",
+        "checks[1].at": "round-01.json:4",
+        "checks[2].at": "round-01.json:4",
+        "checks[3].at": "round-01.json:4",
+        "checks[4].at": "round-01.json:4",
+        "checks[5].at": "round-01.json:4",
+        "checks[6].at": "round-01.json:4",
+        "checks[7].at": "round-01.json:4",
+        "checks[8].at": "round-01.json:4",
+        "checks[9].at": "round-01.json:4",
+        "checks[10].at": "round-01.json:4",
+        "checks[11].at": "round-01.json:4",
+        "checks[12].at": "round-01.json:4",
+        "checks[13].at": "round-01.json:4",
+        "checks[14].at": "round-01.json:4",
+        "checks[15].at": "round-01.json:4"
       },
       "time_sources": {
         "startedAt": "packet.json:160",
-        "producedAt": "packet.json:91"
+        "producedAt": "packet.json:91",
+        "checks[0].at": "round-01.json:4",
+        "checks[1].at": "round-01.json:4",
+        "checks[2].at": "round-01.json:4",
+        "checks[3].at": "round-01.json:4",
+        "checks[4].at": "round-01.json:4",
+        "checks[5].at": "round-01.json:4",
+        "checks[6].at": "round-01.json:4",
+        "checks[7].at": "round-01.json:4",
+        "checks[8].at": "round-01.json:4",
+        "checks[9].at": "round-01.json:4",
+        "checks[10].at": "round-01.json:4",
+        "checks[11].at": "round-01.json:4",
+        "checks[12].at": "round-01.json:4",
+        "checks[13].at": "round-01.json:4",
+        "checks[14].at": "round-01.json:4",
+        "checks[15].at": "round-01.json:4"
       },
-      "emittedAt": "2026-11-12T17:10:10Z",
+      "emittedAt": "2026-11-12T17:50:09Z",
       "gaps": [
         {
           "field": "bar.digest",
@@ -206,8 +581,23 @@
           "hard": false
         },
         {
-          "field": "checks",
-          "reason": "the run's round records carry no evaluator reading",
+          "field": "checks.batch",
+          "reason": "the run's round records name no batch",
+          "hard": false
+        },
+        {
+          "field": "checks.failureCondition",
+          "reason": "the packet declares no per-dimension failure condition",
+          "hard": false
+        },
+        {
+          "field": "checks.outcome",
+          "reason": "the run's round records carry a score, not a custody outcome per dimension",
+          "hard": false
+        },
+        {
+          "field": "checks.evidence",
+          "reason": "the run wrote no evaluator evidence file",
           "hard": false
         },
         {

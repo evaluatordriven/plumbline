@@ -1,0 +1,2517 @@
+Warning: Input is not a terminal (fd=0).
+────────────────────────────────────────────────────────────────────────────────
+Warning: it's best to only add files that need changes to the chat.
+https://aider.chat/docs/troubleshooting/edit-errors.html
+Aider v0.86.2
+Model: deepseek/deepseek-v4-flash with diff edit format, infinite output
+Git repo: ../../custody/.git/worktrees/custody-job40b with 267 files
+Repo-map: using 512 tokens, auto refresh
+Added CHANGELOG.md to the chat.
+Added CONTRIBUTING.md to the chat.
+Added DRAFT-NOTE.md to the chat.
+Added README.md to the chat.
+Added SPEC.md to the chat.
+Added examples/minimal/inputs.json to the chat.
+Added examples/minimal/record.json to the chat.
+Added schema/custody-v1.schema.json to the chat (read-only).
+Added fixtures/expected.json to the chat (read-only).
+Added tests/test_v099_instrument1.py to the chat (read-only).
+Added tools/count.py to the chat (read-only).
+Added tools/check_verdicts.py to the chat (read-only).
+Added tests/example_version_check.py to the chat (read-only).
+Added checker/check.py to the chat (read-only).
+
+Initial repo scan can be slow in larger repos, but only happens once.
+Scanning repo:   0%|          | 0/267 [00:00<?, ?it/s]Scanning repo:  88%|████████▊ | 235/267 [00:00<00:00, 2305.23it/s]Scanning repo: 100%|██████████| 267/267 [00:00<00:00, 1032.70it/s]
+--------------------------------------------------------------------------------
+
+► THINKING                                                                      
+
+Let me work out what the seven documents need to say.                           
+
+I need to produce edits to seven files. Let me consider each.                   
+
+First, SPEC.md: header must be **Version 0.9.9 · candidate · <date>** with date 
+strictly later than 2026-11-04 and not in future. Current date is 2026-11-12.   
+Use 2026-11-12.                                                                 
+
+Also section 4's specVersion example must be 0.9.9. And test_01 checks the      
+section-4 row's example matches the header. Note test_05 requires the row's     
+prose around the version token to be unchanged (version tokens masked). So      
+change 0.9.8 to 0.9.9 in the specVersion row: "This document's version, e.g.    
+0.9.8" → "0.9.9".                                                               
+
+Also there might be other version tokens in SPEC.md? Let's grep mentally.       
+SPEC.md mentions "0.9.0"? Actually section 8 has "Before 1.0.0" etc. There's no 
+other 0.9.x token. Let me check: CL1-15 ... no. So only header and the          
+specVersion row.                                                                
+
+Wait — count.py scans current documents for \b[vV]?(0\.\d+\.\d+)\b and complains
+if != version. SPEC.md contains "0.9.8" only in the header and the specVersion  
+example. Both change. Good.                                                     
+
+CHANGELOG.md: the newest heading at top must be ## 0.9.9 (candidate). Currently 
+newest is ## 0.9.8 (candidate). We must not modify the existing 0.9.8 entry     
+(it's history). But we need a new entry for 0.9.9 that claims no requirement    
+changed. And test_06 checks CADENCE_CONTRADICTION_RE — no requirement id under  
+Breaking in that entry. So the 0.9.9 entry must say "no requirement changed" in 
+some phrasing.                                                                  
+
+But careful: the 0.9.8 entry below contains "Breaking ... - CL1-10: ..." but    
+CADENCE_CONTRADICTION_RE only applies to _changelog_entry(text, version) which  
+extracts text from the version heading to the next version heading. So the 0.9.9
+entry's own text only.                                                          
+
+Also count.py scans "current documents": current = [p for p in md if "record"   
+not in p.relative_to(ROOT).parts[:1] and p.name != "CHANGELOG.md"]. So          
+CHANGELOG.md is exempt from version token scanning. Good.                       
+
+But wait — test_09 measure_documents_clean scans CURRENT_DOCUMENTS = README,    
+CONTRIBUTING, DRAFT-NOTE, GOVERNANCE, SECURITY, NOTICE, PATENTS, SPEC +         
+examples. CHANGELOG not included. Good.                                         
+
+CONTRIBUTING.md: test_07 requires the gap sentence to keep naming which release 
+shipped without a record (0.9.8 or "the previous release" in words) and where   
+the note is, and it must carry no version token count.py reads as stale. Since  
+the release is now 0.9.9, the token 0.9.8 in CONTRIBUTING.md is a stale token   
+(count.py reads current documents; CONTRIBUTING.md's tokens must equal 0.9.9).  
+So the sentence must be rewritten to name the release in words: "The release    
+before this one shipped without a record — the gap note in record/ says why".   
+And test_07's check (c): claim found, named release found ("the release before  
+this one"), own_note absent, names_this_release False → no problem. Good.       
+
+Also test_07 checks the base sentences survive, with version tokens masked. It  
+compares the base CONTRIBUTING sentences to current ones. The base sentence     
+containing the fact is exempt. Other sentences must survive with version tokens 
+masked. So we must change only the fact-carrying sentence.                      
+
+Let me look at the base CONTRIBUTING.md text (which is the current one in the   
+chat):                                                                          
+
+                                                                                
+ A behavioral change to the checker, the fixtures or the schema is itself a     
+ job: the bar is frozen before the                                              
+ change, a reader who could not see the maker's answer reads it, and the        
+ release carrying it ships a record.                                            
+ Version 0.9.8 shipped without one — `record/RECORD-GAP-v0.9.8.md` says why —   
+ and `count.py` now refuses a                                                   
+ release that neither carries a record nor declares its absence.                
+                                                                                
+
+The fact sentence: "Version 0.9.8 shipped without one —                         
+record/RECORD-GAP-v0.9.8.md says why — and count.py now refuses a release that  
+neither carries a record nor declares its absence."                             
+
+Wait, sentences(text) joins lines. The paragraph is one unit (lines joined). So 
+the whole paragraph may be one "sentence" unit for carries_version_fact. Hmm,   
+sentences() flushes on blank lines and paragraphs. So the entire paragraph "A   
+behavioral change ... absence." is ONE unit. carries_version_fact matches if it 
+has "shipped without" and a release name and "record/" or RECORD-GAP. Yes.      
+
+Now test_07's (d) arm: for each base unit not carrying the fact, if its masked  
+version appears in now_units, fine. The paragraph carries the fact, so it's     
+exempt.                                                                         
+
+Now (a): survivors — any token in CONTRIBUTING.md != 0.9.9. After rewriting,    
+tokens: none (we remove both 0.9.8 tokens). But careful: masked comparison in   
+(d) for other units. Also TCC BY nothing.                                       
+
+But hold on — after the rewrite, does the paragraph still carry the fact? "The  
+release before this one shipped without a record — the gap note in record/ says 
+why — and count.py now refuses a release that neither carries a record nor      
+declares its absence." claims: "shipped without" ✓ (regex \bshipped without     
+(one|it|a record|its record)\b — "shipped without a record" ✓). names: "the     
+release before this one"? GAP_RELEASE_NAMED_RE = \b(the                         
+(previous|last|preceding|prior) release|release before                          
+(this|it))\b|\b0\.9\.[0-9]+\b. "the release before this one" → "release before  
+this" matches release before (this|it). ✓. where: "record/" ✓.                  
+
+test_08 requires CONTRIBUTING phrases: "a reader who could not see the maker's  
+answer reads it", "count.py`? now refuses", "ships a record". All survive.      
+
+Also test_08 checks CONTRIBUTING has no stale tokens via count.py (test_02/03)  
+and via measure_documents_clean? CONTRIBUTING isn't in CURRENT_DOCUMENTS... wait
+it is: CURRENT_DOCUMENTS = ("README.md", "CONTRIBUTING.md", "DRAFT-NOTE.md",    
+"GOVERNANCE.md", "SECURITY.md", "NOTICE", "PATENTS.md", "SPEC.md"). Yes         
+CONTRIBUTING is there. So no stale tokens anywhere in CONTRIBUTING.             
+
+Let me check other tokens in CONTRIBUTING: "Version 0.9.8" and                  
+"RECORD-GAP-v0.9.8.md". Those are the only ones. Good.                          
+
+README.md: **Status: v0.9.8, candidate.** → v0.9.9. test_08 regex               
+\*\*Status:\s*v?(\d+\.\d+\.\d+) must equal the release. Also README says "this  
+release's record claims CL1" (required phrase). Also "no reader panel, guide    
+tester or human reader". Keep. Also any other version tokens in README? record/ 
+mention? Let me scan README for 0.9 tokens: only the Status line I think. Also  
+"External evidence (CL1-15, CL3-3)" no versions. Good.                          
+
+DRAFT-NOTE.md: This is the release draft note. test_08:                         
+
+ • It must keep "Hunk inventory" and ## \d+\.\s numbered sections.              
+ • Its title line names the release: first = next(ln for ln in lines if         
+   ln.strip().startswith("#")), version_tokens of that line must equal the      
+   release (or be empty). Current title "# Draft Note — v0.9.8 (candidate)" →   
+   change to v0.9.9.                                                            
+ • stale = any version token in the whole doc != release → must be empty! Uh oh.
+   The current DRAFT-NOTE.md is full of tokens? Let's look: it mentions 0.9.8 in
+   "0.9.8 release entry", "bump specVersion to 0.9.8", "regenerate minimal      
+   record at 0.9.8". Also "da2a3dd..HEAD". Also "147 total". Version tokens:    
+   version_tokens finds \b[vV]?(0\.\d+\.\d+)\b. So "0.9.8" occurrences. All must
+   become 0.9.9 or be removed.                                                  
+
+Hmm. But test_05 doesn't apply to DRAFT-NOTE. test_08 requires DRAFT-NOTE names 
+the release and no stale tokens, and requires that                              
+measure_draft_note_claims_frozen return [] on a CUT tree.                       
+
+Wait — is this tree a "cut tree"? base_version from git = 0.9.8, and our version
+= 0.9.9, so version != base_v → CUT TREE arm: claims_frozen must == [] and      
+measure_document_consistency must == [].                                        
+
+So DRAFT-NOTE.md must not claim frozen paths in inventory lines. The current one
+lists checker/check.py, fixtures/expected.json, fixtures/generate.py,           
+tests/red_counts.py in the inventory → those would be reported. Also the hunk   
+map table lists checker/check.py, fixtures/..., tests/red_counts.py. Also prose 
+"tools/make_record.py" with change verbs ("bugs"? CHANGE_VERB_RE includes       
+"chang", "bump", "mov", "edit", "rewr", "modif", "updat", "regenerat", "total", 
+"hunk"). Note "hunk" is a change verb! So any prose line naming a frozen path   
+and containing "hunk" is reported. Careful.                                     
+
+Also FROZEN_DIRECTORIES includes "tools/", so "tools/make_record.py" in prose   
+with a change verb is reported. In the current DRAFT-NOTE, lots of prose about  
+tools/make_record.py, e.g. "The largest surface area and highest risk sit in    
+tools/make_record.py (hunks 11–16 ...)" — contains "hunk" and a backticked      
+frozen path? _frozen_in grabs backticked tokens; tools/make_record.py is        
+backticked → frozen. And "hunks" → CHANGE_VERB_RE matches "hunk". So reported.  
+
+So the new DRAFT-NOTE must be rewritten substantially: inventory only of the    
+seven documents we edit, and prose that names no frozen path with a change verb.
+Also avoid naming frozen paths in prose with change verbs; discussing them      
+without change verbs is OK but risky — better to avoid entirely.                
+
+Also note measure_draft_note_claims_frozen is called by                         
+measure_document_consistency and also directly in test_08. And there's a        
+subtlety: _frozen_in matches bare tokens                                        
+(?:checker|fixtures|schema|tools|tests)/[\w./-]+. So avoid those prefixes       
+entirely in DRAFT-NOTE.                                                         
+
+Also test_08 for README/CONTRIBUTING/DRAFT-NOTE required phrases: DRAFT-NOTE    
+needs "Hunk inventory" (case-insensitive) and ## \d+\.\s. Note: if I write "Hunk
+inventory" as a heading "## 1. Hunk inventory (N6)" that satisfies both. But    
+careful: the HUNK_MAP_ROW_RE and inventory regex; fine.                         
+
+Wait, careful: the required phrase for DRAFT-NOTE is regex Hunk inventory re.I. 
+Fine.                                                                           
+
+But also careful about the "hunk" change verb in prose lines — a line with "Hunk
+inventory" has no frozen path, so hits is empty → skipped. Good.                
+
+Hmm, but what about the heading "## Hunk map" — no frozen path on that line.    
+Fine. But table rows | \README.md` | 2 | 1 |` — README.md is not frozen. Only   
+paths starting with checker/, fixtures/, schema/, tools/, tests/ or exactly     
+FROZEN_PATHS. README.md, CHANGELOG.md, DRAFT-NOTE.md, SPEC.md, CONTRIBUTING.md, 
+examples/minimal/inputs.json, examples/minimal/record.json are all safe. Good.  
+
+So the new DRAFT-NOTE inventories only the seven documents. Good — DRAFT-NOTE   
+itself is one of them.                                                          
+
+Now, also measure_document_consistency calls measure_draft_note_claims_frozen   
+and requires the whole thing [] on a cut tree.                                  
+
+Also note: on a cut tree the test also asserts problems == [] from              
+measure_document_consistency. problems include version token checks for         
+README/CONTRIBUTING/DRAFT-NOTE required phrases, README status, DRAFT-NOTE      
+title, DRAFT-NOTE stale tokens, and frozen claims.                              
+
+Examples: examples/minimal/inputs.json specVersion → "0.9.9". And record.json   
+specVersion → "0.9.9".                                                          
+
+But wait: record.json is a built record with digests. test_09                   
+measure_example_digests verifies every digest in record.json against files under
+examples/minimal/. Changing specVersion only doesn't affect digests (digests are
+of memo.md, bar.md, etc.). But tools/check_verdicts.py is run over              
+examples/minimal/record.json?? Let's check: measure_example_digests runs        
+tools/check_verdicts.py with cwd=root. check_verdicts uses tools/verdicts.json  
+rows. If the examples/minimal/record.json specVersion is 0.9.9 but... the       
+checker doesn't check specVersion against SPEC.md (cr2 only requires it be a    
+str). The verdict table row for examples/minimal/record.json expects OK/CL1.    
+Changing specVersion doesn't change verdict. OK.                                
+
+Hmm, but does check_verdicts.py also check record coverage of record/*.json? It 
+iterates records.glob("*.json") in record/ dir. The fixture expected lists      
+records under record/. Let me see: "record/custody-v0.9.8.json"? We can't see   
+record/. But test_11 says there are stored records under record/. check_verdicts
+is already green presumably at base (test_09 green at base). Adding nothing to  
+record/ keeps it green. Good.                                                   
+
+Also measure_documents_clean for the JSON examples checks specVersion field     
+equals release. Good.                                                           
+
+Now also test_02: count.py must report zero problems except the missing-record  
+problem for 0.9.9. count.py scans current docs for stale tokens. After my edits:
+SPEC.md tokens all 0.9.9; README 0.9.9; CONTRIBUTING none; DRAFT-NOTE 0.9.9     
+(only); GOVERNANCE/SECURITY/NOTICE/PATENTS — do they carry 0.9.x tokens?        
+Presumably not (test at base passes). schema file scanned too — no 0.9 tokens   
+presumably.                                                                     
+
+Wait: count.py's current scan includes ROOT/"schema"/"custody-v1.schema.json".  
+It contains 0.9.8? Let me check the schema provided: in external.requirement    
+description: "CL2-4 is the 0.x name of CL1-15, accepted until 1.0.0." That's    
+"0.x" not a token. Anything else? I don't see 0.9.8 in the schema. Good.        
+
+Also count.py checks: "the release SPEC.md names is the newest entry in         
+CHANGELOG.md" ✓, "has a record or a RECORD-GAP note" → will report missing      
+record (expected, that's Instrument 2's). test_02 requires exactly that one     
+problem present, and others absent. Also "for gap in                            
+record.glob(RECORD-GAP-v*.md)": it reports a problem if the gap note's version  
+not in GAP_EXCEPTIONS. record/RECORD-GAP-v0.9.8.md exists and 0.9.8 IS in       
+GAP_EXCEPTIONS → no problem. Good.                                              
+
+Also count.py checks README claims levels: for level in set(re.findall(r"claims 
+(CL[123]|baseline)\b", readme)) - recorded. README says "this release's record  
+claims CL1". Is CL1 in recorded (levels claimed by records in record/)? record/ 
+surely has custody-v0.9.8.json claiming... hmm. At base this passes, so CL1 is  
+recorded. We don't change that. But we do add a new release; still same README  
+sentence. Fine.                                                                 
+
+Also count.py checks: for each record in record/, if named custody-vX.json and X
+!= version → continue (history). Good.                                          
+
+Also count.py checks README.md does not state the record's claimed level for    
+records not named with an earlier version... The record/custody-v0.9.8.json is  
+named with 0.9.8 != 0.9.9 → continue. Fine, and base already green.             
+
+Also count.py agreement: "versions... README.md claims no level that no record  
+supports". OK.                                                                  
+
+Now: count.py also checks DRAFT-NOTE? No. Only README and SPEC for checker      
+counts.                                                                         
+
+Now the CHANGELOG addition. test_06 uses _changelog_entry(text, "0.9.9") which  
+grabs from the heading to the next version heading. Must contain a cadence claim
+and no breaking requirement bullets.                                            
+
+Also test_00 requires newest changelog heading == 0.9.9. The first              
+^#{0,3}\s*(\d+\.\d+\.\d+)\b match in the file. Note the file begins "#          
+Changelog" then "## 0.9.8 (candidate)". We'll insert "## 0.9.9 (candidate)"     
+above it.                                                                       
+
+Careful: is there any 0.9.9 reference already in CHANGELOG? No.                 
+
+Also note test_03 requires the gap-not-permitted problem absent and stale token 
+gone. Fine.                                                                     
+
+Now the SPEC.md date: 2026-11-12 (today, not in future) and strictly later than 
+2026-11-04. Good. Let me use 2026-11-12.                                        
+
+Hmm, but the job says the carried-forward artifact from job35 tree already says 
+0.9.9. I can't read it (not in the chat). I'll write the content myself.        
+
+Now let me also double-check test_01: measure_header requires section-4 example 
+equals declared version; CHANGELOG newest == declared; date not future and      
+strictly later than BASE_HEADER_DATE (2026-11-04, literal in the test). ✓.      
+
+test_05: measure_spec_change — needs git show base SPEC.md; compares section 5  
+rows text (must be identical), section 4 field rows cell by cell (except        
+specVersion's last cell with version tokens masked; and required-cell answer).  
+And the rest of the text with header and specVersion example masked must be     
+identical. So: DO NOT change any other text in SPEC.md. So my only SPEC.md      
+edits: header line (version + date), and the specVersion row's 0.9.8 → 0.9.9.   
+
+Careful with _spec_body_without_header: it masks the header line and masks the  
+specVersion row's last cell with _body_without_versions. The rest compared. If I
+only change those, identical. ✓                                                 
+
+But careful: HEADER_RE.sub("**Version <removed>**", text, count=1) — the header 
+line is **Version 0.9.8 · candidate · 2026-11-04** · Predicate type .... So     
+HEADER_RE matches **Version 0.9.8 · candidate · 2026-11-04** and replaces it    
+with **Version <removed>**; the rest of the line stays. Since I keep status     
+"candidate" and only change digits/date, the masked body is unchanged. ✓        
+
+Now, does anything else in SPEC.md need to change for other tests? test_09 scans
+SPEC.md for stale tokens — none after edit.                                     
+
+Now let me write the CHANGELOG entry. It must:                                  
+
+ • Say the release changed no requirement, in a recognized phrasing.            
+ • Not have a requirement id bullet under Breaking.                             
+
+Also test_06's CADENCE_CONTRADICTION_RE =                                       
+\*\*Breaking\*\*[^\n]*\n(?:[^\n]*\n){0,40}?[ \t]*(?:-|•|\*)[                    
+\t]*(?:CL[123]|CR|BL)-\d+ — so avoid "Breaking" entirely in the 0.9.9 entry.    
+
+Entry content: documents-only release: version bumped across the seven release  
+documents, no requirement changed, no record here (Instrument 2 writes it).     
+Careful: don't claim a requirement changed. Also the cadence claim patterns     
+include \bno requirement (changed|changes|...)\b. I'll write "No requirement    
+changed."                                                                       
+
+Let me draft:                                                                   
+
+                                                                                
+ ## 0.9.9 (candidate)                                                           
+                                                                                
+ **No requirement changed.** This release cuts the version across the seven     
+ release documents — `SPEC.md`,                                                 
+ `CHANGELOG.md`, `CONTRIBUTING.md`, `README.md`, `DRAFT-NOTE.md` and the two    
+ example files under                                                            
+ `examples/minimal/` — and changes nothing the specification requires. No       
+ requirement row in SPEC.md                                                     
+ section 5 moved, no section-4 field changed shape, and the reference checker,  
+ the schema and the fixtures                                                    
+ are untouched: a record that read `OK` under 0.9.8 reads `OK` here.            
+                                                                                
+ **Record.** This release ships its custody record: the record is written under 
+ `record/` for the tag, and                                                     
+ `record/RECORD-GAP-v0.9.8.md` stays where it is as the note for the earlier    
+ release that the exception                                                     
+ allowed. No gap note is taken for this release.                                
+                                                                                
+ **Carried forward** (unfinished at 0.9.8)                                      
+ - CL1-10 remains open from the stranger test.                                  
+                                                                                
+
+Hmm wait: careful about 0.9.8 tokens in CHANGELOG — CHANGELOG is exempt from    
+count.py's version scan and from test_09's document list. But test_06's entry   
+text is only the 0.9.9 section; the 0.9.8 tokens are in the 0.9.9 entry. Does   
+any check flag that? _changelog_entry text → CADENCE_CLAIM_PATTERNS and         
+contradiction regex. 0.9.8 fine.                                                
+
+But hmm — does count.py check anything about CHANGELOG besides newest heading?  
+newest = re.search(r"^#{0,3}\s*(\d+\.\d+\.\d+)", CHANGELOG) — first match must  
+be 0.9.9. ✓.                                                                    
+
+Careful about "Record." heading — fine.                                         
+
+Hmm, but do I want to claim "this release ships its custody record"? test_00    
+checks no gap note exists for 0.9.9; that's it. The record doesn't exist yet    
+(Instrument 2). The DRAFT-NOTE/README may say it exists. test_08 README phrase  
+"this release's record claims CL1" — keep it. Fine, README already says that at 
+base with v0.9.8. Hmm, at base README's record is record/custody-v0.9.8.json    
+presumably. If I bump status to v0.9.9 while the record for 0.9.9 doesn't exist 
+yet... count.py: for level in set(re.findall(r"claims (CL[123]|baseline)\b",    
+readme)) - recorded — CL1 recorded by an existing record (0.9.8). ✓ passes.     
+test_08 requires the phrase to exist. OK.                                       
+
+Careful not to state something that conflicts with count.py. count.py doesn't   
+check that.                                                                     
+
+Let me be careful about claiming the record ships. It's a candidate; README says
+"Each release carries its own custody record in record/, kept with that         
+release's tag; this release's record claims CL1". Keep that as is. In CHANGELOG 
+I'll say the record is Instrument 2's work and is written when the release is   
+cut. Hmm, but "No requirement changed" is the required claim. Let me phrase     
+precisely and honestly.                                                         
+
+Actually maybe keep CHANGELOG entry minimal and safe:                           
+
+                                                                                
+ ## 0.9.9 (candidate)                                                           
+                                                                                
+ **No requirement changed.** This release cuts the version across the seven     
+ release documents and moves                                                    
+ nothing else: `SPEC.md`'s header and the `specVersion` example in its section  
+ 4, the `CHANGELOG.md`                                                          
+ entry below, the stale-stamp sentence in `CONTRIBUTING.md`, the status line in 
+ `README.md`, this                                                              
+ release's draft note, and `specVersion` in the two example files under         
+ `examples/minimal/`. No                                                        
+ requirement in SPEC.md section 5 changed, no section-4 field changed its       
+ shape, and the reference                                                       
+ checker, the schema, the fixtures and the tests are untouched, so a record     
+ that read `OK` under 0.9.8                                                     
+ reads `OK` under 0.9.9.                                                        
+                                                                                
+
+Wait, 0.9.8 token in this entry — fine.                                         
+
+But careful: "the stale-stamp sentence in CONTRIBUTING.md" — hmm,               
+CONTRIBUTING.md contains "Version 0.9.8" — no, we rewrite it. In the changelog I
+can describe it.                                                                
+
+Then maybe add a second paragraph about the record:                             
+
+                                                                                
+ **Record.** The custody record for this release is Instrument 2's work: it is  
+ written over the job's log                                                     
+ when the release is cut, and no gap note is taken for 0.9.9 — the exception in 
+ `GAP_EXCEPTIONS` names                                                         
+ the release before this one.                                                   
+                                                                                
+
+That's fine.                                                                    
+
+Hmm, one more: test_06 also requires the Releases section of CONTRIBUTING to    
+carry the Owner's cadence amendment verbatim: "a release that changes no        
+requirement does not count toward the monthly cadence". At base, is it present? 
+test_06 is green at base... Let me check the base clause: if uncut, it asserts  
+the problems mention "no entry for" or "does not say the release changed no".   
+Hmm, at base the newest changelog entry is 0.9.8, version 0.9.8, so uncut is    
+True → only asserts some problem exists. Then it plants the amendment into a    
+copy by replacing "At most one release a month while the version starts with 0" 
+and asserts measure_cadence reports no "amendment" problem. That works          
+regardless of whether the subject carries the amendment because the plant       
+inserts it.                                                                     
+
+But once cut, self.assertEqual(problems, [], "\n".join(problems)) for           
+measure_cadence(self.subject), which requires the amendment in the Releases     
+section AND the changelog claim. So I MUST insert the amendment into            
+CONTRIBUTING.md's Releases section!                                             
+
+Let me re-read: CONTRIBUTING Releases section:                                  
+
+                                                                                
+ ## Releases                                                                    
+                                                                                
+ At most one release a month while the version starts with 0, quarterly after   
+ 1.0. Versions follow                                                           
+ Semantic Versioning 2.0.0; `SPEC.md` section 8 says what counts as a major     
+ change. Every release is a                                                     
+ git tag, and is cited by its commit.                                           
+                                                                                
+
+No amendment present at base. So I must add it. The amendment text: "a release  
+that changes no requirement does not count toward the monthly cadence". It's    
+matched with carried_verbatim, which tolerates wrapping. So I can add: "A       
+release that changes no requirement does not count toward the monthly cadence." 
+— note case: carried_verbatim checks needle in " ".join(haystack.split()) —     
+case-sensitive! The needle is lowercase "a release that changes no              
+requirement...". If I capitalize "A release...", the substring won't match!     
+
+Hmm. Careful. carried_verbatim(releases, CADENCE_AMENDMENT) → if needle in "    
+".join(haystack.split()). Case-sensitive. So I need the exact lowercase string  
+somewhere. That means the sentence must start lowercase, or be embedded         
+mid-sentence.                                                                   
+
+So write: "At most one release a month while the version starts with 0,         
+quarterly after 1.0: a release that changes no requirement does not count toward
+the monthly cadence."                                                           
+
+That embeds the amendment lowercase mid-sentence. But careful with the second   
+reading (joined with newlines replaced): the first check needle in "            
+".join(haystack.split()) normalizes all whitespace to single spaces, so wrapping
+is fine.                                                                        
+
+But wait — does inserting this break test_07's (d) arm? Sentence-level          
+comparison. The base has the paragraph:                                         
+
+"At most one release a month while the version starts with 0, quarterly after   
+1.0. Versions follow Semantic Versioning 2.0.0; SPEC.md section 8 says what     
+counts as a major change. Every release is a git tag, and is cited by its       
+commit."                                                                        
+
+sentences() flushes at blank lines and headings; so the Releases section body:  
+lines joined → one unit starting "At most one release a month...".              
+UNSTABLE_PREFIXES includes "At most one release a month". So in the (d) arm, for
+base units starting with that prefix, it checks head = " ".join(s.split()[:8]) =
+"At most one release a month while the version starts" and requires head in     
+_body_without_versions(n) for some now unit. If I edit that sentence, the head  
+must survive: "At most one release a month while the version starts with 0,     
+quarterly after 1.0: a release that ..." — head is "At most one release a month 
+while the version starts" (8 words: At(1) most(2) one(3) release(4) a(5)        
+month(6) while(7) the(8)) → present. ✓                                          
+
+Hmm wait: " ".join(s.split()[:8]) on the base sentence gives "At most one       
+release a month while the version starts" — yes 8 tokens: At, most, one,        
+release, a, month, while, the. And the new text contains that exact substring. ✓
+
+Now, also: does sentences() treat the Releases body as one unit including       
+"Versions follow..." and "Every release..."? Those are separate lines in the    
+same paragraph; sentences() joins consecutive non-blank lines into one buf → so 
+the entire paragraph is ONE unit: "At most one release a month ... cited by its 
+commit."                                                                        
+
+So the unit starts with "At most one release a month" → prefix → only head      
+check. Good.                                                                    
+
+Now, careful: the base unit for that paragraph — does it carry a version fact?  
+No. Good.                                                                       
+
+Wait, but is UNSTABLE_PREFIXES checked before the general loss check? Yes:      
+
+                                                                                
+ for s in base_units:                                                           
+     if s in base_fact_units or masked in masked_now: continue                  
+     if any(f in s for f in base_fact_units): continue                          
+     if any(s.startswith(u) for u in UNSTABLE_PREFIXES):                        
+         head = ...                                                             
+         if not any(head in _body_without_versions(n) for n in now_units):      
+ lost.append(s)                                                                 
+         continue                                                               
+     lost.append(s)                                                             
+                                                                                
+
+Only the paragraph starting "At most one release a month" is protected.         
+"Versions follow Semantic Versioning" and "Every release is a git tag" are      
+prefixes too, but they're in the same unit so not separately needed... unless a 
+blank line separates them. In CONTRIBUTING they're one paragraph. Fine.         
+
+Hmm, but wait: masked_now is computed from now_units. If I modify the paragraph 
+by inserting the amendment, _body_without_versions(s) for the base paragraph    
+won't match now. Then the UNSTABLE_PREFIXES branch applies. head survives. ✓    
+
+But there's also the sentence-level check on other units. Which base units are  
+there? Everything else must be preserved with version tokens masked. So my edits
+to CONTRIBUTING must be confined to the fact paragraph and the Releases         
+paragraph.                                                                      
+
+Careful: sentences() also treats lines starting with "|" or "-" as standalone   
+units, and "```" etc. Fine, we don't change those.                              
+
+Now the fact paragraph rewrite. The base paragraph is:                          
+
+"A behavioral change to the checker, the fixtures or the schema is itself a job:
+the bar is frozen before the change, a reader who could not see the maker's     
+answer reads it, and the release carrying it ships a record. Version 0.9.8      
+shipped without one — record/RECORD-GAP-v0.9.8.md says why — and count.py now   
+refuses a release that neither carries a record nor declares its absence."      
+
+Wait — is this one paragraph (no blank line)? Yes, three lines forming one      
+paragraph. So it's ONE unit, and it carries the fact (contains "shipped without 
+one", "0.9.8", "record/").                                                      
+
+Hmm — careful: it's one unit, so base_fact_units includes the whole thing. It's 
+exempt from (d).                                                                
+
+Now rewriting: I need to remove both 0.9.8 tokens. The job description says     
+"CONTRIBUTING.md keeps naming 0.9.8 as the release that shipped without a record
+(that is a past fact, not this release), and carries no version token that      
+count.py reads as a stale current-version token." Those two are in tension:     
+count.py refuses any 0.9.x token != current version in current documents. So    
+naming 0.9.8 as a literal is impossible. Hence name it in words — exactly as    
+test_07's honest_rewrite does: "The release before this one shipped without one 
+— the gap note in record/ says why — and count.py now refuses ...".             
+
+Note test_07's honest_rewrite: para.replace(f"Version {GAP_EXCEPTION_VERSION}   
+shipped without one", "The release before this one shipped without one") and    
+para.replace(f"record/RECORD-GAP-v{GAP_EXCEPTION_VERSION}.md", "the gap note in 
+record/"). And then asserts measure_stale_stamp(cleared) == []. So this exact   
+rewrite is known to pass. I'll use exactly that wording.                        
+
+So the destination CONTRIBUTING fact paragraph becomes:                         
+
+"A behavioral change to the checker, the fixtures or the schema is itself a job:
+the bar is frozen before the change, a reader who could not see the maker's     
+answer reads it, and the release carrying it ships a record. The release before 
+this one shipped without one — the gap note in record/ says why — and count.py  
+now refuses a release that neither carries a record nor declares its absence."  
+
+Now, does count.py flag "0.9" tokens in CONTRIBUTING? None left. ✓              
+
+But hold on: test_07's (c) arm with own_note absent and named="the release      
+before this one" → names_this_release = named.group(0).find(version) >= 0,      
+version="0.9.9", group(0)="the release before this one" → find returns -1 →     
+False. And named is not None, so not the first branch; elif names_this_release  
+and not own_note → False. No problem. ✓                                         
+
+Also test_07 (b): now_fact must exist; the rewritten paragraph carries the fact.
+flat_now = " ".join(now_fact); GAP_RELEASE_NAMED_RE matches "release before     
+this"; GAP_NOTE_NAMED_RE matches "record/". ✓                                   
+
+Now README.md. Change the status line. Also, does README carry any other stale  
+token? Let me check the README text for 0.9.: "Status: v0.9.8, candidate." —    
+only. And "record/RECORD-GAP..."? No.                                           
+
+Hmm, wait: README says "No signing tool ships here yet". Fine.                  
+
+Also test_08's README required phrases: "this release's record claims CL1", "no 
+reader panel, guide tester or human reader", "## Quickstart". Keep them. The    
+sentence "This release had no reader panel, guide tester or human reader. Its   
+record says so." — keep. Hmm, that's a limitation bullet. Keep as is.           
+
+So README: **Status: v0.9.8, candidate.** → **Status: v0.9.9, candidate.**.     
+
+Is there anything in README's limitations that must be updated? "Each release   
+carries its own custody record in record/, kept with that release's tag; this   
+release's record claims CL1, and states why not higher." Fine.                  
+
+Now DRAFT-NOTE.md — full rewrite. Let me design it.                             
+
+Requirements:                                                                   
+
+ 1 First heading line names the release: "# Draft Note — v0.9.9 (candidate)".   
+ 2 Contains "Hunk inventory" (case-insensitive) and at least one ## \d+\.\s     
+   heading.                                                                     
+ 3 No version token other than 0.9.9 anywhere (version_tokens regex             
+   \b[vV]?(0\.\d+\.\d+)\b). Careful: avoid writing 0.9.8 anywhere, and avoid    
+   2.0.0? Hmm! \b[vV]?(0\.\d+\.\d+)\b only matches tokens starting with 0. So   
+   4.0? no. 4,500 no. But watch out for things like "0.9.9" only. Also avoid    
+   "2.0.0"? It doesn't match (starts with 2). OK.                               
+   But careful: avoid other 0.x.y tokens like "0.1.0".                          
+ 4 measure_draft_note_claims_frozen must return []. So no line may name a frozen
+   path (checker/, fixtures/, schema/, tools/, tests/ prefixes, or the          
+   FROZEN_PATHS) in an inventory line or hunk-map row, and no prose line may    
+   name a frozen path together with a change verb.                              
+   Simplest: never write a path under checker/, tools/, fixtures/, schema/,     
+   tests/ in DRAFT-NOTE.md at all. Also, hmm — the phrase "tests/" appears in   
+   prose? Avoid. I'll avoid all of those prefixes and words like "tests".       
+   Careful: "the reference checker" in prose — "checker" alone isn't a path     
+   (needs checker/). But CHANGE_VERB_RE... "checker" doesn't match a frozen path
+   token. Safe. But to be safe, avoid it anyway? It's fine: _frozen_in requires 
+   token == FROZEN_PATHS entry or startswith a FROZEN_DIRECTORIES prefix.       
+   "checker" doesn't start with "checker/". Safe.                               
+ 5 Prose must not name a frozen path with a change verb. Since we avoid frozen  
+   paths entirely, fine.                                                        
+
+Also note: the inventory line regex ^\d+\.\s+[^`]+`` — inventory lines are      
+numbered list items starting with a backticked path. Only for lines that also   
+have frozen hits, so safe.                                                      
+
+Let me also be careful: measure_document_consistency for DRAFT-NOTE checks first
+heading line tokens. "v0.9.9" → version_tokens finds "0.9.9" ✓ equals release.  
+
+Now write the draft note consistent with reality: 7 documents changed. Hunks:   
+let me keep it honest but not overly precise about +/- counts? The job caveat   
+says correct inventory numbers to the actual git diff --stat. I cannot run git. 
+Hmm.                                                                            
+
+Do any tests check the counts? measure_draft_note_claims_frozen HUNK_MAP_ROW_RE 
+requires | \path` | \d+ |shape for the hunk map. The +/- counts in the numbered 
+inventory are not checked. So I can omit counts or keep them approximate. But   
+accuracy matters for the document's own integrity... The job says "If test_08 or
+test_09 rejects them, correct the inventory numbers". They won't be rejected.   
+But better to be honest. I don't know exact line counts. I could write the      
+inventory without +/- counts? The convention in the base note is1. path (+n -m) 
+— description`. Removing counts would be odd.                                   
+
+I'll include approximate counts? That risks being wrong. Hmm. Alternatively,    
+phrase the inventory without counts: "1. SPEC.md — the header and section 4's   
+example value". That's honest and avoids fabricated numbers. But the hunk map   
+table has a "hunks" column with integer counts — also unverifiable.             
+
+Let me think about what's defensible: the document is a draft note for          
+reviewers. Stating invented line counts is worse than omitting them. But the    
+bar's required phrase is just "Hunk inventory" and a numbered section. I'll     
+write the inventory as a numbered list with a short description of what moved in
+each file, without fabricated +/- numbers, and a summary table without hunk     
+counts (or with counts of files). Hmm, the table is optional.                   
+
+Actually, I can reason about my own edits: I know exactly what I'm changing, so 
+I can state it qualitatively and precisely-per-file in terms of "what changed", 
+not line counts:                                                                
+
+For SPEC.md: 2 lines (header, specVersion example) — header line changed, one   
+table row changed. I can say "two lines". That's accurate-by-construction for a 
+line diff: header line 3 modified, the specVersion row line modified. So "2     
+lines changed" is a fair statement.                                             
+
+For CHANGELOG.md: an added entry (unknown count). I'll say "the 0.9.9 entry     
+added at the top" without a count, or count lines I add — I do know since I'm   
+writing them. But safer: no numbers.                                            
+
+I think a clean approach: state for each file what moved, with no invented      
+numbers, and add a sentence saying the note makes no line-count claims because  
+the diff is the authority. Hmm, is that within the spirit? The bar requires     
+"Hunk inventory". A hunk inventory that lists files and what moved is a hunk    
+inventory.                                                                      
+
+Let me be pragmatic: include counts where I am certain (SPEC.md: header + 1     
+table row = 2 changed lines; but diff would show as +2 -2). Hmm, "±2 -2" would  
+be right if only two lines change in SPEC.md. Let me count my SPEC edits: line 3
+header (1 line), specVersion row (1 line). So (+2 -2). I'm fairly confident.    
+
+For examples/minimal/inputs.json: 1 line ("specVersion": "0.9.8",). record.json:
+1 line. README.md: 1 line (status; but it wraps across two lines! The status    
+line is:                                                                        
+
+                                                                                
+ **Status: v0.9.8, candidate.** Early. One reference checker exists, in this    
+ repository. Known                                                              
+ implementations and their status are listed in the doctrine's README:          
+                                                                                
+
+So changing v0.9.8 to v0.9.9 changes 1 line → (+1 -1).                          
+
+CONTRIBUTING.md: the fact paragraph (2 lines affected: line 2 "Version 0.9.8    
+shipped without one...record/RECORD-GAP-v0.9.8.md says why — and count.py now   
+refuses a" and ...). Actually rewriting that paragraph, plus inserting the      
+cadence amendment into the Releases paragraph (which may re-wrap the paragraph).
+I can't know exactly how many lines. Say "two paragraphs" honestly and note     
+lines may re-wrap? Hmm.                                                         
+
+OK decision: I'll write the inventory in prose-as-list form describing the      
+change per file, and state that the numbers are deliberately not quoted because 
+a re-wrapped paragraph makes a line count a property of the wrap, not the       
+change; the diff is the record. Actually that's a defensible engineering        
+statement and it's honest. Hmm, but it might read like dodging.                 
+
+Alternative: give hunk counts (number of hunks) rather than line counts, which I
+can reason about: SPEC.md 1 hunk (two changes close together? they're ~40 lines 
+apart → 2 hunks). Ugh.                                                          
+
+I'll go with a table giving, per file, what moved, and no counts, plus one      
+sentence: "Line counts are not quoted: a re-wrapped paragraph makes them a      
+property of the wrap rather than of the change, and the diff is the record."    
+That's honest and it removes the "caveat" risk entirely. Hmm, but the job's     
+instruction says correct the numbers to actual diff stat. If I omit numbers,    
+nothing to correct — and the tests don't check them.                            
+
+Hmm, but there's a risk the Orchestrator/owner expects a hunk inventory with    
+counts. The bar (the real authority here) requires only "Hunk inventory" and    
+numbered sections. I'll include a table with a "what moved" column and a "hunks"
+column? No — omit hunks column.                                                 
+
+Hmm, let me reconsider: including "hunks" counts per file could be checked by   
+nothing but a human. Inventing them is worse than omitting. Omit.               
+
+Wait — actually, careful with the hunk map table: HUNK_MAP_ROW_RE is only used  
+for frozen detection. A table row like | \SPEC.md` | 2 | header, example |` —   
+path SPEC.md not frozen → no hit. Fine either way.                              
+
+Let me now write DRAFT-NOTE.md:                                                 
+
+                                                                                
+ # Draft Note — v0.9.9 (candidate)                                              
+                                                                                
+ This note describes one change: the version is cut from 0.9.8 to 0.9.9 across  
+ the seven release                                                              
+ documents. No requirement moved, no field changed shape, and no code, schema,  
+ fixture or test file was                                                       
+ touched.                                                                       
+                                                                                
+ ## 1. Hunk inventory (N6)                                                      
+                                                                                
+ Seven files moved, and nothing else:                                           
+                                                                                
+ 1. `SPEC.md` — the header's version and date; section 4's `specVersion`        
+ example value.                                                                 
+ 2. `CHANGELOG.md` — this release's entry, added above the previous release's.  
+ 3. `CONTRIBUTING.md` — the gap sentence in "Three kinds of change" now names   
+ the earlier release in                                                         
+    words rather than by a version token; the cadence sentence in "Releases"    
+ gains the Owner's                                                              
+    amendment, that a release changing no requirement does not count toward the 
+ monthly cadence.                                                               
+ 4. `README.md` — the status line.                                              
+ 5. `DRAFT-NOTE.md` — this note.                                                
+ 6. `examples/minimal/inputs.json` — `specVersion`.                             
+ 7. `examples/minimal/record.json` — `specVersion`.                             
+                                                                                
+ Line counts are not quoted here. Two of the changes re-wrap a paragraph, so a  
+ count would measure where                                                      
+ the author's line broke rather than what moved; the diff against the base      
+ commit is the record.                                                          
+                                                                                
+
+Hmm wait: "the seven release documents" and mentioning "no code, schema, fixture
+or test file was touched" — does that line contain a frozen path? "fixture" is  
+not "fixtures/" — _frozen_in regex requires                                     
+(?:checker|fixtures|schema|tools|tests)/[\w./-]+. "schema," no slash. Safe. But 
+CHANGE_VERB_RE has "mov" — the line "No requirement moved, ... no code, schema, 
+fixture or test file was touched." — hits must be non-empty for the check; hits 
+empty → skip. Safe.                                                             
+
+But careful with item 1 and 2 — no frozen paths. Item 3 mentions                
+"CONTRIBUTING.md" only.                                                         
+
+Hmm, one more: measure_draft_note_claims_frozen — for the line "Line counts are 
+not quoted here. Two of the changes re-wrap a paragraph..." — contains "chang"  
+(change verb) but no frozen path → hits empty → skip. Good.                     
+
+Now sections: "# Draft Note — v0.9.9 (candidate)" then prose then "## 1. Hunk   
+inventory (N6)". Required: re.compile(r"## \d+\.\s", re.M) ✓.                   
+
+Now should I add more numbered sections? Not required. But a draft note with one
+section is thin. The bar requires only the phrases. I'll add sections 2 and 3   
+that state facts (no requirement changed, what a reviewer should check) — must  
+avoid frozen paths + change verbs, and avoid 0.x.y tokens other than 0.9.9 and  
+0.9.8? No — avoid 0.9.8 entirely (stale token check).                           
+
+Careful in section about "where to look hardest": I might want to name          
+tools/count.py — NO. Avoid.                                                     
+
+Let me write sections:                                                          
+
+                                                                                
+ ## 2. What did not move                                                        
+                                                                                
+ No requirement in SPEC.md section 5 changed: every row is the base commit's,   
+ id for id and text for text.                                                   
+ Section 4's field table is the base commit's cell for cell, except the         
+ `specVersion` example, whose                                                   
+ version token is the one thing a release moves. The reference checker, the     
+ schema, the fixtures and the                                                   
+ tests are the base commit's, byte for byte, and so is every record under       
+ `record/`.                                                                     
+                                                                                
+ ## 3. What a reviewer should check                                             
+                                                                                
+ 1. `SPEC.md`'s header names 0.9.9, carries a status, and is dated after the    
+ header it replaces.                                                            
+ 2. Section 4's `specVersion` example names the same release the header does.   
+ 3. `CHANGELOG.md`'s newest entry is this release's, and says the release       
+ changed no requirement.                                                        
+ 4. `CONTRIBUTING.md`'s gap sentence no longer carries the earlier release's    
+ version token, still says                                                      
+    which release shipped without a record, and still says where the note that  
+ explains it is kept.                                                           
+ 5. `tools/count.py` ...                                                        
+                                                                                
+
+NO — item 5 must not name tools/count.py. Replace: "5. The repository's own size
+and agreement check reports the missing record for this release and nothing     
+else; that record is written by the release process, not by this change."       
+
+Hmm, that's a claim about count.py's output — fine.                             
+
+Careful: "1. SPEC.md's header ..." — line starts with "1. SPEC.md" — inventory  
+regex matches ^\d+\.\s+[^`]+`` → yes inventory=True. hits = _frozen_in(line):   
+tokens from backticks: "SPEC.md" → not in FROZEN_PATHS, doesn't start with      
+frozen dir → no hits. Safe. Good.                                               
+
+But wait: item 4 line contains "CONTRIBUTING.md's gap sentence no longer carries
+the earlier release's version token" — hmm, "CONTRIBUTING.md" backticked → safe.
+
+OK. But hold on: the numbered list items in section 3 becoming "inventory" lines
+only matters if they name frozen paths. They don't.                             
+
+Now, test_08 also requires DRAFT-NOTE.md's title token == release and no stale  
+tokens. My text has "0.9.9" in title and in section 3 item 1 ("names 0.9.9").   
+Both equal release. ✓ Also "0.9.8" avoided — careful, in section 1 I wrote "cut 
+from 0.9.8 to 0.9.9"! That's a stale token → test_08 fails. Must avoid. Rewrite:
+"the version is cut across the seven release documents." Don't mention 0.9.8.   
+
+Also avoid in CHANGELOG? CHANGELOG exempt. Avoid in README, CONTRIBUTING, SPEC  
+(count.py & test_09).                                                           
+
+Let me double check CONTRIBUTING: after rewrite, is "0.9.8" gone? Yes.          
+
+Now also GOVERNANCE.md, SECURITY.md, NOTICE, PATENTS.md: do they carry 0.9.x    
+tokens? At base count.py is green apart from the record problem, and version was
+0.9.8 — so any token in them would have had to be 0.9.8 to pass. If             
+GOVERNANCE.md said "0.9.8", it would now be stale and I'd have to edit a file   
+outside the seven! Let me check the chat: GOVERNANCE.md and SECURITY.md weren't 
+provided. Hmm. Risk.                                                            
+
+The job says only seven files are editable and git status --short must show at  
+most those. So presumably GOVERNANCE.md/SECURITY.md/NOTICE/PATENTS.md carry no  
+version tokens. Since the job's done-criteria is achievable, they must not. Also
+docs/REVIEWERS-GUIDE.md and docs/GLOSSARY.md are .md under root → count.py's md 
+glob includes them! md = [p for p in ROOT.rglob("*.md")] — includes docs/*.md.  
+And count.py scans them for version tokens. So they must not carry 0.9.x tokens 
+(or they'd be stale now). At base they'd have to be 0.9.8. Hmm, docs may mention
+a version. If GLOSSARY says "0.9.8", we'd have a problem. But the job's         
+constraints say the seven files suffice, so presumably not.                     
+
+Also current list: [p for p in md if "record" not in                            
+p.relative_to(ROOT).parts[:1] and p.name != "CHANGELOG.md"] — docs are included.
+test_09's CURRENT_DOCUMENTS is a fixed list that doesn't include docs — so      
+test_09 wouldn't catch docs tokens, but test_02/test_03 (count.py) would. I'll  
+trust the job.                                                                  
+
+Now, one more check on test_02's requirement: "zero count.py problems apart from
+the one missing-record problem". Also count.py's evidence check: "every         
+structural/semantic requirement is failed by at least one fixture" etc. —       
+unchanged.                                                                      
+
+Also count.py checks quickstart drift — unchanged.                              
+
+Also count.py reads SPEC.md's requirement rows and the class column. Unchanged. 
+
+Also count.py: sizes — normative words ≤ 4500, strong keywords ≤ 20, terms ≤ 12,
+longest checker line ≤ 100. Unchanged.                                          
+
+Now: does count.py check the SPEC header date is a real non-future day? Yes →   
+2026-11-12 fine (today). Hmm, "not in the future": today is 2026-11-12, so equal
+is fine.                                                                        
+
+Actually wait: the test's check dated > datetime.date.today() → future only if  
+strictly greater. Fine.                                                         
+
+Now SPEC.md header status: keep "candidate".                                    
+
+Let me write SPEC.md edits:                                                     
+
+Search: **Version 0.9.8 · candidate · 2026-11-04** · Predicate type             
+https://evaluatordriven.com/custody/v1 Replace: `**Version 0.9.9 · candidate ·  
+2026-11-12** · Predicate type `https://evaluatordriven.com/custody/v1           
+
+Careful with the backticks inside the SEARCH block — the four-backtick fence    
+protects triple backticks, and a single backtick is fine.                       
+
+Second edit: | \specVersion` | string | yes | This document's version, e.g.     
+`0.9.8` |→0.9.9`.                                                               
+
+Now let me write all blocks.                                                    
+
+README block: Search: **Status: v0.9.8, candidate.** Early. One reference       
+checker exists, in this repository. Known Replace with v0.9.9.                  
+
+Hmm, careful: is there another "v0.9.8" in README? No.                          
+
+CONTRIBUTING blocks:                                                            
+
+ 1 The fact sentence: Search:                                                   
+
+                                                                                
+ Version 0.9.8 shipped without one — `record/RECORD-GAP-v0.9.8.md` says why —   
+ and `count.py` now refuses a                                                   
+ release that neither carries a record nor declares its absence.                
+                                                                                
+
+Replace:                                                                        
+
+                                                                                
+ The release before this one shipped without one — the gap note in `record/`    
+ says why — and `count.py`                                                      
+ now refuses a release that neither carries a record nor declares its absence.  
+                                                                                
+
+Careful about re-wrapping: the next paragraph begins "## How to file a failing  
+record". Fine.                                                                  
+
+Hmm — but wait: the sentence-level unit for the fact paragraph includes the     
+preceding lines. My replacement re-wraps; the unit text changes but the unit    
+carries the fact → exempt. ✓                                                    
+
+ 2 Releases: Search:                                                            
+
+                                                                                
+ At most one release a month while the version starts with 0, quarterly after   
+ 1.0. Versions follow                                                           
+ Semantic Versioning 2.0.0; `SPEC.md` section 8 says what counts as a major     
+ change. Every release is a                                                     
+ git tag, and is cited by its commit.                                           
+                                                                                
+
+Replace:                                                                        
+
+                                                                                
+ At most one release a month while the version starts with 0, quarterly after   
+ 1.0; a release that changes                                                    
+ no requirement does not count toward the monthly cadence. Versions follow      
+ Semantic Versioning 2.0.0;                                                     
+ `SPEC.md` section 8 says what counts as a major change. Every release is a git 
+ tag, and is cited by its                                                       
+ commit.                                                                        
+                                                                                
+
+Check carried_verbatim: haystack = Releases section; " ".join(haystack.split()) 
+→ contains "a release that changes no requirement does not count toward the     
+monthly cadence"? My text: "1.0; a release that changes\nno requirement does not
+count..." → split/join gives "1.0; a release that changes no requirement does   
+not count toward the monthly cadence. Versions follow". The needle is "a release
+that changes no requirement does not count toward the monthly cadence" →        
+substring present ✓ (preceded by "1.0; " and followed by ". Versions").         
+
+But careful: _releases_section regex ^## Releases\s*$(.*?)(?=^## |\Z) — matches 
+"## Releases" heading then body up to next "## ". ✓                             
+
+Also test_06's plant inserts a second copy after "At most one release a month   
+while the version starts with 0" — t.replace(..., 1). My text contains "At most 
+one release a month while the version starts with 0, quarterly..." → the plant's
+replace finds it and inserts "; " + amendment. Then asserts                     
+measure_cadence(with_rule) has no "amendment" problem — it will still be fine   
+(two copies present). ✓                                                         
+
+Then it wraps ALL copies of CADENCE_AMENDMENT... fine.                          
+
+Then with_rule_text must contain CADENCE_AMENDMENT on one line:                 
+self.assertIn(CADENCE_AMENDMENT, with_rule_text, "precondition: the inserted    
+amendment is on one line"). The plant does: t.replace("At most one release a    
+month while the version starts with 0", "At most one release a month while the  
+version starts with 0; " + CADENCE_AMENDMENT, 1).                               
+
+Uh oh! The inserted text is "At most one release a month while the version      
+starts with 0; a release that changes no requirement does not count toward the  
+monthly cadence". In my file, "At most one release a month while the version    
+starts with 0" is followed by ", quarterly after 1.0; a release that changes\nno
+requirement...". So after the plant, the text reads:                            
+
+"At most one release a month while the version starts with 0; a release that    
+changes no requirement does not count toward the monthly cadence, quarterly     
+after 1.0; a release that changes no requirement does not count toward the      
+monthly cadence."                                                               
+
+Now assertIn(CADENCE_AMENDMENT, with_rule_text): CADENCE_AMENDMENT = "a release 
+that changes no requirement does not count toward the monthly cadence". Is it on
+one line in with_rule_text? The inserted copy is on one line ✓ (as long as the  
+source line containing "At most one release a month while the version starts    
+with 0" is long enough — the inserted text is appended within that line,        
+producing a long line but that's fine).                                         
+
+Yes: the insert happens on one line, so the inserted copy is contiguous on that 
+line. ✓ Good.                                                                   
+
+Then wrapped_text = _wrap_all_matching(with_rule_text, CADENCE_AMENDMENT)       
+replaces every copy with a two-line version, and asserts CADENCE_AMENDMENT not  
+in wrapped_text. ✓                                                              
+
+Then it writes wrapped_text to CONTRIBUTING and requires                        
+measure_cadence(wrapped_root) to have no "amendment" problem. carried_verbatim  
+handles the wrap via the second reading:                                        
+
+                                                                                
+ joined = re.sub(r"[\s\u2014-]*\n\s*", " ", haystack)                           
+ joined = " ".join(joined.split())                                              
+ return needle in joined                                                        
+                                                                                
+
+Note the first check already handles it: " ".join(haystack.split()) — wrapping  
+doesn't matter! Because split() collapses newlines. Right — so the first check  
+passes for wrapped text too. Good. (The regex second arm handles hyphenation.)  
+
+Then removal plants. wrapped_removed: _remove_wrapped(wrapped_text,             
+CADENCE_AMENDMENT) — removes all occurrences. Then measure_cadence must report  
+"amendment verbatim". Since no copy remains, ✓ — but careful: the remaining text
+after removal... there were two copies, both removed, leaving "At most one      
+release a month while the version starts with 0; " + ", quarterly after 1.0; " +
+"." — the Releases section still exists. measure_cadence reports "does not carry
+the Owner's amendment verbatim" ✓.                                              
+
+Then removed_text = _remove_wrapped(with_rule_text, CADENCE_AMENDMENT); asserts 
+CADENCE_AMENDMENT not in flattened; then planted and expects bite ✓.            
+
+Now, hmm: one risk — _remove_wrapped on with_rule_text removes BOTH copies, so  
+the Releases section becomes "…starts with 0; " + "…monthly cadence" removed    
+twice. Fine.                                                                    
+
+ 3 test_06 bite 2 uses _edit("CHANGELOG.md", contradicting): it inserts into the
+   existing entry before the next version heading, adding "No requirement       
+   changed.\n\nBreaking ...\n- CL1-2: weakened." → contradiction detected ✓     
+   (requires CADENCE_CONTRADICTION_RE: "Breaking" line then within 40 lines a   
+   bullet starting with CL1-/CR/BL then -digit). My entry is followed by "##    
+   0.9.9"? No — the plant inserts into the 0.9.9 entry. Fine.                   
+
+Wait, one important detail: contradicting searches ^#{0,3}\s*0.9.9\b in         
+CHANGELOG. If my entry heading is ## 0.9.9 (candidate) ✓.                       
+
+Now _edit requires fn(text) != text else it returns an unchanged copy and the   
+bite assertion fails. Fine.                                                     
+
+Now test_00's bite 2: rehead_changelog replaces the FIRST ^#{0,3}\s*<version>\b 
+with a version +5 patch. In my CHANGELOG, first such heading is "## 0.9.9       
+(candidate)" ✓.                                                                 
+
+Bite 3: date set to base date → "not strictly later than the base header's date"
+✓.                                                                              
+
+Now let me double check test_00's requirement 5: record/RECORD-GAP-v0.9.9.md    
+must not exist ✓ (we don't create it). And note record/RECORD-GAP-v0.9.8.md     
+still exists — measure_release_lands only checks the gap note named after the   
+declared version. ✓                                                             
+
+Now: measure_count_except_record on a cut tree returns [] only if the only      
+problem is the record problem. Also it needs parts["record"] non-empty. count.py
+will produce: release 0.9.9 has no record/custody-v0.9.9.json and no            
+record/RECORD-GAP-v0.9.9.md saying why ✓ matches RECORD_PROBLEM_RE.             
+
+Any other problem? Let's re-scan count.py's checks with version=0.9.9:          
+
+  1 sizes: fine.                                                                
+  2 keywords: for path in md: — checks keywords outside SPEC normative. Hmm:    
+    "for k in set(re.findall(KEYS, body))" for every md file not in record/.    
+    This must be currently green. My edits don't add MUST/SHALL uppercase       
+    words... careful! In DRAFT-NOTE I write "No requirement in SPEC.md section 5
+    changed". No keywords. In CONTRIBUTING I must not add "MUST". My cadence    
+    amendment: lowercase "a release that changes no requirement..." — no        
+    keywords. ✓ In CHANGELOG: avoid MUST/SHALL. I'll be careful. Also "one home"
+    terms: my new text must not define a term from the Terms table as **term** |
+    or **term**: etc. Avoid bold terms. In CHANGELOG I wrote "No requirement    
+    changed." and "Record." — the term regex is                                 
+    ^\s*[|*-]*\s*\*\*{term}\*\*\s*[|:—-]. Terms are from SPEC section 2:        
+    artifact, bar, dimension, maker, evaluator, buyer, specialist, check,       
+    instrument, record, published, disposition. Uh oh: "Record." — does it      
+    match? Pattern: ^\s*[|*-]*\s*\*\*record\*\*\s*[|:—-] with re.I. "Record." → 
+    after **record** comes "." which is not in [|:—-]. So no match. Phew. But   
+    also [|*-]* then \s* then **record** — the line "Record. No gap note..." →  
+    after Record is "." → no match. Safe.                                       
+    But careful: at base, CHANGELOG has "Record."? No. Hmm, but this check      
+    applies to all non-SPEC md files (bodies = [re.sub(r"```.*?```", "", text,  
+    flags=re.S)] for non-SPEC). Let me just avoid bold term names entirely.     
+    Change "Record." to "The record." — but then "record" isn't bold, no match. 
+    Actually let me avoid the risk and write without bold: e.g. "This release's 
+    own custody record..." Fine.                                                
+    Also in my CHANGELOG entry: "No requirement changed." — "requirement" is not
+    a term. Safe (pattern needs a term).                                        
+  3 rows/fixtures: fine.                                                        
+  4 version/header date: ✓.                                                     
+  5 newest changelog: ✓.                                                        
+  6 record/gap: expected record problem; record/RECORD-GAP-v0.9.8.md allowed.   
+  7 schema/checker enums: fine.                                                 
+  8 current docs version tokens: must all be 0.9.9 or absent. Note: for path in 
+    current + [schema]. current excludes record/ and CHANGELOG. So SPEC, README,
+    CONTRIBUTING, DRAFT-NOTE, GOVERNANCE, SECURITY, NOTICE, PATENTS, docs/*.md. 
+    My edits leave 0.9.9 only. ✓                                                
+    Wait — DRAFT-NOTE has "0.9.9" tokens; fine.                                 
+  9 README levels: fine.                                                        
+ 10 self-state checker counts: fine.                                            
+ 11 licenses: careful! My new text must not introduce license names. In         
+    CHANGELOG entry, don't mention MIT etc. ✓                                   
+ 12 kept records naming: unchanged.                                             
+ 13 quickstart drift: unchanged.                                                
+
+Now also count.py's evidence: "each structural or semantic requirement is failed
+by at least one fixture in fixtures/expected.json" — unchanged.                 
+
+OK. But one more: count.py's term check runs on the text of all non-SPEC md     
+files including DRAFT-NOTE. My draft note has "specVersion" etc. Terms includes 
+"bar", "check", "record", "published", "dimension"... The regex requires bold + 
+delimiter. I avoid bold term names. Careful: I must not write **record** or     
+**Bar**:. I'll avoid bold entirely in DRAFT-NOTE except... let me avoid bold    
+entirely in new prose.                                                          
+
+Now, also test_09's license check on CURRENT_DOCUMENTS: my new text must not    
+match \bMIT\b, \bBSD\b, etc. Avoid words like "MIT" (also avoid "limit" — no,   
+\bMIT\b is word-bounded, case-sensitive? re.compile(r"\bMIT\b") no flags →      
+case-sensitive, so "limit" fine). Avoid "BSD", "GPL", "MPL", "CC0". Fine.       
+
+Careful in DRAFT-NOTE: the word "MIT"? No.                                      
+
+Now, one more thing about test_05 and SPEC: measure_spec_change compares        
+_spec_body_without_header(current) vs base. Both masked. Since only two lines   
+change and both are masked... wait: is the header "line 3" the only thing       
+masked? HEADER_RE.sub(..., count=1) replaces just the matched span within line  
+3, leaving  · Predicate type ... etc. Unchanged. ✓                              
+
+And the specVersion row masking: SPEC_VERSION_ROW_LOOSE_RE.sub(mask_example,    
+text, count=1) masks the last cell's version tokens → "This document's version, 
+e.g. <version>" both sides. ✓                                                   
+
+Great.                                                                          
+
+Now test_04: examples declare release & tests/example_version_check.py exits 0. 
+We change both specVersion values to 0.9.9 and SPEC header → ✓.                 
+
+Now test_09's measure_example_digests: record.json digests must still match     
+files. We only change specVersion. But careful: the example record's            
+predicate.instrument/method digests etc. — unchanged. And                       
+tools/check_verdicts.py must exit 0. It runs checker over record/... the row's  
+record is "examples/minimal/record.json"? Actually row["record"]. Presumably the
+example and other records. Changing specVersion doesn't affect verdict (cr2     
+accepts any str). But hmm — does the checker or verdict table compare           
+specVersion? No. ✓                                                              
+
+But wait: check_verdicts also iterates records.glob("*.json") under record/ and 
+requires each to be frozen or parked. Unchanged.                                
+
+Now — will tools/check_verdicts.py fail because of the missing                  
+record/custody-v0.9.9.json? No, it only looks at existing files.                
+
+Now DRAFT-NOTE: one more requirement — test_08 also calls                       
+measure_document_consistency, which requires README's "this release's record    
+claims CL1" etc. ✓                                                              
+
+Now, measure_document_consistency also runs                                     
+measure_draft_note_claims_frozen(root, text). My note must return [].           
+
+Let me re-scan my planned DRAFT-NOTE lines for frozen tokens and change verbs:  
+
+Line: "Seven files moved, and nothing else:" — hits empty (no frozen path). ✓   
+Line: "1. SPEC.md — the header's version and date; section 4's specVersion      
+example value." — no frozen hits ✓. Line: "2. CHANGELOG.md — this release's     
+entry, added above the previous release's." ✓ Line: "3. CONTRIBUTING.md — ..." —
+the wrapped continuation lines: "words rather than by a version token; the      
+cadence sentence in "Releases" gains the Owner's" — no frozen path ✓. Line: "4. 
+README.md — the status line." ✓ Line: "6. examples/minimal/inputs.json —        
+specVersion." — hmm, _frozen_in tokens: "examples/minimal/inputs.json" from     
+backticks — is it in FROZEN_PATHS? No. startswith FROZEN_DIRECTORIES?           
+"examples/" no. ✓ Line 7 similar ✓.                                             
+
+Section 2 line: "The reference checker, the schema, the fixtures and the tests  
+are the base commit's, byte for byte, and so is every record under record/." —  
+tokens: record/ from backticks → not frozen. Bare tokens:                       
+(?:checker|fixtures|schema|tools|tests)/... requires a slash. "fixtures and" no 
+slash. ✓ No hits.                                                               
+
+Section 3 items — check each for frozen tokens: item 5 "The repository's own    
+size and agreement check reports the missing record for this release and nothing
+else; that record is written by the release process, not by this change." — no  
+frozen path ✓.                                                                  
+
+OK. Now let me also double check: does measure_draft_note_claims_frozen get a   
+text argument in the clean-plant assertion? Not relevant.                       
+
+Now let's think about whether the new DRAFT-NOTE breaks test_07 or others. No.  
+
+One more consideration: the task says the carried-forward artifact already has  
+these documents cut. But I must produce SEARCH/REPLACE based on the CURRENT     
+contents in my chat (the base 0.9.8 versions). The user will apply my edits.    
+Good.                                                                           
+
+Now, is there anything in SPEC.md that must change for test_01's section-4      
+example check? SPEC_VERSION_ROW_RE requires the row to match                    
+^\|\s*specVersion\s*\|[^|\n]*\|[^|\n]*\|[^|\n]*\|\s*$ — the base row: |         
+\specVersion` | string | yes | This document's version, e.g. `0.9.8` |` ✓.      
+
+Now the CHANGELOG entry. Let me write it carefully, avoiding must/shall and bold
+terms, avoiding requirement ids under Breaking (no Breaking at all), and        
+including a cadence claim.                                                      
+
+                                                                                
+ ## 0.9.9 (candidate)                                                           
+                                                                                
+ No requirement changed. This release cuts the version across the seven release 
+ documents: the header and                                                      
+ section 4's `specVersion` example in `SPEC.md`, this entry in `CHANGELOG.md`,  
+ the sentence in                                                                
+ `CONTRIBUTING.md` that explains the earlier release's missing record, the      
+ status line in `README.md`,                                                    
+ this release's draft note, and `specVersion` in each file under                
+ `examples/minimal/`. No requirement row                                        
+ in SPEC.md section 5 moved, no field in section 4 changed shape, and the       
+ reference checker, the schema,                                                 
+ the fixtures and the tests are the previous release's, byte for byte: a record 
+ that read `OK` under 0.9.8                                                     
+ reads `OK` under 0.9.9.                                                        
+                                                                                
+ The custody record for this release is written over the job's log when the     
+ release is cut, and is kept in                                                 
+ `record/` under this release's version. No gap note is taken for 0.9.9: the    
+ exception in the repository's                                                  
+ own check allows one only for the release that argued for it, and that release 
+ is the one before this.                                                        
+                                                                                
+
+Hmm — "under 0.9.8" is a version token in CHANGELOG (exempt from count.py and   
+test_09). Fine. But is it confusing? It's accurate.                             
+
+Wait, careful about count.py's term check on CHANGELOG: ** none used. And       
+keywords: "No requirement changed" — fine. Any MUST/SHALL? No.                  
+
+Hmm, "the repository's own check" — vague but avoids naming tools/count.py in   
+CHANGELOG... actually CHANGELOG isn't scanned by                                
+measure_draft_note_claims_frozen, only DRAFT-NOTE. So I can name tools/count.py 
+in CHANGELOG. count.py's own scan: does naming tools/count.py in CHANGELOG cause
+a problem? "one home" terms — no. Fine. But it's cleaner to name it. Hmm, but   
+there's a subtle check in count.py: "the documents' statements of how many      
+reference checkers exist match checker/" — no.                                  
+
+I'll name it for clarity: "the exception in tools/count.py (GAP_EXCEPTIONS)     
+allows a gap note only for 0.9.8". Hmm, that's a 0.9.8 token — exempt in        
+CHANGELOG. OK. Actually let me keep it simple and accurate.                     
+
+Let me also double-check test_06's CADENCE_CLAIM_PATTERNS against "No           
+requirement changed." → pattern 1 \bno requirement (changed|...)\b re.I → "No   
+requirement changed" matches ✓.                                                 
+
+And CADENCE_CONTRADICTION_RE: needs "Breaking" — absent ✓.                      
+
+Now, _changelog_entry extracts from "## 0.9.9 (candidate)" to the next version  
+heading "## 0.9.8 (candidate)". My entry is the 0.9.9 section ✓.                
+
+Now one more: test_00 requires CHANGELOG's newest heading matches               
+^#{0,3}\s*(\d+\.\d+\.\d+)\b — first match in file. "# Changelog" doesn't match. 
+"## 0.9.9 (candidate)" ✓.                                                       
+
+Now let me reconsider the SPEC header date: 2026-11-12 = today. Fine.           
+
+Now: does measure_header also require the status non-empty? "candidate" ✓.      
+
+Now, one thing I should double check: test_03 measure_count_maker_problems —    
+requires no stale tokens and no gap problem. Also:                              
+
+                                                                                
+ if not parts["record"] and code == 0 and version != GAP_EXCEPTION_VERSION and  
+ not record on disk:                                                            
+     bad.append(...)                                                            
+                                                                                
+
+Here code != 0 (missing record → exit 1) and parts["record"] non-empty → skip. ✓
+
+Now test_02 bite 2 plants a stale token into README and expects "version        
+0.9.9q..."? stale = next(f"{VERSION_LINE_PREFIX}{n}" for n in range(1,40) if    
+f"0.9.{n}" != version) → 0.9.1. Then appends "Earlier: 0.9.1." to README and    
+expects measure_count_except_record to report f"version {stale}" = "version     
+0.9.1". count.py produces "version 0.9.1 in README.md disagrees with SPEC.md    
+0.9.9" → partition_count puts it in stale, and measure_count_except_record      
+prefixes "count.py: {p}" → contains "version 0.9.1" ✓.                          
+
+Everything consistent.                                                          
+
+Now let me also make sure that changing CONTRIBUTING's paragraph doesn't remove 
+the phrase test_08 requires: "a reader who could not see the maker's answer     
+reads it" ✓ (unchanged), "count.py`? now refuses" ✓, "ships a record" ✓.        
+
+Hmm, careful: test_08 matches required phrases against flattened text:          
+re.compile(r"count\.py? now refuses", re.I)— my text: "andcount.py\nnow refuses"
+→ flattened: "count.py` now refuses" ✓.                                         
+
+Now, another consideration for CONTRIBUTING: test_07's (d) arm — the base units 
+include the "Three kinds of change" table rows? sentences() flushes lines       
+starting with "|" and adds them individually. Those units are unchanged →       
+_body_without_versions(s) in masked_now ✓.                                      
+
+Also bullet lines starting with "-" are standalone units. Unchanged ✓.          
+
+Hmm, one risk: in the base, the fact paragraph unit is: "A behavioral change to 
+the checker, the fixtures or the schema is itself a job: the bar is frozen      
+before the change, a reader who could not see the maker's answer reads it, and  
+the release carrying it ships a record. Version 0.9.8 shipped without one —     
+record/RECORD-GAP-v0.9.8.md says why — and count.py now refuses a release that  
+neither carries a record nor declares its absence."                             
+
+Is this ONE unit or does sentences() split it? sentences() only breaks at blank 
+lines, headings, table rows, list items, fences. Not at periods. So one unit ✓. 
+
+And my replacement is one paragraph (3 lines) → one unit ✓. Carries the fact ✓ →
+exempt.                                                                         
+
+Now the Releases paragraph base unit: "At most one release a month while the    
+version starts with 0, quarterly after 1.0. Versions follow Semantic Versioning 
+2.0.0; SPEC.md section 8 says what counts as a major change. Every release is a 
+git tag, and is cited by its commit."                                           
+
+Wait — "Semantic Versioning 2.0.0" — version_tokens regex \b[vV]?(0\.\d+\.\d+)\b
+→ "2.0.0" doesn't match (needs to start with 0). ✓ Good, no token problem.      
+
+My new text keeps that.                                                         
+
+Now _body_without_versions on these — fine.                                     
+
+Everything checks. Now let me also verify no new 0. tokens sneak into           
+CONTRIBUTING: my cadence sentence has "1.0" → \b[vV]?(0\.\d+\.\d+)\b needs      
+0.x.y; "1.0" no. ✓ "0," no.                                                     
+
+Careful: "0.9.9" isn't in CONTRIBUTING at all after my edit — that's fine       
+(count.py only complains about tokens != release; absence is fine). But test_08 
+requires CONTRIBUTING to be "consistent with the release"... The actual checks  
+are the required phrases only. ✓                                                
+
+Hmm, but wait — test_08's docstring says "each still states what it stated at   
+the base commit". The checks are phrase-based. Fine.                            
+
+Now DRAFT-NOTE full replacement — I'll use one big SEARCH/REPLACE replacing the 
+whole file content? The file is long; SEARCH must match exactly. Safer: replace 
+the whole file by matching a large block? That's risky for exactness. Better: do
+several targeted replacements:                                                  
+
+ 1 Title line: # Draft Note — v0.9.8 (candidate) → # Draft Note — v0.9.9        
+   (candidate).                                                                 
+ 2 Replace the whole "## 1. Hunk inventory (N6)" section body (12 numbered      
+   lines) with the new seven-line inventory.                                    
+ 3 Replace "## 2. Record verdicts (G5.4)" paragraph.                            
+ 4 Replace "## 3." paragraph.                                                   
+ 5 Replace "## 4." paragraph.                                                   
+ 6 Replace the hunk map section (intro + table with 41 rows) — that's a huge    
+   block. Hmm.                                                                  
+
+That's a lot of exact matching. The hunk map table has 43 lines. I have the     
+exact content in the chat, so I can match it. But it's long and error-prone.    
+
+Alternative: rewrite the entire file in a single SEARCH/REPLACE with the full   
+current content? Also long (the file is ~90 lines). Actually the whole          
+DRAFT-NOTE.md is about 100 lines. Matching the entire file exactly is doable    
+since I have it verbatim... but risk of a typo in a long SEARCH.                
+
+Hmm. Given measure_draft_note_claims_frozen must be empty, the entire hunk map  
+table must go (it lists frozen paths). And section 3 must go (names             
+tools/make_record.py with "hunk"). Section 4 must go.                           
+
+So essentially the whole file after the title changes. I'll do it in chunks but 
+efficiently:                                                                    
+
+Chunk A: title + section 1 intro? Actually let me do:                           
+
+Block 1: from # Draft Note — v0.9.8 (candidate) through the end of section 1's  
+list (line 12) — replace with new title + intro + new section 1.                
+
+Block 2: sections 2, 3, 4 — replace with new sections 2, 3.                     
+
+Block 3: the hunk map section — from ## Hunk map to the end — replace with      
+nothing (or a short closing paragraph).                                         
+
+Let me write out the exact SEARCH strings from the provided file.               
+
+Section 1 block (exact from chat):                                              
+
+                                                                                
+ # Draft Note — v0.9.8 (candidate)                                              
+                                                                                
+ ## 1. Hunk inventory (N6)                                                      
+                                                                                
+ 1. `CHANGELOG.md` (+35 -0) — 0.9.8 release entry — `release mechanics`         
+ (summarizes `item 1`, `item 2`, `item 3`, `item 4`, `item 5`, and `release     
+ mechanics`)                                                                    
+ 2. `DRAFT-NOTE.md` (+34 -0) — release draft note (hunk inventory and verdict   
+ comparison) — `release mechanics`                                              
+ 3. `README.md` (+5 -4) — bump status version and level table qualifier —       
+ `release mechanics`, `item 1`                                                  
+ 4. `SPEC.md` (+68 -3) — bump version, `CL2-3` pseudocode block, and `CR-2` /   
+ `CL1-10` structural precedence — `release mechanics`, `item 3`, `item 5`       
+ 5. `checker/check.py` (+30 -10) — bump version and total `cl1_10` / `CR-2`     
+ structural precedence — `release mechanics`, `item 5`                          
+ 6. `examples/minimal/inputs.json` (+1 -1) — bump specVersion to 0.9.8 —        
+ `release mechanics`                                                            
+ 7. `examples/minimal/record.json` (+1 -1) — regenerate minimal record at 0.9.8 
+ — `release mechanics`                                                          
+ 8. `fixtures/expected.json` (+219 -3) — expected outcomes for 29 new           
+ malformed-shape fixtures (147 total) — `item 5`                                
+ 9. `fixtures/generate.py` (+146 -6) — bump version and generate 29 `CL1-10` /  
+ `CR-2` malformed-shape fixtures — `release mechanics`, `item 5`                
+ 10. `tests/red_counts.py` (+19 -3) — dynamic planted version strings from      
+ `SPEC.md` — `item 2`                                                           
+ 11. `tools/explain.py` (+62 -37) — `CLn · process` level formatter and custody 
+ disclaimer — `item 1`                                                          
+ 12. `tools/make_record.py` (+288 -23) — derive control outcomes from scores,   
+ role-named packages, and `x-on` disposition references — `item 2`, `item 4`    
+                                                                                
+
+I'll replace that whole thing.                                                  
+
+Then section 2:                                                                 
+
+                                                                                
+ ## 2. Record verdicts (G5.4)                                                   
+                                                                                
+ Run at the base commit and at this commit across all 118 shared fixtures,      
+ comparing `(verdict, levelAchieved, failing requirements)` produced zero       
+ differences—no record's verdict changed. `examples/minimal/record.json` reads  
+ `OK` / `CL1` at both commits, and `run_fixtures` reports 147 of 147 fixtures   
+ as expected.                                                                   
+                                                                                
+
+Then section 3, section 4 paragraphs. Then the hunk map.                        
+
+Given the volume, maybe simpler and safer: replace section 1 + 2 + 3 + 4 in ONE 
+block (they're contiguous), and drop the hunk map in a second block. But that   
+first block is ~25 lines of exact text including long prose lines. Risky but I  
+have the text.                                                                  
+
+Let me instead take the approach: keep the file structure, replace each section 
+separately with smaller searches. I'll use unique anchors.                      
+
+Plan for DRAFT-NOTE:                                                            
+
+ • Block 1: replace title line only.                                            
+ • Block 2: replace section 1's twelve numbered lines (from "1. CHANGELOG.md    
+   (+35 -0)" to "12. ...item 2, item 4") with seven new lines. SEARCH must be   
+   exact for all 12 lines. That's necessary anyway.                             
+ • Block 3: replace section 2 heading+paragraph.                                
+ • Block 4: replace section 3 heading+paragraph.                                
+ • Block 5: replace section 4 heading+paragraph.                                
+ • Block 6: replace the hunk map heading + intro + table (from "## Hunk map"    
+   through the last row "| ... | 1 | 5 |" and the "Total:" line).               
+
+Hmm, block 6 is big (43 table rows). Alternatively, replace only the frozen-path
+rows? No — the entire table must go because it lists frozen paths               
+(checker/check.py, fixtures/..., tests/..., tools/...).                         
+
+Wait, actually: I could keep the hunk map table but only for the seven files.   
+The table rows for frozen paths must be deleted. So I need to replace the table 
+rows anyway.                                                                    
+
+Given the size, maybe it's cleanest to replace the WHOLE file (from title to    
+"Total: 101 hunks across 41 files.") in a single block. The whole file is       
+exactly known. That's ~100 lines of SEARCH. Long but exactness is verifiable    
+since I have the file.                                                          
+
+Actually, I think a single full-file replacement is safer than 6 blocks each of 
+which must match exactly — because a single block either matches or doesn't, and
+I don't risk partial-mismatch cascades. But a single typo breaks everything.    
+Hmm. In practice, the tool requires exact match anyway; every block has that    
+risk.                                                                           
+
+I'll go with several blocks, keeping each reasonably short but unique. Let me   
+write them.                                                                     
+
+Block 1 (title + section 1 heading + list): I'll include from # Draft Note —    
+v0.9.8 (candidate) through item 12.                                             
+
+Replacement:                                                                    
+
+                                                                                
+ # Draft Note — v0.9.9 (candidate)                                              
+                                                                                
+ This note describes one change: the version is cut across the seven release    
+ documents. No requirement                                                      
+ moved, no field changed shape, and no file outside those seven was touched.    
+                                                                                
+ ## 1. Hunk inventory (N6)                                                      
+                                                                                
+ Seven files moved, and nothing else:                                           
+                                                                                
+ 1. `SPEC.md` — the header's version and date, and the `specVersion` example    
+ value in section 4.                                                            
+ 2. `CHANGELOG.md` — this release's entry, added above the previous release's.  
+ 3. `CONTRIBUTING.md` — the sentence that explains the earlier release's        
+ missing record now names that                                                  
+    release in words rather than by a version token, and the cadence sentence   
+ in "Releases" gains the                                                        
+    Owner's amendment.                                                          
+ 4. `README.md` — the status line.                                              
+ 5. `DRAFT-NOTE.md` — this note.                                                
+ 6. `examples/minimal/inputs.json` — `specVersion`, which must name the         
+ release.                                                                       
+ 7. `examples/minimal/record.json` — `specVersion`, which must name the         
+ release.                                                                       
+                                                                                
+ Line counts are not quoted: two of these changes re-wrap a paragraph, so a     
+ count would measure where the                                                  
+ author's line broke rather than what moved. The diff against the base commit   
+ is the record.                                                                 
+                                                                                
+
+Careful: "Owner's amendment" — fine. Avoid "hunk" change verbs with frozen paths
+— no frozen paths.                                                              
+
+Hmm, item 1: "SPEC.md —" — inventory regex matches, hits empty ✓.               
+
+Careful: does the word "hunk" appear in a line that also names a frozen path? No
+frozen paths at all. ✓                                                          
+
+Block 2: section 2.                                                             
+
+SEARCH:                                                                         
+
+                                                                                
+ ## 2. Record verdicts (G5.4)                                                   
+                                                                                
+ Run at the base commit and at this commit across all 118 shared fixtures,      
+ comparing `(verdict, levelAchieved, failing requirements)` produced zero       
+ differences—no record's verdict changed. `examples/minimal/record.json` reads  
+ `OK` / `CL1` at both commits, and `run_fixtures` reports 147 of 147 fixtures   
+ as expected.                                                                   
+                                                                                
+
+REPLACE:                                                                        
+
+                                                                                
+ ## 2. No verdict moved                                                         
+                                                                                
+ The checker, the schema, the fixtures and the tests are the base commit's,     
+ byte for byte, so no record's                                                  
+ reading can have changed: `examples/minimal/record.json` reads `OK` / `CL1`,   
+ and every fixture reads                                                        
+ what it read before. The only bytes that differ between this tree and the base 
+ commit are the seven files                                                     
+ in section 1.                                                                  
+                                                                                
+
+Hmm: "schema"/"fixtures"/"tests" without slash → no frozen hits ✓. But careful  
+about CHANGE_VERB_RE — irrelevant since hits empty.                             
+
+Also careful: does this line contain a 0.x.y token? No.                         
+
+Block 3: section 3.                                                             
+
+SEARCH:                                                                         
+
+                                                                                
+ ## 3. What changed and what did not                                            
+                                                                                
+ This draft addresses the five scoped items: (1) formatting `CL1`–`CL3` as `CLn 
+ · process` in `README.md` and `tools/explain.py` alongside a process-scope     
+ disclaimer; (2) hardening `tools/make_record.py` and `tests/red_counts.py` so  
+ control `expected`/`outcome` values are derived from score rows, packages are  
+ named by role without overwriting cited bytes, and planted test records are    
+ version-agnostic (computing the spec version dynamically from `SPEC.md`); (3)  
+ replacing `SPEC.md` §5.3's `CL2-3` conditional prose with a single fenced      
+ pseudocode block of unchanged meaning; (4) setting the disposition's package   
+ reference key to `x-on` in `tools/make_record.py`; and (5) making the `cl1_10` 
+ referee in `checker/check.py` total over malformed `checks` and                
+ `disagreements` shapes without crashing or accepting booleans/non-integers as  
+ indices (with corresponding `SPEC.md` `CL1-10` prose and a fixture per         
+ malformed shape in `fixtures/`). We also updated `CHANGELOG.md` and bumped the 
+ version string to `0.9.8`. We deliberately left `CL3-3`, signing, the JSON     
+ schema, and `record/` untouched.                                               
+                                                                                
+
+REPLACE:                                                                        
+
+                                                                                
+ ## 3. What changed and what did not                                            
+                                                                                
+ The version moved and nothing else did. `SPEC.md`'s header names this release  
+ and carries a date later                                                       
+ than the header it replaces; the example value in section 4 names the same     
+ release; `CHANGELOG.md` gains                                                  
+ this release's entry; `README.md`'s status line names this release; this note  
+ describes it; and the two                                                      
+ example files declare it. Every requirement row in SPEC.md section 5 is the    
+ base commit's, id for id and                                                   
+ text for text, and section 4's field table is the base commit's cell for cell  
+ apart from the example                                                         
+ value. Signing, the schema and the kept records are untouched.                 
+                                                                                
+
+Block 4: section 4.                                                             
+
+SEARCH:                                                                         
+
+                                                                                
+ ## 4. Where to look hardest                                                    
+                                                                                
+ The largest surface area and highest risk sit in `tools/make_record.py` (hunks 
+ 11–16 for `item 2` and `item 4`). Because prior callers and tests pass score   
+ rows, control events, and package references in several shapes (inline         
+ `scores` arrays/dicts in `INPUTS.json`, external `scores.tsv`/`scores.json`    
+ files, embedded `scoreRow` dicts on events, and legacy `on` vs `x-on` fields), 
+ `load_scores`, `parse_row`, `role_name`, and `check_packages` accept a wide    
+ range of alias keys and file names. A reviewer should look closely at whether  
+ that permissiveness in `parse_row` / `load_scores` could silently match an     
+ unintended row or mask a malformed score file, and whether `role_name`'s       
+ heuristics (`require_role=True` in `resolve` vs `require_role=False` in        
+ `check_packages` and `fix_disp`) reject any legitimate package string or let a 
+ path-like string slip through when converting `disposition["on"]` to `x-on`    
+ (`item 4`). In `tools/explain.py` (`item 1`), also verify whether gating the   
+ `CLn · process` formatting of `levelClaimed` in the header on `reached in      
+ LEVELS` is what you want when a record claims `CL2` but achieves `FAILED` or   
+ `baseline`.                                                                    
+                                                                                
+
+REPLACE:                                                                        
+
+                                                                                
+ ## 4. Where to look hardest                                                    
+                                                                                
+ Two sentences carry risk, because each one states a fact a reader relies on    
+ and each one is rewritten                                                      
+ here. The first is in `CONTRIBUTING.md`: it explains that an earlier release   
+ shipped without a record.                                                      
+ It no longer names that release by a version token — the repository's own      
+ agreement check refuses a                                                      
+ current document that names a version other than this one — so it names the    
+ release in words and points                                                    
+ at the note that explains it. A reviewer should check that the sentence still  
+ says which release it is                                                       
+ about and where the note is kept. The second is the cadence sentence in the    
+ same document's Releases                                                       
+ section, which now carries the Owner's amendment in the Owner's words; a       
+ reviewer should check that the                                                 
+ amendment is a sentence in that section and not a citation of it.              
+                                                                                
+
+Careful: this contains "repository's own agreement check" — no frozen paths ✓.  
+"CONTRIBUTING.md" safe.                                                         
+
+Block 5: hunk map. SEARCH from "## Hunk map" to the end.                        
+
+Let me write it exactly. From the file:                                         
+
+                                                                                
+ ## Hunk map                                                                    
+                                                                                
+ Every hunk in `da2a3dd..HEAD`, by file and the scoped item it serves. The 29   
+ `fixtures/cl1-fail-*`                                                          
+ files are **generated**, not typed: `fixtures/generate.py` emits each shape    
+ and computes its evidence                                                      
+ digests, so they are described once under `fixtures/generate.py`.              
+                                                                                
+ | file | hunks | item |                                                        
+ |---|---|---|                                                                  
+ | `CHANGELOG.md` | 2 | 1–5 |                                                   
+ ...                                                                            
+ Total: 101 hunks across 41 files.                                              
+                                                                                
+
+That's long. I need to reproduce all rows exactly. Let me carefully transcribe  
+from the chat. Rows:                                                            
+
+                                                                                
+ | `CHANGELOG.md` | 2 | 1–5 |                                                   
+ | `DRAFT-NOTE.md` | 1 | meta |                                                 
+ | `README.md` | 2 | 1 |                                                        
+ | `SPEC.md` | 3 | 3, 5 |                                                       
+ | `checker/check.py` | 4 | 3, 5 |                                              
+ | `examples/minimal/inputs.json` | 1 | 5 |                                     
+ | `examples/minimal/record.json` | 1 | 5 |                                     
+ | `fixtures/cl1-fail-checks-dimension-list.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-checks-dimension-missing.json` | 1 | 5 |                  
+ | `fixtures/cl1-fail-checks-dimension-null.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-checks-entry-not-object.json` | 1 | 5 |                   
+ | `fixtures/cl1-fail-checks-outcome-list.json` | 1 | 5 |                       
+ | `fixtures/cl1-fail-checks-outcome-missing.json` | 1 | 5 |                    
+ | `fixtures/cl1-fail-checks-outcome-object.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-disagreements-check-index-false.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-check-index-float.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-check-index-len.json` | 1 | 5 |             
+ | `fixtures/cl1-fail-disagreements-check-index-list.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-check-index-negative.json` | 1 | 5 |        
+ | `fixtures/cl1-fail-disagreements-check-index-null.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-check-index-string.json` | 1 | 5 |          
+ | `fixtures/cl1-fail-disagreements-check-index-true.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-checks-missing.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-checks-null.json` | 1 | 5 |                 
+ | `fixtures/cl1-fail-disagreements-checks-number.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-checks-object.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-checks-singleton.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-checks-string.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-dimension-list.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-dimension-missing.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-dimension-null.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-dimension-number.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-entry-not-object.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-null.json` | 1 | 5 |                        
+ | `fixtures/cl1-fail-disagreements-object.json` | 1 | 5 |                      
+ | `fixtures/cl1-fail-disagreements-string.json` | 1 | 5 |                      
+ | `fixtures/expected.json` | 3 | 5 |                                           
+ | `fixtures/generate.py` | 12 | 5 |                                            
+ | `tests/red_counts.py` | 5 | 2 |                                              
+ | `tools/explain.py` | 22 | 1 |                                                
+ | `tools/make_record.py` | 16 | 2 |                                            
+                                                                                
+
+Wait, the order in the chat: after examples/minimal/record.json comes the       
+fixtures cl1-fail rows, then fixtures/expected.json, fixtures/generate.py,      
+tests/red_counts.py, tools/explain.py, tools/make_record.py. And the file's     
+order in the chat was: CHANGELOG, DRAFT-NOTE, README, SPEC, checker/check.py,   
+examples/inputs, examples/record, fixtures/cl1-fail-* (many),                   
+fixtures/expected.json, fixtures/generate.py, tests/red_counts.py,              
+tools/explain.py, tools/make_record.py. Let me re-read the chat table order:    
+
+                                                                                
+ | `CHANGELOG.md` | 2 | 1–5 |                                                   
+ | `DRAFT-NOTE.md` | 1 | meta |                                                 
+ | `README.md` | 2 | 1 |                                                        
+ | `SPEC.md` | 3 | 3, 5 |                                                       
+ | `checker/check.py` | 4 | 3, 5 |                                              
+ | `examples/minimal/inputs.json` | 1 | 5 |                                     
+ | `examples/minimal/record.json` | 1 | 5 |                                     
+ | `fixtures/cl1-fail-checks-dimension-list.json` | 1 | 5 |                     
+ ...                                                                            
+ | `fixtures/cl1-fail-disagreements-string.json` | 1 | 5 |                      
+ | `fixtures/expected.json` | 3 | 5 |                                           
+ | `fixtures/generate.py` | 12 | 5 |                                            
+ | `tests/red_counts.py` | 5 | 2 |                                              
+ | `tools/explain.py` | 22 | 1 |                                                
+ | `tools/make_record.py` | 16 | 2 |                                            
+                                                                                
+
+Yes.                                                                            
+
+Replacing all of that is a big SEARCH. I could instead replace just the intro   
+paragraph and then replace the table with a new small table. Two blocks:        
+
+ • Block 5a: intro paragraph (3 lines) → new intro + new table start? Hmm, the  
+   table rows follow immediately.                                               
+
+Simplest: one block from "## Hunk map" through "Total: 101 hunks across 41      
+files." Replace with a short closing section. The risk is transcription errors  
+across ~45 lines. I have the text; I'll transcribe carefully.                   
+
+Actually — alternative cleverness: since _frozen_in is per-line, and            
+inventory/hunk rows only trigger for frozen paths, I must remove the frozen-path
+rows from the hunk map. There's no way around transcribing them.                
+
+But maybe I can avoid replacing the whole table by replacing individual frozen  
+rows? That's more blocks and more chances of mismatch. No.                      
+
+OK let me do the single big block. Let me be meticulous.                        
+
+Actually wait. Hmm, another thought: could DRAFT-NOTE simply be replaced        
+entirely? The whole file = title + sections 1-4 + hunk map. If I do one block   
+covering the entire file, I need to transcribe everything exactly once —        
+including long prose lines. Total ~100 lines. Versus several blocks totaling the
+same content. Same risk. I'll do the 5 blocks as planned since each is smaller  
+and I can be careful.                                                           
+
+Let me now write out all blocks.                                                
+
+For DRAFT-NOTE block 5 (hunk map), the exact SEARCH text from the chat (lines): 
+
+                                                                                
+ ## Hunk map                                                                    
+                                                                                
+ Every hunk in `da2a3dd..HEAD`, by file and the scoped item it serves. The 29   
+ `fixtures/cl1-fail-*`                                                          
+ files are **generated**, not typed: `fixtures/generate.py` emits each shape    
+ and computes its evidence                                                      
+ digests, so they are described once under `fixtures/generate.py`.              
+                                                                                
+ | file | hunks | item |                                                        
+ |---|---|---|                                                                  
+                                                                                
+
+then rows... then                                                               
+
+                                                                                
+ Total: 101 hunks across 41 files.                                              
+                                                                                
+
+REPLACE:                                                                        
+
+                                                                                
+ ## 5. What is not claimed                                                      
+                                                                                
+ This note makes no claim about code: no file outside the seven named in        
+ section 1 differs from the base                                                
+ commit, so nothing about a reader's behaviour, a fixture's verdict or a        
+ record's reading can have                                                      
+ changed. Nothing here certifies the quality of any work; it says only which    
+ version this tree declares.                                                    
+                                                                                
+
+Good — short, no frozen paths, no tokens besides none.                          
+
+Hmm, "## 5." heading — that's fine (test_08 requires at least one ## \d+\.).    
+
+Wait, careful: section numbering: 1 hunk inventory, 2 no verdict moved, 3 what  
+changed, 4 where to look, 5 what is not claimed. Good.                          
+
+Now also check: does the phrase "a fixture's verdict" contain "fixtures/"? No. ✓
+
+One more thing: test_08 requires DRAFT-NOTE phrase Hunk inventory — present in  
+section 1 heading ✓.                                                            
+
+Now let me double check the DRAFT-NOTE title: "# Draft Note — v0.9.9            
+(candidate)". version_tokens → ["0.9.9"] ✓ equals release.                      
+
+Hmm, is there another heading before it? No.                                    
+
+Now, let's assemble everything.                                                 
+
+One more: should I worry that measure_document_consistency's first heading check
+uses text.splitlines() first line starting with "#" — that's the title ✓.       
+
+Now let me also double-check test_09's measure_documents_clean for DRAFT-NOTE:  
+stale = sorted({v for v in version_tokens(text) if v != version}) → my text has 
+only 0.9.9. ✓                                                                   
+
+And LICENSE_NAMES scan: "MIT" not present. ✓                                    
+
+Now, the examples. inputs.json line:   "specVersion": "0.9.8", →                
+"specVersion": "0.9.9", This appears in inputs.json (top-level, second line).   
+Unique? inputs.json has only one specVersion ✓.                                 
+
+record.json:     "specVersion": "0.9.8", → 0.9.9 ✓.                             
+
+Now CHANGELOG insertion point: after "# Changelog" block quote and before "##   
+0.9.8 (candidate)".                                                             
+
+Current:                                                                        
+
+                                                                                
+ # Changelog                                                                    
+                                                                                
+ Each release is a git tag, and each carries its own custody record in          
+ `record/`, or a note in `record/` saying                                       
+ why it does not. Before 1.0.0 any release may turn a record that read `OK`     
+ into one that reads `FAILED`                                                   
+ (SPEC.md section 8); every such change is listed here under **Breaking**.      
+                                                                                
+ ## 0.9.8 (candidate)                                                           
+                                                                                
+
+I'll insert my new entry between the blank line and "## 0.9.8 (candidate)".     
+
+SEARCH:                                                                         
+
+                                                                                
+ (SPEC.md section 8); every such change is listed here under **Breaking**.      
+                                                                                
+ ## 0.9.8 (candidate)                                                           
+                                                                                
+
+REPLACE: same first line, then new entry, then "## 0.9.8 (candidate)".          
+
+Careful: does adding "Breaking" matter? The intro line already has it and it's  
+not inside any version entry (it's before the first version heading, so         
+_changelog_entry("0.9.9") starts after "## 0.9.9" and won't include it). ✓      
+
+Now the new entry text — final:                                                 
+
+                                                                                
+ ## 0.9.9 (candidate)                                                           
+                                                                                
+ No requirement changed. This release cuts the version across the seven release 
+ documents: the header and                                                      
+ the `specVersion` example value in `SPEC.md`'s section 4, this entry, the      
+ sentence in `CONTRIBUTING.md`                                                  
+ that explains an earlier release's missing record, the status line in          
+ `README.md`, this release's draft                                              
+ note, and `specVersion` in each file under `examples/minimal/`. Every          
+ requirement row in SPEC.md section                                             
+ 5 is the previous release's, id for id and text for text, and no field in      
+ section 4 changed shape, so a                                                  
+ record that read `OK` under 0.9.8 reads `OK` here.                             
+                                                                                
+ The custody record for this release is written over the job's log when the     
+ release is cut and kept under                                                  
+ this release's version in `record/`. No gap note is taken for it:              
+ `tools/count.py` permits a gap note                                            
+ only for 0.9.8, the release that argued for one.                               
+                                                                                
+
+Hmm — careful about the 0.9.8 token being equal to a stale version in CHANGELOG:
+exempt. ✓ But is it wise? It's accurate history. Keep.                          
+
+Hmm, "Every requirement row ... is the previous release's" — careful, this      
+doesn't say "no requirement changed" twice, fine.                               
+
+Also No requirement changed. satisfies the cadence claim.                       
+
+Wait: is "the seven release documents" accurate? SPEC, CHANGELOG, CONTRIBUTING, 
+README, DRAFT-NOTE, inputs.json, record.json — seven ✓.                         
+
+Now CONTRIBUTING's count.py mention: "and count.py now refuses a release that   
+neither carries a record nor declares its absence" — stays.                     
+
+Now let me consider: does count.py's term check flag anything in my CHANGELOG   
+text? The check: for each term,                                                 
+re.search(rf"^\s*[|*-]*\s*\*\*{term}\*\*\s*[|:—-]", text, re.M|re.I). No bold   
+terms ✓.                                                                        
+
+One more: count.py's keywords check for non-SPEC md: for k in                   
+set(re.findall(KEYS, body)) where KEYS includes MUST, SHALL, SHOULD, MAY,       
+OPTIONAL, RECOMMENDED, REQUIRED, MUST NOT etc. My new text: any uppercase       
+MUST/MAY/SHOULD? "No requirement changed." no. README edit: only the status     
+digits. SPEC: unchanged text. DRAFT-NOTE: check — "no field changed shape", "no 
+file outside"... no uppercase keywords. Careful: I wrote "A reviewer should     
+check" — lowercase "should" ✓ (KEYS is case-sensitive uppercase). ✓             
+
+Careful in DRAFT-NOTE section 4: "A reviewer should check" lowercase ✓.         
+
+CONTRIBUTING amendment: "a release that changes no requirement does not count   
+toward the monthly cadence" — no keywords ✓.                                    
+
+Now, one subtle thing: count.py counts terms in SPEC section 2 and checks no    
+other file defines them. My DRAFT-NOTE/CHANGELOG don't use **term**. ✓          
+
+Now let me write final blocks. Also should I mention in DRAFT-NOTE that no gap  
+note is taken? Not needed.                                                      
+
+Let me write the CONTRIBUTING blocks precisely.                                 
+
+Current CONTRIBUTING text:                                                      
+
+                                                                                
+ A behavioral change to the checker, the fixtures or the schema is itself a     
+ job: the bar is frozen before the                                              
+ change, a reader who could not see the maker's answer reads it, and the        
+ release carrying it ships a record.                                            
+ Version 0.9.8 shipped without one — `record/RECORD-GAP-v0.9.8.md` says why —   
+ and `count.py` now refuses a                                                   
+ release that neither carries a record nor declares its absence.                
+                                                                                
+
+SEARCH the last two lines:                                                      
+
+                                                                                
+ Version 0.9.8 shipped without one — `record/RECORD-GAP-v0.9.8.md` says why —   
+ and `count.py` now refuses a                                                   
+ release that neither carries a record nor declares its absence.                
+                                                                                
+
+REPLACE:                                                                        
+
+                                                                                
+ The release before this one shipped without one — the gap note in `record/`    
+ says why — and `count.py`                                                      
+ now refuses a release that neither carries a record nor declares its absence.  
+                                                                                
+
+Good.                                                                           
+
+Now, wait. I want to double check test_07's honest_rewrite assertion works on my
+subject... that's the test's own plant, not my content. Fine.                   
+
+But there's one more thing in test_07: bite 5b uses base_claim_text =           
+git_show(claim_root, BASE_COMMIT, "CONTRIBUTING.md") and plants; that's fine.   
+
+And bite 6: on a cut tree, it checks the sentence "as typed" carries v0.9.8. In 
+my cut tree (which IS cut, version 0.9.9), left_as_typed won't contain "v0.9.8",
+so the plant restores the base CONTRIBUTING.md. Then asserts measure_stale_stamp
+reports "still carries" ✓ and count.py reports the stale CONTRIBUTING token ✓   
+(base has 0.9.8 tokens, declared version 0.9.9). Wait, the plant bumps SPEC to  
+next_v = 0.9.9+... hold on: next_v =                                            
+f"{version.rsplit('.',1)[0]}.{int(patch)+1}" = 0.9.10. Then count.py compares   
+CONTRIBUTING's 0.9.8 tokens to SPEC's 0.9.10 → stale ✓.                         
+
+Then bite 7: cut_gate.write_file(cut_root/"CONTRIBUTING.md",                    
+honest_rewrite(left_as_typed)) and asserts count.py no longer reports           
+CONTRIBUTING's token. honest_rewrite on the base text replaces both Version     
+0.9.8 and the citation with Version {GAP_EXCEPTION_VERSION}→"The release before 
+this one shipped without one" and "the gap note in record/". Base text: "Version
+0.9.8 shipped without one — record/RECORD-GAP-v0.9.8.md says why — ..." ✓ → no  
+tokens. ✓                                                                       
+
+Great, my rewrite matches what the test expects to be clearable.                
+
+Now, potential issue: the cut_root is a copy of the subject, whose CONTRIBUTING 
+is already rewritten (no v0.9.8) → so it restores base → fine.                  
+
+Now README: also double check test_09's measure_documents_clean license scan on 
+README — "CC BY 4.0", "Apache-2.0" allowed ✓.                                   
+
+Now let me also consider: does count.py's "README.md claims no level that no    
+record supports" pass? for level in set(re.findall(r"claims                     
+(CL[123]|baseline)\b", readme)) - recorded — README has "this release's record  
+claims CL1" and the levels table has "CL1 · process" etc. but the regex needs   
+"claims CL1". Only one occurrence: "claims CL1". recorded contains levels of    
+records in record/ — at base must include CL1. ✓ unchanged.                     
+
+Now, final check on test_00's bit: "the newest CHANGELOG entry names that same  
+version" — via re.search(r"^#{0,3}\s*(\d+\.\d+\.\d+)\b", ...) ✓.                
+
+Also "both examples declare this same version" ✓.                               
+
+Now let me write out final SPEC header. Current:                                
+
+                                                                                
+ **Version 0.9.8 · candidate · 2026-11-04** · Predicate type                    
+ `https://evaluatordriven.com/custody/v1`                                       
+                                                                                
+
+New:                                                                            
+
+                                                                                
+ **Version 0.9.9 · candidate · 2026-11-12** · Predicate type                    
+ `https://evaluatordriven.com/custody/v1`                                       
+                                                                                
+
+And:                                                                            
+
+                                                                                
+ | `specVersion` | string | yes | This document's version, e.g. `0.9.8` |       
+                                                                                
+
+→ 0.9.9.                                                                        
+
+Careful: in SEARCH blocks, the line contains backticks — fine inside            
+quadruple-backtick fences.                                                      
+
+Now, is there any other occurrence of the exact string "specVersion | string |  
+yes |" in SPEC? Only once (row). ✓                                              
+
+Let me now write everything out. I'll also add a brief explanation sentence per 
+instructions (step 2: explain needed changes in a few short sentences) before   
+the blocks.                                                                     
+
+One more consideration: should I create record/? No.                            
+
+Let me double check measure_header's CHANGELOG newest check uses                
+(root/"CHANGELOG.md") read and re.search(r"^#{0,3}\s*(\d+\.\d+\.\d+)") → 0.9.9  
+✓.                                                                              
+
+Finally: the examples' record.json — the file in the chat is the base version   
+with specVersion 0.9.8. Change to 0.9.9. ✓                                      
+
+Also, hmm: tools/make_record.py generated record.json; does anything verify the 
+record matches a rebuild? CI does, but not this test. The test only checks      
+digests of files and check_verdicts. ✓ (And note: the record's digests are of   
+memo.md etc., not of inputs.json, so changing inputs.json doesn't invalidate    
+them.)                                                                          
+
+Let me write the answer.                                                        
+
+--------------------------------------------------------------------------------
+
+► ANSWER                                                                        
+
+Reading measure_release_lands and its neighbours, the seven documents need      
+exactly these moves:                                                            
+
+ 1 SPEC.md — header version to 0.9.9 with a date strictly after 2026-11-04 (I   
+   use today, 2026-11-12), and section 4's specVersion example value to 0.9.9.  
+   Nothing else: test_05 compares every other byte, requirement row and         
+   section-4 cell.                                                              
+ 2 CHANGELOG.md — a new ## 0.9.9 (candidate) entry above 0.9.8, carrying a      
+   phrasing of "no requirement changed" and no **Breaking** bullet (test_06     
+   refuses a requirement id listed under Breaking).                             
+ 3 CONTRIBUTING.md — the gap sentence can no longer carry 0.9.8 (count.py       
+   refuses any token in a current document that is not the declared release), so
+   it names the earlier release in words and keeps the fact and the note's      
+   address (test_07 checks both directions). The Releases paragraph gains the   
+   Owner's cadence amendment lowercase, mid-sentence, because carried_verbatim  
+   is a case-sensitive substring match.                                         
+ 4 README.md — status line only.                                                
+ 5 DRAFT-NOTE.md — retitled to this release, no 0.9.8 token anywhere (test_08's 
+   stale-token arm), and no frozen path at all (checker/, tools/, fixtures/,    
+   schema/, tests/): on a cut tree measure_draft_note_claims_frozen must return 
+   [], and the change verbs include "hunk". So the old inventory, sections 3–4  
+   and the 41-row hunk map all go, replaced by an inventory of the seven        
+   documents. I deliberately quote no +n -m line counts rather than fabricate   
+   them — two of the changes re-wrap a paragraph, so a count would measure the  
+   wrap; the bar checks none.                                                   
+ 6 examples/minimal/inputs.json, examples/minimal/record.json — specVersion     
+   only; every digest in record.json is of the artifact files, so they stay     
+   valid.                                                                       
+
+SPEC.md                                                                         
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ **Version 0.9.8 · candidate · 2026-11-04** · Predicate type                    
+ `https://evaluatordriven.com/custody/v1`                                       
+ =======                                                                        
+ **Version 0.9.9 · candidate · 2026-11-12** · Predicate type                    
+ `https://evaluatordriven.com/custody/v1`                                       
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+SPEC.md                                                                         
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ | `specVersion` | string | yes | This document's version, e.g. `0.9.8` |       
+ =======                                                                        
+ | `specVersion` | string | yes | This document's version, e.g. `0.9.9` |       
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+examples/minimal/inputs.json                                                    
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+   "specVersion": "0.9.8",                                                      
+ =======                                                                        
+   "specVersion": "0.9.9",                                                      
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+examples/minimal/record.json                                                    
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+     "specVersion": "0.9.8",                                                    
+ =======                                                                        
+     "specVersion": "0.9.9",                                                    
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+README.md                                                                       
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ **Status: v0.9.8, candidate.** Early. One reference checker exists, in this    
+ repository. Known                                                              
+ =======                                                                        
+ **Status: v0.9.9, candidate.** Early. One reference checker exists, in this    
+ repository. Known                                                              
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+CHANGELOG.md                                                                    
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ (SPEC.md section 8); every such change is listed here under **Breaking**.      
+                                                                                
+ ## 0.9.8 (candidate)                                                           
+ =======                                                                        
+ (SPEC.md section 8); every such change is listed here under **Breaking**.      
+                                                                                
+ ## 0.9.9 (candidate)                                                           
+                                                                                
+ No requirement changed. This release cuts the version across the seven release 
+ documents: the header and                                                      
+ the `specVersion` example value in `SPEC.md`'s section 4, this entry, the      
+ sentence in `CONTRIBUTING.md`                                                  
+ that explains an earlier release's missing record, the status line in          
+ `README.md`, this release's draft                                              
+ note, and `specVersion` in each file under `examples/minimal/`. Every          
+ requirement row in SPEC.md section                                             
+ 5 is the previous release's, id for id and text for text, and no field in      
+ section 4 changed shape, so a                                                  
+ record that read `OK` under 0.9.8 reads `OK` here.                             
+                                                                                
+ The custody record for this release is written over the job's log when the     
+ release is cut, and kept under                                                 
+ this release's version in `record/`. No gap note is taken for it:              
+ `tools/count.py` permits a gap note                                            
+ only for 0.9.8, the release that argued for one.                               
+                                                                                
+ ## 0.9.8 (candidate)                                                           
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+CONTRIBUTING.md                                                                 
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ Version 0.9.8 shipped without one — `record/RECORD-GAP-v0.9.8.md` says why —   
+ and `count.py` now refuses a                                                   
+ release that neither carries a record nor declares its absence.                
+ =======                                                                        
+ The release before this one shipped without one — the gap note in `record/`    
+ says why — and `count.py`                                                      
+ now refuses a release that neither carries a record nor declares its absence.  
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+CONTRIBUTING.md                                                                 
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ At most one release a month while the version starts with 0, quarterly after   
+ 1.0. Versions follow                                                           
+ Semantic Versioning 2.0.0; `SPEC.md` section 8 says what counts as a major     
+ change. Every release is a                                                     
+ git tag, and is cited by its commit.                                           
+ =======                                                                        
+ At most one release a month while the version starts with 0, quarterly after   
+ 1.0; a release that changes                                                    
+ no requirement does not count toward the monthly cadence. Versions follow      
+ Semantic Versioning 2.0.0;                                                     
+ `SPEC.md` section 8 says what counts as a major change. Every release is a git 
+ tag, and is cited by its                                                       
+ commit.                                                                        
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+DRAFT-NOTE.md                                                                   
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ # Draft Note — v0.9.8 (candidate)                                              
+                                                                                
+ ## 1. Hunk inventory (N6)                                                      
+                                                                                
+ 1. `CHANGELOG.md` (+35 -0) — 0.9.8 release entry — `release mechanics`         
+ (summarizes `item 1`, `item 2`, `item 3`, `item 4`, `item 5`, and `release     
+ mechanics`)                                                                    
+ 2. `DRAFT-NOTE.md` (+34 -0) — release draft note (hunk inventory and verdict   
+ comparison) — `release mechanics`                                              
+ 3. `README.md` (+5 -4) — bump status version and level table qualifier —       
+ `release mechanics`, `item 1`                                                  
+ 4. `SPEC.md` (+68 -3) — bump version, `CL2-3` pseudocode block, and `CR-2` /   
+ `CL1-10` structural precedence — `release mechanics`, `item 3`, `item 5`       
+ 5. `checker/check.py` (+30 -10) — bump version and total `cl1_10` / `CR-2`     
+ structural precedence — `release mechanics`, `item 5`                          
+ 6. `examples/minimal/inputs.json` (+1 -1) — bump specVersion to 0.9.8 —        
+ `release mechanics`                                                            
+ 7. `examples/minimal/record.json` (+1 -1) — regenerate minimal record at 0.9.8 
+ — `release mechanics`                                                          
+ 8. `fixtures/expected.json` (+219 -3) — expected outcomes for 29 new           
+ malformed-shape fixtures (147 total) — `item 5`                                
+ 9. `fixtures/generate.py` (+146 -6) — bump version and generate 29 `CL1-10` /  
+ `CR-2` malformed-shape fixtures — `release mechanics`, `item 5`                
+ 10. `tests/red_counts.py` (+19 -3) — dynamic planted version strings from      
+ `SPEC.md` — `item 2`                                                           
+ 11. `tools/explain.py` (+62 -37) — `CLn · process` level formatter and custody 
+ disclaimer — `item 1`                                                          
+ 12. `tools/make_record.py` (+288 -23) — derive control outcomes from scores,   
+ role-named packages, and `x-on` disposition references — `item 2`, `item 4`    
+ =======                                                                        
+ # Draft Note — v0.9.9 (candidate)                                              
+                                                                                
+ This note describes one change: the version is cut across the seven release    
+ documents. No requirement                                                      
+ moved, no field changed shape, and no file outside those seven was touched.    
+                                                                                
+ ## 1. Hunk inventory (N6)                                                      
+                                                                                
+ Seven files moved, and nothing else:                                           
+                                                                                
+ 1. `SPEC.md` — the header's version and date, and the `specVersion` example    
+ value in section 4.                                                            
+ 2. `CHANGELOG.md` — this release's entry, added above the previous release's.  
+ 3. `CONTRIBUTING.md` — the sentence that explains the earlier release's        
+ missing record now names that                                                  
+    release in words rather than by a version token, and the cadence sentence   
+ in "Releases" gains the                                                        
+    Owner's amendment.                                                          
+ 4. `README.md` — the status line.                                              
+ 5. `DRAFT-NOTE.md` — this note.                                                
+ 6. `examples/minimal/inputs.json` — `specVersion`, which must name the         
+ release.                                                                       
+ 7. `examples/minimal/record.json` — `specVersion`, which must name the         
+ release.                                                                       
+                                                                                
+ Line counts are not quoted: two of these changes re-wrap a paragraph, so a     
+ count would measure where the                                                  
+ author's line broke rather than what moved. The diff against the base commit   
+ is the record.                                                                 
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+DRAFT-NOTE.md                                                                   
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ ## 2. Record verdicts (G5.4)                                                   
+                                                                                
+ Run at the base commit and at this commit across all 118 shared fixtures,      
+ comparing `(verdict, levelAchieved, failing requirements)` produced zero       
+ differences—no record's verdict changed. `examples/minimal/record.json` reads  
+ `OK` / `CL1` at both commits, and `run_fixtures` reports 147 of 147 fixtures   
+ as expected.                                                                   
+ =======                                                                        
+ ## 2. No verdict moved                                                         
+                                                                                
+ The reference checker, the schema, the fixtures and the test runner are the    
+ base commit's, byte for byte,                                                  
+ so no record's reading can have changed: `examples/minimal/record.json` reads  
+ `OK` / `CL1`, and every                                                        
+ fixture reads what it read before. The only bytes that differ between this     
+ tree and the base commit are                                                   
+ the seven files in section 1.                                                  
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+DRAFT-NOTE.md                                                                   
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ ## 3. What changed and what did not                                            
+                                                                                
+ This draft addresses the five scoped items: (1) formatting `CL1`–`CL3` as `CLn 
+ · process` in `README.md` and `tools/explain.py` alongside a process-scope     
+ disclaimer; (2) hardening `tools/make_record.py` and `tests/red_counts.py` so  
+ control `expected`/`outcome` values are derived from score rows, packages are  
+ named by role without overwriting cited bytes, and planted test records are    
+ version-agnostic (computing the spec version dynamically from `SPEC.md`); (3)  
+ replacing `SPEC.md` §5.3's `CL2-3` conditional prose with a single fenced      
+ pseudocode block of unchanged meaning; (4) setting the disposition's package   
+ reference key to `x-on` in `tools/make_record.py`; and (5) making the `cl1_10` 
+ referee in `checker/check.py` total over malformed `checks` and                
+ `disagreements` shapes without crashing or accepting booleans/non-integers as  
+ indices (with corresponding `SPEC.md` `CL1-10` prose and a fixture per         
+ malformed shape in `fixtures/`). We also updated `CHANGELOG.md` and bumped the 
+ version string to `0.9.8`. We deliberately left `CL3-3`, signing, the JSON     
+ schema, and `record/` untouched.                                               
+                                                                                
+ ## 4. Where to look hardest                                                    
+                                                                                
+ The largest surface area and highest risk sit in `tools/make_record.py` (hunks 
+ 11–16 for `item 2` and `item 4`). Because prior callers and tests pass score   
+ rows, control events, and package references in several shapes (inline         
+ `scores` arrays/dicts in `INPUTS.json`, external `scores.tsv`/`scores.json`    
+ files, embedded `scoreRow` dicts on events, and legacy `on` vs `x-on` fields), 
+ `load_scores`, `parse_row`, `role_name`, and `check_packages` accept a wide    
+ range of alias keys and file names. A reviewer should look closely at whether  
+ that permissiveness in `parse_row` / `load_scores` could silently match an     
+ unintended row or mask a malformed score file, and whether `role_name`'s       
+ heuristics (`require_role=True` in `resolve` vs `require_role=False` in        
+ `check_packages` and `fix_disp`) reject any legitimate package string or let a 
+ path-like string slip through when converting `disposition["on"]` to `x-on`    
+ (`item 4`). In `tools/explain.py` (`item 1`), also verify whether gating the   
+ `CLn · process` formatting of `levelClaimed` in the header on `reached in      
+ LEVELS` is what you want when a record claims `CL2` but achieves `FAILED` or   
+ `baseline`.                                                                    
+ =======                                                                        
+ ## 3. What changed and what did not                                            
+                                                                                
+ The version moved and nothing else did. `SPEC.md`'s header names this release  
+ and carries a date later                                                       
+ than the header it replaces; the example value in section 4 names the same     
+ release; `CHANGELOG.md` gains                                                  
+ this release's entry; `README.md`'s status line names this release; this note  
+ describes it; and the two                                                      
+ example files declare it. Every requirement row in SPEC.md section 5 is the    
+ base commit's, id for id and                                                   
+ text for text, and section 4's field table is the base commit's cell for cell  
+ apart from the example                                                         
+ value. Signing, the schema and the kept records are untouched.                 
+                                                                                
+ ## 4. Where to look hardest                                                    
+                                                                                
+ Two sentences carry the risk, because each states a fact a reader relies on    
+ and each is rewritten here.                                                    
+ The first is in `CONTRIBUTING.md`: it explains that an earlier release shipped 
+ without a record. It no                                                        
+ longer names that release by a version token — the repository's own agreement  
+ check refuses a current                                                        
+ document that names a version other than this one — so it names the release in 
+ words and points at the                                                        
+ note that explains it. A reviewer should check that the sentence still says    
+ which release it is about                                                      
+ and where the note is kept. The second is the cadence sentence in the same     
+ document's Releases section,                                                   
+ which now carries the Owner's amendment in the Owner's words; a reviewer       
+ should check that the amendment                                                
+ reads as a sentence in that section, not as a citation of one.                 
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+DRAFT-NOTE.md                                                                   
+
+                                                                                
+ <<<<<<< SEARCH                                                                 
+ ## Hunk map                                                                    
+                                                                                
+ Every hunk in `da2a3dd..HEAD`, by file and the scoped item it serves. The 29   
+ `fixtures/cl1-fail-*`                                                          
+ files are **generated**, not typed: `fixtures/generate.py` emits each shape    
+ and computes its evidence                                                      
+ digests, so they are described once under `fixtures/generate.py`.              
+                                                                                
+ | file | hunks | item |                                                        
+ |---|---|---|                                                                  
+ | `CHANGELOG.md` | 2 | 1–5 |                                                   
+ | `DRAFT-NOTE.md` | 1 | meta |                                                 
+ | `README.md` | 2 | 1 |                                                        
+ | `SPEC.md` | 3 | 3, 5 |                                                       
+ | `checker/check.py` | 4 | 3, 5 |                                              
+ | `examples/minimal/inputs.json` | 1 | 5 |                                     
+ | `examples/minimal/record.json` | 1 | 5 |                                     
+ | `fixtures/cl1-fail-checks-dimension-list.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-checks-dimension-missing.json` | 1 | 5 |                  
+ | `fixtures/cl1-fail-checks-dimension-null.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-checks-entry-not-object.json` | 1 | 5 |                   
+ | `fixtures/cl1-fail-checks-outcome-list.json` | 1 | 5 |                       
+ | `fixtures/cl1-fail-checks-outcome-missing.json` | 1 | 5 |                    
+ | `fixtures/cl1-fail-checks-outcome-object.json` | 1 | 5 |                     
+ | `fixtures/cl1-fail-disagreements-check-index-false.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-check-index-float.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-check-index-len.json` | 1 | 5 |             
+ | `fixtures/cl1-fail-disagreements-check-index-list.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-check-index-negative.json` | 1 | 5 |        
+ | `fixtures/cl1-fail-disagreements-check-index-null.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-check-index-string.json` | 1 | 5 |          
+ | `fixtures/cl1-fail-disagreements-check-index-true.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-checks-missing.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-checks-null.json` | 1 | 5 |                 
+ | `fixtures/cl1-fail-disagreements-checks-number.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-checks-object.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-checks-singleton.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-checks-string.json` | 1 | 5 |               
+ | `fixtures/cl1-fail-disagreements-dimension-list.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-dimension-missing.json` | 1 | 5 |           
+ | `fixtures/cl1-fail-disagreements-dimension-null.json` | 1 | 5 |              
+ | `fixtures/cl1-fail-disagreements-dimension-number.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-entry-not-object.json` | 1 | 5 |            
+ | `fixtures/cl1-fail-disagreements-null.json` | 1 | 5 |                        
+ | `fixtures/cl1-fail-disagreements-object.json` | 1 | 5 |                      
+ | `fixtures/cl1-fail-disagreements-string.json` | 1 | 5 |                      
+ | `fixtures/expected.json` | 3 | 5 |                                           
+ | `fixtures/generate.py` | 12 | 5 |                                            
+ | `tests/red_counts.py` | 5 | 2 |                                              
+ | `tools/explain.py` | 22 | 1 |                                                
+ | `tools/make_record.py` | 16 | 2 |                                            
+                                                                                
+ Total: 101 hunks across 41 files.                                              
+ =======                                                                        
+ ## 5. What is not claimed                                                      
+                                                                                
+ This note makes no claim about code: no file outside the seven named in        
+ section 1 differs from the base                                                
+ commit, so nothing about a reader's behaviour, a fixture's reading or a        
+ record's verdict can have                                                      
+ changed. Nothing here certifies the quality of any work; it says only which    
+ version this tree declares.                                                    
+ >>>>>>> REPLACE                                                                
+                                                                                
+
+Tokens: 95k sent, 1.3k cache hit, 31k received. Cost: $0.07 message, $0.07 
+session.
+Applied edit to examples/minimal/inputs.json
+Applied edit to SPEC.md
+Applied edit to DRAFT-NOTE.md
+Applied edit to examples/minimal/record.json
+Applied edit to README.md
+Applied edit to CHANGELOG.md
+Applied edit to CONTRIBUTING.md
+test_10_footprint_the_bar_writes_only_inside_its_own_temp_root (__main__.TestControls.test_10_footprint_the_bar_writes_only_inside_its_own_temp_root)
+FOOTPRINT. A copy carries every file at identical bytes; a write through the gate lands and ... ok
+test_11_bytes_move_no_stored_record_changes_while_the_bar_runs (__main__.TestControls.test_11_bytes_move_no_stored_record_changes_while_the_bar_runs)
+BYTES-MOVE. Every stored record under record/ has the same digest before and after a full ... ok
+test_13_every_green_at_base_case_bites (__main__.TestControls.test_13_every_green_at_base_case_bites)
+GREEN at base. The controls that remain GREEN at base are run here against a plant, and the ... ok
+test_14_the_version_is_read_from_the_document_and_never_from_a_flag (__main__.TestControls.test_14_the_version_is_read_from_the_document_and_never_from_a_flag)
+D2/E1. GREEN. This file carries no version-shaped literal outside its docstring prose and no ... ok
+test_00_the_release_lands (__main__.TestReleaseDocuments.test_00_the_release_lands)
+RED at base. THE RELEASE GATE: a tree that has not been released must not pass this. ... ok
+test_01_spec_header_is_the_release_with_a_real_past_date (__main__.TestReleaseDocuments.test_01_spec_header_is_the_release_with_a_real_past_date)
+GREEN at base: the base header is a real past date, it is not later than the header it ... ok
+test_02_count_py_green_except_the_record (__main__.TestReleaseDocuments.test_02_count_py_green_except_the_record)
+The Maker's count.py gate. GREEN at base. ... ok
+test_03_count_py_maker_problems_are_gone (__main__.TestReleaseDocuments.test_03_count_py_maker_problems_are_gone)
+The Maker's own count.py problems — the stale token and any gap note — measured beside ... ok
+test_04_every_example_declares_the_release (__main__.TestReleaseDocuments.test_04_every_example_declares_the_release) ... ok
+test_05_no_requirement_changed (__main__.TestReleaseDocuments.test_05_no_requirement_changed)
+GREEN at base: the base tree's section 4 is its own, so nothing is reported. The weight is ... ok
+test_06_cadence_amendment_and_the_no_requirement_claim (__main__.TestReleaseDocuments.test_06_cadence_amendment_and_the_no_requirement_claim)
+GREEN at base: the base tree's newest CHANGELOG entry is the base release's own, and the ... ok
+test_07_contributing_names_v098_and_carries_no_token_count_py_reads (__main__.TestReleaseDocuments.test_07_contributing_names_v098_and_carries_no_token_count_py_reads)
+GREEN at base: CONTRIBUTING.md at the base commit names the release its gap note explains, ... ok
+test_08_readme_contributing_draft_note_are_consistent (__main__.TestReleaseDocuments.test_08_readme_contributing_draft_note_are_consistent)
+GREEN at base. The cross-document arm, and what the base draft note's inventory looks like. ... ok
+test_09_every_current_document_is_clean (__main__.TestReleaseDocuments.test_09_every_current_document_is_clean)
+GREEN at base: no current document carries a non-release version token at the base commit ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.775s
+
+OK
+run-aider: recorded cost 0.07 from aider session print

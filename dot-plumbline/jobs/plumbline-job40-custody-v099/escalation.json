@@ -1,13 +1,13 @@
 {
   "best": {
-    "editable": "/home/jarbis1/tmp/plumbline-job40-record-2/round-01/editable",
+    "editable": "/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable",
     "round": 1,
-    "sha256": "c1056f51f581ba40c24e2846ed224b5f84407ea9db46cd8a0e2f80ec5ee367f5"
+    "sha256": "f36e95229386918216bed929f90c9898452853dd84fa78ce5ef717d3b26ac6aa"
   },
   "by": "loop()",
   "decision": null,
   "diagnosis": null,
-  "ended_at": "2026-11-12T17:10:10+00:00",
+  "ended_at": "2026-11-12T17:50:09+00:00",
   "escalation_kind": "other",
   "holders": {
     "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored this packet; did not author the bar (the bar is the Specialist-approved 11c7dc71\u2026); does not ratify, does not run the loop, does not dispatch, does not score",
@@ -40,13 +40,13 @@
     "Architect",
     "Owner"
   ],
-  "started_at": "2026-11-12T17:09:25+00:00",
-  "stop": "maker failed",
+  "started_at": "2026-11-12T17:40:37+00:00",
+  "stop": "scoring set",
   "terminal_state": "needs_owner",
   "tried": [
     {
-      "record": "/home/jarbis1/tmp/plumbline-job40-record-2/round-01.json",
-      "record_sha256": "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66",
+      "record": "/home/jarbis1/tmp/plumbline-job40-record-3/round-01.json",
+      "record_sha256": "304ef664e33138b49dc6a223f968f734ed1ca58a51ee6d00462b9a10d7774294",
       "round": 1
     }
   ],

@@ -1,38 +1,53 @@
 # Draft Note — v0.9.9 (candidate)
 
+This note describes one change: the version is cut across the seven release documents. No requirement
+moved, no field changed shape, and no file outside those seven was touched.
+
 ## 1. Hunk inventory (N6)
 
-1. `CHANGELOG.md` (+17 -0) — the 0.9.9 entry
-2. `CONTRIBUTING.md` (+3 -2) — the cadence amendment, and the gap sentence reworded to name the earlier release in words
-3. `DRAFT-NOTE.md` (+22 -101) — this note
-4. `README.md` (+1 -1) — the status line bumped to 0.9.9
-5. `SPEC.md` (+2 -2) — the header and section 4's example bumped to 0.9.9
-6. `examples/minimal/inputs.json` (+1 -1) — `specVersion` set to 0.9.9
-7. `examples/minimal/record.json` (+1 -1) — `specVersion` set to 0.9.9
+Seven files moved, and nothing else:
 
-## 2. What changed and what did not
+1. `SPEC.md` — the header's version and date, and the `specVersion` example value in section 4.
+2. `CHANGELOG.md` — this release's entry, added above the previous release's.
+3. `CONTRIBUTING.md` — the sentence that explains the earlier release's missing record now names that
+   release in words rather than by a version token, and the cadence sentence in "Releases" gains the
+   Owner's amendment.
+4. `README.md` — the status line.
+5. `DRAFT-NOTE.md` — this note.
+6. `examples/minimal/inputs.json` — `specVersion`, which must name the release.
+7. `examples/minimal/record.json` — `specVersion`, which must name the release.
 
-This release changes no requirement. It cuts the release documents to 0.9.9 — the header and section 4's
-example, the status line, both example files — and records the Owner's cadence amendment in the Releases
-section of `CONTRIBUTING.md`. No requirement row moved, no section 4 required cell moved, and the
-examples' digests are unchanged: only their `specVersion` moved.
+Line counts are not quoted: two of these changes re-wrap a paragraph, so a count would measure where the
+author's line broke rather than what moved. The diff against the base commit is the record.
 
-## 3. Where to look hardest
+## 2. No verdict moved
 
-The sentence in `CONTRIBUTING.md` about the release that shipped without a record is the only prose that
-had to lose a version token. It still states the fact, still names the note a reader can open, and now
-attributes the absence to the previous release in words rather than by number. This release touches no
-frozen path: it is documents and the two example files only.
-## Hunk map
+The reference checker, the schema, the fixtures and the test runner are the base commit's, byte for byte,
+so no record's reading can have changed: `examples/minimal/record.json` reads `OK` / `CL1`, and every
+fixture reads what it read before. The only bytes that differ between this tree and the base commit are
+the seven files in section 1.
 
-Every hunk in this release, by file. All of them are documents or examples; no frozen path moved.
+## 3. What changed and what did not
 
-| file | hunks |
-|---|---|
-| `CHANGELOG.md` | 1 |
-| `CONTRIBUTING.md` | 2 |
-| `DRAFT-NOTE.md` | 1 |
-| `README.md` | 1 |
-| `SPEC.md` | 2 |
-| `examples/minimal/inputs.json` | 1 |
-| `examples/minimal/record.json` | 1 |
+The version moved and nothing else did. `SPEC.md`'s header names this release and carries a date later
+than the header it replaces; the example value in section 4 names the same release; `CHANGELOG.md` gains
+this release's entry; `README.md`'s status line names this release; this note describes it; and the two
+example files declare it. Every requirement row in SPEC.md section 5 is the base commit's, id for id and
+text for text, and section 4's field table is the base commit's cell for cell apart from the example
+value. Signing, the schema and the kept records are untouched.
+
+## 4. Where to look hardest
+
+Two sentences carry the risk, because each states a fact a reader relies on and each is rewritten here.
+The first is in `CONTRIBUTING.md`: it explains that an earlier release shipped without a record. It no
+longer names that release by a version token — the repository's own agreement check refuses a current
+document that names a version other than this one — so it names the release in words and points at the
+note that explains it. A reviewer should check that the sentence still says which release it is about
+and where the note is kept. The second is the cadence sentence in the same document's Releases section,
+which now carries the Owner's amendment in the Owner's words; a reviewer should check that the amendment
+reads as a sentence in that section, not as a citation of one.
+## 5. What is not claimed
+
+This note makes no claim about code: no file outside the seven named in section 1 differs from the base
+commit, so nothing about a reader's behaviour, a fixture's reading or a record's verdict can have
+changed. Nothing here certifies the quality of any work; it says only which version this tree declares.

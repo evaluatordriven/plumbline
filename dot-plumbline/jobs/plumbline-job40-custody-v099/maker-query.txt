@@ -1,9 +1,9 @@
 You are dispatched by the Orchestrator. This is not a chat.
 
-Findings: /home/jarbis1/tmp/plumbline-job40-record-2/findings-01.json
-Work tree: /home/jarbis1/tmp/custody-job40
-Cost file: /home/jarbis1/tmp/plumbline-job40-record-2/cost-01-maker.json
-Record directory: /home/jarbis1/tmp/plumbline-job40-record-2
+Findings: /home/jarbis1/tmp/plumbline-job40-record-3/findings-01.json
+Work tree: /home/jarbis1/tmp/custody-job40b
+Cost file: /home/jarbis1/tmp/plumbline-job40-record-3/cost-01-maker.json
+Record directory: /home/jarbis1/tmp/plumbline-job40-record-3
 
 The findings may be empty on the first round. Read this packet, and only this
 packet, for artifact.test_cmd, artifact.frozen, and artifact.editable:
@@ -24,8 +24,8 @@ write_file +  over  or heredoc
 
 If this is a kit change, a multi-file change, or the bar is a frozen suite,
 do not write the implementation. Write:
-  /home/jarbis1/tmp/plumbline-job40-record-2/aider-prompt.md
-  /home/jarbis1/tmp/plumbline-job40-record-2/aider-dispatch.json
+  /home/jarbis1/tmp/plumbline-job40-record-3/aider-prompt.md
+  /home/jarbis1/tmp/plumbline-job40-record-3/aider-dispatch.json
 The prompt names the failing tests as the spec and contains no solution.
 The dispatch JSON has message, files (editable only), read (frozen tests),
 and test_cmd. Then stop. This route launches Aider after you exit. Do not

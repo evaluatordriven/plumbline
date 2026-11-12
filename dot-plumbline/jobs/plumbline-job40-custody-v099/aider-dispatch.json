@@ -1,0 +1,25 @@
+{
+  "message": "/home/jarbis1/tmp/plumbline-job40-record-3/aider-prompt.md",
+  "files": [
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "DRAFT-NOTE.md",
+    "README.md",
+    "SPEC.md",
+    "examples/minimal/inputs.json",
+    "examples/minimal/record.json"
+  ],
+  "read": [
+    "tests/test_v099_instrument1.py",
+    "checker/check.py",
+    "tools/count.py",
+    "tools/check_verdicts.py",
+    "schema/custody-v1.schema.json",
+    "fixtures/expected.json",
+    "tests/example_version_check.py"
+  ],
+  "test_cmd": [
+    "python3",
+    "tests/test_v099_instrument1.py"
+  ]
+}

@@ -1,0 +1,16 @@
+--- stdout
+  ⟳ compacting context…
+Evaluation complete. Score written to `/home/jarbis1/tmp/plumbline-job40-record-3/eval-score.json` (verified JSON, 7466 bytes). No cost file — I measured no cost.
+
+What I ran in the job root `/home/jarbis1/tmp/custody-job40b`:
+
+1. `python3 tests/test_v099_instrument1.py` — exit 0, "Ran 14 tests in 2.047s", OK. All 14 collected cases green.
+2. `python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v` (by name) — exit 1, FAILED (failures=1): test_12 ok; test_12b failed with the bar's own predicted Instrument-2 gate message over the absent `record/custody-v0.9.9.json`.
+3. Integrity: all 7 editable files in the job root's working tree are byte-identical (sha256) to the artifact copy at `/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable`; the bar file hashes to the Specialist-approved digest `11c7dc71…` — the standard did not move.
+
+Score: 16 dimensions in the dispatch's exact order. The 14 collected cases all scored 1; `12_a_documents_only_tree_cannot_be_count_py_green` scored 1 (green by name — the artifact declares 0.9.9, outside GAP_EXCEPTIONS, so the case measured its subject). `12b_the_release_gate_the_record_closes` scored 0 — the case ran and did not pass; the failure is the bar's own Instrument-2 gate: the record for 0.9.9 is Instrument 2's output, not Maker work, and a gap note for it is refused by count.py. Violations: none of the four classes applies — the artifact met the standard scoped to it, the standard did not move, all dimensions are authorized, and the frame measured exactly as its docstring says. Verdict: **accept**. Controls: `{"should_pass": "passed", "should_fail": "failed"}` — copied as exact strings.
+
+--- stderr
+
+session_id: 20261112_174344_407c41
+

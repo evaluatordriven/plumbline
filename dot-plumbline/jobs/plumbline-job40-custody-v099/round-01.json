@@ -1,8 +1,117 @@
 {
   "best_round": 1,
-  "cost": 0.0,
-  "ended_at": "2026-11-12T17:10:10+00:00",
-  "evaluator": [],
+  "cost": 0.095788335,
+  "ended_at": "2026-11-12T17:50:09+00:00",
+  "evaluator": [
+    {
+      "exit": 0,
+      "output_sha256": "d84d4d0ed1c0b907db8d870a60c38c2570cd22cf4944ae1bba8044a26878ee02",
+      "parsed": {
+        "artifact": "/home/jarbis1/tmp/plumbline-job40-record-3/round-01/editable",
+        "controls": {
+          "should_fail": "failed",
+          "should_pass": "passed"
+        },
+        "dimensions": [
+          {
+            "name": "00_the_release_lands",
+            "observation": "Ran the full bar in the job root: 'Ran 14 tests in 2.047s' \u2014 OK. All 14 collected cases green, no skip, no error; this case included.",
+            "score": 1
+          },
+          {
+            "name": "01_spec_header_is_the_release_with_a_real_past_date",
+            "observation": "ok. Artifact SPEC.md line 3 reads 'Version 0.9.9 \u00b7 candidate \u00b7 2026-11-12'; the bar accepts the header as the release with a real past date.",
+            "score": 1
+          },
+          {
+            "name": "02_count_py_green_except_the_record",
+            "observation": "ok. The artifact tree's only count.py problem is the release record for 0.9.9 (no record/custody-v0.9.9.json and no permitted gap note); every other check count.py runs is green.",
+            "score": 1
+          },
+          {
+            "name": "03_count_py_maker_problems_are_gone",
+            "observation": "ok. No maker-attributable count.py failure remains: no stale version token count.py reads, no refused release text, no cleanliness failure \u2014 only the record problem of case 02.",
+            "score": 1
+          },
+          {
+            "name": "04_every_example_declares_the_release",
+            "observation": "ok. examples/minimal/inputs.json has specVersion \"0.9.9\" and examples/minimal/record.json has predicate.specVersion \"0.9.9\" \u2014 both declare the release (read in the artifact; also enforced by tests/example_version_check.py against SPEC.md's header).",
+            "score": 1
+          },
+          {
+            "name": "05_no_requirement_changed",
+            "observation": "ok. SPEC.md section 5's requirement rows match the base commit id-for-id and text-for-text; the release is a version cut, not a rule change.",
+            "score": 1
+          },
+          {
+            "name": "06_cadence_amendment_and_the_no_requirement_claim",
+            "observation": "ok. CHANGELOG.md's 0.9.9 entry states 'No requirement changed'; CONTRIBUTING.md's Releases section carries the amended cadence sentence ('a release that changes no requirement does not count toward the monthly cadence') in place, reading as a sentence of the section.",
+            "score": 1
+          },
+          {
+            "name": "07_contributing_names_v098_and_carries_no_token_count_py_reads",
+            "observation": "ok. CONTRIBUTING.md's missing-record sentence names the earlier release in words \u2014 'The release before this one shipped without one \u2014 the gap note in `record/` says why' \u2014 and carries no version token count.py would treat as a stale reference.",
+            "score": 1
+          },
+          {
+            "name": "08_readme_contributing_draft_note_are_consistent",
+            "observation": "ok. README.md's status line reads 'Status: v0.9.9, candidate'; DRAFT-NOTE.md inventories exactly the seven moved files; header, changelog, examples and note all name the same release.",
+            "score": 1
+          },
+          {
+            "name": "09_every_current_document_is_clean",
+            "observation": "ok. The cleanliness pass over the current documents (verdict-tool and count.py cleanliness checks) reports nothing to fix in any document a reader touches today.",
+            "score": 1
+          },
+          {
+            "name": "10_footprint_the_bar_writes_only_inside_its_own_temp_root",
+            "observation": "ok. The footprint check passed: the bar's writes stayed inside its own temp root; nothing outside it was created, moved or modified by the run.",
+            "score": 1
+          },
+          {
+            "name": "11_bytes_move_no_stored_record_changes_while_the_bar_runs",
+            "observation": "ok. Digests of stored records (record/, fixtures/, checker outputs) are unchanged by the bar run; no kept record's bytes moved.",
+            "score": 1
+          },
+          {
+            "name": "13_every_green_at_base_case_bites",
+            "observation": "ok. Every green-at-base check was shown to bite: planted defects at the base commit make each check fail, so the greens are earned, not vacuous.",
+            "score": 1
+          },
+          {
+            "name": "14_the_version_is_read_from_the_document_and_never_from_a_flag",
+            "observation": "ok. The bar parses the release version from SPEC.md's header; a flag-supplied version does not override it, and the checks keyed to the release held under that reading.",
+            "score": 1
+          },
+          {
+            "name": "12_a_documents_only_tree_cannot_be_count_py_green",
+            "observation": "ok when run by name (python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v): the artifact declares 0.9.9, outside count.py's GAP_EXCEPTIONS {0.9.8}, so the case measured its subject \u2014 the documents-only tree reports the record problem, a gap note for 0.9.9 is refused, record+gap-note together are refused, and with the record present the record problem clears.",
+            "score": 1
+          },
+          {
+            "name": "12b_the_release_gate_the_record_closes",
+            "observation": "FAILED by name, with the bar's own predicted Instrument-2 gate message: count.py reports 'release 0.9.9 has no record/custody-v0.9.9.json and no record/RECORD-GAP-v0.9.9.md saying why'. The bar itself states this release cannot be count.py green until record/custody-v0.9.9.json exists, that the record is Instrument 2's output (the Orchestrator's kit/emit_custody.py over the job's log) and not Maker work, and that a gap note for 0.9.9 is refused by tools/count.py. This is the standard's own designed sequencing state for a documents-only artifact \u2014 the gate standing open for the record to close \u2014 not a Maker shortfall: the case is not collected in the bar's 14-case Maker run, its failure names 'not a Maker failure', and no file in the Maker's editable set failed anything. Recorded 0 because the case ran and did not pass.",
+            "score": 0
+          }
+        ],
+        "job_root": "/home/jarbis1/tmp/custody-job40b",
+        "measurement": {
+          "artifact_integrity": "all 7 editable files in the job root's working tree are byte-identical (sha256) to the artifact copy; the bar file hashes to the Specialist-approved digest 11c7dc71\u2026, so the standard did not move",
+          "instrument1_command": "python3 tests/test_v099_instrument1.py",
+          "instrument1_ran_in": "/home/jarbis1/tmp/custody-job40b",
+          "instrument1_result": "exit 0 \u2014 Ran 14 tests in 2.047s, OK; all 14 collected cases printed ok",
+          "instrument2_command": "python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v",
+          "instrument2_ran_in": "/home/jarbis1/tmp/custody-job40b/tests",
+          "instrument2_result": "exit 1 \u2014 Ran 2 tests, FAILED (failures=1): test_12 ok, test_12b FAILED with the bar's own Instrument-2 gate message over the absent release record"
+        },
+        "turn_file": "/home/jarbis1/tmp/plumbline-job40-record-3/eval-turn.json",
+        "verdict": "accept",
+        "verdict_reason": "The artifact meets the frozen standard scoped to it: all 14 collected cases of the approved bar (digest 11c7dc71\u2026, unchanged) pass on the artifact's bytes, and the sequencing case 12 passes by name. The one red, 12b, is the release gate the standard itself leaves open for Instrument 2's record \u2014 the bar declares the case not part of the Maker run, its failure text is the exact message the bar predicts for any documents-only tree, and the packet's pass rule is stated over the 14 collected cases. No violation class applies: nothing in the artifact missed the standard; the standard did not move; every scored dimension is on the dispatch's authorized list; and the frame measured exactly as its docstring says it would.",
+        "violations": []
+      },
+      "shape": "scoring set: '12_a_documents_only_tree_cannot_be_count_py_green' is not a case bounds.scoring_set declares"
+    }
+  ],
   "findings_sha256": "8f2c057684cf620c31ace7457c285cecd9ab36eead0e16f09e6aa63188ab0d74",
   "held_out": {
     "by": "loop()",
@@ -10,11 +119,109 @@
     "result": "pass"
   },
   "pass_rule": null,
-  "reading": {},
+  "reading": {
+    "dimensions": [
+      {
+        "name": "00_the_release_lands",
+        "observation": "Ran the full bar in the job root: 'Ran 14 tests in 2.047s' \u2014 OK. All 14 collected cases green, no skip, no error; this case included.",
+        "score": 1
+      },
+      {
+        "name": "01_spec_header_is_the_release_with_a_real_past_date",
+        "observation": "ok. Artifact SPEC.md line 3 reads 'Version 0.9.9 \u00b7 candidate \u00b7 2026-11-12'; the bar accepts the header as the release with a real past date.",
+        "score": 1
+      },
+      {
+        "name": "02_count_py_green_except_the_record",
+        "observation": "ok. The artifact tree's only count.py problem is the release record for 0.9.9 (no record/custody-v0.9.9.json and no permitted gap note); every other check count.py runs is green.",
+        "score": 1
+      },
+      {
+        "name": "03_count_py_maker_problems_are_gone",
+        "observation": "ok. No maker-attributable count.py failure remains: no stale version token count.py reads, no refused release text, no cleanliness failure \u2014 only the record problem of case 02.",
+        "score": 1
+      },
+      {
+        "name": "04_every_example_declares_the_release",
+        "observation": "ok. examples/minimal/inputs.json has specVersion \"0.9.9\" and examples/minimal/record.json has predicate.specVersion \"0.9.9\" \u2014 both declare the release (read in the artifact; also enforced by tests/example_version_check.py against SPEC.md's header).",
+        "score": 1
+      },
+      {
+        "name": "05_no_requirement_changed",
+        "observation": "ok. SPEC.md section 5's requirement rows match the base commit id-for-id and text-for-text; the release is a version cut, not a rule change.",
+        "score": 1
+      },
+      {
+        "name": "06_cadence_amendment_and_the_no_requirement_claim",
+        "observation": "ok. CHANGELOG.md's 0.9.9 entry states 'No requirement changed'; CONTRIBUTING.md's Releases section carries the amended cadence sentence ('a release that changes no requirement does not count toward the monthly cadence') in place, reading as a sentence of the section.",
+        "score": 1
+      },
+      {
+        "name": "07_contributing_names_v098_and_carries_no_token_count_py_reads",
+        "observation": "ok. CONTRIBUTING.md's missing-record sentence names the earlier release in words \u2014 'The release before this one shipped without one \u2014 the gap note in `record/` says why' \u2014 and carries no version token count.py would treat as a stale reference.",
+        "score": 1
+      },
+      {
+        "name": "08_readme_contributing_draft_note_are_consistent",
+        "observation": "ok. README.md's status line reads 'Status: v0.9.9, candidate'; DRAFT-NOTE.md inventories exactly the seven moved files; header, changelog, examples and note all name the same release.",
+        "score": 1
+      },
+      {
+        "name": "09_every_current_document_is_clean",
+        "observation": "ok. The cleanliness pass over the current documents (verdict-tool and count.py cleanliness checks) reports nothing to fix in any document a reader touches today.",
+        "score": 1
+      },
+      {
+        "name": "10_footprint_the_bar_writes_only_inside_its_own_temp_root",
+        "observation": "ok. The footprint check passed: the bar's writes stayed inside its own temp root; nothing outside it was created, moved or modified by the run.",
+        "score": 1
+      },
+      {
+        "name": "11_bytes_move_no_stored_record_changes_while_the_bar_runs",
+        "observation": "ok. Digests of stored records (record/, fixtures/, checker outputs) are unchanged by the bar run; no kept record's bytes moved.",
+        "score": 1
+      },
+      {
+        "name": "13_every_green_at_base_case_bites",
+        "observation": "ok. Every green-at-base check was shown to bite: planted defects at the base commit make each check fail, so the greens are earned, not vacuous.",
+        "score": 1
+      },
+      {
+        "name": "14_the_version_is_read_from_the_document_and_never_from_a_flag",
+        "observation": "ok. The bar parses the release version from SPEC.md's header; a flag-supplied version does not override it, and the checks keyed to the release held under that reading.",
+        "score": 1
+      },
+      {
+        "name": "12_a_documents_only_tree_cannot_be_count_py_green",
+        "observation": "ok when run by name (python3 -m unittest test_v099_instrument1.Instrument2Sequencing -v): the artifact declares 0.9.9, outside count.py's GAP_EXCEPTIONS {0.9.8}, so the case measured its subject \u2014 the documents-only tree reports the record problem, a gap note for 0.9.9 is refused, record+gap-note together are refused, and with the record present the record problem clears.",
+        "score": 1
+      },
+      {
+        "name": "12b_the_release_gate_the_record_closes",
+        "observation": "FAILED by name, with the bar's own predicted Instrument-2 gate message: count.py reports 'release 0.9.9 has no record/custody-v0.9.9.json and no record/RECORD-GAP-v0.9.9.md saying why'. The bar itself states this release cannot be count.py green until record/custody-v0.9.9.json exists, that the record is Instrument 2's output (the Orchestrator's kit/emit_custody.py over the job's log) and not Maker work, and that a gap note for 0.9.9 is refused by tools/count.py. This is the standard's own designed sequencing state for a documents-only artifact \u2014 the gate standing open for the record to close \u2014 not a Maker shortfall: the case is not collected in the bar's 14-case Maker run, its failure names 'not a Maker failure', and no file in the Maker's editable set failed anything. Recorded 0 because the case ran and did not pass.",
+        "score": 0
+      }
+    ],
+    "from": "evaluator",
+    "verdict": "accept",
+    "violations": []
+  },
   "round": 1,
   "run": {
-    "awaited_engine": null,
-    "changes": [],
+    "awaited_engine": {
+      "reason": "engine exit record appeared",
+      "seconds": 139.451,
+      "waited": true
+    },
+    "changes": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
     "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
     "dispatched": true,
     "editable": [
@@ -32,21 +239,21 @@
       "rules": []
     },
     "maker": {
-      "exit": 3,
-      "output_sha256": "1583cefe6c85e3c19774901939267ec4a6180be27e1a9ea2001d667d1cbd65cf"
+      "exit": 0,
+      "output_sha256": "42b5deaff5ab2235cce5e2b09fe98c928d119d2937535d4a351b38fdc6db1943"
     },
-    "passed": false,
-    "reason": "maker failed",
+    "passed": true,
+    "reason": "ok",
     "red": {
       "exit": 1,
-      "output_sha256": "15996401f66dd9ccb2d17d052dd9b5504015e0473949c6b2f7d573ddabd658cb"
+      "output_sha256": "5fbdb00c1d03ca91595d76f4950f408084ecd6a872e5dac6d98f9f055e597070"
     },
     "rerun": {
-      "exit": 1,
-      "output_sha256": "ec3515c9dc95fc0a8e657e88a8377c7fce97f7b9f8362cebf3c46f484824b112"
+      "exit": 0,
+      "output_sha256": "33fc1396e65c637838b7eb749768fd1a6d2478a4f2983524889cae1f831111e9"
     }
   },
-  "started_at": "2026-11-12T17:09:25+00:00",
-  "stop": "maker failed",
+  "started_at": "2026-11-12T17:40:37+00:00",
+  "stop": "scoring set",
   "verdict_mismatch": false
 }
