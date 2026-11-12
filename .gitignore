@@ -3,3 +3,10 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# CI / local checkouts of pinned corpora. Must stay under github.workspace for
+# actions/checkout, but must not dirty porcelain or the emitter refuses
+# [revision] dirty (measured 2026-11-12 PR #51).
+.ci-deps/
+custody-upstream/
+doctrine-upstream/
