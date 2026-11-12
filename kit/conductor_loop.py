@@ -51,6 +51,15 @@ that code and writes neither ``summary.json`` nor ``escalation.json``. A packet
 refusal is not a finish: the seam is not called and no custody record is
 written.
 
+The version the record attests is not typed anywhere. The seam reads the custody
+commit and the version that commit's SPEC.md declares from the kit's own
+``tools/pin.json``, finds a checkout of that commit on this machine, and names
+it in ``inputs/custody.json`` as ``custody_spec`` — the field the emitter already
+reads. The emitter itself is unchanged and gains no flag, so the seam's exit
+code is still exactly ``emit_custody.py --job-dir J``'s. With no pin, or no
+checkout at the pinned commit, nothing is supplied and the emitter's own
+``spec-version`` refusal stands.
+
 A clean finish is then closed and filed by ``file_finish(record_dir, halt)``,
 the last act of ``loop()``: it writes ``custody/status.json`` into the job
 folder (``custody`` or ``missing``, with the record's sha256 and the terminal
@@ -236,6 +245,123 @@ def _own_clock() -> bool:
     return getattr(datetime.now, "__self__", None) is datetime
 
 
+_PIN_FILE = os.path.join("tools", "pin.json")
+
+
+def _pinned_custody():
+    """``custody`` from the kit's own ``tools/pin.json``, or None when it cannot be read.
+
+    ``commit`` and ``specVersion`` are READ from the pin and never typed here:
+    ``tools/build_schemas.py --custody`` derives ``specVersion`` from the ``**Version X.Y.Z**``
+    header of the SPEC.md at that commit, so a re-pin cannot leave the version behind (the
+    failure that derivation exists to prevent, measured 2026-11-10). A pin that cannot be read
+    is not a licence to guess a version: the seam then names no document and the emitter
+    refuses for itself, which is the refusal this seam must not paper over.
+    """
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    try:
+        with open(os.path.join(root, _PIN_FILE), encoding="utf-8") as handle:
+            body = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    custody = body.get("custody") if isinstance(body, dict) else None
+    if not isinstance(custody, dict):
+        return None
+    commit = custody.get("commit")
+    version = custody.get("specVersion")
+    if not (isinstance(commit, str) and commit.strip()):
+        return None
+    if not (isinstance(version, str) and version.strip()):
+        return None
+    files = custody.get("files") if isinstance(custody.get("files"), dict) else {}
+    spec = files.get("SPEC.md")
+    return {
+        "root": root,
+        "commit": commit.strip(),
+        "version": version.strip(),
+        "spec_sha256": spec if isinstance(spec, str) else None,
+    }
+
+
+def _git_head(path):
+    """The commit a checkout's work tree is at, or None when it is not a readable checkout."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", path, "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+        )
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    return (proc.stdout or "").strip() or None
+
+
+def _custody_checkout(pin):
+    """A custody checkout at exactly the pinned commit, or None.
+
+    Looked for where the pin can be honoured: ``$PLUMBLINE_CUSTODY``, a ``custody/`` beside this
+    repo, then one inside it — the places the seat already looks, so no path is typed here and
+    the convention is not overridden by a guess. The commit is compared with the checkout's own
+    ``HEAD`` and the document with the digest the pin records, so a checkout at another revision,
+    or one whose SPEC.md moved after it was pinned, is not the document the job attests and is
+    not used. Nothing is derived from the pin when no checkout matches.
+    """
+    candidates = []
+    env = (os.environ.get("PLUMBLINE_CUSTODY") or "").strip()
+    if env:
+        candidates.append(env)
+    candidates.append(os.path.join(os.path.dirname(pin["root"]), "custody"))
+    candidates.append(os.path.join(pin["root"], "custody"))
+    for candidate in candidates:
+        checkout = os.path.abspath(os.path.expanduser(candidate))
+        spec = os.path.join(checkout, "SPEC.md")
+        if not os.path.isfile(spec):
+            continue
+        if _git_head(checkout) != pin["commit"]:
+            continue
+        try:
+            digest = _sha_file(spec)
+        except OSError:
+            continue
+        if pin["spec_sha256"] and digest != pin["spec_sha256"]:
+            continue
+        return checkout
+    return None
+
+
+def _supply_custody_document(record_dir, checkout):
+    """Name the pinned custody document in the job's custody inputs.
+
+    ``kit/emit_custody.py`` reads ``inputs/custody.json: custody_spec`` to resolve the version
+    the record attests, so the seam supplies exactly that key and merges the rest of the file
+    untouched. A job that already names its own document keeps it: the seat that wrote the
+    inputs made a choice, and overriding it would attest a document the job did not name. A file
+    that cannot be parsed is left as it is — it is not this seam's to rewrite, and the emitter
+    names the refusal.
+    """
+    path = os.path.join(str(record_dir), "inputs", "custody.json")
+    body = {}
+    if os.path.isfile(path):
+        try:
+            with open(path, encoding="utf-8") as handle:
+                loaded = json.load(handle)
+        except (OSError, ValueError):
+            return
+        if not isinstance(loaded, dict):
+            return
+        body = loaded
+        named = body.get("custody_spec")
+        if isinstance(named, str) and named.strip():
+            return
+    body["custody_spec"] = checkout
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as handle:
+        json.dump(body, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+
+
 def emit_custody_for_finish(record_dir, summary):
     """Run ``kit/emit_custody.py`` against ``record_dir``; return its exit code.
 
@@ -246,11 +372,27 @@ def emit_custody_for_finish(record_dir, summary):
     command uses. Exit 0 is the only done: the record was written and names no
     hard gap. Any other exit code is not a done finish.
 
+    It supplies the record's version before it runs. The emitter refuses a
+    record whose ``predicate.specVersion`` has no source, and it will not fall
+    back to a flag or to a literal; so this seam names the custody document the
+    job attests. ``tools/pin.json`` records the custody commit and the version
+    its SPEC.md declares, a checkout of that commit is found on this machine,
+    and the job's ``inputs/custody.json`` carries it as ``custody_spec`` — the
+    field the emitter already reads. The version is therefore read from the pin
+    and the document, never typed in this module, and the emitter runs
+    unchanged: no flag is added, so this seam's exit code is still exactly what
+    ``emit_custody.py --job-dir J`` produces on the same directory. With no pin,
+    or no checkout at the pinned commit, nothing is supplied and the emitter's
+    own refusal stands.
+
     ``summary`` is carried for the caller's convenience; it is not forwarded.
-    The seam's result is exactly what the same command produces on the same
-    directory, so a twin run of the emitter side-by-side matches it.
     """
     emitter = os.path.join(os.path.dirname(os.path.abspath(__file__)), "emit_custody.py")
+    pin = _pinned_custody()
+    if pin is not None:
+        checkout = _custody_checkout(pin)
+        if checkout is not None:
+            _supply_custody_document(record_dir, checkout)
     proc = subprocess.run(
         [sys.executable, emitter, "--job-dir", str(record_dir)],
         capture_output=True,
