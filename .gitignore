@@ -3,3 +3,9 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# CI / local checkouts of pinned corpora INSIDE the worktree make the emitter
+# refuse [revision] dirty (measured 2026-11-12 PR #51). Keep them ignored so
+# PLUMBLINE_CUSTODY / EDI_CORPUS siblings never poison porcelain.
+custody-upstream/
+doctrine-upstream/
