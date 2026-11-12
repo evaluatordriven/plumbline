@@ -46,7 +46,7 @@ from unittest import mock
 PY = sys.executable
 RECORD_REL = "custody/record.custody.json"
 PREDECESSOR = "tests/test_loop_custody_on_finish.py"
-PREDECESSOR_SHA = "049808b1125a3bca69033da95790a45b2383782d9057c27bd547c87688438e7d"
+PREDECESSOR_SHA = "3480290de595fca616e5724c39354ce2c515a5ea16c464cd478c643e5fe87511"
 ESCALATE_BAR = "tests/test_escalate.py"
 ESCALATE_BAR_SHA = "40eb3d7e3b985974ff3f462b4252c6fc7a65d71848b1431f98f5efe76dd0c7af"
 LOOP_PY = "kit/conductor_loop.py"
@@ -62,7 +62,16 @@ LOOP_PY = "kit/conductor_loop.py"
 # could not say how it was filed (measured on Job 31's first close).
 # This re-pin: loop() now waits for a detached engine's own exit record before it measures the tree — after
 # Job 31 record-3 booked a real +16/-6 fix as "no artifact" 56 seconds before the engine wrote it.
-LOOP_SHA = "6db27b6a04237a6a34c95f63b31b3d1e95383d1c5b288f9c432584bc93dbe0db"
+# JOB 38 re-pin: the finish seam now names the custody document the job attests — `emit_custody_for_finish`
+# reads the custody commit and the version its SPEC.md declares from tools/pin.json, finds a checkout at that
+# commit, and writes `inputs/custody.json: custody_spec` — so a kit job that names no document files instead of
+# dying on the emitter's `spec-version` refusal. The seam this bar locks is untouched: it is still called once,
+# loop()'s signature is unchanged, a non-zero code is still CustodyNotDone, and the record is still written by
+# the emitter rather than by this module.
+# THE VALUE BELOW MUST COME FROM THE FILE IT PINS. Re-pin it with `sha256sum kit/conductor_loop.py` after this
+# job's change is applied; a digest cannot be written from anywhere but the bytes it names, so a typed guess
+# here would be the very drift this constant exists to catch.
+LOOP_SHA = "f089d686c33ddfb8d405406c55114e7088c95738f1f50ec25839c5352f546b6f"
 SCHEMA_ROOTS = ("schemas/custody", "schemas/vendor")
 SCHEMA_MANIFEST_SHA = "7182a9740347403960d81799430ead78784cb28c209a22ef728cebc6ee2b8876"
 INVENTED_KEYS = ("approvals", "buyer", "specialist", "retention", "harness_log")

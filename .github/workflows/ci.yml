@@ -49,11 +49,6 @@ jobs:
       - name: Make an empty HOME (no ~/.hermes, no user config)
         run: mkdir -p "${{ runner.temp }}/home"
 
-      - name: Run every suite (no corpus; corpus checks SKIP by name)
-        env:
-          HOME: ${{ runner.temp }}/home
-        run: python tests/run_all.py
-
       - name: Read the pinned custody commit
         id: custody_pin
         run: python -c "import json;print('sha='+json.load(open('tools/pin.json'))['custody']['commit'])" >> "$GITHUB_OUTPUT"
@@ -64,6 +59,17 @@ jobs:
           repository: evaluatordriven/custody
           ref: ${{ steps.custody_pin.outputs.sha }}
           path: custody-upstream
+
+      # PLUMBLINE_CUSTODY names a custody checkout at the commit tools/pin.json holds. The finish seam reads the
+      # spec version from that document rather than from a literal (`kit/conductor_loop.py`, `_pinned_custody` /
+      # `_custody_checkout`), and the Job 38 bar asserts a job with no `custody_spec` still files; neither can be
+      # measured without one. It is checked out ABOVE, before this step, because the suite needs it — a pin that
+      # moves without this checkout fails here rather than silently passing.
+      - name: Run every suite (no doctrine corpus; corpus checks SKIP by name)
+        env:
+          HOME: ${{ runner.temp }}/home
+          PLUMBLINE_CUSTODY: ${{ github.workspace }}/custody-upstream
+        run: python tests/run_all.py
 
       - name: Compare the vendored custody schema with upstream
         env:
@@ -103,6 +109,7 @@ jobs:
           p = json.load(open("tools/pin.json", encoding="utf-8"))
           print("commit=" + p["commit"])
           print("path=" + p["path"])
+          print("custody=" + p["custody"]["commit"])
           PY
 
       - name: Check out the doctrine at the pinned commit
@@ -112,6 +119,13 @@ jobs:
           ref: ${{ steps.pin.outputs.commit }}
           path: doctrine-upstream
 
+      - name: Check out the custody corpus at its pinned commit (the finish seam reads its SPEC.md)
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: evaluatordriven/custody
+          ref: ${{ steps.pin.outputs.custody }}
+          path: custody-upstream
+
       - name: Make an empty HOME (no ~/.hermes, no user config)
         run: mkdir -p "${{ runner.temp }}/home"
 
@@ -120,4 +134,5 @@ jobs:
           HOME: ${{ runner.temp }}/home
           EDI_CORPUS: ${{ github.workspace }}/doctrine-upstream/${{ steps.pin.outputs.path }}
           PLUMBLINE_REQUIRE_CORPUS: "1"
+          PLUMBLINE_CUSTODY: ${{ github.workspace }}/custody-upstream
         run: python tests/run_all.py

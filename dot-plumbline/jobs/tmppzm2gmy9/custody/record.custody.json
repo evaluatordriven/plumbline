@@ -1,1 +1,0 @@
-{"_type": "https://in-toto.io/Statement/v1", "subject": [], "predicateType": "https://evaluatordriven.com/custody/v1", "predicate": {"buyer": "invented-buyer-not-held", "x-plumbline": {"gaps": []}}}

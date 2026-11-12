@@ -18,7 +18,7 @@ did).
     plumbline_job.py close --job-dir dot-plumbline/jobs/<job-id> --run run.json [--run run2.json] [--corpus PATH]
                            [--terminal-state accepted|needs_owner|rejected [--outcome O]]
     plumbline_job.py custody --job-dir dot-plumbline/jobs/<job-id> [--out-dir DIR]    (no corpus needed)
-    plumbline_job.py file --job-dir <ended job dir> [--into dot-plumbline/jobs] [--backfill]
+    plumbline_job.py file --job-dir <ended job dir> [--into dot-plumbline/jobs] [--name NAME] [--backfill]
 
 `open` creates the directory, emits the packet, and files the brief under `inputs/`. If the packet emitter
 refuses the brief, THE DIRECTORY IS REMOVED: a job folder that exists without readable terms is the exact
@@ -338,6 +338,28 @@ def do_close(a) -> int:
 TERMINALS = ("accepted", "needs_owner", "rejected")
 
 
+def _is_finish(doc) -> bool:
+    """True when the packet is a finish a loop() wrote, not a job and not a dispatch.
+
+    A finish carries a terminal state — ``loop()`` writes it at the top level as
+    ``terminal_state`` and again, in the record's own vocabulary, as ``terminalState`` —
+    and usually the nested ``finish``/``summary`` the emitter reads. Such a folder is the
+    EVIDENCE of a run whose packet names no ``job_id``, so it belongs under ``runs/``:
+    under ``jobs/`` a folder without an id is a job no reader can name, and refusing it
+    loses the only trace of a finish that ran in a scratch directory.
+
+    The ``job_id`` test is first on purpose. A folder that DOES carry an id is a job
+    whatever else it carries, and it is not this function's to reclassify.
+    """
+    if not isinstance(doc, dict) or doc.get("job_id"):
+        return False
+    for key in ("terminal_state", "terminalState"):
+        value = doc.get(key)
+        if isinstance(value, str) and value.strip():
+            return True
+    return isinstance(doc.get("finish"), dict) or isinstance(doc.get("summary"), dict)
+
+
 def do_file(a) -> int:
     """Copy an ended job — or a run's working directory — into `dot-plumbline/`, and record which it is.
 
@@ -370,22 +392,39 @@ def do_file(a) -> int:
         return 2
     if doc.get("job_id"):
         kind = "job"
-    elif "finish" in doc and doc.get("terminalState"):
-        # A finish descriptor IS a job. `_custody_packet()` starts from the ratified packet, and the corpus's
-        # packet schema has no `job_id` — that is a Plumbline instance field — so a real finish carries no job id
-        # and was filed as "unclassified" the first time loop() tried to file one (measured 2026-11-09). What a
-        # finish always carries is its terminal state; no dispatch packet has one.
-        kind = "job"
     elif {"artifact", "bounds", "job"} <= set(doc) or ("job" in doc and ("target" in doc or "maker_cmd" in doc)):
+        kind = "run"
+    elif _is_finish(doc):
+        # A finish descriptor from loop() whose ratified packet carries no `job_id`. It is EVIDENCE of a run,
+        # not a job. Filed under `jobs/` it would be the pair `test_jobs_carry_a_job_packet_and_runs_do_not`
+        # refuses — measured 2026-11-12 (Job 38c), and again as Job 38d's `jobs/tmp3oudgzx8`. Filed under
+        # `runs/` nothing reads it as a closed job, and the record of a finish that ran in a scratch directory
+        # survives that directory (Owner ruling, 2026-11-12: an id-less finish must reach the instance record;
+        # vanishing is not one of the honest readings). No id is minted here and the packet is not edited: the
+        # folder keeps its own name, which is what filing a folder has always done.
         kind = "run"
     else:
         print(f"NOT FILED: {packet_src} is neither a job packet (no `job_id`) nor a dispatch packet "
-              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`). Filing an unclassified folder "
-              f"would make a reader guess.")
+              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`), and it is not a finish either; "
+              f"a folder nothing classifies cannot be filed without making a reader guess what it is.")
         return 2
     root = Path(a.into).expanduser().resolve() if a.into else (HERE.parent / "dot-plumbline").resolve()
     into = root / ("jobs" if kind == "job" else "runs")
-    dest = into / src.name
+    # THE NAME IS THE JOB'S, NEVER THE SCRATCH DIRECTORY'S. A finish runs in a temporary record directory —
+    # `tmp3oudgzx8` and the like — and copying that basename into `jobs/` files a job under a name no reader
+    # can use. Measured 2026-11-12 (Job 38d): one accepted finish over a packet with no `job_id` left
+    # `jobs/tmp3oudgzx8` behind, and a packet that carried a real id still landed under the scratch name.
+    # The caller that knows the job's identity passes it in (`--name`); a folder a person made, or one a
+    # caller files with no name, keeps its own name, which is what filing has always done. The name must be
+    # a single component: a `job_id` holding a path separator is refused rather than written outside `jobs/`.
+    wanted = str(getattr(a, "name", None) or "").strip()
+    name = wanted or src.name
+    if name in ("", ".", "..") or name != os.path.basename(name) or os.sep in name:
+        print(f"NOT FILED: {name!r} is not a single folder name, so there is no destination under "
+              f"{'jobs' if kind == 'job' else 'runs'}/ that a reader could use. Writing it would either be "
+              f"ambiguous or land outside the filing directory.")
+        return 2
+    dest = into / name
     if src == dest.resolve():
         print(f"NOT FILED: {src} is already the filed folder. A filing that copies onto itself destroys the "
               f"source; there is nothing to do.")
@@ -516,6 +555,9 @@ def main() -> int:
     f.add_argument("--job-dir", required=True, help="the ended job's folder (must carry packet.json)")
     f.add_argument("--into", help="the dot-plumbline directory (default: <repo>/dot-plumbline); the kit picks "
                    "`jobs/` for a job packet and `runs/` for a dispatch packet")
+    f.add_argument("--name", help="the folder to file as (default: the source directory's name). loop() passes "
+                   "the packet's own job_id here, so a finish is filed under its id and never under the "
+                   "temporary record directory it ran in")
     f.add_argument("--run-log", help="override the run-log path (default: <into>/run-log.json)")
     f.add_argument("--backfill", action="store_true",
                    help="mark the row `unfiled_backfill: true` — for a job that ended before filing was a command")
