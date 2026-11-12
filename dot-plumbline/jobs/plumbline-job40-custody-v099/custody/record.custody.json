@@ -1,0 +1,246 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "round-01/editable/CHANGELOG.md",
+      "digest": {
+        "sha256": "94fa22658558ecb31e16c9042a697d59eba65f08b652962f731883ee460acb23"
+      }
+    },
+    {
+      "name": "round-01/editable/CONTRIBUTING.md",
+      "digest": {
+        "sha256": "67a1415481e8904a8d4c0c831f9bbfc2605bf8afba74c0bc5e3a9673f6a6f499"
+      }
+    },
+    {
+      "name": "round-01/editable/DRAFT-NOTE.md",
+      "digest": {
+        "sha256": "c9c18404295222eec0d32aab5f7ec77a3e2301ea0bd1932f6f5df9ed7894f0d8"
+      }
+    },
+    {
+      "name": "round-01/editable/README.md",
+      "digest": {
+        "sha256": "eae4ec312ce4a20bfd44ddcba5ad6d7ce7ccd24554819d1163baed404848dded"
+      }
+    },
+    {
+      "name": "round-01/editable/SPEC.md",
+      "digest": {
+        "sha256": "f90eaf890dbf101884bfe63109bafee80fc164729602c2c96653d565a171bc70"
+      }
+    },
+    {
+      "name": "round-01/editable/examples/minimal/inputs.json",
+      "digest": {
+        "sha256": "b6aff4f1e3d4f4b0b73794a35600269d924690135202955e63abd947c60c2ef5"
+      }
+    },
+    {
+      "name": "round-01/editable/examples/minimal/record.json",
+      "digest": {
+        "sha256": "c438ac64f565b130457719aba105f52ee52802df5efc3bd1ad838635ad1468ba"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.8",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": null,
+      "frozenAt": null,
+      "author": null,
+      "dimensions": [],
+      "approvals": [],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": null,
+      "kind": null,
+      "version": null,
+      "method": null,
+      "model": null
+    },
+    "startedAt": "2026-11-12T17:09:25Z",
+    "producedAt": "2026-11-12T17:10:10Z",
+    "instrument": {
+      "rubric": null,
+      "runner": null
+    },
+    "evaluators": [
+      {
+        "id": "plumbline-eval via route-eval",
+        "name": "plumbline-eval via route-eval",
+        "kind": "model",
+        "model": null,
+        "script": null
+      }
+    ],
+    "checks": [],
+    "controls": [],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts §4.2); Owner ratification required"
+    ],
+    "retention": null,
+    "external": [],
+    "disposition": {
+      "state": null,
+      "by": null,
+      "at": null,
+      "acknowledgesUnobserved": []
+    },
+    "x-plumbline": {
+      "job_id": "plumbline-job40-custody-v099",
+      "sources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:91"
+      },
+      "terminal_state": "needs_owner",
+      "outcome": "needs_owner",
+      "verdict": null,
+      "stop": "maker failed",
+      "round_count": 1,
+      "rounds": [
+        {
+          "round": 1,
+          "record": "round-01.json",
+          "sha256": "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+        }
+      ],
+      "evaluator_runs": [],
+      "spend": {
+        "rounds_cost_usd": 0.0,
+        "source": "round-*.json cost"
+      },
+      "schema": "plumbline/x-plumbline/v1",
+      "spec_version": {
+        "origin": "document",
+        "path": "/home/jarbis1/tmp/custody-pin8a6",
+        "source": "/home/jarbis1/tmp/custody-pin8a6/SPEC.md:3",
+        "sha256": "ddc6e3512ec27abc6d0c1783cf7847bdd714de1f176e4f7992bb12a5e78be844"
+      },
+      "emitter": {
+        "name": "kit/emit_custody.py",
+        "kit_revision": "62aa8db",
+        "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+        "tree": "5aab8317ceab3a52d885139d7663ca8014553631",
+        "dirty": false,
+        "statedRevision": null
+      },
+      "time_tolerance_s": 60,
+      "times": {
+        "startedAt": "packet.json started_at",
+        "producedAt": "packet.json ended_at"
+      },
+      "hand_times": [],
+      "timeSources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:91"
+      },
+      "time_sources": {
+        "startedAt": "packet.json:160",
+        "producedAt": "packet.json:91"
+      },
+      "emittedAt": "2026-11-12T17:10:10Z",
+      "gaps": [
+        {
+          "field": "bar.digest",
+          "reason": "the run wrote no frozen bar file, and its packet names none",
+          "hard": false
+        },
+        {
+          "field": "bar.frozenAt",
+          "reason": "the run wrote no freeze time",
+          "hard": false
+        },
+        {
+          "field": "bar.author",
+          "reason": "the run wrote no bar author",
+          "hard": false
+        },
+        {
+          "field": "bar.dimensions",
+          "reason": "the run wrote no bar dimension",
+          "hard": false
+        },
+        {
+          "field": "bar.approvals",
+          "reason": "the run recorded no approval",
+          "hard": false
+        },
+        {
+          "field": "maker.name",
+          "reason": "the packet's maker block names no name",
+          "hard": false
+        },
+        {
+          "field": "maker.kind",
+          "reason": "the packet's maker block names no kind",
+          "hard": false
+        },
+        {
+          "field": "maker.version",
+          "reason": "the packet's maker block names no version",
+          "hard": false
+        },
+        {
+          "field": "maker.method",
+          "reason": "the run wrote no maker method file",
+          "hard": false
+        },
+        {
+          "field": "instrument.rubric",
+          "reason": "the run wrote no rubric file and pinned no rubric digest",
+          "hard": false
+        },
+        {
+          "field": "instrument.runner",
+          "reason": "the run wrote no runner file and pinned no runner digest",
+          "hard": false
+        },
+        {
+          "field": "checks",
+          "reason": "the run's round records carry no evaluator reading",
+          "hard": false
+        },
+        {
+          "field": "controls",
+          "reason": "the run's round records carry no control case",
+          "hard": false
+        },
+        {
+          "field": "external",
+          "reason": "the run wrote no harness log, so no CL1-15 evidence exists",
+          "hard": false
+        },
+        {
+          "field": "retention",
+          "reason": "the run recorded no retention location",
+          "hard": false
+        },
+        {
+          "field": "disposition.state",
+          "reason": "the packet holds no disposition_state",
+          "hard": false
+        },
+        {
+          "field": "disposition.by",
+          "reason": "the run named no approver",
+          "hard": false
+        },
+        {
+          "field": "disposition.at",
+          "reason": "the run recorded no disposition time",
+          "hard": false
+        }
+      ]
+    }
+  }
+}

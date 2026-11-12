@@ -1,0 +1,154 @@
+{
+  "_type": "https://in-toto.io/Statement/v1",
+  "subject": [
+    {
+      "name": "memo.md",
+      "digest": {
+        "sha256": "6f98d74080d8d419a3f77771fb6cb468f5d94926d6bbef057b56e2b39f9af774"
+      }
+    }
+  ],
+  "predicateType": "https://evaluatordriven.com/custody/v1",
+  "predicate": {
+    "specVersion": "0.9.9",
+    "levelClaimed": "CL1",
+    "bar": {
+      "digest": {
+        "sha256": "61c50d19fda2f8bf2e20ca8524d5dfa8f215d4f27e5951715601f047820abfbe"
+      },
+      "frozenAt": "2026-10-05T09:00:00Z",
+      "author": "Jordan Blake",
+      "dimensions": [
+        {
+          "id": "D1",
+          "criterion": "Every figure names its source and date",
+          "scale": null
+        },
+        {
+          "id": "D2",
+          "criterion": "The recommendation follows from the figures given",
+          "scale": null
+        }
+      ],
+      "approvals": [
+        {
+          "role": "buyer",
+          "by": "Casey Park",
+          "barDigest": {
+            "sha256": "61c50d19fda2f8bf2e20ca8524d5dfa8f215d4f27e5951715601f047820abfbe"
+          },
+          "at": "2026-10-05T08:40:00Z",
+          "adopted": null
+        },
+        {
+          "role": "specialist",
+          "by": "Riley Moss",
+          "barDigest": {
+            "sha256": "61c50d19fda2f8bf2e20ca8524d5dfa8f215d4f27e5951715601f047820abfbe"
+          },
+          "at": "2026-10-05T08:50:00Z",
+          "adopted": null
+        }
+      ],
+      "publishedAt": null,
+      "groundTruth": [],
+      "dissent": []
+    },
+    "maker": {
+      "name": "Alex Kim",
+      "kind": "person",
+      "version": "n/a (person)",
+      "method": {
+        "sha256": "dadfad99b1a7d632ea246b72ac445f867dcfb1265d182ae733b165316070b1a9"
+      },
+      "model": null
+    },
+    "startedAt": "2026-10-05T10:00:00Z",
+    "producedAt": "2026-10-06T15:00:00Z",
+    "instrument": {
+      "rubric": {
+        "sha256": "70215f416d493c067b5958212f8c6252499b548469b86ce1c063654c14b805df"
+      },
+      "runner": {
+        "sha256": "38d6039853da0d1189a65a6840574143c913ce053a07e29ddf453186a7bc8efc"
+      }
+    },
+    "evaluators": [
+      {
+        "id": "E1",
+        "name": "Taylor Grant",
+        "kind": "person",
+        "model": null,
+        "script": null
+      }
+    ],
+    "checks": [
+      {
+        "dimension": "D1",
+        "evaluator": "E1",
+        "run": 1,
+        "batch": "B1",
+        "at": "2026-10-07T10:05:00Z",
+        "outcome": "conforms",
+        "score": null,
+        "failureCondition": "A figure without a named source and date",
+        "evidence": {
+          "name": "reading-D1.md",
+          "sha256": "2ce170d58dacce55444929e57137063a6e1bc8fbd7b41069ead32263194c499f"
+        },
+        "unobserved": null
+      },
+      {
+        "dimension": "D2",
+        "evaluator": "E1",
+        "run": 1,
+        "batch": "B1",
+        "at": "2026-10-07T10:09:00Z",
+        "outcome": "conforms",
+        "score": null,
+        "failureCondition": "A recommendation that needs facts the memo does not give",
+        "evidence": {
+          "name": "reading-D2.md",
+          "sha256": "dec9158ec2a45295c39bea4064c87ab8c6100ad126c247fd4a93bdd7914f81a2"
+        },
+        "unobserved": null
+      }
+    ],
+    "controls": [
+      {
+        "id": "K1",
+        "batch": "B1",
+        "evaluator": "E1",
+        "case": {
+          "sha256": "19899b12f2ef66a0b8a3dd383a2303f981281f77d4646ab134b551c7f48fa459"
+        },
+        "expected": "does_not_conform",
+        "outcome": "does_not_conform"
+      },
+      {
+        "id": "K2",
+        "batch": "B1",
+        "evaluator": "E1",
+        "case": {
+          "sha256": "bb539f973b93178f73d41e0f996f50c1a7f8e08c490a4813f161925dc69fb9fd"
+        },
+        "expected": "conforms",
+        "outcome": "conforms"
+      }
+    ],
+    "disagreements": [],
+    "violations": [],
+    "separationGaps": [],
+    "retention": {
+      "location": "team drive / records / meeting-memo",
+      "public": false
+    },
+    "external": [],
+    "disposition": {
+      "state": "given",
+      "by": "Casey Park",
+      "at": "2026-10-07T16:00:00Z",
+      "acknowledgesUnobserved": []
+    }
+  }
+}

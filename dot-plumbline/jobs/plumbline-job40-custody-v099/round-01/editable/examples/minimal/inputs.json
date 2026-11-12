@@ -1,0 +1,54 @@
+{
+  "subject": {"files": ["memo.md"]},
+  "specVersion": "0.9.9",
+  "levelClaimed": "CL1",
+  "bar": {
+    "digest": {"file": "bar.md"},
+    "frozenAt": "2026-10-05T09:00:00Z",
+    "author": "Jordan Blake",
+    "dimensions": [
+      {"id": "D1", "criterion": "Every figure names its source and date", "scale": null},
+      {"id": "D2", "criterion": "The recommendation follows from the figures given", "scale": null}
+    ],
+    "approvals": [
+      {"role": "buyer", "by": "Casey Park", "barDigest": {"file": "bar.md"},
+       "at": "2026-10-05T08:40:00Z", "adopted": null},
+      {"role": "specialist", "by": "Riley Moss", "barDigest": {"file": "bar.md"},
+       "at": "2026-10-05T08:50:00Z", "adopted": null}
+    ],
+    "publishedAt": null,
+    "groundTruth": [],
+    "dissent": []
+  },
+  "maker": {"name": "Alex Kim", "kind": "person", "version": "n/a (person)", "method": {"file": "method.md"},
+            "model": null},
+  "startedAt": "2026-10-05T10:00:00Z",
+  "producedAt": "2026-10-06T15:00:00Z",
+  "instrument": {"rubric": {"file": "rubric.md"}, "runner": {"file": "procedure.md"}},
+  "evaluators": [{"id": "E1", "name": "Taylor Grant", "kind": "person", "model": null, "script": null}],
+  "checks": [
+    {"dimension": "D1", "evaluator": "E1", "run": 1, "batch": "B1", "at": "2026-10-07T10:05:00Z",
+     "outcome": "conforms", "score": null,
+     "failureCondition": "A figure without a named source and date",
+     "evidence": {"evidenceFile": "evidence/reading-D1.md"}, "unobserved": null},
+    {"dimension": "D2", "evaluator": "E1", "run": 1, "batch": "B1", "at": "2026-10-07T10:09:00Z",
+     "outcome": "conforms", "score": null,
+     "failureCondition": "A recommendation that needs facts the memo does not give",
+     "evidence": {"evidenceFile": "evidence/reading-D2.md"}, "unobserved": null}
+  ],
+  "controls": [
+    {"id": "K1", "batch": "B1", "evaluator": "E1", "case": {"file": "control-case.md"},
+     "expected": "does_not_conform",
+     "outcome": "does_not_conform"},
+    {"id": "K2", "batch": "B1", "evaluator": "E1", "case": {"file": "control-clean-case.md"},
+     "expected": "conforms",
+     "outcome": "conforms"}
+  ],
+  "disagreements": [],
+  "violations": [],
+  "separationGaps": [],
+  "retention": {"location": "team drive / records / meeting-memo", "public": false},
+  "external": [],
+  "disposition": {"state": "given", "by": "Casey Park", "at": "2026-10-07T16:00:00Z",
+                  "acknowledgesUnobserved": []}
+}

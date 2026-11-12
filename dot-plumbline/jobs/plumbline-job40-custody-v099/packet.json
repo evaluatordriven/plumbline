@@ -1,0 +1,308 @@
+{
+  "acceptedRound": null,
+  "accepted_round": null,
+  "artifact": {
+    "base": "dd64e06 (job40-v099 worktree at /home/jarbis1/tmp/custody-job40; porcelain EMPTY at authoring except the untracked bar tests/test_v099_instrument1.py, copied in for this job and never committed)",
+    "deliverable": "a work tree in which the release documents all name one release later than the base 0.9.8, dated later than the base header, with no RECORD-GAP note carrying the release's name; the requirement set unchanged; the two example files declaring the release; and all 14 collected cases of tests/test_v099_instrument1.py green. The Maker writes documents only. It does not write record/custody-v0.9.9.json: that file is Instrument 2's, and Instrument 2 is not this bar and not this job's Maker work.",
+    "editable": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
+    "frozen": [
+      "tests/test_v099_instrument1.py",
+      "checker/check.py",
+      "tools/count.py",
+      "tools/check_verdicts.py",
+      "schema/custody-v1.schema.json",
+      "fixtures/expected.json",
+      "tests/example_version_check.py"
+    ],
+    "paths": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
+    "repo": "https://github.com/evaluatordriven/custody.git",
+    "scope": {
+      "allowed": "edits inside the seven release documents, and nothing else; the documents must keep the requirement rows, the section-4 required cells and the CONTRIBUTING sentences the base carries, changing only version tokens, the header line and the release's own entry",
+      "not_allowed": [
+        "any edit to tests/test_v099_instrument1.py: the bar is FROZEN. It is the approved bytes (sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16) and the Owner's standing instruction is not to reopen it",
+        "any edit to checker/, tools/, schema/, fixtures/ or tests/: the bar's own FROZEN_PATHS and FROZEN_DIRECTORIES (tests/test_v099_instrument1.py:1205-1216) freeze those directories whole",
+        "creating record/RECORD-GAP-v0.9.9.md: a gap note for this release is refused; this release ships a record, which is Instrument 2's file and not the Maker's",
+        "creating record/custody-v0.9.9.json: the record is Instrument 2's, produced by the release's own instrument, not by the document Maker",
+        "adding, removing or rewording any requirement row (CR-/CL1-/CL2-/CL3-/BL-), any section-4 required cell, or the CONTRIBUTING sentences test_08 requires to survive"
+      ]
+    },
+    "test_cmd": [
+      "python3",
+      "tests/test_v099_instrument1.py"
+    ]
+  },
+  "bestRound": 1,
+  "best_round": 1,
+  "bounds": {
+    "T_accept": 1,
+    "T_dim": 1,
+    "T_reject": 0,
+    "budget": {
+      "amount": 0.3,
+      "note": "Strictly under US$0.30 of all model/API spend and under 4 h wall, first Maker dispatch to disposition; either breach -> needs_owner. The lean default, not a measured figure: the programme has ~$1.00 of headroom against a job whose work is seven documents. cap 2 with the carried-forward best artifact means one generation to land the version cut and one revision to repair it; T_accept 1 and T_dim 1 mean one unmet check at the cap ends needs_owner, never accepted.",
+      "time_hours_lt": 4,
+      "unit": "USD"
+    },
+    "cap": 2,
+    "cap_counts": "generations",
+    "scoring_set": [
+      "10_footprint_the_bar_writes_only_inside_its_own_temp_root",
+      "11_bytes_move_no_stored_record_changes_while_the_bar_runs",
+      "13_every_green_at_base_case_bites",
+      "14_the_version_is_read_from_the_document_and_never_from_a_flag",
+      "00_the_release_lands",
+      "01_spec_header_is_the_release_with_a_real_past_date",
+      "02_count_py_green_except_the_record",
+      "03_count_py_maker_problems_are_gone",
+      "04_every_example_declares_the_release",
+      "05_no_requirement_changed",
+      "06_cadence_amendment_and_the_no_requirement_claim",
+      "07_contributing_names_v098_and_carries_no_token_count_py_reads",
+      "08_readme_contributing_draft_note_are_consistent",
+      "09_every_current_document_is_clean"
+    ],
+    "scoring_set_note": "The 14 case names the bar COLLECTS, in the order the kit's own collector returns them (kit/conductor_loop.py:_collected_cases, which runs the bar's load_tests: TestControls's four by name, then TestReleaseDocuments's ten), names with `test_` removed, the spelling a dimension carries. No `12` and no `12b`: Instrument2Sequencing is dropped by the bar's load_tests and its class name does not begin with `Test`, so neither `python3 tests/test_v099_instrument1.py` nor `discover` collects them. The split stands. Job 35 died partly because 16 names were scored against 14 collected."
+  },
+  "buyer": "Steve Moitozo II (S2)",
+  "cap": 2,
+  "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+  "constitution_ref": "dot-plumbline/constitution.json",
+  "constitution_version": "0.1.0",
+  "cost": 0.0,
+  "disposition": null,
+  "disposition_state": "not_yet_given",
+  "endedAt": "2026-11-12T17:10:10+00:00",
+  "ended_at": "2026-11-12T17:10:10+00:00",
+  "entry": "A",
+  "escalation": {
+    "carries": "shortfalls",
+    "classes": [
+      "cap_reached",
+      "budget_breach",
+      "time_breach",
+      "artifact_missed_standard",
+      "tampered_out_of_scope",
+      "evaluator_split",
+      "held_out_unreadable",
+      "frame_at_fault"
+    ],
+    "classes_source": "The five owner-set names (cap_reached, budget_breach, time_breach, artifact_missed_standard, tampered_out_of_scope) are the Owner's vocabulary as carried in this programme. evaluator_split and held_out_unreadable are loop()'s own stop constants. frame_at_fault is the Architect's, used only when the bar itself is shown wrong. Class labels chosen by the Architect; no threshold in them.",
+    "holders": {
+      "architect": "Architect (Hermes plumbline-architect profile) \u2014 authored this packet; did not author the bar (the bar is the Specialist-approved 11c7dc71\u2026); does not ratify, does not run the loop, does not dispatch, does not score",
+      "not_holders": "The Architect does not hold the orchestrator seat here, and no holder below equals the Architect: holders.architect is 'Architect (Hermes plumbline-architect profile)', which is not an entry in holders.orchestrator.",
+      "orchestrator": [
+        {
+          "carries": "dispatch, the pass rule, the cap, the clock, the budget, the round records, the filing",
+          "does": "rounds",
+          "holder": "plumbline-conductor round runner",
+          "kind": "script",
+          "tested": "loop() of kit/conductor_loop.py at kit pin 62aa8db has run to a filed finish under the kit's own end-to-end tests. Its refusals are that revision's _problems(), which the Architect read and ran before this packet was written. NOT yet shown by a run against this packet: loop() refuses this packet until the Owner sets ratified to true."
+        },
+        {
+          "carries": "the escalation record and the relay of the Owner's decision; the Architect writes the options and the recommendation",
+          "does": "escalations",
+          "holder": "escalation-delivery holder (the conductor profile's escalation route)",
+          "kind": "script",
+          "tested": "plumbline-escalate at the kit pin: its refusals and its writer are exercised by tests/test_escalate.py; it writes escalation.json from loop()'s facts and relays the Owner's decision. It writes none of the content."
+        }
+      ]
+    },
+    "route": [
+      "Architect",
+      "Owner"
+    ]
+  },
+  "evaluator": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-eval"
+    ],
+    "held_out": [],
+    "kind": "model",
+    "name": "plumbline-eval via route-eval",
+    "note": "loop() sets PLUMBLINE_TURN and PLUMBLINE_COST and reads JSON from stdout; route-eval scores nothing itself. Two runs, as bounded; T_accept 1 and T_dim 1 mean every dimension must score 1, and a split across the two runs is evaluator_split, not an average. route-eval derives its dimension names by regex from the bar file's `def test_` lines (route-eval._dimension_names), which are the same 14 names bounds.scoring_set declares.",
+    "read_only": true,
+    "runs": 2,
+    "who": "plumbline-eval (model Evaluator seat)"
+  },
+  "finish": {
+    "accepted_round": null,
+    "best_round": 1,
+    "cap": 2,
+    "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+    "cost": 0.0,
+    "ended_at": "2026-11-12T17:10:10+00:00",
+    "outcome": "needs_owner",
+    "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
+    "rounds": 1,
+    "rounds_sha256": [
+      "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-12T17:09:25+00:00",
+    "stop": "maker failed",
+    "terminal_state": "needs_owner"
+  },
+  "ground_truth": [
+    {
+      "channel": "python3 tests/test_v099_instrument1.py (from the job tree, PYTHONPATH=.)",
+      "hardness": "INVARIANT",
+      "source": "tests/test_v099_instrument1.py \u2014 the Specialist-approved bar",
+      "version": "sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16"
+    },
+    {
+      "hardness": "INVARIANT",
+      "source": "The Specialist's approval of that digest. The bar is approved bytes; this job does not reopen it and the Architect did not write it.",
+      "version": "11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16"
+    },
+    {
+      "hardness": "DOCUMENT",
+      "source": "Owner ruling, the job's name: \"Fresh-v099\" \u2014 a new job for the custody v0.9.9 release; Job 35 is closed as incomplete and is not to be reanimated.",
+      "version": "Owner, 2026-11-12 (this job's brief)"
+    },
+    {
+      "channel": "exit 1; stdout captured 2026-11-12 by the Architect",
+      "hardness": "PRIOR",
+      "source": "The bar's own RED measurement at base, measured by the Architect on this tree: PYTHONPATH=. python3 tests/test_v099_instrument1.py -> Ran 14 tests, FAILED (failures=2). RED: 00_the_release_lands, 02_count_py_green_except_the_record. The other 12 green at base (incl. 01, 03-11, 13, 14). NOTE: the bar's own docstring at line 102 claims a different base reading (1 RED, test_00 only). That docstring is not measured on this tree and is not what this packet carries; the run above is.",
+      "version": "11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16"
+    },
+    {
+      "channel": "git -C /home/jarbis1/tmp/plumbline-job35-tree status --short",
+      "hardness": "PRIOR",
+      "source": "The Maker's best artifact, carried forward, not regenerated: Job 35's round-1 green documents at /home/jarbis1/tmp/plumbline-job35-tree (a custody clone of 534d873). `git status --short` shows M CHANGELOG.md CONTRIBUTING.md DRAFT-NOTE.md README.md SPEC.md examples/minimal/inputs.json examples/minimal/record.json (plus M tests/test_v099_release.py, which this job does not carry: it is Job 35's bar, not this one's). The bar bytes in that tree are the same 11c7dc71\u2026 as this job's bar.",
+      "version": "/home/jarbis1/tmp/plumbline-job35-tree, HEAD 900f2ba"
+    },
+    {
+      "hardness": "DOCUMENT",
+      "source": "The custody document contract: tools/count.py requires a record named custody-v<version>.json or a RECORD-GAP note for the version, and GAP_EXCEPTIONS = {'0.9.8'} (tools/count.py:44) makes the gap an exception for 0.9.8 only.",
+      "version": "custody dd64e06 (tools/count.py at base)"
+    }
+  ],
+  "human_seat": "Steve Moitozo II (S2)",
+  "instrument_profile": "full",
+  "job_id": "plumbline-job40-custody-v099",
+  "job_name": "Custody v0.9.9 release: cut the version across the release documents, so the release ships a record instead of a gap note",
+  "job_to_be_done": {
+    "desired_future": "A custody worktree at 0.9.9 in which every document agrees on the release, count.py reports only the record it does not yet have, and the record can be produced against a tree whose checks and whose producedAt belong to the same artifact.",
+    "gains": [
+      "The release ships a record (Instrument 2) instead of an argued gap",
+      "No requirement moves, so the monthly cadence is not consumed (Owner ruling, CADENCE_AMENDMENT)",
+      "The documents can be checked, not merely rewritten"
+    ],
+    "pain_points": [
+      "The release documents are at 0.9.8 and a release that has not moved cannot ship a record: count.py reports it unreleased, and the previous release's gap-note exception (GAP_EXCEPTIONS = {'0.9.8'}, tools/count.py:44) is a path no later release may take",
+      "A release written by hand across five documents drifts: README, CONTRIBUTING, DRAFT-NOTE, SPEC and the two examples each carry a version stamp, and one stale stamp is a count.py problem",
+      "Job 35's run never finished, so its green documents exist but were never accepted and filed (see notes)"
+    ],
+    "statement": "Cut custody v0.9.9 as a release that changes no requirement: the documents name one later release, consistently, so the release can ship a record rather than a gap note."
+  },
+  "k": 2,
+  "maker": {
+    "cmd": [
+      "/home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker"
+    ],
+    "engine": "aider via route-maker (the conductor profile's maker route)",
+    "feedback_forms": [
+      "failing test output (the bar's own assertions, verbatim)",
+      "diff (aider's edit format)"
+    ],
+    "handoff": "rule12",
+    "task_classes": [
+      {
+        "class": "generation",
+        "shown_by": "Job 35 round 1: the seven release documents went from RED to GREEN against a documents-only bar. The artifact is carried forward as the best artifact (see notes), so this job does not need a fresh generation to start from scratch."
+      },
+      {
+        "class": "revision",
+        "shown_by": "Job 35 round 1 was followed by a round the loop labelled regenerate, which the Maker did not complete. No completed revision run of this route through loop() has been shown to the Architect for this job; the revision class is carried from Job 35's generation and is not independently evidenced."
+      }
+    ],
+    "version": "the conductor profile's route-maker at /home/jarbis1/.hermes/profiles/plumbline-conductor/bin/route-maker; the model id is recorded in each maker log, not re-derived here"
+  },
+  "mandate_ref": {
+    "doc": "EDI-MANDATE.md",
+    "version": "f8bfb7934dbbefe3b32bc146b4481dba1744bc53"
+  },
+  "mode": "scored",
+  "notes": "WHY THIS JOB EXISTS. Job 35's run never finished: round 1 ended pass_rule regenerate, round 2 was killed and the loop stopped 'tampered', and emit_custody refuses its record with `[order] producedAt 20:35:43Z is after checks.at 20:12:33Z` because producedAt comes from packet.json ended_at, which the loop wrote after round 2. A fresh run that ACCEPTS and FILES gives Instrument 2 a producedAt that belongs to the artifact the checks measured. Job 35 is closed as incomplete and its packet and record dir are not reused. WHAT IS CARRIED FROM IT. Only the seven document files of its round-1 green tree, named as ground_truth and as the Maker's starting artifact at /home/jarbis1/tmp/plumbline-job35-tree; they are to be carried forward into this job's tree, not regenerated. The Maker starts from those bytes. THE BASE READING DISCREPANCY, disclosed: the bar's docstring (line 102) says 'exit 1, 1 RED \u2014 test_00 \u2014 and 13 GREEN'. The Architect measured, on this tree and these bytes, Ran 14 / FAILED (failures=2), with test_02 also red. The docstring is stale or was written for a different tree; the packet's ground_truth carries the measurement, not the docstring. The Architect does not reword the bar. THE BAR IS NOT TOUCHED: it is the Specialist-approved digest 11c7dc71\u2026, copied byte for byte, and it is frozen. If the bar is wrong, that is frame_at_fault and the Owner's, not a Maker edit. THE RECORD IS NOT MAKER WORK: record/custody-v0.9.9.json is Instrument 2's file; test_12/test_12b are Instrument 2's cases and are not in this job's 14. The instrument 2 holds the Maker bar clean of byte: route-eval's dimension list is derived by regex from `def test_` lines and yields the same 14.",
+  "outcome": "needs_owner",
+  "packetSha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
+  "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
+  "proposed": {
+    "budget_choice": "The Architect set $0.30 / 4 h as the lean default named in the brief and did not measure a different figure. This is a choice, disclosed as a choice. The programme has ~$1.00 of headroom.",
+    "drafted_by": "Architect (Hermes plumbline-architect profile), 2026-11-12",
+    "entry_reason": "Entry A by the artifact: the release has not been cut, the bar is approved before the work, and what is missing is commissioned documents work. This is a fresh job, not a reanimation of Job 35 (Owner: 'Fresh-v099').",
+    "frozen_choice": "The Architect put tests/test_v099_instrument1.py in artifact.frozen and NOT in artifact.editable. The loop refuses a turn whose frozen set intersects its editable set (kit/conductor_software.py:80-108, refuse_editable), so this is how 'the bar is frozen, not editable' is expressible to the kit. The other six frozen entries are the bar's own FROZEN_PATHS/FROZEN_DIRECTORIES: the bar measures the tree it runs in, so the tools, schema, fixtures and checker it cites must not move under it.",
+    "k_x": "k = 2 iteration bound; x = 10 (% of budget) B.1.2 discovery window. x is NOT a spend allowance: the budget stays strictly under US$0.30.",
+    "level_claimed_for_own_record": "CL1",
+    "problems_readings": "kit.conductor_loop._problems() with evaluator_fn=None, on this tree: staged form (this file, ratified false) -> ['ratified is not true'] and nothing else, on both the real bar-file path and an inline test_cmd path; promoted form (ratified true, in memory, nothing else changed) -> [] on both paths. The single staged finding is the Owner's flag, not a defect.",
+    "schema_contradiction": "MEASURED, and disclosed rather than papered over. schemas/job-packet.schema.json carries two allOf blocks that cannot both hold for an unratified scored packet: rule 1 (ratified:false) forbids top-level bounds / specialist / standard_ref, and rule 2 (mode:scored) REQUIRES specialist and bounds. Measured with the corpus gate (validate_job_packet.py, jsonschema 4.26.0, Draft 2020-12): the staged file -> exit 1, 'scored mode missing: specialist' / 'scored mode missing: bounds' when the three are moved under proposed, and 'ratified:false must not have top-level bounds/specialist/standard_ref' when they are top level. BOTH staged shapes fail, so no unratified scored packet can pass the gate; this is not a mistake in this file. Measured with ratified flipped to true and the three at top level -> 'OK (schema-verified)', exit 0. This is the same contradiction Job 38's packet records in its disclosed_tensions. It is the Owner's or the schema maintainer's to resolve, not the Architect's to paper over, and the Architect has not edited the schema.",
+    "scoring_set_choice": "The Architect chose to DECLARE the scoring set rather than omit it. An absent set is the legacy packet and scores the whole reply; a declared set is validated and is refused if it drops a case the bar collects (kit/conductor_loop.py:1078-1088). The 14 names are exactly the collected set, so the declaration omits nothing and the refusal does not fire. Declaring them is what makes the 16-vs-14 confusion of Job 35 structurally impossible rather than a matter of the Evaluator naming 14.",
+    "separation": "Maker and Evaluator are separate seats reached by separate routes (route-maker, route-eval). The Architect authored the packet and neither route; it did not author the bar.",
+    "status": "STAGED, NOT RATIFIED. Written by the Architect 2026-11-12 for the Owner; the Owner ratifies, the Architect does not ratify what it authored. The must-ask values (specialist, bounds, standard_ref) ARE carried at top level, as every staged packet in this programme carries them, so the Owner can read every term in one place. That shape fails the corpus gate for a reason that is structural and is not this packet's defect: see schema_contradiction.",
+    "threshold_mapping": "Binary scale per dimension: 1 = the case passes, 0 = it does not. pass = mean >= T_accept(1) AND min >= T_dim(1), i.e. every one of the 14 collected cases passes. Any 0 with iterations < cap -> regenerate; at cap -> needs_owner. T_reject 0 means the algebra never rejects (min < 0 impossible); rejected stays the Owner's call."
+  },
+  "ratified": true,
+  "rounds": 1,
+  "roundsSha256": [
+    "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+  ],
+  "rounds_sha256": [
+    "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+  ],
+  "separation_gaps": [
+    "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+    "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+  ],
+  "specialist": "Steve Moitozo II (S2) \u2014 the Specialist who approved the bar at sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16. Carried from the approval: this packet does not newly name a Specialist, and the Architect did not author the bar.",
+  "stage": "revision",
+  "standard_ref": {
+    "doc": "tests/test_v099_instrument1.py",
+    "version": "sha256 11c7dc7115f2e1b1403678275b787b7c0fe332e9f05cfd60799370e17a097a16 \u2014 the Specialist-approved digest, copied into /home/jarbis1/tmp/custody-job40 byte for byte; 14 collected cases, 2 uncollected Instrument 2 cases"
+  },
+  "startedAt": "2026-11-12T17:09:25+00:00",
+  "started_at": "2026-11-12T17:09:25+00:00",
+  "stop": "maker failed",
+  "summary": {
+    "accepted_round": null,
+    "best_round": 1,
+    "cap": 2,
+    "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+    "cost": 0.0,
+    "ended_at": "2026-11-12T17:10:10+00:00",
+    "outcome": "needs_owner",
+    "packet_sha256": "aa0d276f6586a76c5a76f77851d22c50691e14fe12faef2e02ccebd57fb79476",
+    "rounds": 1,
+    "rounds_sha256": [
+      "368be71f9990e70f27cf1b3869fe0f1346f9c4ff145acbffe66df53fe9414a66"
+    ],
+    "separation_gaps": [
+      "The gate rerun is a script Evaluator reading held in the same module as Orchestrator dispatch (DOCTRINE D3.holder, rule 5).",
+      "Architect proposed packet not recorded after seeing drafts (D3.Architect vs Contracts \u00a74.2); Owner ratification required"
+    ],
+    "started_at": "2026-11-12T17:09:25+00:00",
+    "stop": "maker failed",
+    "terminal_state": "needs_owner"
+  },
+  "terminalState": "needs_owner",
+  "terminal_state": "needs_owner",
+  "x": 10
+}

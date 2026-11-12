@@ -1,0 +1,52 @@
+{
+  "best_round": 1,
+  "cost": 0.0,
+  "ended_at": "2026-11-12T17:10:10+00:00",
+  "evaluator": [],
+  "findings_sha256": "8f2c057684cf620c31ace7457c285cecd9ab36eead0e16f09e6aa63188ab0d74",
+  "held_out": {
+    "by": "loop()",
+    "method": "line and sha256 scan: each held-out file's sha256 hex digest, and each of its lines (bytes decoded as UTF-8, undecodable bytes replaced) that has an alphanumeric character, searched verbatim as a substring of the findings text; a line with no alphanumeric character is skipped; a path that cannot be opened and read fails the check",
+    "result": "pass"
+  },
+  "pass_rule": null,
+  "reading": {},
+  "round": 1,
+  "run": {
+    "awaited_engine": null,
+    "changes": [],
+    "commit": "62aa8db25ee7ceb33cf56fd2ea440d6280a847ed",
+    "dispatched": true,
+    "editable": [
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      "DRAFT-NOTE.md",
+      "README.md",
+      "SPEC.md",
+      "examples/minimal/inputs.json",
+      "examples/minimal/record.json"
+    ],
+    "hashes_unchanged": true,
+    "ignored": {
+      "paths": [],
+      "rules": []
+    },
+    "maker": {
+      "exit": 3,
+      "output_sha256": "1583cefe6c85e3c19774901939267ec4a6180be27e1a9ea2001d667d1cbd65cf"
+    },
+    "passed": false,
+    "reason": "maker failed",
+    "red": {
+      "exit": 1,
+      "output_sha256": "15996401f66dd9ccb2d17d052dd9b5504015e0473949c6b2f7d573ddabd658cb"
+    },
+    "rerun": {
+      "exit": 1,
+      "output_sha256": "ec3515c9dc95fc0a8e657e88a8377c7fce97f7b9f8362cebf3c46f484824b112"
+    }
+  },
+  "started_at": "2026-11-12T17:09:25+00:00",
+  "stop": "maker failed",
+  "verdict_mismatch": false
+}
