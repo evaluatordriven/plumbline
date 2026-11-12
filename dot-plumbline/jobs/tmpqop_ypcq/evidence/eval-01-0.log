@@ -1,1 +1,0 @@
-{"dimensions": [{"name": "q", "score": 1, "observation": "seen"}], "violations": [], "verdict": "accept", "controls": {"should_pass": "passed", "should_fail": "failed"}}
