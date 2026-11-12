@@ -423,12 +423,16 @@ def _custody_packet(packet, halt, job_id=None):
     own fields are kept alongside so the record's subject can be drawn from
     them.
 
-    The descriptor also carries a ``job_id``. ``plumbline_job.do_file()`` files a
-    folder under ``jobs/`` only when its packet carries one — a folder under
-    ``jobs/`` with no id is a job no reader can read — and the ratified packet
-    need not carry one, so the finish supplies the record directory's own name,
-    which is what the filed folder will be called. ``job_id`` is passed in rather
-    than typed here; a packet that already names one keeps it.
+    The descriptor carries a ``job_id`` only when the packet this job was handed
+    names one. ``plumbline_job.do_file()`` files a folder under ``jobs/`` only
+    when its packet carries an id — a folder under ``jobs/`` with no id is a job
+    no reader can read — so a finish whose packet names none is not a job and is
+    not filed as one. Nothing here invents an identity: a temporary record
+    directory's basename is not a job id, and writing one into the packet would
+    change, after dispatch, the terms the job was handed (measured 2026-11-12,
+    Job 38d: the fallback to the record directory's name is how
+    ``jobs/tmp3oudgzx8`` came to exist). The optional ``job_id`` is an identity a
+    CALLER asserts — never a fallback to the scratch folder the finish ran in.
     """
     descriptor = dict(packet) if isinstance(packet, dict) else {}
     if not (isinstance(descriptor.get("job_id"), str) and descriptor["job_id"].strip()):
@@ -803,8 +807,7 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     }
     if not _own_clock():
         raise CustodyNotDone(halt, _exit_code(stop))
-    _dump(os.path.join(record_dir, "packet.json"),
-          _custody_packet(loaded, halt, os.path.basename(os.path.abspath(str(record_dir)))))
+    _dump(os.path.join(record_dir, "packet.json"), _custody_packet(loaded, halt))
     code = emit_custody_for_finish(record_dir, halt)
     if code != 0:
         raise CustodyNotDone(halt, code if code in (1, 2, 3) else 3)
@@ -821,6 +824,33 @@ def loop(packet, *, record_dir, cwd=None, timeout_s=600, commit=None, evaluator_
     return halt
 
 
+def _filed_name(record_dir):
+    """The folder name a finish is filed under: the packet's own ``job_id``, or None.
+
+    A job is filed under the identity its packet names — never under the scratch
+    directory it happened to run in. ``loop()`` cannot pass ``job_id`` to
+    ``do_file()`` as a parameter of its own: the destination name is the job's,
+    not the caller's. So the name is read back from the ``packet.json`` this
+    finish wrote, which is the same file ``do_file()`` classifies from.
+
+    None is the honest answer for a finish whose packet names no id: it has no
+    name a reader could use, so ``do_file()`` refuses it and nothing lands under
+    ``jobs/``. Refusing is one of the honest readings the bar names; inventing a
+    name from the record directory is not.
+    """
+    try:
+        with open(os.path.join(str(record_dir), "packet.json"), encoding="utf-8") as handle:
+            doc = json.load(handle)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(doc, dict):
+        return None
+    name = doc.get("job_id")
+    if isinstance(name, str) and name.strip():
+        return name.strip()
+    return None
+
+
 def file_finish(record_dir, halt):
     """State the job's custody status in its own folder, then file it, as the Orchestrator's last act.
 
@@ -835,6 +865,14 @@ def file_finish(record_dir, halt):
     to remember — that is the defect this fixes, one level up. ``PLUMBLINE_FILE_INTO`` names the instance's
     ``dot-plumbline`` once, in the seat's entry script; a caller who does not set it gets a status file and a
     ``filed: false`` row saying no destination was configured, never a silent skip.
+
+    WHY THE FILED FOLDER IS NAMED BY THE JOB. A finish runs in a temporary record directory, and filing copies
+    that folder under the destination. Left to itself the copy takes the scratch directory's name — measured
+    2026-11-12 (Job 38d): ``dot-plumbline/jobs/tmp3oudgzx8``, a folder under ``jobs/`` that no reader can name
+    because it is nobody's job. So the name handed to ``do_file()`` is the packet's own ``job_id``. A finish
+    whose packet names no id has no such name and is not filed as a job: an invented identity is worse than a
+    missing folder, and the row says so. The destination is still configuration, not a parameter — the NAME is
+    the job's, and it is read from the job's own terms.
 
     WHY IT CANNOT RAISE. An accepted artifact must not be undone by a filing defect: the work is done, the
     record either shipped or did not, and a traceback here would fail a job that already passed. Every outcome
@@ -866,13 +904,17 @@ def file_finish(record_dir, halt):
                              "and the job is not filed; this row is the record of that.")
             return row
         args = argparse.Namespace(job_dir=str(record_dir), into=into, run_log=None, force=True,
-                                  backfill=False, allow_incomplete=False)
+                                  backfill=False, allow_incomplete=False, name=_filed_name(record_dir))
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             code = plumbline_job.do_file(args)
         row["filed"] = code == 0
-        row["dest"] = str(pathlib.Path(into).expanduser().resolve() / ("jobs" if state == "custody" else "runs")
-                          / pathlib.Path(str(record_dir)).name)
+        if row["filed"]:
+            row["dest"] = str(
+                pathlib.Path(into).expanduser().resolve()
+                / ("jobs" if state == "custody" else "runs")
+                / (args.name or pathlib.Path(str(record_dir)).name)
+            )
         row["detail"] = (buffer.getvalue() or "").strip()[-800:]
     except Exception as exc:  # filing must not undo a finish; the row is the report
         row["detail"] = "filing raised %s: %s" % (type(exc).__name__, exc)
