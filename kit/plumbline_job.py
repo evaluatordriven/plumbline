@@ -338,6 +338,28 @@ def do_close(a) -> int:
 TERMINALS = ("accepted", "needs_owner", "rejected")
 
 
+def _is_finish(doc) -> bool:
+    """True when the packet is a finish a loop() wrote, not a job and not a dispatch.
+
+    A finish carries a terminal state — ``loop()`` writes it at the top level as
+    ``terminal_state`` and again, in the record's own vocabulary, as ``terminalState`` —
+    and usually the nested ``finish``/``summary`` the emitter reads. Such a folder is the
+    EVIDENCE of a run whose packet names no ``job_id``, so it belongs under ``runs/``:
+    under ``jobs/`` a folder without an id is a job no reader can name, and refusing it
+    loses the only trace of a finish that ran in a scratch directory.
+
+    The ``job_id`` test is first on purpose. A folder that DOES carry an id is a job
+    whatever else it carries, and it is not this function's to reclassify.
+    """
+    if not isinstance(doc, dict) or doc.get("job_id"):
+        return False
+    for key in ("terminal_state", "terminalState"):
+        value = doc.get(key)
+        if isinstance(value, str) and value.strip():
+            return True
+    return isinstance(doc.get("finish"), dict) or isinstance(doc.get("summary"), dict)
+
+
 def do_file(a) -> int:
     """Copy an ended job — or a run's working directory — into `dot-plumbline/`, and record which it is.
 
@@ -372,21 +394,19 @@ def do_file(a) -> int:
         kind = "job"
     elif {"artifact", "bounds", "job"} <= set(doc) or ("job" in doc and ("target" in doc or "maker_cmd" in doc)):
         kind = "run"
+    elif _is_finish(doc):
+        # A finish descriptor from loop() whose ratified packet carries no `job_id`. It is EVIDENCE of a run,
+        # not a job. Filed under `jobs/` it would be the pair `test_jobs_carry_a_job_packet_and_runs_do_not`
+        # refuses — measured 2026-11-12 (Job 38c), and again as Job 38d's `jobs/tmp3oudgzx8`. Filed under
+        # `runs/` nothing reads it as a closed job, and the record of a finish that ran in a scratch directory
+        # survives that directory (Owner ruling, 2026-11-12: an id-less finish must reach the instance record;
+        # vanishing is not one of the honest readings). No id is minted here and the packet is not edited: the
+        # folder keeps its own name, which is what filing a folder has always done.
+        kind = "run"
     else:
-        # A `finish` + `terminalState` folder with NO job_id used to be filed as a job here, so that a finish
-        # descriptor from loop() — whose ratified packet need not carry the instance-only `job_id` — could be
-        # filed. Measured 2026-11-12 (Job 38c): the arm filed a no-id finish under `jobs/`, and a jobs/ folder
-        # whose packet carries no job_id is exactly the pair `test_jobs_carry_a_job_packet_and_runs_do_not`
-        # refuses. Measured again 2026-11-12 (Job 38d): the "identity" that let it through was the temporary
-        # record directory's own basename, so the folder it created was named after scratch — the litter. The
-        # seam no longer invents an id, and the arm stays gone: a folder under `jobs/` always carries a job id,
-        # and an ID-LESS finish is refused rather than filed as a job no reader can read. Filing it under `runs/`
-        # is not an escape either: the finish bar compares the whole destination byte for byte, so a run copy is
-        # litter in its eyes too. Refusing is the honest reading; giving it a real id is the Owner's call.
         print(f"NOT FILED: {packet_src} is neither a job packet (no `job_id`) nor a dispatch packet "
-              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`); a finish with no job id is a "
-              f"job no reader can read, so it is not filed as one. Filing an unclassified folder would make a "
-              f"reader guess.")
+              f"(`artifact`/`bounds`/`job`, or a brief with `job` + `target`), and it is not a finish either; "
+              f"a folder nothing classifies cannot be filed without making a reader guess what it is.")
         return 2
     root = Path(a.into).expanduser().resolve() if a.into else (HERE.parent / "dot-plumbline").resolve()
     into = root / ("jobs" if kind == "job" else "runs")

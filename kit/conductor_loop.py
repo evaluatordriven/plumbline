@@ -64,7 +64,10 @@ A clean finish is then closed and filed by ``file_finish(record_dir, halt)``,
 the last act of ``loop()``: it writes ``custody/status.json`` into the job
 folder (``custody`` or ``missing``, with the record's sha256 and the terminal
 state), and copies the folder into ``$PLUMBLINE_FILE_INTO`` — the instance's
-``dot-plumbline`` — through ``plumbline_job.file``. It raises nothing: an
+``dot-plumbline`` — through ``plumbline_job.file``. A finish whose packet
+carries a ``job_id`` is filed under ``jobs/<job_id>``; one that carries none
+is the evidence of a run and lands under ``runs/``, because a folder under
+``jobs/`` with no id is a job no reader can name. It raises nothing: an
 accepted artifact must not be undone by a filing defect, so the outcome lands
 in ``summary.json`` as ``filing`` with ``state``, ``filed``, ``dest`` and the
 command's own words. With the variable unset the status file is still written
@@ -833,10 +836,12 @@ def _filed_name(record_dir):
     not the caller's. So the name is read back from the ``packet.json`` this
     finish wrote, which is the same file ``do_file()`` classifies from.
 
-    None is the honest answer for a finish whose packet names no id: it has no
-    name a reader could use, so ``do_file()`` refuses it and nothing lands under
-    ``jobs/``. Refusing is one of the honest readings the bar names; inventing a
-    name from the record directory is not.
+    None is the honest answer for a finish whose packet names no id: it has no job
+    name a reader could use, so nothing lands under ``jobs/``. It is not refused:
+    the finish is filed as a run under ``runs/``, keeping the folder name it
+    already has, so the evidence of a finish outlives the scratch directory it ran
+    in. Inventing a job name from the record directory is the thing neither
+    reading does.
     """
     try:
         with open(os.path.join(str(record_dir), "packet.json"), encoding="utf-8") as handle:
@@ -870,9 +875,11 @@ def file_finish(record_dir, halt):
     that folder under the destination. Left to itself the copy takes the scratch directory's name — measured
     2026-11-12 (Job 38d): ``dot-plumbline/jobs/tmp3oudgzx8``, a folder under ``jobs/`` that no reader can name
     because it is nobody's job. So the name handed to ``do_file()`` is the packet's own ``job_id``. A finish
-    whose packet names no id has no such name and is not filed as a job: an invented identity is worse than a
-    missing folder, and the row says so. The destination is still configuration, not a parameter — the NAME is
-    the job's, and it is read from the job's own terms.
+    whose packet names no id is not a job, so it is not filed under ``jobs/``: an invented identity is worse
+    than a missing name. It is still filed — as the evidence of a run, under ``runs/``, where nothing reads it
+    as a closed job — because the record of a finish must outlive the scratch directory it ran in. The
+    destination is still configuration, not a parameter — the NAME is the job's, and it is read from the job's
+    own terms.
 
     WHY IT CANNOT RAISE. An accepted artifact must not be undone by a filing defect: the work is done, the
     record either shipped or did not, and a traceback here would fail a job that already passed. Every outcome
@@ -903,17 +910,24 @@ def file_finish(record_dir, halt):
             row["detail"] = ("no destination configured: PLUMBLINE_FILE_INTO is unset. The status file is written "
                              "and the job is not filed; this row is the record of that.")
             return row
+        name = _filed_name(record_dir)
         args = argparse.Namespace(job_dir=str(record_dir), into=into, run_log=None, force=True,
-                                  backfill=False, allow_incomplete=False, name=_filed_name(record_dir))
+                                  backfill=False, allow_incomplete=False, name=name)
         buffer = io.StringIO()
         with contextlib.redirect_stdout(buffer):
             code = plumbline_job.do_file(args)
         row["filed"] = code == 0
         if row["filed"]:
+            # Say where the filer ACTUALLY wrote. A row that names a folder which is not there
+            # sends a reader to nothing, and whether a record exists (`state`) is not what
+            # decides which directory a folder belongs in: a JOB is a packet with a `job_id`
+            # and lands under `jobs/<id>`, while an id-less finish is the EVIDENCE of a run and
+            # lands under `runs/` — the same choice `do_file()` makes from the same packet, read
+            # back here so the summary can describe its own filing.
             row["dest"] = str(
                 pathlib.Path(into).expanduser().resolve()
-                / ("jobs" if state == "custody" else "runs")
-                / (args.name or pathlib.Path(str(record_dir)).name)
+                / ("jobs" if name else "runs")
+                / (name or pathlib.Path(str(record_dir)).name)
             )
         row["detail"] = (buffer.getvalue() or "").strip()[-800:]
     except Exception as exc:  # filing must not undo a finish; the row is the report
