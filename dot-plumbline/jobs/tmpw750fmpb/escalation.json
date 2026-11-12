@@ -1,0 +1,51 @@
+{
+  "best": {
+    "editable": "/tmp/tmpw750fmpb/round-01/editable",
+    "round": 1,
+    "sha256": "dc87747fe42f63dc988670c52563ff418a144d2ae019110eef99b32da61754c7"
+  },
+  "by": "loop()",
+  "decision": null,
+  "diagnosis": null,
+  "ended_at": "2026-11-12T11:57:17+00:00",
+  "escalation_kind": "below_floor",
+  "holders": {
+    "architect": "plumbline-architect",
+    "orchestrator": [
+      {
+        "does": "rounds",
+        "holder": "kit.conductor_loop.loop",
+        "kind": "script",
+        "tested": "rec#abc"
+      },
+      {
+        "does": "escalations",
+        "holder": "escalation-agent",
+        "kind": "model",
+        "tested": "rec#def"
+      }
+    ]
+  },
+  "human_seat": "Owner",
+  "options": null,
+  "outcome": "rejected",
+  "problems": [],
+  "proposed_packet": null,
+  "question": null,
+  "recommendation": null,
+  "route": [
+    "Architect",
+    "Owner"
+  ],
+  "started_at": "2026-11-12T11:57:16+00:00",
+  "stop": "rejected",
+  "terminal_state": "rejected",
+  "tried": [
+    {
+      "record": "/tmp/tmpw750fmpb/round-01.json",
+      "record_sha256": "ea63c397ed60c576b88d9c124c7efbbff1898f0be8344b1a5558900ad1acdf40",
+      "round": 1
+    }
+  ],
+  "why_unobservable": null
+}

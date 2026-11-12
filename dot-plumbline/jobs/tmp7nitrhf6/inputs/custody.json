@@ -1,0 +1,7 @@
+{
+  "custody_inputs": "plumbline/custody-inputs/v1",
+  "bar": {
+    "file": "custody/bar.md",
+    "frozenAt": "2026-11-12T11:57:16Z"
+  }
+}

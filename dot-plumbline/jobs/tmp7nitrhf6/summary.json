@@ -1,0 +1,24 @@
+{
+  "accepted_round": 1,
+  "best_round": 1,
+  "cap": 1,
+  "commit": "not recorded",
+  "cost": 0.0,
+  "ended_at": "2026-11-12T11:57:16+00:00",
+  "filing": {
+    "dest": "/home/jarbis1/plumbline-records/dot-plumbline/jobs/tmp7nitrhf6",
+    "detail": "run-log: appended the filed row for tmp7nitrhf6 (27 rows)\nfiled (job/custody): /home/jarbis1/plumbline-records/dot-plumbline/jobs/tmp7nitrhf6  (12 files, packet sha256 bdc2746f6ed3)",
+    "filed": true,
+    "state": "custody"
+  },
+  "outcome": "accepted",
+  "packet_sha256": "f58e1d8c93b924b4390b08118e6b88a43ea896fe1feca9e4f36ea19b48c7e769",
+  "rounds": 1,
+  "rounds_sha256": [
+    "6e3550ff1b9900d038709cc98749f22ab3f2fd0d8567b36de5ec696fb69c2e61"
+  ],
+  "separation_gaps": [],
+  "started_at": "2026-11-12T11:57:16+00:00",
+  "stop": "accepted",
+  "terminal_state": "accepted"
+}
