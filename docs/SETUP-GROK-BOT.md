@@ -182,10 +182,11 @@ publish its cases or its answer key, and you should not publish yours: a publish
 
 **Who holds what.**
 
-- The **Orchestrator** asks the **Architect** to build the case suite and a manifest of its hashes. The conduit
-  does not message the Architect to do this.
+- The **live Orchestrator**, the one already qualified and not the candidate, asks the **Architect** to build the
+  case suite and a manifest of its hashes. The candidate never arranges its own test. The conduit does not message
+  the Architect to do this.
 - The **Evaluator** alone holds the answer key, in a place only it can read (its own bot store, not the shared
-  box), and grades every reply against it. The Orchestrator asks for that grade. The conduit does not.
+  box), and grades every reply against it. The live Orchestrator asks for that grade. The conduit does not.
 - The Orchestrator under test never sees the suite's tools, the key or the grader's notes. The conduit may read
   the run record afterward, except the key, and may comment to you. It does not message the Evaluator about the suite.
 
