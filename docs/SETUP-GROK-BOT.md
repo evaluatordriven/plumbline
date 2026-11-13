@@ -73,8 +73,8 @@ the two apart; when your bot starts conducting, the seats lose the one bot that 
 - **It never,** during a job, dispatches work, runs `loop()`, routes verdicts, picks the next round, briefs a
   seat, fills an escalation, summarises in place of the file, or decides.
 - **Anything that looks like conducting goes to the Orchestrator.** During a job, a question for a seat goes to
-  the Orchestrator, which routes it. Outside a job, the conduit may ask the Evaluator to grade an Orchestrator
-  qualification, and never sees the answer key.
+  the Orchestrator, which routes it. Outside a job, the conduit may ask the Architect to build the qualification
+  checks, and may ask the Evaluator to grade them. It never sees the answer key.
 - **It may still manage the bots themselves:** create them, update their instructions through the platform's
   own update with a sha256 readback, and keep the qualification records. That work is outside any job and
   holds no seat.
