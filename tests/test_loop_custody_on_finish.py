@@ -67,6 +67,7 @@ import shutil
 import subprocess
 import sys
 import unittest
+from datetime import datetime, timezone
 from tempfile import TemporaryDirectory
 from unittest import mock
 
@@ -300,7 +301,8 @@ class SeamTests(_Bar):
            behaviour, not whether a version was found. The only field in a record that the job
            directory's name reaches is `x-plumbline.job_id` (the emitter's one path-derived
            value), so each record is compared after that name is rewritten to one placeholder
-           (`_sanitise`). Nothing else may differ.
+           (`_sanitise`). Both runs share `$PLUMBLINE_EMIT_NOW`, so the emission clock is the
+           same instant and a wall-clock tick is not a difference. Nothing else may differ.
 
         3. NOT A CLOSER: THE RECORD IS THE EMITTER'S. Where the bare emitter emits (0, or 1
            with named gaps), the seam's exit equals the twin's and its record, name-sanitised,
@@ -333,48 +335,57 @@ class SeamTests(_Bar):
             {"terminal_state": "open"},
             {"terminal_state": "accepted", "outcome": "accepted"},
         )
-        for packet in cases:
-            with self.subTest(packet=packet):
-                with TemporaryDirectory() as root:
-                    left = os.path.join(root, "aaaaaaaa")
-                    right = os.path.join(root, "aaaaaaab")
-                    for side in (left, right):
-                        if packet is not None:
-                            _dump(os.path.join(side, "packet.json"), packet)
-                        _dump(_custody(side), {"preexisting": True})
-                        with open(_custody(side), "wb") as fh:
-                            fh.write(marker)
-                    # 2. The twin is the job dir BEFORE the seam, byte for byte, with its own name.
-                    for base, dirs, files in os.walk(left):
-                        rel = os.path.relpath(base, left)
-                        dest = os.path.join(right, rel) if rel != "." else right
-                        os.makedirs(dest, exist_ok=True)
-                        for name in files:
-                            shutil.copyfile(os.path.join(base, name), os.path.join(dest, name))
-                    code = fn(left, {"terminal_state": "accepted", "outcome": "accepted", "stop": "accepted"})
-                    # 3. The twin gets the SAME document the seam supplies: emitter against emitter.
-                    twin = _emitter(right, checkout)
-                    left_bytes = _read(_custody(left))
-                    twin_bytes = _read(_custody(right))
-                    if twin in (2, 3) or twin_bytes == marker:
-                        # The bare emitter refused (2 or 3) and wrote nothing: the sentinel survives,
-                        # and the seam did not turn the refusal into a ship.
-                        self.assertEqual(left_bytes, marker,
-                                         "the seam wrote a record where the bare emitter refuses: it closed")
-                        self.assertNotEqual(code, 0,
-                                            "the seam returned 0 where the bare emitter refuses")
-                    else:
-                        # The bare emitter emitted (0, or 1 with named gaps): the seam must be that
-                        # emitter, byte for byte, up to the job-directory name the record carries.
-                        self.assertEqual(code, twin,
-                                         "seam exit %r != the emitter's %r on the same fixture" % (code, twin))
-                        self.assertIsNotNone(left_bytes, "the seam wrote no record where the emitter did")
-                        self.assertEqual(_sanitise(left_bytes, left), _sanitise(twin_bytes, right),
-                                         "the seam's record is not the emitter's on the same fixture")
-                        self.assertEqual(
-                            (json.loads(left_bytes) if left_bytes else {}).get("predicateType"),
-                            PREDICATE_TYPE,
-                            "the seam left a record that is not a custody statement")
+        pinned = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+        prior = os.environ.get("PLUMBLINE_EMIT_NOW")
+        os.environ["PLUMBLINE_EMIT_NOW"] = pinned
+        try:
+            for packet in cases:
+                with self.subTest(packet=packet):
+                    with TemporaryDirectory() as root:
+                        left = os.path.join(root, "aaaaaaaa")
+                        right = os.path.join(root, "aaaaaaab")
+                        for side in (left, right):
+                            if packet is not None:
+                                _dump(os.path.join(side, "packet.json"), packet)
+                            _dump(_custody(side), {"preexisting": True})
+                            with open(_custody(side), "wb") as fh:
+                                fh.write(marker)
+                        # 2. The twin is the job dir BEFORE the seam, byte for byte, with its own name.
+                        for base, dirs, files in os.walk(left):
+                            rel = os.path.relpath(base, left)
+                            dest = os.path.join(right, rel) if rel != "." else right
+                            os.makedirs(dest, exist_ok=True)
+                            for name in files:
+                                shutil.copyfile(os.path.join(base, name), os.path.join(dest, name))
+                        code = fn(left, {"terminal_state": "accepted", "outcome": "accepted", "stop": "accepted"})
+                        # 3. The twin gets the SAME document the seam supplies: emitter against emitter.
+                        twin = _emitter(right, checkout)
+                        left_bytes = _read(_custody(left))
+                        twin_bytes = _read(_custody(right))
+                        if twin in (2, 3) or twin_bytes == marker:
+                            # The bare emitter refused (2 or 3) and wrote nothing: the sentinel survives,
+                            # and the seam did not turn the refusal into a ship.
+                            self.assertEqual(left_bytes, marker,
+                                             "the seam wrote a record where the bare emitter refuses: it closed")
+                            self.assertNotEqual(code, 0,
+                                                "the seam returned 0 where the bare emitter refuses")
+                        else:
+                            # The bare emitter emitted (0, or 1 with named gaps): the seam must be that
+                            # emitter, byte for byte, up to the job-directory name the record carries.
+                            self.assertEqual(code, twin,
+                                             "seam exit %r != the emitter's %r on the same fixture" % (code, twin))
+                            self.assertIsNotNone(left_bytes, "the seam wrote no record where the emitter did")
+                            self.assertEqual(_sanitise(left_bytes, left), _sanitise(twin_bytes, right),
+                                             "the seam's record is not the emitter's on the same fixture")
+                            self.assertEqual(
+                                (json.loads(left_bytes) if left_bytes else {}).get("predicateType"),
+                                PREDICATE_TYPE,
+                                "the seam left a record that is not a custody statement")
+        finally:
+            if prior is None:
+                os.environ.pop("PLUMBLINE_EMIT_NOW", None)
+            else:
+                os.environ["PLUMBLINE_EMIT_NOW"] = prior
 
 
 class PatchedTests(_Bar):
@@ -544,7 +555,8 @@ def _emitter(job, checkout=None):
 
     When `checkout` is given the twin is handed the SAME custody document the seam supplies, by
     writing `inputs/custody.json: custody_spec` — the field the emitter already reads — so the
-    comparison is emitter against emitter on one fixture, and the only bytes allowed to differ
+    comparison is emitter against emitter on one fixture. The test pins `$PLUMBLINE_EMIT_NOW`
+    so the emission clock is not a difference; the only bytes allowed to differ
     between the two records are the job's own name (see `_sanitise`). When it is not, the twin
     is a bare run: it is given no document, so whether it emits or refuses is the emitter's own
     answer on that directory.
