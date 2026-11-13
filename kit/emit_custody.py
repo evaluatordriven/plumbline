@@ -1641,6 +1641,26 @@ def s_key(pl_name: dict, dim: str) -> str:
     return dim
 
 
+def _now_from_env():
+    """The clock ``$PLUMBLINE_EMIT_NOW`` pins, or None when it is unset.
+
+    Unset, ``build()`` keeps the wall clock. Set, both a seam run and its twin
+    can be given the same instant, so a second boundary is not a record diff.
+    A set value that is not an ISO timestamp is a refusal, not a silent fallback.
+    """
+    raw = (os.environ.get("PLUMBLINE_EMIT_NOW") or "").strip()
+    if not raw:
+        return None
+    text = raw[:-1] + "+00:00" if raw.endswith("Z") else raw
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError as exc:
+        raise ValueError(f"PLUMBLINE_EMIT_NOW is not an ISO timestamp ({raw!r})") from exc
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).replace(microsecond=0)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Emit a custody/v1 record for a job at a terminal state.")
     ap.add_argument("--job-dir", required=True)
@@ -1673,8 +1693,13 @@ def main(argv=None) -> int:
     inputs = Path(a.inputs).expanduser() if a.inputs else job / "inputs" / "custody.json"
     ref = H.Refusals()
     try:
-        record, gaps, _ = build(job, inputs, ref, expect=a.expect_revision, allow_hand=a.allow_hand_times,
-                                spec_version=a.spec_version)
+        pinned = _now_from_env()
+    except ValueError as exc:
+        print(f"REFUSED: {exc}")
+        return 2
+    try:
+        record, gaps, _ = build(job, inputs, ref, now=pinned, expect=a.expect_revision,
+                                allow_hand=a.allow_hand_times, spec_version=a.spec_version)
     except (ValueError, OSError) as exc:
         print(f"REFUSED: could not read the job's files ({exc})"); return 2
     if ref:
