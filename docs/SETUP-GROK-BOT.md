@@ -46,7 +46,7 @@ the placeholders, and give the bot the name in the first column.
 | E-DI Orchestrator | `kit/bots/orchestrator.md` | Running the loop: dispatch, routing, bounds, the pass rule, the record |
 | E-DI Maker | `kit/bots/maker.md` | Producing and revising the work |
 | E-DI Evaluator | `kit/bots/evaluator.md` | Judging the work against the frozen standard |
-| Your own bot (the Owner's conduit) | `kit/bots/owner-conduit.md` | Carrying words between you and the Orchestrator verbatim; managing the bots and keeping the qualification record. Holds no seat. Required. |
+| Your own bot (the Owner's conduit) | `kit/bots/owner-conduit.md` | Carries words between you and the Orchestrator. Seat words stay verbatim; its own comments are labeled. It does not message the Architect, Maker, or Evaluator. Holds no seat. Required. |
 
 Rules that hold whatever you name the bots:
 
@@ -68,16 +68,18 @@ next person. Strip your own ids and pins first, or the template carries them.
 Your own bot is the **conduit** between you and the Orchestrator. The Orchestrator is the **conductor**. Keep
 the two apart; when your bot starts conducting, the seats lose the one bot that owns the loop.
 
-- **The conduit carries words both ways, verbatim,** with the file's path and sha256, and adds a covering note
-  only.
-- **It never,** during a job, dispatches work, runs `loop()`, routes verdicts, picks the next round, briefs a
-  seat, fills an escalation, summarises in place of the file, or decides.
-- **Anything that looks like conducting goes to the Orchestrator.** During a job, a question for a seat goes to
-  the Orchestrator, which routes it. Outside a job, the conduit may ask the Architect to build the qualification
-  checks, and may ask the Evaluator to grade them. It never sees the answer key.
+- **It may read.** Job files, records, and seat output are open to it. It does not read held-out material or
+  an answer key. A key it has read is a spent instrument.
+- **Seat words stay verbatim.** What a seat wrote is delivered unedited, with its path and sha256, and labeled
+  as that seat's words. The conduit may add color commentary for you after that, labeled as its own. Commentary
+  never replaces the file, and a summary in place of the file is not delivery.
+- **It does not message the Architect, Maker, or Evaluator.** Instructions and information enter those seats
+  only through the Orchestrator. That includes qualification. A question for a seat goes to the Orchestrator.
+- **It never** dispatches work, runs `loop()`, routes verdicts, picks the next round, fills an escalation, or
+  decides.
 - **It may still manage the bots themselves:** create them, update their instructions through the platform's
-  own update with a sha256 readback, and keep the qualification records. That work is outside any job and
-  holds no seat.
+  own update with a sha256 readback, and keep the qualification records by reading them. That work is outside
+  any job and holds no seat. Asking a seat to build or grade is not management. That ask goes to the Orchestrator.
 
 The rule is written into `kit/bots/owner-conduit.md`, and the other templates refer to "the Owner's conduit bot".
 
@@ -180,10 +182,12 @@ publish its cases or its answer key, and you should not publish yours: a publish
 
 **Who holds what.**
 
-- The **Architect** or your conduit bot builds the case suite and a manifest of its hashes.
+- The **Orchestrator** asks the **Architect** to build the case suite and a manifest of its hashes. The conduit
+  does not message the Architect to do this.
 - The **Evaluator** alone holds the answer key, in a place only it can read (its own bot store, not the shared
-  box), and grades every reply against it.
-- The Orchestrator under test never sees the suite's tools, the key or the grader's notes.
+  box), and grades every reply against it. The Orchestrator asks for that grade. The conduit does not.
+- The Orchestrator under test never sees the suite's tools, the key or the grader's notes. The conduit may read
+  the run record afterward, except the key, and may comment to you. It does not message the Evaluator about the suite.
 
 **What we learned running it:**
 
