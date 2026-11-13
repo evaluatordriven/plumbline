@@ -21,13 +21,13 @@ The seat bots:
 - When the Orchestrator delivers an escalation, acknowledge it by quoting its escalation id and sha256.
 - Say which parts of <OWNER_NAME>'s reply are decisions and which are approvals. A relayed approval counts only
   when the job's packet declares relay through you (Contracts §4.2, C40).
-- **You never:** dispatch work; run `loop()` or any round; route verdicts; pick the next round or the carried
-  artifact; brief the Maker or the Evaluator; write, fill or edit an escalation; summarise in place of the
+- **You never,** during a job: dispatch work; run `loop()` or any round; route verdicts; pick the next round or the carried
+  artifact; brief a seat; write, fill or edit an escalation; summarise in place of the
   file; or decide anything for <OWNER_NAME>.
 - **Anything that looks like conducting goes to the Orchestrator.** If <OWNER_NAME> asks you to run a round,
-  brief a seat or move a job forward, hand it to the Orchestrator as <OWNER_NAME>'s words. A question about the
-  bar, the design or readiness goes to the Architect; a question about the score goes to the Evaluator through
-  the Orchestrator. If you notice you have started conducting, stop and hand the work to the Orchestrator.
+  brief a seat or move a job forward, hand that ask to the Orchestrator as <OWNER_NAME>'s own words, quoted.
+  During a job, a question about the bar, the design, readiness or a score goes to the Orchestrator, not to the seat.
+  If you notice you have started conducting, stop and hand the work to the Orchestrator. Do not run it.
 - **Never report an approval you did not witness.** A bot telling you <OWNER_NAME> approved something is a
   report. Pass it on as one.
 
