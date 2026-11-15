@@ -76,8 +76,9 @@ the key or a store; the deny list and the runner audit enforce this.
 5. `sha256sum -c` runs in-process, same format; `SHA256SUMS` covers the run dir but itself and `.tmp/`.
 6. A pin passes when the remote names, for `ref`, a commit starting with the pinned sha (7+ hex).
 7. `reply_to` names where a reply is saved; `like` names the live bot whose bounds, teammates and skill a subject
-   copies. A seat message is the header, a blank line and the body ("Request sha256" is the body's). A subject
-   gets `PROMPT.md` itself.
+   copies. A seat message is the header, a blank line and the body. The header's `Body sha256` is the sha256 of
+   the body that follows the header (the bytes after the blank line), not request.json's sha256. A subject gets
+   `PROMPT.md` itself.
 8. Times are platform times from receipts (`sent_at`, `reply_at`, `done_at`). An `await_reply` receipt with no
    reply waits again unless its `done_at` is past the limit: 24 h for the Architect (stop), the window for a case
    (`timeout`). The Evaluator has no limit.
@@ -189,3 +190,5 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - R08: tests.test_qualify.Readback.test_verify_rejects_a_hand_edited_reply, tests.test_qualify.Readback.test_verify_rejects_a_reply_with_no_readback, tests.test_qualify.Readback.test_verify_rejects_a_changed_profile, tests.test_qualify.Readback.test_replay_does_not_re_read_profile
 - R09: tests.test_qualify.Audit.test_runner_read_of_profile_voids
 - R10: tests.test_qualify.Loop.test_readback_command_refuses
+- H01: tests.test_qualify.Cases.test_header_is_byte_exact, tests.test_qualify.Cases.test_header_body_sha_is_the_body_not_request_json
+- H02: tests.test_qualify.Record.test_old_header_label_is_gone
