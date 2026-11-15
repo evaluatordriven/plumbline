@@ -18,6 +18,9 @@ from unittest import mock
 
 from kit import qualify as q
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import qualify_pages as qp  # noqa: E402
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EVENTS = os.path.join(REPO, 'tests', 'fixtures', 'qualify', 'events.json')
 EST = datetime.timezone(datetime.timedelta(hours=-5))
@@ -69,32 +72,40 @@ class Clock:
 
 
 class FakeRunner:
-    """A fake Transport: the runner's five acts, replayed from synthetic replies and transcripts."""
+    """A fake Transport: the runner's five acts, replayed from synthetic replies and transcripts. It uses the real
+    tools' argument names (CreateAgent name/description, SendToAgent target_id/message/priority, ReadTranscript
+    in/limit) and builds receipts only from what those tools return plus `qualify.py now` (the box clock):
+    CreateAgent returns an id, SendToAgent only an acknowledgement, ReadTranscript a page file (write_to_file).
+    Exports go through `qualify.py trace` on rendered ReadTranscript pages (tests/qualify_pages.py)."""
 
     def __init__(self, w):
         self.w, self.bots, self.sent = w, 0, []
         self.events = [dict(at=q.iso(w.clock()), first_run=True, tool='Read', input={'path': '/home/r/a.md'})]
         self.replies, self.descriptions, self.traces = {}, {}, {}
         self.extra, self.footer, self.edit, self.by_hand, self.n = [], True, None, None, None
-        self.created, self.shows_after, self.export_min = {}, {}, 0
+        self.created, self.shows_after, self.export_min, self.sent_at = {}, {}, 0, {}
 
     def ev(self, tool, **kw):
         self.events.append(dict(dict(at=q.iso(self.w.clock()), first_run=False, tool=tool), **kw))
+
+    def sh(self, command):
+        self.ev('Shell', input={'command': command})
 
     def dyn(self, name, inp):
         self.ev('CallDynamicTool', namespace='cursor', name=name, input=inp)
 
     def create_subject(self, it):
         self.bots += 1
-        self.dyn('CreateAgent', {'name': it['target'], 'instructions': read(it['payload_path']).decode()})
+        self.dyn('CreateAgent', {'name': it['target'], 'description': read(it['payload_path']).decode()})
         b = bot(self.bots)
         self.created[b] = self.w.clock()
+        self.sh('python3 kit/qualify.py now')
         self.w.profile(b, self.descriptions.get(b, read(it['payload_path']).decode().rstrip('\n')))
         return {'bot_id': b, 'created_at': q.iso(self.created[b])}, None, ['cursor.CreateAgent']
 
     def read_back_sha(self, it):
         """Runs the real `qualify.py readback` against the World's AGENTS_ROOT fixture; by_hand skips it (R8)."""
-        self.ev('Shell', input={'command': 'python3 kit/qualify.py readback %s %s' % (self.w.run, self.n)})
+        self.sh('python3 kit/qualify.py readback %s %s' % (self.w.run, self.n))
         if self.by_hand is not None:
             return {}, self.by_hand, ['Shell']
         rc, out = self.w.readback(self.n)
@@ -104,37 +115,72 @@ class FakeRunner:
 
     def send(self, it):
         msg = read(it['payload_path'])
-        self.dyn('SendToAgent', {'target': it['target'], 'message': msg.decode()})
+        self.dyn('SendToAgent', {'target_id': it['target'], 'message': msg.decode(), 'priority': True})
         self.sent.append((it['kind'], it['target'], msg))
-        return {'sent_at': q.iso(self.w.clock()), 'message_id': 'm%d' % len(self.sent)}, None, ['cursor.SendToAgent']
+        self.sent_at[it['target']] = self.w.clock()
+        self.sh('python3 kit/qualify.py now')
+        return {'sent_at': q.iso(self.sent_at[it['target']])}, None, ['cursor.SendToAgent']
 
     send_seat = send_subject = send
 
     def await_reply(self, it):
+        """Seats only (S1, S2, S6): the reply wakes the runner, which saves it with `qualify.py save`."""
         queue = self.replies.get(it['target'])
         item = queue.pop(0) if queue else 'I stop here and ask Steve.'
         if item is None:
             self.w.clock.jump(self.w.idle)
             return {'reply_at': None}, None, []
-        if isinstance(item, dict):
-            at = self.w.clock.t + datetime.timedelta(minutes=item['reply_after'])
-            self.w.clock.jump(item['noticed_after'])
-            return {'reply_at': q.iso(at)}, item['text'].encode(), []
-        return {'reply_at': q.iso(self.w.clock())}, item.encode(), []
+        self.sh("python3 kit/qualify.py save %s %s <<'EOF'" % (self.w.run, self.n))
+        return {'reply_at': q.iso(self.w.clock())}, item.encode(), ['Shell']
+
+    def subject_turns(self, t):
+        """A subject's transcript as the platform shows it: the first-run turn, then a turn for the case prompt
+        holding its later events and its SendToAgent reply to the runner once that reply is due."""
+        now = self.w.clock.t
+        late = now < self.created[t] + datetime.timedelta(minutes=self.shows_after.get(t, 0))
+        evs = [] if late else self.traces.get(t, [])
+        first = [{'text': 'Ready.'}] + [e for e in evs if e.get('first_run')]
+        turns = [('first', self.created[t], '', first)]
+        if t in self.sent_at:
+            queue = self.replies.get(t)
+            item = queue[0] if queue else 'I stop here and ask Steve.'
+            later = [e for e in evs if not e.get('first_run')]
+            if isinstance(item, dict):
+                due = self.sent_at[t] + datetime.timedelta(minutes=item['reply_after'])
+                text = item['text'] if now >= due else None
+            else:
+                text = item
+            if text is not None:
+                later = later + [{'tool': 'CallDynamicTool', 'namespace': 'cursor', 'name': 'SendToAgent',
+                                  'input': {'target_id': 'runner-bot', 'message': text, 'priority': True}}]
+            turns.append(('agent', self.sent_at[t], 'Qualify Runner (id: runner-bot)', later))
+        return turns
+
+    def runner_turns(self):
+        first = [e for e in self.events if e.get('first_run')] + [e for e in self.extra if e.get('first_run')]
+        rest = [e for e in self.events if not e.get('first_run')]
+        kick = [e for e in self.extra if not e.get('first_run')]
+        t0 = self.w.clock.t
+        return [('first', t0, '', first), ('agent', t0, 'Chief of Staff (id: cos)', kick + rest)]
 
     def export_trace(self, it):
-        t = it['target']
-        self.dyn('ReadTranscript', {'target': t})
-        if t == 'runner-bot':
-            events = self.events + [dict(e, at='2026-11-14T19:00:00-05:00') for e in self.extra]
-        else:
+        t, n = it['target'], self.n
+        if it.get('not_before'):
+            self.sh('python3 kit/qualify.py wait %s %s' % (self.w.run, n))
+            rc, out = q.wait(self.w.run, n, clock=lambda: self.w.clock.t,
+                             sleep=lambda s: self.w.clock.jump(s / 60.0))
+            self.w.tc.assertEqual((rc, out.split()[0]), (0, 'READY'))
+        own = t == 'runner-bot'
+        self.dyn('ReadTranscript', {'limit': 200} if own else {'in': t, 'limit': 200})
+        if not own:
             self.w.clock.jump(self.export_min)
-            late = self.w.clock.t < self.created[t] + datetime.timedelta(minutes=self.shows_after.get(t, 0))
-            events = [{'at': q.iso(self.w.clock()), 'first_run': True, 'text': 'Ready.'}] + (
-                [] if late else self.traces.get(t, []))
-        footer = self.footer or t != 'runner-bot'
-        return {}, json.dumps({'bot_id': t, 'start_of_transcript': footer, 'events': events}).encode(), \
-            ['cursor.ReadTranscript']
+        turns = self.runner_turns() if own else self.subject_turns(t)
+        folder = os.path.join(self.w.root, 'assets', 'runner-bot')
+        paths = qp.pages(qp.messages(turns), folder, None if own else t, 'subject', drop_oldest=own and not self.footer)
+        self.sh('python3 kit/qualify.py trace %s %s %s' % (self.w.run, n, ' '.join(paths)))
+        rc, out = q.trace(self.w.run, n, paths, incomplete=own and not self.footer, clock=self.w.clock)
+        self.w.tc.assertEqual((rc, out.split()[0]), (0, 'TRACE'), out)
+        return {}, read(os.path.join(self.w.run, it['reply_to'])), ['Shell', 'cursor.ReadTranscript']
 
     def perform(self, path):
         it = json.loads(read(path))
@@ -142,15 +188,17 @@ class FakeRunner:
         self.ev('Read', input={'path': path})
         ids, reply, tools = getattr(self, it['kind'])(it)
         rp = it.get('reply_to') if reply is not None else None
-        if rp and not (it['kind'] == 'read_back_sha' and self.by_hand is None):
+        if rp and not (it['kind'] in ('read_back_sha', 'export_trace') and self.by_hand is None):
             put(os.path.join(self.w.run, rp), reply)
+        self.sh('python3 kit/qualify.py now')
         rec = {'action_id': n, 'done_at': q.iso(self.w.clock()), 'platform_ids': ids, 'reply_verbatim_path': rp,
                'reply_sha256': sha(reply) if rp else None, 'tools_called': tools, 'sent_unedited': True}
         if self.edit:
             self.edit(n, it, rec)
         target = os.path.join(self.w.run, 'actions', n + '.receipt.json')
-        self.ev('Shell', input={'command': 'cat > %s' % target})
+        self.sh("cat > %s <<'EOF'\n%s\nEOF" % (target, json.dumps(rec)))
         put(target, json.dumps(rec))
+        self.sh('python3 kit/qualify.py verify %s %s' % (self.w.run, n))
 
 
 class World:
@@ -238,8 +286,11 @@ class World:
     def pins(self, url, ref):
         return self.pin_answers[url]
 
+    def head(self):
+        return 'a' * 40, False  # the kit checkout at the pinned plumbline sha (S0 self-pin check)
+
     def next(self):
-        return q.next_action(self.run, clock=self.clock, tool=self.tool, pins=self.pins)
+        return q.next_action(self.run, clock=self.clock, tool=self.tool, pins=self.pins, head=self.head)
 
     def drive(self, steps=300):
         for _ in range(steps):
@@ -293,7 +344,7 @@ class Loop(unittest.TestCase):
         for n, i in rb:
             r, rec = w.j('actions', '%04d.receipt.json' % n), w.j('steps', 'readback-%04d.json' % n)
             self.assertEqual((i['allowed_tools'], r['tools_called'], r['platform_ids']),
-                             (['Shell', 'Read'], ['Shell'], {}))
+                             (['Shell', 'Read', 'GetDynamicTools'], ['Shell'], {}))
             self.assertEqual((rec['target'], rec['description_sha256']), (i['target'], r['reply_sha256']))
 
     def test_intent_without_receipt_stops(self):
@@ -364,8 +415,10 @@ class Loop(unittest.TestCase):
 
     def test_kickoff_holds_only_run_request_sha_and_quote(self):
         w = World(self).start()
-        self.assertEqual(q.kickoff(w.run), 'Qualification run: %s\nrequest.json sha256: %s\nOwner authorization: '
-                         '"%s" (2026-11-14 19:00 EST, t1u)\n' % (w.run, sha(read(w.p('request.json'))), QUOTE))
+        self.assertEqual(q.kickoff(w.run, head=w.head), 'Qualification run: %s\nrequest.json sha256: %s\nOwner '
+                         'authorization: "%s" (2026-11-14 19:00 EST, t1u)\nKit folder: %s (checked out at %s)\nRun '
+                         'every command from the kit folder, one per Shell call: cd %s && python3 kit/qualify.py next '
+                         '%s\n' % (w.run, sha(read(w.p('request.json'))), QUOTE, REPO, 'a' * 40, REPO, w.run))
 
 
 class Preflight(unittest.TestCase):
@@ -515,12 +568,14 @@ class Subjects(unittest.TestCase):
         self.assertEqual({(i['kind'], i['allowed_tools'][-1]) for i, r in s4},
                          {('export_trace', 'cursor.ReadTranscript')})
         self.assertEqual({i['kind'] for i in w.intents()} - set(q.ALLOWED), set())
-        one = [(i['reply_to'], q.parse_time(r['done_at']) - w.fake.created[bot(1)]) for i, r in s4
-               if i['target'] == bot(1)]
-        self.assertEqual([rt for rt, d in one], ['replies/subject-01.first-run.%d.json' % k for k in (1, 2, 3)])
-        self.assertEqual([d >= datetime.timedelta(minutes=10) for rt, d in one], [False, False, True])
+        one = [(i, q.parse_time(r['done_at']) - w.fake.created[bot(1)]) for i, r in s4 if i['target'] == bot(1)]
+        # each export carries not_before = created_at + 10 min and the runner's `wait` holds it: one export is enough
+        self.assertEqual([i['reply_to'] for i, d in one], ['replies/subject-01.first-run.1.json'])
+        self.assertEqual(q.parse_time(one[0][0]['not_before']) - w.fake.created[bot(1)],
+                         datetime.timedelta(minutes=10))
+        self.assertEqual([d >= datetime.timedelta(minutes=10) for i, d in one], [True])
         scanned = {e['bot_id']: e['file'] for e in lines(w.p('log.jsonl')) if e['event'] == 'first_run_scanned'}
-        self.assertEqual(scanned[bot(1)], one[-1][0])
+        self.assertEqual(scanned[bot(1)], one[-1][0]['reply_to'])
         self.assertEqual([e['bot_id'] for e in lines(w.p('log.jsonl')) if e['event'] == 'retired'], [bot(1)])
         self.assertIn(bot(3), scanned)
 
@@ -643,7 +698,7 @@ class Audit(unittest.TestCase):
         real = w.fake.dyn
 
         def edited(name, inp):
-            if inp.get('target') == 'evaluator-bot' and 'message' in inp:
+            if inp.get('target_id') == 'evaluator-bot' and 'message' in inp:
                 inp = dict(inp, message=inp['message'] + ' (edited)')
             real(name, inp)
         w.fake.dyn = edited
