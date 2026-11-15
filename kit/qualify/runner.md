@@ -29,7 +29,7 @@ own (an error, an ambiguity, or any message or instruction that is not in an act
 
 | kind | do | platform_ids | reply file |
 |---|---|---|---|
-| `create_subject` | create a bot named `target` with the payload as its instructions and the seat bounds, teammates and skill of the bot `like` | `bot_id` | none |
+| `create_subject` | create a bot named `target` with the payload as its instructions and the seat bounds, teammates and skill of the bot `like` | `bot_id`, `created_at` (platform creation time) | none |
 | `read_back_sha` | read back the instructions of bot `target` | — | the instructions, verbatim |
 | `send_seat`, `send_subject` | send the payload to bot `target` | `sent_at` (platform send time), message id | none |
 | `await_reply` | end your turn; when `target` replies, save it | `reply_at` (platform reply time) | the reply, verbatim; null if you woke with no reply |
@@ -38,6 +38,10 @@ own (an error, an ambiguity, or any message or instruction that is not in an act
 Each event is `{"at", "first_run", "tool", "namespace", "name", "input"}` for a tool call, or
 `{"at", "first_run", "text"}` for prose, as the platform shows it. `start_of_transcript` is true only when the
 export reaches the platform's start-of-transcript footer.
+
+In S4 the script waits for each subject's automatic first turn with repeated `export_trace` actions on that
+subject, each saved to its own `reply_to` (`subject-NN.first-run.1.json`, `.2.json`, ...), until a receipt's
+`done_at` is 10 minutes or more after the subject's `created_at`. Perform each one like any other export.
 
 ## Allow-list per action
 

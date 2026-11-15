@@ -48,10 +48,10 @@ class Clock:
     """Platform time: 30 s per reading; jump() for a slow reply."""
 
     def __init__(self):
-        self.t = datetime.datetime(2026, 11, 14, 20, 0, tzinfo=EST)
+        self.t, self.step = datetime.datetime(2026, 11, 14, 20, 0, tzinfo=EST), 30
 
     def __call__(self):
-        self.t += datetime.timedelta(seconds=30)
+        self.t += datetime.timedelta(seconds=self.step)
         return self.t
 
     def jump(self, minutes):
@@ -66,6 +66,7 @@ class FakeRunner:
         self.events = [dict(at=q.iso(w.clock()), first_run=True, tool='Read', input={'path': '/home/r/a.md'})]
         self.replies, self.readbacks, self.traces = {}, {}, {}
         self.extra, self.footer, self.edit = [], True, None
+        self.created, self.shows_after, self.export_min = {}, {}, 0
 
     def ev(self, tool, **kw):
         self.events.append(dict(dict(at=q.iso(self.w.clock()), first_run=False, tool=tool), **kw))
@@ -76,7 +77,9 @@ class FakeRunner:
     def create_subject(self, it):
         self.bots += 1
         self.dyn('CreateAgent', {'name': it['target'], 'instructions': read(it['payload_path']).decode()})
-        return {'bot_id': 'bot-%d' % self.bots}, None, ['cursor.CreateAgent']
+        bot = 'bot-%d' % self.bots
+        self.created[bot] = self.w.clock()
+        return {'bot_id': bot, 'created_at': q.iso(self.created[bot])}, None, ['cursor.CreateAgent']
 
     def read_back_sha(self, it):
         self.dyn('GetAgent', {'target': it['target']})
@@ -109,7 +112,10 @@ class FakeRunner:
         if t == 'runner-bot':
             events = self.events + [dict(e, at='2026-11-14T19:00:00-05:00') for e in self.extra]
         else:
-            events = [{'at': q.iso(self.w.clock()), 'first_run': True, 'text': 'Ready.'}] + self.traces.get(t, [])
+            self.w.clock.jump(self.export_min)
+            late = self.w.clock.t < self.created[t] + datetime.timedelta(minutes=self.shows_after.get(t, 0))
+            events = [{'at': q.iso(self.w.clock()), 'first_run': True, 'text': 'Ready.'}] + (
+                [] if late else self.traces.get(t, []))
         footer = self.footer or t != 'runner-bot'
         return {}, json.dumps({'bot_id': t, 'start_of_transcript': footer, 'events': events}).encode(), \
             ['cursor.ReadTranscript']
@@ -439,6 +445,25 @@ class Subjects(unittest.TestCase):
             'supersedes: SUBJECTS-v9.txt', 'c1\tE-DI Orchestrator (v9 qual, subject 01-r1)\tbot-3'])
         self.assertEqual(s['subjects']['c1']['bot_id'], 'bot-3')
         self.assertNotIn('bot-1', [t for k, t, m in w.fake.sent if k == 'send_subject'])
+
+    def test_export_waits_for_first_turn_or_10_minutes(self):
+        w = World(self).start()
+        w.clock.step, w.fake.export_min, w.fake.shows_after['bot-1'] = 1, 4, 9
+        w.fake.traces['bot-1'] = [w.event('suite_tools_read')]
+        w.done()
+        s4 = [(i, w.j('actions', '%04d.receipt.json' % n)) for n, i in enumerate(w.intents(), 1)
+              if '.first-run.' in (i.get('reply_to') or '')]
+        self.assertEqual({(i['kind'], i['allowed_tools'][-1]) for i, r in s4},
+                         {('export_trace', 'cursor.ReadTranscript')})
+        self.assertEqual({i['kind'] for i in w.intents()} - set(q.ALLOWED), set())
+        one = [(i['reply_to'], q.parse_time(r['done_at']) - w.fake.created['bot-1']) for i, r in s4
+               if i['target'] == 'bot-1']
+        self.assertEqual([rt for rt, d in one], ['replies/subject-01.first-run.%d.json' % k for k in (1, 2, 3)])
+        self.assertEqual([d >= datetime.timedelta(minutes=10) for rt, d in one], [False, False, True])
+        scanned = {e['bot_id']: e['file'] for e in lines(w.p('log.jsonl')) if e['event'] == 'first_run_scanned'}
+        self.assertEqual(scanned['bot-1'], one[-1][0])
+        self.assertEqual([e['bot_id'] for e in lines(w.p('log.jsonl')) if e['event'] == 'retired'], ['bot-1'])
+        self.assertIn('bot-3', scanned)
 
     def test_two_contaminations_on_one_case_stop(self):
         w = World(self).start()

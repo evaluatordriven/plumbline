@@ -37,13 +37,14 @@ NEVER = {'WebSearch', 'WebFetch', 'UpdateMemory', 'UpdateRoutine', 'UpdateSkill'
          'CreateChannel', 'Vault', 'FillCredential'}
 RECEIPT_FIELDS = ['action_id', 'done_at', 'platform_ids', 'reply_verbatim_path', 'reply_sha256',
                   'tools_called', 'sent_unedited']
-PLATFORM_IDS = {'create_subject': ['bot_id'], 'send_seat': ['sent_at'], 'send_subject': ['sent_at']}
+PLATFORM_IDS = {'create_subject': ['bot_id', 'created_at'], 'send_seat': ['sent_at'], 'send_subject': ['sent_at']}
 REPLY_REQUIRED = ('read_back_sha', 'export_trace')
 KEY_NAME = re.compile(r'(?<![\w.-])(keys/|KEY(?:[._-][\w.-]*)?(?!\w))')
 SHA64 = re.compile(r'\b[0-9a-f]{64}\b')
 SHELL_OK = re.compile(r'^(cd \S+ && )?((\S*/)?python3? (\S*/)?kit/qualify\.py |sha256sum |'
                       r'(cat|tee|printf|echo)\b[^\n]*actions/\d{4}\.receipt(\.2)?\.json)')
 SILENT_ARCHITECT_MIN = 24 * 60
+FIRST_TURN_MIN = 10
 EXPECTS = ('should-pass', 'should-stop')
 VERDICTS = ('pass', 'fail', 'void')
 
@@ -211,7 +212,8 @@ class RunnerTransport(Transport):
         self.run = run
 
     def create_subject(self, name, payload_path, like):
-        return self._act('create_subject', name, payload_path, like=like)['platform_ids']['bot_id']
+        ids = self._act('create_subject', name, payload_path, like=like)['platform_ids']
+        return ids['bot_id'], parse_time(ids['created_at'])
 
     def read_back(self, bot_id, reply_to):
         return self._act('read_back_sha', bot_id, reply_to=reply_to)['reply']
@@ -224,7 +226,8 @@ class RunnerTransport(Transport):
         return r['reply'], parse_time(r['platform_ids'].get('reply_at')), parse_time(r['done_at'])
 
     def export_trace(self, bot_id, reply_to):
-        return self._act('export_trace', bot_id, reply_to=reply_to)['reply']
+        r = self._act('export_trace', bot_id, reply_to=reply_to)
+        return r['reply'], parse_time(r['done_at'])
 
     def _act(self, kind, target, payload_path=None, reply_to=None, like=None):
         run = self.run
@@ -321,7 +324,7 @@ class Run:
         self.clock, self.tool_fn, self.pins = clock, tool, pins
         self.t = RunnerTransport(self)
         self.n, self.stage, self.suite = 0, 'S0', None
-        self.keys = set()
+        self.keys, self.created = set(), {}
         lp = self.p('log.jsonl')
         if os.path.exists(lp):
             with open(lp, encoding='utf-8') as fh:
@@ -541,7 +544,8 @@ class Run:
 
     def make_subject(self, i, suffix):
         name = 'E-DI Orchestrator (%s qual, subject %02d%s)' % (self.req['ver'], i, suffix)
-        bot = self.t.create_subject(name, self.req['candidate_path'], self.req['live_bot_id'])
+        bot, at = self.t.create_subject(name, self.req['candidate_path'], self.req['live_bot_id'])
+        self.created[bot] = at
         rel = 'replies/subject-%02d%s.readback.txt' % (i, suffix)
         if text_sha(self.t.read_back(bot, rel)) != self.req['candidate_sha256']:
             raise Stop(self.stage, 'subject sha mismatch: %s (%s)' % (name, bot), self.p(rel))
@@ -558,13 +562,16 @@ class Run:
         self.subjects_file('SUBJECTS-%s.txt' % self.req['ver'])
 
     def trace(self, bot, rel):
-        data = self.t.export_trace(bot, rel)
+        return self.trace_at(bot, rel)[0]
+
+    def trace_at(self, bot, rel):
+        data, done = self.t.export_trace(bot, rel)
         try:
             tr = json.loads(data.decode('utf-8'))
             tr['events'] = [e for e in tr['events'] if isinstance(e, dict)]
         except (ValueError, KeyError, TypeError, AttributeError):
             tr = None
-        return tr
+        return tr, done
 
     def deny_patterns(self, case):
         own = os.path.dirname(os.path.join(self.suite, case['prompt_path']))
@@ -583,17 +590,27 @@ class Run:
             hits += ['%s at %s' % (x, e.get('at')) for x in found]
         return hits
 
+    def first_run(self, bot, base):
+        """Export until a receipt's done_at is 10 minutes past created_at (SPEC L110); return the last export."""
+        limit, k = self.created[bot] + datetime.timedelta(minutes=FIRST_TURN_MIN), 0
+        while True:
+            k += 1
+            rel = '%s.%d.json' % (base, k)
+            tr, done = self.trace_at(bot, rel)
+            if tr is None or not tr.get('start_of_transcript'):
+                raise Stop('S4', 'the export of %s is not complete (no start-of-transcript footer)' % bot,
+                           self.p(rel))
+            if done >= limit:
+                self.log('first_run_scanned', key='first_run_scanned %s' % bot, bot_id=bot, file=rel)
+                return tr, rel
+
     def s4(self):
         self.stage, retired = 'S4', False
         for i, c in enumerate(self.cases, 1):
             tries = 0
             while True:
                 name, bot = self.subjects[c['id']]
-                rel = 'replies/subject-%02d%s.first-run.json' % (i, '-r%d' % tries if tries else '')
-                tr = self.trace(bot, rel)
-                if tr is None or not tr.get('start_of_transcript'):
-                    raise Stop('S4', 'the export of %s is not complete (no start-of-transcript footer)' % bot,
-                               self.p(rel))
+                tr, rel = self.first_run(bot, 'replies/subject-%02d%s.first-run' % (i, '-r%d' % tries if tries else ''))
                 hits = self.deny_hits(tr, c, True)
                 if not hits:
                     break

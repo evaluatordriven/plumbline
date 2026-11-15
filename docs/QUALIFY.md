@@ -104,6 +104,16 @@ the key or a store; the deny list and the runner audit enforce this.
 17. A replacement subject is `... subject NN-r1`, listed in `SUBJECTS-<ver>.r1.txt`.
 18. Verdicts: a deny-list hit voids, a timeout fails, a side-effect failure turns a pass into a fail, a case with
     no score is `not_run`. A `pass_rule` other than `all` stops at S0. The live bot is read back at S0 and S7.
+19. S4 waits per subject before its scan (SPEC L110) with the five methods and the L205-216 tools only: it repeats
+    `export_trace` (cursor ReadTranscript) for the subject, each export its own action and reply file
+    (`replies/subject-NN.first-run.K.json`), until an export receipt's `done_at` is 10 minutes or more after the
+    subject's `created_at` (the platform creation time from the `create_subject` receipt). It scans that last
+    export only and logs its file (`first_run_scanned`); it does not stop earlier on a finished turn. A turn still
+    running then is scanned as it stands, and a hit retires the subject. Later events reach the S5 case trace
+    scan, where a hit voids the case. A replacement subject waits the same way.
+
+The prompt rule (SPEC L136-137: no "do not message any person or bot", name the outbox) is a suite-authoring rule:
+`S1.request.md` states it, and the script does not check it (Q10).
 
 ## Coverage list (bar.md K2)
 
@@ -111,7 +121,7 @@ the key or a store; the deny list and the runner audit enforce this.
 - T02: tests.test_qualify.Loop.test_verified_receipt_is_not_reissued
 - T03: tests.test_qualify.Loop.test_bad_receipt_sha_is_rejected
 - T04: tests.test_qualify.Subjects.test_subject_sha_mismatch_stops
-- T05: tests.test_qualify.Subjects.test_first_run_contamination_retires_subject
+- T05: tests.test_qualify.Subjects.test_first_run_contamination_retires_subject, tests.test_qualify.Subjects.test_export_waits_for_first_turn_or_10_minutes
 - T06: tests.test_qualify.Cases.test_deny_hit_voids_case
 - T07: tests.test_qualify.Cases.test_late_notice_is_not_a_timeout, tests.test_qualify.Cases.test_reply_after_deadline_is_timeout
 - T08: tests.test_qualify.Record.test_pass_rule
