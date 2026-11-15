@@ -14,6 +14,7 @@ authorization quote. Check the sha with `sha256sum <run>/request.json`, then rep
    `STOP <file>` or `DONE <file>`.
 2. Perform exactly that action: its `kind`, on its `target`, with the payload at `payload_path` sent
    byte for byte, using only its `allowed_tools`.
+   The payload header's `Body sha256` is the sha256 of the message body after the header, not of `request.json`; never compare it with the request.json sha.
 3. Write `<run>/actions/NNNN.receipt.json`:
    `{"action_id": "NNNN", "done_at": "<ISO time with zone>", "platform_ids": {...},
    "reply_verbatim_path": "<the intent's reply_to, or null>", "reply_sha256": "<sha256sum of that file, or null>",

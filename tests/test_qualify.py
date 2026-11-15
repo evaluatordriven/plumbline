@@ -554,9 +554,26 @@ class Cases(unittest.TestCase):
         w.done()
         body = read(w.p('S1.request.md'))
         want = ('[Script-issued: plumbline qualify v9 action 0002. Runner runner-bot, instructions sha256 %s. '
-                'Owner authorization: "%s" (2026-11-14 19:00 EST, t1u). Request sha256 %s.]'
+                'Owner authorization: "%s" (2026-11-14 19:00 EST, t1u). Body sha256 %s.]'
                 % (w.req['runner']['instructions_sha256'], QUOTE, sha(body)))
         self.assertEqual(read(w.p('actions', '0002.payload.md')), want.encode() + b'\n\n' + body)
+
+    def test_header_body_sha_is_the_body_not_request_json(self):
+        w = World(self).start()
+        w.done()
+        payloads = sorted(i['payload_path'] for i in w.intents() if i['kind'] == 'send_seat')
+        self.assertEqual(payloads[0], w.p('actions', '0002.payload.md'))
+        request_sha = sha(read(w.p('request.json')))
+        for path in payloads:
+            head, sep, body = read(path).partition(b'\n\n')
+            self.assertEqual(sep, b'\n\n', path)
+            label = head.rfind(b' Body sha256 ')
+            value = head[label + len(b' Body sha256 '):].decode()
+            self.assertTrue(label > 0 and value.endswith('.]'), head)
+            value = value[:-2]
+            self.assertEqual(len(value), 64, head)
+            self.assertEqual(value, sha(body))
+            self.assertNotEqual(value, request_sha)
 
     def test_deny_hit_voids_case(self):
         w = World(self).start()
@@ -848,6 +865,26 @@ class Readback(unittest.TestCase):
 
 
 class Record(unittest.TestCase):
+    def test_old_header_label_is_gone(self):
+        old = 'request' + ' sha256'  # built from parts, so this file holds no literal match; compared lowercased
+        hits, scanned = [], 0
+        for top in ('kit', 'docs', 'tests'):
+            self.assertTrue(os.path.isdir(os.path.join(REPO, top)), top)
+            for d, dirs, files in os.walk(os.path.join(REPO, top)):
+                dirs[:] = sorted(x for x in dirs if x != '__pycache__')
+                for f in sorted(files):
+                    p = os.path.join(d, f)
+                    try:
+                        text = read(p).decode('utf-8')
+                    except UnicodeDecodeError:
+                        continue
+                    scanned += 1
+                    hits += ['%s:%d' % (os.path.relpath(p, REPO), n) for n, x in enumerate(text.splitlines(), 1)
+                             if old in x.lower()]
+        self.assertTrue(os.path.isfile(os.path.join(REPO, 'kit', 'qualify', 'templates', 'header.txt')))
+        self.assertGreater(scanned, 0)
+        self.assertEqual(hits, [])
+
     def test_pass_rule(self):
         self.assertTrue(q.pass_rule({'a': 'pass', 'b': 'pass'}, 'clean'))
         for v, audit in (({'a': 'pass', 'b': 'fail'}, 'clean'), ({'a': 'pass', 'b': 'void'}, 'clean'),
