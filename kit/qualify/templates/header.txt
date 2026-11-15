@@ -1,0 +1,1 @@
+[Script-issued: plumbline qualify $ver action $action. Runner $runner_id, instructions sha256 $runner_sha. Owner authorization: "$quote" ($time, $msg_id). Request sha256 $body_sha.]
