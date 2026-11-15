@@ -458,7 +458,7 @@ def transcript(sim):
     for e in sim.runner.log:
         if e[0] == 'end':
             out.append('- %s: %s (sha256 %s)' % (e[1], os.path.relpath(e[2], sim.run), sha(open(e[2], 'rb').read())
-                                                if os.path.exists(e[2]) else 'renamed'))
+                                                if os.path.exists(e[2]) else 'n/a: renamed to STOP-NN.md by resume'))
             continue
         n, name, it = e[1], e[2], e[3]
         rec = e[4] if len(e) > 4 else None
