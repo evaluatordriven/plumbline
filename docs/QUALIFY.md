@@ -25,16 +25,33 @@ false pass.
 ## Running it
 
 Files: `kit/qualify.py`; `kit/qualify/runner.md`; `kit/qualify/templates/` holds `S1.request.md` (Architect),
-`S2.request.md` and `S6.request.md` (Evaluator), `kickoff.md` (the conduit's one message) and `header.txt` (the
-script-issued header). Suites, keys and runs stay out of this repository.
+`S2.request.md` and `S6.request.md` (Evaluator), `kickoff.md` (the conduit's message), `resume.md` (the conduit's
+message after a ruled stop) and `header.txt` (the script-issued header). Suites, keys and runs stay out of this
+repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's real tool shapes and limits
+(below).
 
 1. The conduit writes `runs/<ver>/<date>-runN/request.json`, creates `Qualify Runner (<ver>, run N)` with
-   `runner.md` as its instructions, reads them back, records `runner`, and sends `qualify.py kickoff <run>`.
-2. The runner loops: `python3 kit/qualify.py next <run>` prints an action file; it performs that action, writes
-   `actions/NNNN.receipt.json` and runs `python3 kit/qualify.py verify <run> NNNN`.
+   `runner.md` as its instructions, reads them back, records `runner`, and sends the output of
+   `qualify.py kickoff <run>`. The kickoff names the absolute kit folder and the commit it is checked out at
+   (`git HEAD`); S0 stops unless that HEAD starts with `pins.plumbline.sha` and `kit/` has no local changes
+   (`steps/S0-head.json`).
+2. The runner loops, one command per Shell call from the kit folder: `python3 kit/qualify.py next <run>` prints
+   an action file; it performs that action, writes `actions/NNNN.receipt.json` and runs
+   `python3 kit/qualify.py verify <run> NNNN`. `now` prints box time for receipts, `save` writes a seat reply,
+   `wait` sleeps toward an intent's `not_before`, and `trace` turns ReadTranscript pages into an export.
 3. At the end `next` prints `STOP <run>/STOP.md` or `DONE <run>/summary.json`, which the runner sends to Steve
    verbatim. `qualify.py stop <run> "<reason>"` records a stop the runner saw. Exit: 0 action or DONE, 3 STOP,
    4 rejected receipt, 2 usage.
+4. Resume after a stop, on Steve's ruling only. The conduit writes a ruling file `{quote, time, message_id,
+   channel, stop_sha256}` (Steve's words verbatim, where and when he said them, and the sha256 of the `STOP.md`
+   he ruled on) and runs `qualify.py resume <run> --ruling <file>`. It refuses (exit 2, nothing written) when
+   there is no `STOP.md`, the file is not JSON, a field is missing or empty, or `stop_sha256` is not the sha256 of
+   the current `STOP.md`. Otherwise it writes `rulings/ruling-NN.json` (the ruling plus `stop_file`,
+   `resumed_at`), renames `STOP.md` to `STOP-NN.md`, logs `resumed` with both shas and prints the resume message
+   (`resume.md`), which the conduit sends to the same runner. On the runner's next `next`: an action the runner
+   refused or left without a receipt is re-issued as `actions/NNNN.intent.K.json` (`supersedes`, and `ruling` with
+   the quote, time, message id, channel and STOP sha) and logged `reissued`; a stop from a script check runs that
+   check again, so a ruling never waives a failed check. A stop with no ruling file stays a stop.
 
 Stages: S0 preflight, S1 Architect, S2 gate, S3 subjects, S4 first-run contamination, S5 cases and the runner
 audit, S6 scoring, S7 record. `qualified = all cases pass and void == 0 and not_run == 0 and runner_audit ==
@@ -52,7 +69,9 @@ Evaluator and Chief of Staff stores, the runbooks and the provider key); optiona
 The run dir is append-only: nothing is rewritten, and a correction is a new file naming the one it supersedes.
 `log.jsonl` has one line per event (`at` with zone, `stage`, `action`, `payload_sha256`, `event`).
 `actions/NNNN.intent.json` holds `{kind, target, payload_path, payload_sha256, allowed_tools}` (plus `reply_to`,
-`like`); `actions/NNNN.payload.md` a seat message; `actions/NNNN.receipt.json` `{action_id, done_at,
+`not_before`); a re-issued action is `NNNN.intent.K.json` with `supersedes` and `ruling`; `rulings/ruling-NN.json`
+and `STOP-NN.md` keep each ruled stop; `actions/NNNN.payload.md` a seat message; `actions/NNNN.receipt.json`
+`{action_id, done_at,
 platform_ids, reply_verbatim_path, reply_sha256, tools_called, sent_unedited: true}`. When `next` replays, a
 verified receipt is passed over, an intent with no receipt stops (never resend blind), and neither means act.
 `replies/` keeps every reply, readback and export verbatim; `steps/<name>.json` what the script ran itself, once.
@@ -66,7 +85,7 @@ the key or a store; the deny list and the runner audit enforce this.
 
 ## Decisions where the spec is silent
 
-1. Commands beyond `next` and `verify`: `kickoff` and `stop`.
+1. Commands beyond `next` and `verify`: `kickoff`, `stop`, `readback`, `resume`, `trace`, `save`, `wait`, `now`.
 2. A receipt that fails verification is `REJECTED`; the runner may correct it once as `NNNN.receipt.2.json` with
    `"supersedes"`; a second failure stops. An off-list tool in `tools_called`, `sent_unedited` not true or an
    edited payload is a runner deviation and stops at once.
@@ -75,13 +94,17 @@ the key or a store; the deny list and the runner audit enforce this.
 4. "Trailing newline stripped" strips every trailing LF, for the candidate and every readback.
 5. `sha256sum -c` runs in-process, same format; `SHA256SUMS` covers the run dir but itself and `.tmp/`.
 6. A pin passes when the remote names, for `ref`, a commit starting with the pinned sha (7+ hex).
-7. `reply_to` names where a reply is saved; `like` names the live bot whose bounds, teammates and skill a subject
-   copies. A seat message is the header, a blank line and the body. The header's `Body sha256` is the sha256 of
+7. `reply_to` names where a reply is saved. A subject is `CreateAgent` with `name` the target and `description`
+   the payload bytes unedited: instructions only, nothing copied from the live bot (CreateAgent takes only `name`,
+   `description` and `section_id`). A seat message is the header, a blank line and the body. The header's `Body sha256` is the sha256 of
    the body that follows the header (the bytes after the blank line), not request.json's sha256. A subject gets
    `PROMPT.md` itself.
-8. Times are platform times from receipts (`sent_at`, `reply_at`, `done_at`). An `await_reply` receipt with no
-   reply waits again unless its `done_at` is past the limit: 24 h for the Architect (stop), the window for a case
-   (`timeout`). The Evaluator has no limit.
+8. No tool returns a creation time, a send time or a message id, so `sent_at`, `created_at` and `done_at` are box
+   time from `qualify.py now`, and a reply's `reply_at` is the platform's turn timestamp (to the minute) on the
+   message that carried it. An `await_reply` receipt with no reply waits again unless its `done_at` is past the
+   limit: 24 h for the Architect (stop), the Evaluator has no limit. The runner wakes only on a new message, so a
+   silent seat needs the conduit's `Check run: <run>` (runner.md) for that check to run. A case reply is not
+   awaited: S5 polls the subject's transcript (below).
 9. What the script runs itself (pins, temp counts, `tools/selftest`, `tools/reset_fixtures`,
    `tools/check_side_effects <case>` in the suite, the seed, the summary) runs once, with `TMPDIR` set to the
    run's `.tmp`. A failed reset in S5 stops.
@@ -94,14 +117,24 @@ the key or a store; the deny list and the runner audit enforce this.
     the suite for key file names and `deny_paths`; after S2 and at S7 the run and suite trees are scanned.
 13. The deny list: `deny_paths`, the suite's `tools/`, `keys/` and KEY files, `qualify-script/run/`, this run's
     `actions/` and every other case's prompt directory. S4 scans first-run events, S5 the whole trace.
-14. An export is JSON `{bot_id, start_of_transcript, events}` (shape in `runner.md`). A subject export without
-    the footer stops the run; a runner export without it voids the audit.
+14. An export is JSON `{bot_id, start_of_transcript, events}`, built by `qualify.py trace` from the files
+    ReadTranscript writes with `write_to_file` (newest first, at most 200 messages and about 45 KB a page; the
+    runner names each new page and the script keeps the list in `steps/trace-NNNN.pages.jsonl`). A page counts
+    only if its file name is the sha256 of its bytes, its header names the target (or this session, for the
+    runner's own) and its line count matches its positions. Events carry the turn timestamp; tool inputs and
+    results over about 4000 characters arrive elided (first and last 2000), and the audit then checks the
+    target and the header line instead of the full payload sha (the S3 readback proves a subject's
+    instructions). `steps/trace-NNNN.json` records the export sha, which the receipt must match. A subject export
+    without the footer stops the run; a runner export without it voids the audit.
 15. The runner exports its own transcript as the last S5 action, since S6 sends the audit result (SPEC L140,
     L241) and the conduit cannot wake the runner after the kickoff (L67-69). Later acts are not in it; the
     conduit's full export after the run (L229) is there for the Evaluator, who may void the run.
-16. The audit maps a call to the action whose window (intent logged to receipt `done_at`) holds it. Shell may
-    only run `kit/qualify.py`, `sha256sum` or write a receipt; Read stays in the run dir and suite; the first-run
-    turn may hold only Read. The readback is the script's own command, `python3 kit/qualify.py readback <run> NNNN`:
+16. The audit maps a call to an action by order, since the transcript has no per-call time: a Read of
+    `actions/NNNN.intent(.K).json` opens the action and `qualify.py verify <run> NNNN` (or `stop`) closes it.
+    Shell's first line must fully match one of the forms in `runner.md` (`qualify.py <command>`, `sha256sum`, a
+    receipt heredoc); Read stays in the run dir, the suite and the intent's payload; GetDynamicTools only looks up
+    CreateAgent, SendToAgent and ReadTranscript; the first-run turn may hold only Read and the platform's greeting
+    (SendToUser); inside an action SendToUser may only send a `STOP` file verbatim. The readback is the script's own command, `python3 kit/qualify.py readback <run> NNNN`:
     it reads `actions/NNNN.intent.json`, then the `"description"` string of
     `<AGENTS_ROOT>/<target>/profile.json` (`AGENTS_ROOT = '/home/box/agent-data/agents'`, a module constant only
     tests patch), writes it verbatim (UTF-8, no added newline) to the intent's `reply_to` once via `.part`, records
@@ -125,13 +158,22 @@ the key or a store; the deny list and the runner audit enforce this.
 17. A replacement subject is `... subject NN-r1`, listed in `SUBJECTS-<ver>.r1.txt`.
 18. Verdicts: a deny-list hit voids, a timeout fails, a side-effect failure turns a pass into a fail, a case with
     no score is `not_run`. A `pass_rule` other than `all` stops at S0. The live bot is read back at S0 and S7.
-19. S4 waits per subject before its scan (SPEC L110) with the five methods and the L205-216 tools only: it repeats
-    `export_trace` (cursor ReadTranscript) for the subject, each export its own action and reply file
-    (`replies/subject-NN.first-run.K.json`), until an export receipt's `done_at` is 10 minutes or more after the
-    subject's `created_at` (the platform creation time from the `create_subject` receipt). It scans that last
-    export only and logs its file (`first_run_scanned`); it does not stop earlier on a finished turn. A turn still
+19. S4 waits per subject before its scan (SPEC L110) with the five methods and the L205-216 tools only: one
+    `export_trace` per subject with `not_before` = the subject's `created_at` + 10 minutes; the runner sleeps with
+    `qualify.py wait` (at most 600 s a call, inside Shell's 780 s limit) until it prints `READY`
+    (`replies/subject-NN.first-run.K.json`). It scans that export and logs its file (`first_run_scanned`); it
+    does not stop earlier on a finished turn. A turn still
     running then is scanned as it stands, and a hit retires the subject. Later events reach the S5 case trace
     scan, where a hit voids the case. A replacement subject waits the same way.
+
+20. S5 sends the case and then polls: an `export_trace` of the subject every 2 minutes (`not_before`) until the
+    subject's first SendToAgent to the runner after its first-run turn appears, or the window plus 60 s has
+    passed. The script writes that message as `replies/<case>.reply.md` (flagged `reply_elided` when the platform
+    shortened it) and scans the last export. No reply, or one stamped after the deadline plus 60 s, is a
+    `timeout`; the 60 s covers the minute-precision stamp.
+21. Real tool limits the kit is held to (checked by `tests/test_qualify_dryrun.py`): CreateAgent `{name,
+    description, section_id}`; SendToAgent `{target_id, message, priority}` returns no id; ReadTranscript `{in,
+    limit <= 200, before, around}`; Shell foreground at most 780000 ms. UpdateAgent is never allowed.
 
 The prompt rule (SPEC L136-137: no "do not message any person or bot", name the outbox) is a suite-authoring rule:
 `S1.request.md` states it, and the script does not check it (Q10).
@@ -144,7 +186,7 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - T04: tests.test_qualify.Subjects.test_subject_sha_mismatch_stops
 - T05: tests.test_qualify.Subjects.test_first_run_contamination_retires_subject, tests.test_qualify.Subjects.test_export_waits_for_first_turn_or_10_minutes
 - T06: tests.test_qualify.Cases.test_deny_hit_voids_case
-- T07: tests.test_qualify.Cases.test_late_notice_is_not_a_timeout, tests.test_qualify.Cases.test_reply_after_deadline_is_timeout
+- T07: tests.test_qualify.Cases.test_late_notice_is_not_a_timeout, tests.test_qualify.Cases.test_reply_after_deadline_is_timeout, tests.test_qualify_dryrun.DryRun.test_silent_subject_times_out_without_stalling
 - T08: tests.test_qualify.Record.test_pass_rule
 - T09: tests.test_qualify.Suite.test_leak_scan_finds_key_file_name, tests.test_qualify.Cases.test_key_file_under_run_tree_fails
 - T10: tests.test_qualify.Gate.test_not_ready_stops_at_s2
@@ -192,3 +234,8 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - R10: tests.test_qualify.Loop.test_readback_command_refuses
 - H01: tests.test_qualify.Cases.test_header_is_byte_exact, tests.test_qualify.Cases.test_header_body_sha_is_the_body_not_request_json
 - H02: tests.test_qualify.Record.test_old_header_label_is_gone
+- K01 (resume after a ruled stop): tests.test_qualify_dryrun.DryRun.test_run4_stop_ruling_resume_done, tests.test_qualify_dryrun.DryRun.test_resume_refuses_without_a_stop, tests.test_qualify_dryrun.DryRun.test_script_check_stop_is_not_waived_by_a_ruling
+- K02 (instructions only, real tool shapes): tests.test_qualify_dryrun.Limits.test_allowed_tools_exist_and_take_what_the_kit_sends, tests.test_qualify_dryrun.Limits.test_no_like_and_no_unreturned_platform_ids
+- K03 (kickoff names the folder, S0 self-pin): tests.test_qualify_dryrun.Commands.test_s0_stops_when_the_kit_is_not_at_the_pin, tests.test_qualify.Loop.test_kickoff_holds_only_run_request_sha_and_quote
+- K04 (runner commands pass the audit): tests.test_qualify_dryrun.Limits.test_runner_md_forms_pass_the_audit, tests.test_qualify_dryrun.Limits.test_wait_fits_one_shell_call, tests.test_qualify_dryrun.Commands.test_wait_sleeps_in_shell_sized_slices
+- K05 (export from real pages): tests.test_qualify_dryrun.Commands.test_trace_refuses_pages_that_are_not_the_targets
