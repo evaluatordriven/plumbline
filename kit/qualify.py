@@ -10,7 +10,9 @@ Usage (cwd = the kit folder, the repo root the kickoff names; <run> is runs/<ver
                                                message or instruction that is not in an action file)
   python3 kit/qualify.py resume <run> --ruling <file>
                                                resume after an Owner ruling on STOP.md: the ruling file is JSON
-                                               {quote, time, message_id, channel, stop_sha256}; STOP.md becomes
+                                               {quote, time, message_id, channel, stop_sha256} and, to move the
+                                               run to a later kit commit, kit_sha (this kit's HEAD, descended
+                                               from the pin in force; later `next` calls check it); STOP.md becomes
                                                STOP-NN.md, the ruling is kept as rulings/ruling-NN.json, and the
                                                conduit's fixed resume message is printed. A stalled action (an intent
                                                with no receipt) is re-issued as NNNN.intent.K.json carrying the ruling;
@@ -88,12 +90,23 @@ FIRST_TURN_MIN = 10
 POLL_MIN = 2  # S5: a case's subject transcript is exported every POLL_MIN minutes until a reply or the deadline
 DEADLINE_SLACK_S = 60  # a reply counts as on time when an export done within this of the deadline shows it
 WAIT_CAP_S = 600  # one `wait` call sleeps at most this; the Shell tool's foreground limit is 780 s
-# ReadTranscript (real tool, 2026-11-15): pages of at most 200 messages (and about 45 KB), newest first, paged
-# with `before`; a tool input or result over about 4000 characters is shown as its first and last ~2000 with
-# "..." between; the oldest page ends with START_FOOTER. write_to_file saves a page as <sha256 of its bytes>.txt.
-TRANSCRIPT_HEAD = re.compile(r'^Transcript of (?:agent "(?P<name>.*)" \((?P<id>[^)\s]+)\)|(?P<session>this session)), '
-                             r'positions (?P<a>\d+)\s*[\u2013-]\s*(?P<b>\d+) of (?P<n>\d+):\s*$', re.M)
+# ReadTranscript (real tool, pages read 2026-11-15): a page covers positions A-B (0-based, inclusive) of N, newest
+# page first, paged back with `before`; `limit` (<= 200) counts positions and a page also stops near 45 KB. Inside a
+# page the messages run oldest first, one JSON line {role, message} each, role user, assistant or tool. Not every
+# position is readable: a top-level bot's position 0 is never shown, so a page may hold fewer lines than B-A+1, and
+# which positions are missing is not shown. The page with A = 0 ends with START_FOOTER, any other with the
+# OLDER line (before=A); a `before` that leaves only unreadable positions returns the NONE_HEAD line alone. The page
+# is wrapped in a <cursor_untrusted_data_1337 source="ReadTranscript"> tag (a chat view may show it as _redacted;
+# tool results inside use _redacted) with no trailing newline. A tool input or result over about 4000 characters is shown as its first and last ~2000
+# with "..." between. write_to_file saves a page as <sha256 of its bytes>.txt.
+_WHO = r'(?:agent "(?P<name>.*)" \((?P<id>[^)\s]+)\)|(?P<session>this session))'
+TRANSCRIPT_HEAD = re.compile(r'Transcript of ' + _WHO + r', positions (?P<a>\d+)\u2013(?P<b>\d+) of (?P<n>\d+):')
+NONE_HEAD = re.compile(r'No readable messages in ' + _WHO + r' before position (?P<p>\d+)\.')
+OLDER = re.compile(r'Older messages remain: call ReadTranscript again with .*\bbefore=(?P<a>\d+)\.')
+WRAP_OPEN = re.compile(r'<cursor_untrusted_data_\w+ source="ReadTranscript">')
+WRAP_CLOSE = re.compile(r'</cursor_untrusted_data_\w+>')
 START_FOOTER = 'This is the start of the transcript.'
+ROLES = ('user', 'assistant', 'tool')
 STAMP = re.compile(r'<timestamp>\w+, (\w+ \d+, \d{4}), (\d+:\d+ [AP]M) \(UTC([+-]\d+)(?::(\d+))?\)</timestamp>')
 BOT_UUID = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
 READBACK_EXIT = {1: 2, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3}  # refusal case -> exit code (2 usage, 3 STOP)
@@ -215,6 +228,17 @@ def git_head(root=None):
     except (OSError, subprocess.TimeoutExpired):
         return None, True
     return (r.stdout.strip() or None) if r.returncode == 0 else None, d.returncode != 0 or bool(d.stdout.strip())
+
+
+def git_is_ancestor(old, new, root=None):
+    """True when commit `old` is `new` or an ancestor of it in the kit checkout (git merge-base --is-ancestor)."""
+    root = root or os.path.dirname(HERE)
+    try:
+        r = subprocess.run(['git', '-C', root, 'merge-base', '--is-ancestor', old, new], capture_output=True,
+                           text=True, timeout=60)
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return r.returncode == 0
 
 
 def run_tool(path, args, cwd, env):
@@ -642,8 +666,8 @@ class Run:
         r = rulings[k - 1]
         path = self.p('actions', '%s.intent.%d.json' % (n, k + 1))
         self.write_new(path, json.dumps(dict(intent, supersedes=os.path.basename(latest), ruling={
-            x: r.get(x) for x in ('quote', 'time', 'message_id', 'channel', 'stop_sha256', 'stop_file')}),
-            indent=1) + '\n')
+            x: r.get(x) for x in ('quote', 'time', 'message_id', 'channel', 'stop_sha256', 'stop_file', 'kit_sha')
+            if x != 'kit_sha' or r.get(x)}), indent=1) + '\n')
         self.log('reissued', n, intent['payload_sha256'], key='reissued %s %d' % (n, k + 1),
                  intent=os.path.basename(path))
         return path
@@ -734,6 +758,14 @@ class Run:
                 raise Stop('S0', 'this kit checkout (%s) is at %s%s, not the pinned plumbline %s' % (
                     os.path.dirname(HERE), head['sha'], ' with changed kit/ files' if head['dirty'] else '', want),
                     self.p('steps', 'S0-head.json'))
+            # every `next` runs at the kit pin in force: request.json's, or the kit_sha of the latest ruling that
+            # moved it (`resume`); S0-head.json above records only the first start
+            pin, src = kit_pin(self)
+            now_sha, dirty = self.head()
+            if not (now_sha or '').startswith(pin) or dirty:
+                raise Stop(self.stage, 'this kit checkout (%s) is at %s%s, but the run is pinned to %s (%s)' % (
+                    os.path.dirname(HERE), now_sha, ' with changed kit/ files' if dirty else '', pin,
+                    os.path.relpath(src, self.dir)), src)
         tmp = self.p('.tmp')
         os.makedirs(tmp, exist_ok=True)
         self.env = dict(os.environ, TMPDIR=tmp, TMP=tmp, TEMP=tmp)
@@ -991,8 +1023,11 @@ class Run:
         tr = self.trace(R['runner']['bot_id'], 'replies/runner-transcript.json')
         reasons = self.audit(tr)
         self.audit_result = 'void' if reasons else 'clean'
-        self.audit_path = self.write_new('runner-audit.txt', 'runner audit: %s\n%s' % (
-            self.audit_result, ''.join('- %s\n' % x for x in reasons)))
+        hidden = tr.get('unreadable_positions') if isinstance(tr, dict) else None
+        self.audit_path = self.write_new('runner-audit.txt', 'runner audit: %s\n%s%s' % (
+            self.audit_result, ''.join('- %s\n' % x for x in reasons),
+            'not audited: %s transcript position(s) the platform counts but does not show\n' % hidden
+            if hidden else ''))
         self.log('runner_audit', payload_sha=file_sha(self.audit_path), result=self.audit_result)
 
     def poll(self, cid, bot, sent, deadline, rel):
@@ -1227,8 +1262,9 @@ class TraceError(Exception):
 
 
 def parse_page(path):
-    """One ReadTranscript result file (write_to_file): header, one JSON message per line, then the paging line or
-    the start-of-transcript footer."""
+    """One ReadTranscript result file (write_to_file), checked line by line against the real page shape: the
+    wrapper, then the header (or the no-readable-messages line), the JSON message lines, the OLDER line or
+    START_FOOTER, and the closing wrapper. Anything else in the file is refused."""
     try:
         data = read_bytes(path)
     except OSError as e:
@@ -1236,24 +1272,57 @@ def parse_page(path):
     if os.path.basename(path) != sha256(data) + '.txt':
         raise TraceError('page %s is not a ReadTranscript result file: its name is not the sha256 of its bytes'
                          % path)
-    text = data.decode('utf-8', 'replace')
-    m = TRANSCRIPT_HEAD.search(text)
-    if not m:
-        raise TraceError('page %s has no "Transcript of ..., positions A-B of N:" header' % path)
-    msgs = []
-    for line in text[m.end():].splitlines():
-        line = line.strip()
-        if line.startswith('{'):
+    lines = data.decode('utf-8', 'replace').split('\n')
+    while lines and not lines[-1].strip():
+        lines.pop()
+    wrapped = bool(lines) and bool(WRAP_OPEN.fullmatch(lines[0].strip()))
+    if wrapped:
+        if not WRAP_CLOSE.fullmatch(lines[-1].strip()):
+            raise TraceError('page %s opens the ReadTranscript wrapper but does not close it' % path)
+        lines = lines[1:-1]
+    body = [(i, x.strip()) for i, x in enumerate(lines, 2 if wrapped else 1) if x.strip()]
+    if not body:
+        raise TraceError('page %s is empty' % path)
+    first = body[0][1]
+    m, none = TRANSCRIPT_HEAD.fullmatch(first), NONE_HEAD.fullmatch(first)
+    if not (m or none):
+        raise TraceError('page %s has no "Transcript of ..., positions A\u2013B of N:" or "No readable messages in '
+                         '... before position P." line where the header belongs' % path)
+    head = m or none
+    pg = {'path': path, 'sha256': sha256(data), 'id': head.group('id'), 'name': head.group('name'),
+          'session': bool(head.group('session')), 'msgs': [], 'start': False}
+    if none:
+        if len(body) > 1:
+            raise TraceError('page %s says no messages are readable but holds more lines' % path)
+        return dict(pg, kind='none', a=None, b=None, of=None, p=int(none.group('p')), unreadable=None)
+    a, b, of = int(m.group('a')), int(m.group('b')), int(m.group('n'))
+    if not a <= b < of:
+        raise TraceError('page %s says positions %d\u2013%d of %d' % (path, a, b, of))
+    tail = None
+    for i, x in body[1:]:
+        if tail is not None:
+            raise TraceError('page %s line %d follows the page\'s last line: %r' % (path, i, x[:80]))
+        if x.startswith('{'):
             try:
-                msgs.append(json.loads(line))
+                msg = json.loads(x)
             except ValueError as e:
-                raise TraceError('page %s holds a line that is not JSON: %s' % (path, e))
-    a, b = int(m.group('a')), int(m.group('b'))
-    if len(msgs) != b - a + 1:
-        raise TraceError('page %s says positions %d-%d but holds %d messages' % (path, a, b, len(msgs)))
-    return {'path': path, 'sha256': sha256(data), 'id': m.group('id'), 'name': m.group('name'),
-            'session': bool(m.group('session')), 'a': a, 'b': b, 'of': int(m.group('n')), 'msgs': msgs,
-            'start': START_FOOTER in text[m.end():]}
+                raise TraceError('page %s line %d is not JSON: %s' % (path, i, e))
+            if not isinstance(msg, dict) or msg.get('role') not in ROLES:
+                raise TraceError('page %s line %d has role %r; the kit audits only %s' % (
+                    path, i, msg.get('role') if isinstance(msg, dict) else None, ', '.join(ROLES)))
+            pg['msgs'].append(msg)
+        elif x == START_FOOTER or OLDER.fullmatch(x):
+            tail = x
+        else:
+            raise TraceError('page %s line %d is not part of a ReadTranscript page: %r' % (path, i, x[:80]))
+    older = OLDER.fullmatch(tail or '')
+    if a == 0 and tail != START_FOOTER or a > 0 and not (older and int(older.group('a')) == a):
+        raise TraceError('page %s covers positions %d\u2013%d but ends with %r' % (path, a, b, tail))
+    if len(pg['msgs']) > b - a + 1:
+        raise TraceError('page %s says positions %d\u2013%d but holds %d messages' % (path, a, b, len(pg['msgs'])))
+    # fewer lines than positions is the platform's normal shape: some positions are not readable (position 0 of
+    # a top-level bot always), and the page does not say which
+    return dict(pg, kind='page', a=a, b=b, of=of, p=None, start=a == 0, unreadable=b - a + 1 - len(pg['msgs']))
 
 
 def stamp_time(text):
@@ -1309,22 +1378,44 @@ def tool_event(c, at, first):
     return e
 
 
-def export_from_pages(pages, target):
-    """Stitch pages (any order) into {"bot_id", "start_of_transcript", "events", ...}. Events are the assistant's
-    prose and tool calls in transcript order; `at` is the platform timestamp of the turn (minute precision, the
-    only time the platform shows); `first_run` marks the turn the platform's first-run cue opened."""
-    by_pos = {}
+def page_chain(pages):
+    """Order a transcript's pages and check they join: the newest page ends at position N-1 of its N, each older
+    page ends right before the next one starts (B = next A - 1), no two overlap, and the chain reaches the start
+    (the page with A = 0 and START_FOOTER, or a no-readable-messages page before the lowest A). Returns (header
+    pages oldest first, start reached, lowest A). A gap is refused: pages are read newest to oldest."""
+    seen, chain, nones = set(), [], []
     for pg in pages:
-        for i, msg in enumerate(pg['msgs']):
-            by_pos.setdefault(pg['a'] + i, msg)
-    top = max(by_pos) if by_pos else 0
-    contiguous = all(p in by_pos for p in range(1, top + 1))
-    start = contiguous and any(pg['a'] == 1 and pg['start'] for pg in pages)
-    events, at, first = [], None, False
-    for pos in range(1, top + 1):
-        msg = by_pos.get(pos)
-        if not isinstance(msg, dict):
+        if pg['sha256'] in seen:
             continue
+        seen.add(pg['sha256'])
+        (nones if pg['kind'] == 'none' else chain).append(pg)
+    if not chain:
+        raise TraceError('no page with a "Transcript of ..." header was given')
+    chain.sort(key=lambda x: -x['a'])
+    top = chain[0]
+    if top['b'] != top['of'] - 1:
+        raise TraceError('the newest page given (%s) ends at position %d of %d: it is not the newest page' % (
+            top['path'], top['b'], top['of']))
+    for newer, older in zip(chain, chain[1:]):
+        if older['b'] != newer['a'] - 1:
+            raise TraceError('pages %s (positions %d\u2013%d) and %s (positions %d\u2013%d) do not join' % (
+                older['path'], older['a'], older['b'], newer['path'], newer['a'], newer['b']))
+    low = chain[-1]['a']
+    for pg in nones:
+        if pg['p'] != low:
+            raise TraceError('page %s says nothing is readable before position %d, but the lowest page given '
+                             'starts at %d' % (pg['path'], pg['p'], low))
+    return chain[::-1], low == 0 or bool(nones), low, (low if nones else 0)
+
+
+def export_from_pages(pages, target):
+    """Stitch pages into {"bot_id", "start_of_transcript", "events", ...}. Events are the assistant's prose and tool
+    calls in transcript order; `at` is the platform timestamp of the turn (minute precision, the only time the
+    platform shows); `first_run` marks the turn the platform's first-run cue opened. `unreadable_positions` counts
+    the positions the pages cover but do not show (their content and place are not known)."""
+    chain, start, low, none_below = page_chain(pages)  # a no-readable page: positions 0..low-1 are all unreadable
+    events, at, first = [], None, False
+    for msg in (m for pg in chain for m in pg['msgs']):
         body = msg.get('message')
         content = body.get('content') if isinstance(body, dict) else body
         content = [{'type': 'text', 'text': content}] if isinstance(content, str) else content or []
@@ -1340,9 +1431,10 @@ def export_from_pages(pages, target):
                 events.append({'at': at, 'first_run': first, 'text': c.get('text', '')})
             elif isinstance(c, dict) and c.get('type') == 'tool_use':
                 events.append(tool_event(c, at, first))
-    return {'bot_id': target, 'start_of_transcript': bool(start), 'positions': [1 if by_pos else 0, top],
-            'pages': sorted(pg['sha256'] for pg in pages), 'events': events}, contiguous and start, \
-        min((pg['a'] for pg in pages), default=0)
+    return {'bot_id': target, 'start_of_transcript': bool(start), 'positions': [low - none_below, chain[-1]['b']],
+            'of': chain[-1]['of'], 'messages': sum(len(pg['msgs']) for pg in chain),
+            'unreadable_positions': none_below + sum(pg['unreadable'] for pg in chain),
+            'pages': sorted(pg['sha256'] for pg in pages), 'events': events}, bool(start), low
 
 
 def load_intent(run, n, kind):
@@ -1399,8 +1491,11 @@ def trace(run_dir, n, pages, incomplete=False, clock=now_local):
     write_once(full, data)
     run.write_new(run.p('steps', 'trace-%s.json' % n), json.dumps({
         'action': n, 'target': intent['target'], 'export_sha256': sha256(data), 'complete': complete,
-        'pages': [{'path': pg['path'], 'sha256': pg['sha256'], 'positions': [pg['a'], pg['b']], 'of': pg['of']}
-                  for pg in sorted(parsed, key=lambda x: x['a'])], 'written_at': iso(clock())},
+        'unreadable_positions': export['unreadable_positions'],
+        'pages': [{'path': pg['path'], 'sha256': pg['sha256'], 'positions': [pg['a'], pg['b']], 'of': pg['of'],
+                   'lines': len(pg['msgs']), 'no_readable_before': pg['p']}
+                  for pg in sorted(parsed, key=lambda x: -1 if x['a'] is None else x['a'])],
+        'written_at': iso(clock())},
         indent=1, sort_keys=True) + '\n')
     run.stage = last_stage(run)
     run.log('trace', n, sha256(data), key='trace %s' % n, target=intent['target'], complete=complete)
@@ -1501,12 +1596,28 @@ def stalled(run):
 
 
 RULING_FIELDS = ('quote', 'time', 'message_id', 'channel', 'stop_sha256')
+FULL_SHA = re.compile(r'[0-9a-f]{40}')
 
 
-def resume(run_dir, ruling_path, clock=now_local, head=git_head):
+def kit_pin(run):
+    """(the kit commit this run must run at, the file that says so): the kit_sha of the latest ruling that moved
+    it, else request.json's pins.plumbline.sha."""
+    d = run.p('rulings')
+    names = sorted(x for x in os.listdir(d) if re.fullmatch(r'ruling-\d{2}\.json', x)) if os.path.isdir(d) else []
+    for x in reversed(names):
+        r = load_json(os.path.join(d, x))
+        if isinstance(r, dict) and r.get('kit_sha'):
+            return r['kit_sha'], os.path.join(d, x)
+    rq = run.p('request.json')
+    return load_json(rq)['pins']['plumbline']['sha'], rq
+
+
+def resume(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_is_ancestor):
     """Resume after an Owner ruling on STOP.md: (exit code, printed text). Refuses (exit 2, nothing changed) with
     no STOP.md, a ruling that is not JSON or lacks a non-empty quote, time, message_id or channel, or a
-    stop_sha256 that is not the sha256 of STOP.md."""
+    stop_sha256 that is not the sha256 of STOP.md. An optional kit_sha moves the run to a later kit commit: it must
+    be the full sha this kit is checked out at (kit/ clean) and descend from the pin in force; without it this kit
+    must be at the pin in force."""
     run = Run(run_dir, clock=clock)
     sp = run.p('STOP.md')
     if not os.path.isfile(sp):
@@ -1524,15 +1635,37 @@ def resume(run_dir, ruling_path, clock=now_local, head=git_head):
     if ruling['stop_sha256'] != file_sha(sp):
         return 2, 'REFUSED: the ruling is on STOP.md sha256 %s; this STOP.md is %s' % (ruling['stop_sha256'],
                                                                                      file_sha(sp))
+    try:
+        pin, _ = kit_pin(run)
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        return 2, 'REFUSED: cannot read the run\'s kit pin: %s' % e
+    at_sha, dirty = head()
+    extra = {}
+    if 'kit_sha' in ruling:
+        ks = ruling['kit_sha']
+        if not (isinstance(ks, str) and FULL_SHA.fullmatch(ks)):
+            return 2, 'REFUSED: kit_sha must be a full 40-hex commit sha, not %r' % (ks,)
+        if at_sha != ks or dirty:
+            return 2, 'REFUSED: run resume from the kit checked out at kit_sha %s; this kit (%s) is at %s%s' % (
+                ks, os.path.dirname(HERE), at_sha, ' with changed kit/ files' if dirty else '')
+        if not ancestor(pin, ks):
+            return 2, 'REFUSED: kit_sha %s does not descend from the pin in force %s (git merge-base ' \
+                      '--is-ancestor)' % (ks, pin)
+        extra = {'kit_from': pin}
+    elif not (at_sha or '').startswith(pin) or dirty:
+        return 2, 'REFUSED: this kit (%s) is at %s%s; the run is pinned to %s. A ruling that moves the run to ' \
+                  'this kit carries "kit_sha"' % (os.path.dirname(HERE), at_sha,
+                                                  ' with changed kit/ files' if dirty else '', pin)
     k = 1 + len([x for x in os.listdir(run.dir) if re.fullmatch(r'STOP-\d{2}\.md', x)])
     old, n = 'STOP-%02d.md' % k, stalled(run)
     rec = dict(ruling, stop_file=old, action=n, ruling_path=os.path.abspath(ruling_path),
-               ruling_file_sha256=file_sha(ruling_path), resumed_at=iso(clock()))
+               ruling_file_sha256=file_sha(ruling_path), resumed_at=iso(clock()), **extra)
     rp = run.write_new(run.p('rulings', 'ruling-%02d.json' % k), json.dumps(rec, indent=1, sort_keys=True) + '\n')
     os.rename(sp, run.p(old))
     run.stage = last_stage(run)
     run.log('resumed', n, ruling['stop_sha256'], key='resumed %02d' % k, stop_file=old,
-            ruling=os.path.relpath(rp, run.dir), ruling_sha256=file_sha(rp), quote=ruling['quote'])
+            ruling=os.path.relpath(rp, run.dir), ruling_sha256=file_sha(rp), quote=ruling['quote'],
+            **({'kit_sha': ruling['kit_sha'], 'kit_from': extra['kit_from']} if extra else {}))
     kit, at = kit_folder(head)
     return 0, render('resume.md', run=run.dir, ruling=rp, ruling_sha=file_sha(rp), stop_file=run.p(old),
                      stop_sha=ruling['stop_sha256'], quote=ruling['quote'], time=ruling['time'],

@@ -156,11 +156,11 @@ class Platform:
         assert 0 < limit <= LIMIT_MAX, 'ReadTranscript limit %s' % limit
         b = self.bots[args.get('in', caller)]
         turns = self.subject_turns(b) if b.kind == 'subject' else b.turns
-        msgs = qp.messages(turns)
-        before = args.get('before', len(msgs) + 1)
+        msgs = qp.messages(turns, getattr(b, 'hidden_at', ()))
+        before = args.get('before', len(msgs))
         who = 'this session' if 'in' not in args else 'agent "%s" (%s)' % (b.name, b.id)
-        a = before - 1
-        while a > 1 and before - a < limit and len(qp.page_text(msgs, a - 1, before - 1, who)) <= PAGE_BYTES:
+        a = before - 1  # `limit` counts positions; a page also stops near PAGE_BYTES
+        while a > 0 and before - a < limit and len(qp.page_text(msgs, a - 1, before - 1, who)) <= PAGE_BYTES:
             a -= 1
         return 'Result written to file: %s' % qp.save_page(os.path.join(self.root, 'tool-results', caller),
                                                            qp.page_text(msgs, a, before - 1, who))
@@ -295,9 +295,15 @@ class SimRunner:
             while True:
                 res = self.dyn('ReadTranscript', dict(args), write_to_file=True)
                 pages.append(res.split(': ', 1)[1])
-                out = self.kit('trace', self.run, n, pages[-1])[1].split()  # only the page just read
+                rc, text = self.kit('trace', self.run, n, pages[-1])  # only the page just read
+                out = text.split()
                 if out[0] == 'TRACE':
                     break
+                if out[0] == 'REFUSED':  # as the run-5 runner did: stop with what the script printed
+                    stop = self.kit('stop', self.run, 'trace on that file exited %d with %s' % (rc, text.strip()))[1]
+                    self.record('SendToUser', {'type': 'text', 'content': open(stop.split()[1], encoding='utf-8').read()})
+                    self.log.append(('end', 'STOP', stop.split()[1]))
+                    return 'STOP'
                 assert out[0] == 'MORE', out
                 args['before'] = int(out[2].split('=')[1])
             return self.receipt(n, {}, out[1], out[3], ['Shell', 'Read', 'cursor.ReadTranscript'])
@@ -372,6 +378,10 @@ class Sim:
     def head(self):
         return 'a' * 40, False
 
+    @staticmethod
+    def ancestor(old, new):
+        return old == new
+
     def qualify(self, words, stdin):
         verb, rest = words[0], words[1:]
         c = self.clock
@@ -440,7 +450,7 @@ class Sim:
 
     def resume(self, ruling):
         path = put(self.root + '/rulings-in/ruling.json', json.dumps(ruling))
-        rc, text = q.resume(self.run, path, clock=self.clock, head=self.head)
+        rc, text = q.resume(self.run, path, clock=self.clock, head=self.head, ancestor=self.ancestor)
         if rc == 0:
             self.clock.tick(60)
             result = self.runner.wake(COS, text, self.clock())

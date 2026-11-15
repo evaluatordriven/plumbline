@@ -1,9 +1,18 @@
-"""Render a bot's transcript the way the real cursor ReadTranscript tool returns it with write_to_file (seen on
-this platform 2026-11-15): a page per call, newest first, at most `limit` messages; a header line
-'Transcript of agent "NAME" (ID), positions A-B of N:' (or 'Transcript of this session, ...' for the caller's own
-run); one JSON object {"role", "message"} per line; 'Older messages remain: ... before=A.' or the footer
-'This is the start of the transcript.'; a tool input over ELIDE characters shown as its first and last ~2000
-characters with '...' between; the page file named <sha256 of its bytes>.txt. Used by tests only."""
+"""Render a bot's transcript the way the real cursor ReadTranscript tool returns it with write_to_file, matched to
+pages read on this platform 2026-11-15 (tests/fixtures/qualify/readtranscript-subject-first-run.txt has the same
+structure as a real one): the page wrapped in <cursor_untrusted_data_1337 source="ReadTranscript"> ...
+</cursor_untrusted_data_1337> with no trailing newline; a blank line; the header
+'Transcript of agent "NAME" (ID), positions A\u2013B of N:' (or 'Transcript of this session, ...') with 0-based
+inclusive positions and an en dash; one JSON object {"role", "message"} per line, oldest first, roles user,
+assistant and tool; 'Older messages remain: call ReadTranscript again with the same in and before=A.' or, when
+A = 0, 'This is the start of the transcript.'. Not every position is readable: position 0 of a top-level bot (its
+setup) is never shown, so a page holds fewer lines than positions; a `before` that leaves only unreadable
+positions gets 'No readable messages in agent "NAME" (ID) before position P.' alone. `limit` counts positions. A
+tool input over ELIDE characters is shown as its first and last ~2000 characters with '...' between; the page
+file is named <sha256 of its bytes>.txt. Used by tests only.
+
+The previous version of this file (kit-resume) invented 1-based positions with one line per position and no
+unreadable positions; the kit passed against it and failed on the first real page (run 5, action 0044)."""
 import datetime
 import hashlib
 import json
@@ -36,9 +45,14 @@ def tool_use(e, k):
             else inp}
 
 
-def messages(turns):
-    """turns: [(kind, time, user_text, events)], kind 'first' (the platform's first-run cue) or 'agent'."""
-    out = [{'role': 'user', 'message': {'content': [{'type': 'text', 'text': '<memory_context>none</memory_context>'}]}}]
+HIDDEN = None  # a position the transcript counts but does not show
+
+
+def messages(turns, hidden_at=()):
+    """turns: [(kind, time, user_text, events)], kind 'first' (the platform's first-run cue) or 'agent'. Position 0
+    is the bot's setup, never shown; `hidden_at` adds unreadable positions after the given message indexes."""
+    out = [HIDDEN, {'role': 'user', 'message': {'content': [{'type': 'text', 'text':
+                                                              '<memory_context>none</memory_context>'}]}}]
     k = 0
     for kind, t, text, events in turns:
         cue = '[GROK_BOT_HIDDEN_PROMPT][first run] This is your very first turn.' if kind == 'first' else \
@@ -55,16 +69,28 @@ def messages(turns):
                                                                      'result': 'ok'}]}})
             else:
                 out.append({'role': 'assistant', 'message': {'content': [{'type': 'text', 'text': e['text']}]}})
+    for x in sorted(hidden_at, reverse=True):
+        out.insert(x + 1, HIDDEN)
     return out
 
 
+# the page file's own wrapper tag ends in 1337 (tool results inside a page use _redacted); a chat view of the
+# file may show it as _redacted, which is how it was first reported
+TAG = 'cursor_untrusted_data_' + '1337'
+WRAP = '<' + TAG + ' source="ReadTranscript">\n\n%s\n\n</' + TAG + '>'
+
+
 def page_text(msgs, a, b, who):
-    """The bytes of one page: messages a..b (1-based) of msgs; who is 'this session' or 'agent "NAME" (ID)'."""
-    body = '\n'.join(json.dumps(m, ensure_ascii=False) for m in msgs[a - 1:b])
-    tail = 'This is the start of the transcript.' if a == 1 else \
+    """The bytes of one page: positions a..b (0-based, inclusive) of msgs; who is 'this session' or
+    'agent "NAME" (ID)'."""
+    shown = [m for m in msgs[a:b + 1] if m is not HIDDEN]
+    if not shown:
+        return (WRAP % ('No readable messages in %s before position %d.' % (who, b + 1))).encode()
+    body = '\n'.join(json.dumps(m, ensure_ascii=False, separators=(',', ':')) for m in shown)
+    tail = 'This is the start of the transcript.' if a == 0 else \
         'Older messages remain: call ReadTranscript again with the same in and before=%d.' % a
-    return ('<cursor_untrusted_data_redacted source="ReadTranscript">\n\nTranscript of %s, positions %d\u2013%d '
-            'of %d:\n%s\n%s\n\n</cursor_untrusted_data_redacted>\n' % (who, a, b, len(msgs), body, tail)).encode()
+    return (WRAP % ('Transcript of %s, positions %d\u2013%d of %d:\n%s\n%s' % (who, a, b, len(msgs), body, tail))
+            ).encode()
 
 
 def save_page(folder, text):
@@ -76,13 +102,16 @@ def save_page(folder, text):
     return path
 
 
+def who(bot_id=None, name=None):
+    return 'this session' if bot_id is None else 'agent "%s" (%s)' % (name or 'bot', bot_id)
+
+
 def pages(msgs, folder, bot_id=None, name=None, limit=25, drop_oldest=False):
-    """Write the pages a runner gets by paging back from the newest message; returns their paths, newest first."""
-    paths, before = [], len(msgs) + 1
-    who = 'this session' if bot_id is None else 'agent "%s" (%s)' % (name or 'bot', bot_id)
-    while before > 1:
-        a, b = max(1, before - limit), before - 1
-        paths.append(save_page(folder, page_text(msgs, a, b, who)))
+    """Write the pages a runner gets by paging back from the newest position; returns their paths, newest first."""
+    paths, before = [], len(msgs)
+    while before > 0:
+        a, b = max(0, before - limit), before - 1
+        paths.append(save_page(folder, page_text(msgs, a, b, who(bot_id, name))))
         before = a
     return paths[:-1] if drop_oldest and len(paths) > 1 else paths
 

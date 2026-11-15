@@ -337,7 +337,8 @@ class Loop(unittest.TestCase):
         s = w.done()
         self.assertTrue(s['qualified'])
         self.assertEqual(s['verdicts'], {'c1': 'pass', 'c2': 'pass'})
-        self.assertEqual(read(w.p('runner-audit.txt')), b'runner audit: clean\n')
+        self.assertEqual(read(w.p('runner-audit.txt')), b'runner audit: clean\nnot audited: 1 transcript position(s) '
+                         b'the platform counts but does not show\n')  # position 0, the runner's setup
         self.assertEqual(q.next_action(w.run), ('DONE', w.p('summary.json')))
         rb = [(n, i) for n, i in enumerate(w.intents(), 1) if i['kind'] == 'read_back_sha']
         self.assertEqual([i['target'] for n, i in rb], [LIVE, bot(1), bot(2), LIVE])
@@ -389,9 +390,16 @@ class Loop(unittest.TestCase):
         self.assertEqual(q.verify_action(w.run, '0001'), (True, 'VERIFIED 0001'))  # in process: AGENTS_ROOT fixture
         w.fake.perform(w.next()[1])
 
+        # every `next` checks the kit checkout's HEAD against the run's pin: the CLI gets a git that reports the
+        # World's pinned commit with kit/ clean
+        fake = put(os.path.join(w.root, 'bin', 'git'), '#!/bin/sh\ncase "$*" in *rev-parse*) echo %s;; esac\nexit 0\n'
+                   % ('a' * 40))
+        os.chmod(fake, 0o755)
+
         def cli(*args):
             r = subprocess.run([sys.executable, 'kit/qualify.py'] + list(args), cwd=REPO, capture_output=True,
-                               text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1'))
+                               text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1',
+                                                   PATH=os.path.dirname(fake) + os.pathsep + os.environ['PATH']))
             return r.returncode, r.stdout
         self.assertEqual(cli('verify', w.run, '2'), (0, 'VERIFIED 0002\n'))
         self.assertEqual(cli('next', w.run), (0, w.p('actions', '0003.intent.json') + '\n'))
