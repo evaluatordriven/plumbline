@@ -52,6 +52,17 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    refused or left without a receipt is re-issued as `actions/NNNN.intent.K.json` (`supersedes`, and `ruling` with
    the quote, time, message id, channel and STOP sha) and logged `reissued`; a stop from a script check runs that
    check again, so a ruling never waives a failed check. A stop with no ruling file stays a stop.
+5. Resume at a later kit commit. A fix to the kit itself lands as a new commit, but the run is pinned to the old
+   one, and every `next` checks the kit checkout's HEAD (with `kit/` clean) against the pin in force: request.json's
+   `pins.plumbline.sha`, or the `kit_sha` of the latest ruling that moved it. To move it, the ruling file adds
+   `kit_sha`, the full sha of the new commit. The conduit checks the kit folder out at that commit first and runs
+   `resume` from it: it refuses unless HEAD is exactly `kit_sha` with `kit/` clean and the pin in force is an
+   ancestor of `kit_sha` (`git merge-base --is-ancestor`). Without `kit_sha`, `resume` refuses when HEAD is not at
+   the pin in force. `rulings/ruling-NN.json` records `kit_sha` and `kit_from`, the `resumed` log line both, and the
+   re-issued intent's `ruling` the `kit_sha`. `steps/S0-head.json` keeps the first start's commit. The run's
+   actions on record must be the ones the new kit would issue, or `next` stops ("not the action the procedure
+   needs now"). So a kit fix that changes what an action says, or `runner.md` (its sha is in request.json),
+   cannot resume a run. It needs a new run.
 
 Stages: S0 preflight, S1 Architect, S2 gate, S3 subjects, S4 first-run contamination, S5 cases and the runner
 audit, S6 scoring, S7 record. `qualified = all cases pass and void == 0 and not_run == 0 and runner_audit ==
@@ -118,10 +129,24 @@ the key or a store; the deny list and the runner audit enforce this.
 13. The deny list: `deny_paths`, the suite's `tools/`, `keys/` and KEY files, `qualify-script/run/`, this run's
     `actions/` and every other case's prompt directory. S4 scans first-run events, S5 the whole trace.
 14. An export is JSON `{bot_id, start_of_transcript, events}`, built by `qualify.py trace` from the files
-    ReadTranscript writes with `write_to_file` (newest first, at most 200 messages and about 45 KB a page; the
-    runner names each new page and the script keeps the list in `steps/trace-NNNN.pages.jsonl`). A page counts
-    only if its file name is the sha256 of its bytes, its header names the target (or this session, for the
-    runner's own) and its line count matches its positions. Events carry the turn timestamp; tool inputs and
+    ReadTranscript writes with `write_to_file`; the runner names each new page and the script keeps the list in
+    `steps/trace-NNNN.pages.jsonl`. The real page shape (pages read 2026-11-15; a structural copy is
+    `tests/fixtures/qualify/readtranscript-subject-first-run.txt`): a `<cursor_untrusted_data_1337
+    source="ReadTranscript">` wrapper, no trailing newline; the header `Transcript of agent "NAME" (ID),
+    positions A–B of N:` (0-based, inclusive, en dash) or `Transcript of this session, ...`; one compact JSON line
+    `{role, message}` per readable message, oldest first, role `user`, `assistant` or `tool`; then `Older messages
+    remain: ... before=A.` or, when A = 0, `This is the start of the transcript.`. `limit` (at most 200) counts
+    positions and a page also stops near 45 KB. Not every position is readable: a top-level bot's position 0 (its
+    setup) is never shown, so a page can hold fewer lines than B−A+1, and it does not say which positions it left
+    out. A `before` that leaves only unreadable positions returns `No readable messages in ... before position P.`
+    alone. A page counts only if its file name is the sha256 of its bytes, every line is one of these, its header
+    names the target (or this session, for the runner's own), it holds at most B−A+1 lines, and it ends with the
+    footer exactly when A = 0. Pages join by their header ranges: the newest ends at N−1, each older one ends at
+    the next one's A−1, and none overlap. The chain is complete when it reaches A = 0, or a no-readable page
+    before the lowest A. The export and `steps/trace-NNNN.json` record `unreadable_positions`, and
+    `runner-audit.txt` states the runner's count as not audited. What this can no longer prove: that the
+    positions not shown hold nothing the audit or the deny scan would flag. Their number is known, not their
+    content or place. Events carry the turn timestamp; tool inputs and
     results over about 4000 characters arrive elided (first and last 2000), and the audit then checks the
     target and the header line instead of the full payload sha (the S3 readback proves a subject's
     instructions). `steps/trace-NNNN.json` records the export sha, which the receipt must match. A subject export
@@ -239,3 +264,5 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - K03 (kickoff names the folder, S0 self-pin): tests.test_qualify_dryrun.Commands.test_s0_stops_when_the_kit_is_not_at_the_pin, tests.test_qualify.Loop.test_kickoff_holds_only_run_request_sha_and_quote
 - K04 (runner commands pass the audit): tests.test_qualify_dryrun.Limits.test_runner_md_forms_pass_the_audit, tests.test_qualify_dryrun.Limits.test_wait_fits_one_shell_call, tests.test_qualify_dryrun.Commands.test_wait_sleeps_in_shell_sized_slices
 - K05 (export from real pages): tests.test_qualify_dryrun.Commands.test_trace_refuses_pages_that_are_not_the_targets
+- K06 (the real page header): tests.test_qualify_page_header.RealPage.test_the_real_page_shape_is_accepted_and_counted_honestly, tests.test_qualify_page_header.RealPage.test_the_check_run_5_stopped_on_refuses_this_page, tests.test_qualify_page_header.RealPage.test_what_the_page_check_still_refuses, tests.test_qualify_page_header.Paging.test_pages_join_and_unreadable_positions_are_counted, tests.test_qualify_page_header.Paging.test_a_gap_or_a_page_that_is_not_the_newest_is_refused, tests.test_qualify_page_header.Paging.test_a_no_readable_messages_page_ends_the_chain, tests.test_qualify_page_header.SimShape.test_the_simulator_emits_the_real_shape
+- K07 (resume at a later kit commit): tests.test_qualify_page_header.Run5Resume.test_stop_at_0044_ruling_at_a_new_kit_commit_resume_done, tests.test_qualify_page_header.Run5Resume.test_after_the_move_next_at_the_old_commit_stops, tests.test_qualify_page_header.Run5Resume.test_resume_at_the_pin_needs_no_kit_sha
