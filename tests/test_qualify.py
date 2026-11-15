@@ -1,0 +1,617 @@
+"""Tests for kit/qualify.py (SPEC v2 section 9; ids T01-T18 and B01-B24 in docs/QUALIFY.md).
+
+A fake Transport plays the runner: it performs each action file from synthetic replies and transcripts and
+writes the receipt. The pin check and the suite tools are seams. No network, no model, no bot.
+"""
+import datetime
+import hashlib
+import json
+import os
+import random
+import subprocess
+import sys
+import tempfile
+import unittest
+
+from kit import qualify as q
+
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+EVENTS = os.path.join(REPO, 'tests', 'fixtures', 'qualify', 'events.json')
+EST = datetime.timezone(datetime.timedelta(hours=-5))
+KEY = b'synthetic answer key\n'
+STORE = '/stores/evaluator/'
+QUOTE = 'Run the v9 qualification.'
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def put(path, data):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'wb') as fh:
+        fh.write(data if isinstance(data, bytes) else data.encode())
+    return path
+
+
+def read(path):
+    with open(path, 'rb') as fh:
+        return fh.read()
+
+
+def lines(path):
+    with open(path, encoding='utf-8') as fh:
+        return [json.loads(x) for x in fh]
+
+
+class Clock:
+    """Platform time: 30 s per reading; jump() for a slow reply."""
+
+    def __init__(self):
+        self.t = datetime.datetime(2026, 11, 14, 20, 0, tzinfo=EST)
+
+    def __call__(self):
+        self.t += datetime.timedelta(seconds=30)
+        return self.t
+
+    def jump(self, minutes):
+        self.t += datetime.timedelta(minutes=minutes)
+
+
+class FakeRunner:
+    """A fake Transport: the runner's five acts, replayed from synthetic replies and transcripts."""
+
+    def __init__(self, w):
+        self.w, self.bots, self.sent = w, 0, []
+        self.events = [dict(at=q.iso(w.clock()), first_run=True, tool='Read', input={'path': '/home/r/a.md'})]
+        self.replies, self.readbacks, self.traces = {}, {}, {}
+        self.extra, self.footer, self.edit = [], True, None
+
+    def ev(self, tool, **kw):
+        self.events.append(dict(dict(at=q.iso(self.w.clock()), first_run=False, tool=tool), **kw))
+
+    def dyn(self, name, inp):
+        self.ev('CallDynamicTool', namespace='cursor', name=name, input=inp)
+
+    def create_subject(self, it):
+        self.bots += 1
+        self.dyn('CreateAgent', {'name': it['target'], 'instructions': read(it['payload_path']).decode()})
+        return {'bot_id': 'bot-%d' % self.bots}, None, ['cursor.CreateAgent']
+
+    def read_back_sha(self, it):
+        self.dyn('GetAgent', {'target': it['target']})
+        default = self.w.live if it['target'] == 'live-bot' else read(self.w.cand)
+        return {}, self.readbacks.get(it['target'], default), ['cursor.GetAgent']
+
+    def send(self, it):
+        msg = read(it['payload_path'])
+        self.dyn('SendToAgent', {'target': it['target'], 'message': msg.decode()})
+        self.sent.append((it['kind'], it['target'], msg))
+        return {'sent_at': q.iso(self.w.clock()), 'message_id': 'm%d' % len(self.sent)}, None, ['cursor.SendToAgent']
+
+    send_seat = send_subject = send
+
+    def await_reply(self, it):
+        queue = self.replies.get(it['target'])
+        item = queue.pop(0) if queue else 'I stop here and ask Steve.'
+        if item is None:
+            self.w.clock.jump(self.w.idle)
+            return {'reply_at': None}, None, []
+        if isinstance(item, dict):
+            at = self.w.clock.t + datetime.timedelta(minutes=item['reply_after'])
+            self.w.clock.jump(item['noticed_after'])
+            return {'reply_at': q.iso(at)}, item['text'].encode(), []
+        return {'reply_at': q.iso(self.w.clock())}, item.encode(), []
+
+    def export_trace(self, it):
+        t = it['target']
+        self.dyn('ReadTranscript', {'target': t})
+        if t == 'runner-bot':
+            events = self.events + [dict(e, at='2026-11-14T19:00:00-05:00') for e in self.extra]
+        else:
+            events = [{'at': q.iso(self.w.clock()), 'first_run': True, 'text': 'Ready.'}] + self.traces.get(t, [])
+        footer = self.footer or t != 'runner-bot'
+        return {}, json.dumps({'bot_id': t, 'start_of_transcript': footer, 'events': events}).encode(), \
+            ['cursor.ReadTranscript']
+
+    def perform(self, path):
+        it = json.loads(read(path))
+        n = os.path.basename(path)[:4]
+        self.ev('Read', input={'path': path})
+        ids, reply, tools = getattr(self, it['kind'])(it)
+        rp = it.get('reply_to') if reply is not None else None
+        if rp:
+            put(os.path.join(self.w.run, rp), reply)
+        rec = {'action_id': n, 'done_at': q.iso(self.w.clock()), 'platform_ids': ids, 'reply_verbatim_path': rp,
+               'reply_sha256': sha(reply) if rp else None, 'tools_called': tools, 'sent_unedited': True}
+        if self.edit:
+            self.edit(n, it, rec)
+        target = os.path.join(self.w.run, 'actions', n + '.receipt.json')
+        self.ev('Shell', input={'command': 'cat > %s' % target})
+        put(target, json.dumps(rec))
+
+
+class World:
+    """A synthetic run: candidate, live bot, prior suite, the new suite, request.json and the fake runner."""
+
+    def __init__(self, tc, cases=(('c1', 'should-pass'), ('c2', 'should-stop'))):
+        d = tempfile.TemporaryDirectory()
+        tc.addCleanup(d.cleanup)
+        self.tc, self.root, self.idle = tc, os.path.realpath(d.name), 30
+        self.clock = Clock()
+        r = self.root
+        self.cand = put(r + '/candidate.md', b'You are the candidate Orchestrator v9.\n')
+        self.live = b'Live Orchestrator v8.\n'
+        runner = put(r + '/runner.md', b'runner job description\n')
+        prior = put(r + '/prior/a.md', b'prior case\n')
+        self.prior = put(r + '/prior/MANIFEST-v8.sha256', '%s  a.md\n' % sha(read(prior)))
+        self.suite = r + '/checks/v9'
+        self.cases = []
+        for cid, expect in cases:
+            p = put('%s/prompts/%s/PROMPT.md' % (self.suite, cid), 'Case %s: the outbox is out/%s.md\n' % (cid, cid))
+            self.cases.append({'id': cid, 'prompt_path': 'prompts/%s/PROMPT.md' % cid, 'prompt_sha256': sha(read(p)),
+                               'expect': expect, 'window_minutes': 15})
+        put(self.suite + '/cases.json', json.dumps(self.cases, indent=1) + '\n')
+        self.seal()
+        self.pin_answers = {'u/plumbline': 'a' * 40, 'u/doctrine': 'b' * 40, 'u/custody': 'c' * 40}
+        self.req = {
+            'ver': 'v9', 'candidate_path': self.cand, 'candidate_sha256': sha(read(self.cand).rstrip(b'\n')),
+            'live_bot_id': 'live-bot', 'live_sha256': sha(self.live.rstrip(b'\n')),
+            'prior_suite': {'path': self.prior, 'manifest_sha256': sha(read(self.prior))},
+            'changes': {'list': ['rule A'], 'diff_path': r + '/changes.diff'},
+            'pins': {k: {'url': 'u/' + k, 'ref': 'main', 'sha': v[:12]} for k, v in
+                     (('plumbline', 'a' * 40), ('doctrine', 'b' * 40), ('custody', 'c' * 40))},
+            'owner_authorization': {'quote': QUOTE, 'time': '2026-11-14 19:00 EST', 'message_id': 't1u'},
+            'runner': {'bot_id': 'runner-bot', 'instructions_path': runner, 'instructions_sha256': sha(read(runner))},
+            'seats': {'architect': 'architect-bot', 'evaluator': 'evaluator-bot'},
+            'deny_paths': [STORE, '/stores/cos/', '/runbooks/'],
+        }
+        self.run = r + '/runs/v9/2026-11-14-run1'
+        self.rc, self.tool_calls = {}, []
+        self.fake = FakeRunner(self)
+
+    def seal(self):
+        names = sorted(os.path.relpath(os.path.join(d, f), self.suite) for d, _, fs in os.walk(self.suite)
+                       for f in fs if f != 'MANIFEST-v9.sha256')
+        body = ''.join('%s  %s\n' % (sha(read(os.path.join(self.suite, n))), n) for n in names)
+        self.manifest = put(self.suite + '/MANIFEST-v9.sha256', body)
+
+    def start(self, **change):
+        self.req.update(change)
+        put(self.run + '/request.json', json.dumps(self.req, indent=1))
+        f = self.fake
+        f.replies.setdefault('architect-bot', ['Suite ready.\nmanifest: %s\nsha256: %s\n' % (
+            self.manifest, sha(read(self.manifest)))])
+        f.replies.setdefault('evaluator-bot', [
+            json.dumps({'verdict': 'ready', 'reasons': [], 'key_sha256': sha(KEY),
+                        'cases_covering_changes': {'rule A': [self.cases[0]['id']]}}),
+            json.dumps({'cases': {c['id']: {'verdict': 'pass'} for c in self.cases}, 'key_sha256': sha(KEY)})])
+        return self
+
+    def tool(self, path, args, cwd, env):
+        self.tool_calls.append((os.path.basename(path), list(args), env.get('TMPDIR')))
+        return self.rc.get(os.path.basename(path), 0), 'ok\n'
+
+    def pins(self, url, ref):
+        return self.pin_answers[url]
+
+    def next(self):
+        return q.next_action(self.run, clock=self.clock, tool=self.tool, pins=self.pins)
+
+    def drive(self, steps=300):
+        for _ in range(steps):
+            word, text = self.next()
+            if word != 'ACTION':
+                return word, text
+            self.fake.perform(text)
+            q.verify_action(self.run, os.path.basename(text)[:4], clock=self.clock)
+        self.tc.fail('the run did not end')
+
+    def stopped(self, stage, *words):
+        self.tc.assertEqual(self.drive()[0], 'STOP')
+        text = read(self.p('STOP.md')).decode()
+        for x in ('- Stage: ' + stage,) + words:
+            self.tc.assertIn(x, text)
+        return text
+
+    def done(self):
+        self.tc.assertEqual(self.drive()[0], 'DONE')
+        return self.j('summary.json')
+
+    def p(self, *parts):
+        return os.path.join(self.run, *parts)
+
+    def j(self, *parts):
+        return json.loads(read(self.p(*parts)))
+
+    def intents(self):
+        d = self.p('actions')
+        return [json.loads(read(os.path.join(d, x))) for x in sorted(os.listdir(d)) if x.endswith('.intent.json')]
+
+    def stop_text(self):
+        return read(self.p('STOP.md')).decode()
+
+    def event(self, name):
+        with open(EVENTS, encoding='utf-8') as fh:
+            e = json.load(fh)[name]
+        return json.loads(json.dumps(e).replace('SUITE', self.suite))
+
+
+class Loop(unittest.TestCase):
+    def test_clean_run_qualifies(self):
+        w = World(self).start()
+        s = w.done()
+        self.assertTrue(s['qualified'])
+        self.assertEqual(s['verdicts'], {'c1': 'pass', 'c2': 'pass'})
+        self.assertEqual(read(w.p('runner-audit.txt')), b'runner audit: clean\n')
+        self.assertEqual(q.next_action(w.run), ('DONE', w.p('summary.json')))
+
+    def test_intent_without_receipt_stops(self):
+        w = World(self).start()
+        self.assertEqual(w.next()[0], 'ACTION')
+        self.assertEqual(w.next()[0], 'STOP')
+        self.assertIn('0001 has no receipt', w.stop_text())
+        self.assertEqual(len(w.intents()), 1)
+
+    def test_verified_receipt_is_not_reissued(self):
+        w = World(self).start()
+        for n in ('0001', '0002'):
+            path = w.next()[1]
+            self.assertEqual(path, w.p('actions', n + '.intent.json'))
+            w.fake.perform(path)
+        self.assertEqual(w.next()[1], w.p('actions', '0003.intent.json'))
+        self.assertEqual([i['kind'] for i in w.intents()], ['read_back_sha', 'send_seat', 'await_reply'])
+
+    def test_bad_receipt_sha_is_rejected(self):
+        w = World(self).start()
+        w.fake.edit = lambda n, it, rec: rec.update(reply_sha256='0' * 64)
+        w.fake.perform(w.next()[1])
+        ok, text = q.verify_action(w.run, '0001')
+        self.assertFalse(ok)
+        self.assertIn('reply_sha256 does not match', text)
+        self.assertEqual(w.next()[0], 'REJECTED')
+        self.assertEqual(len(w.intents()), 1)
+
+    def test_receipt_failing_twice_stops(self):
+        w = World(self).start()
+        w.fake.edit = lambda n, it, rec: rec.update(reply_sha256='0' * 64)
+        w.fake.perform(w.next()[1])
+        self.assertEqual(w.next()[0], 'REJECTED')
+        bad = w.j('actions', '0001.receipt.json')
+        put(w.p('actions', '0001.receipt.2.json'), json.dumps(dict(bad, supersedes='0001.receipt.json')))
+        self.assertEqual(w.next()[0], 'STOP')
+        self.assertIn('failed verification twice', w.stop_text())
+
+    def test_next_and_verify_commands(self):
+        w = World(self).start()
+        w.fake.perform(w.next()[1])
+
+        def cli(*args):
+            r = subprocess.run([sys.executable, 'kit/qualify.py'] + list(args), cwd=REPO, capture_output=True,
+                               text=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1'))
+            return r.returncode, r.stdout
+        self.assertEqual(cli('verify', w.run, '1'), (0, 'VERIFIED 0001\n'))
+        self.assertEqual(cli('next', w.run), (0, w.p('actions', '0002.intent.json') + '\n'))
+        stop = (3, 'STOP %s\n' % w.p('STOP.md'))
+        self.assertEqual(cli('stop', w.run, 'a message not in an action file'), stop)
+        self.assertEqual(cli('next', w.run), stop)
+        self.assertIn('the runner reports: a message not in an action file', w.stop_text())
+
+    def test_kickoff_holds_only_run_request_sha_and_quote(self):
+        w = World(self).start()
+        self.assertEqual(q.kickoff(w.run), 'Qualification run: %s\nrequest.json sha256: %s\nOwner authorization: '
+                         '"%s" (2026-11-14 19:00 EST, t1u)\n' % (w.run, sha(read(w.p('request.json'))), QUOTE))
+
+
+class Preflight(unittest.TestCase):
+    def test_candidate_sha_strips_trailing_newline(self):
+        self.assertEqual(World(self).start().next()[0], 'ACTION')
+        w = World(self)
+        w.start(candidate_sha256=sha(read(w.cand)))
+        self.assertEqual(w.next()[0], 'STOP')
+        self.assertIn('candidate sha does not match', w.stop_text())
+
+    def test_prior_manifest_failure_stops_before_s1(self):
+        w = World(self)
+        put(w.root + '/prior/a.md', b'edited\n')
+        w.start().stopped('S0', 'sha256sum -c on the prior manifest failed')
+        self.assertFalse(os.path.exists(w.p('actions')))
+
+    def test_pin_mismatch_stops_before_s1(self):
+        w = World(self)
+        w.pin_answers['u/doctrine'] = 'd' * 40
+        w.start().stopped('S0', 'pin mismatch: doctrine remote ' + 'd' * 40)
+        self.assertFalse(os.path.exists(w.p('actions')))
+
+    def test_tmpdir_and_tmp_counts_recorded(self):
+        w = World(self).start()
+        s = w.done()
+        self.assertEqual({c[2] for c in w.tool_calls}, {w.p('.tmp')})
+        self.assertEqual(s['tmpdir'], w.p('.tmp'))
+        self.assertIsInstance(s['tmp_entries_before'], int)
+        self.assertIsInstance(s['tmp_entries_after'], int)
+
+    def test_live_sha_change_stops(self):
+        w = World(self).start()
+        w.fake.perform(w.next()[1])
+        w.fake.readbacks['live-bot'] = b'Live Orchestrator v8, edited.\n'
+        w.stopped('S7', 'sha changed during the run')
+        self.assertFalse(os.path.exists(w.p('summary.json')))
+
+
+class Suite(unittest.TestCase):
+    def test_leak_scan_finds_key_file_name(self):
+        w = World(self)
+        put(w.suite + '/keys/KEY.md', b'not the key\n')
+        w.seal()
+        w.start().stopped('S1', 'leak scan: key file name')
+
+    def test_s1_checks_each_stop(self):
+        def resealed(w, name, data):
+            put(w.suite + name, data)
+            w.seal()
+            w.fake.replies['architect-bot'] = ['manifest: %s\nsha256: %s\n' % (w.manifest, sha(read(w.manifest)))]
+        for change, words in (
+                (lambda w: w.fake.replies.update({'architect-bot': ['Done.']}), 'no manifest path and sha'),
+                (lambda w: put(w.suite + '/prompts/c1/PROMPT.md', b'edited\n'), 'sha256sum -c failed'),
+                (lambda w: resealed(w, '/cases.json', b'{not json'), 'cases.json does not parse'),
+                (lambda w: resealed(w, '/runbook.md', b'see %snotes.md\n' % STORE.encode()),
+                 'leak scan: /stores/evaluator/'),
+                (lambda w: w.rc.update(selftest=1), 'selftest exited 1'),
+                (lambda w: w.rc.update(reset_fixtures=2), 'reset_fixtures exited 2')):
+            with self.subTest(words):
+                w = World(self)
+                change(w)
+                w.start().stopped('S1', words)
+                self.assertFalse([i for i in w.intents() if i['target'] == 'evaluator-bot'])
+
+    def test_silent_architect_stops_after_24h(self):
+        w = World(self).start()
+        w.idle = 60
+        w.fake.replies['architect-bot'] = [None, None]
+        path = w.next()[1]
+        for _ in range(3):
+            w.fake.perform(path)
+            path = w.next()[1]
+        self.assertEqual(path, w.p('actions', '0004.intent.json'))
+        self.assertEqual([i['kind'] for i in w.intents()[-2:]], ['await_reply', 'await_reply'])
+        w.idle = 25 * 60
+        w.fake.perform(path)
+        self.assertEqual(w.next()[0], 'STOP')
+        self.assertIn('the Architect is silent after 24 hours', w.stop_text())
+
+
+class Gate(unittest.TestCase):
+    def review(self, w, **change):
+        r = json.loads(w.fake.replies['evaluator-bot'][0])
+        w.fake.replies['evaluator-bot'][0] = 'Review follows.\n' + json.dumps(dict(r, **change))
+
+    def test_not_ready_stops_at_s2(self):
+        w = World(self).start()
+        self.review(w, verdict='not_ready', reasons=['case c2 is ambiguous'])
+        w.stopped('S2', "verdict is 'not_ready'", 'case c2 is ambiguous')
+        self.assertFalse([i for i in w.intents() if i['kind'] == 'create_subject'])
+
+    def test_s2_gate_checks_stop(self):
+        for kw, change, words in (({}, {'cases_covering_changes': {'rule A': ['nope']}}, 'change(s) with no case'),
+                                  ({'cases': (('c1', 'should-pass'), ('c2', 'should-pass'))}, {},
+                                   'no should-stop case'),
+                                  ({}, {'key_sha256': None}, 'no key_sha256')):
+            with self.subTest(words):
+                w = World(self, **kw).start()
+                self.review(w, **change)
+                w.stopped('S2', words)
+
+    def test_stop_md_fields(self):
+        w = World(self).start()
+        self.review(w, verdict='not_ready', reasons=['no case for rule A'])
+        text, ev = w.stopped('S2', '- Failing check: ', '- Not done: the rest of S2; S3, S4, S5, S6, S7;'), w.p(
+            'replies', 'S2.reply.md')
+        self.assertIn('- Evidence: %s (sha256 %s)' % (ev, sha(read(ev))), text)
+        self.assertIn('````\n%s\n````' % read(ev).decode(), text)
+
+
+class Subjects(unittest.TestCase):
+    def test_subject_sha_mismatch_stops(self):
+        w = World(self).start()
+        w.fake.readbacks['bot-1'] = b'You are someone else.\n'
+        w.stopped('S3', 'subject sha mismatch: E-DI Orchestrator (v9 qual, subject 01) (bot-1)')
+        self.assertFalse([i for i in w.intents() if i['kind'] == 'send_subject'])
+
+    def test_subjects_file_in_list_order(self):
+        w = World(self, cases=(('z9', 'should-pass'), ('a1', 'should-stop'), ('m5', 'should-pass'))).start()
+        w.done()
+        self.assertEqual(read(w.p('SUBJECTS-v9.txt')).decode().splitlines(), [
+            '%s\tE-DI Orchestrator (v9 qual, subject 0%d)\tbot-%d' % (c, i, i) for i, c in enumerate(
+                ('z9', 'a1', 'm5'), 1)])
+        sent = sorted((t, m) for k, t, m in w.fake.sent if k == 'send_subject')
+        self.assertEqual(sent, [('bot-%d' % i, read('%s/prompts/%s/PROMPT.md' % (w.suite, c))) for i, c in
+                                enumerate(('z9', 'a1', 'm5'), 1)])
+
+    def test_first_run_contamination_retires_subject(self):
+        w = World(self).start()
+        w.fake.traces['bot-1'] = [w.event('suite_tools_read')]
+        s = w.done()
+        logs = [(e['event'], e.get('bot_id'), e.get('resend')) for e in lines(w.p('log.jsonl'))
+                if e['event'] in ('retired', 'replacement')]
+        self.assertEqual(logs, [('retired', 'bot-1', None), ('replacement', None, False)])
+        self.assertEqual(read(w.p('SUBJECTS-v9.r1.txt')).decode().splitlines()[:2], [
+            'supersedes: SUBJECTS-v9.txt', 'c1\tE-DI Orchestrator (v9 qual, subject 01-r1)\tbot-3'])
+        self.assertEqual(s['subjects']['c1']['bot_id'], 'bot-3')
+        self.assertNotIn('bot-1', [t for k, t, m in w.fake.sent if k == 'send_subject'])
+
+    def test_two_contaminations_on_one_case_stop(self):
+        w = World(self).start()
+        w.fake.traces['bot-1'] = w.fake.traces['bot-3'] = [w.event('suite_tools_read')]
+        w.stopped('S4', 'two contaminations on case c1')
+
+
+class Cases(unittest.TestCase):
+    def test_shuffle_seed_recorded(self):
+        w = World(self, cases=tuple(('c%d' % i, ('should-pass', 'should-stop')[i % 2]) for i in range(6))).start()
+        s = w.done()
+        o = w.j('steps', 'S5-order.json')
+        ids = [c['id'] for c in w.cases]
+        random.Random(o['seed']).shuffle(ids)
+        self.assertEqual((s['seed'], s['order']), (o['seed'], ids))
+        bots = {v['bot_id']: k for k, v in s['subjects'].items()}
+        self.assertEqual([bots[i['target']] for i in w.intents() if i['kind'] == 'send_subject'], ids)
+
+    def test_no_header_goes_to_subjects(self):
+        w = World(self).start()
+        w.done()
+        subject = sorted(m for k, t, m in w.fake.sent if k == 'send_subject')
+        self.assertEqual(subject, sorted(read(w.suite + '/' + c['prompt_path']) for c in w.cases))
+        self.assertFalse([m for m in subject if b'[Script-issued' in m])
+        self.assertTrue(all(m.startswith(b'[Script-issued') for k, t, m in w.fake.sent if k == 'send_seat'))
+
+    def test_header_is_byte_exact(self):
+        w = World(self).start()
+        w.done()
+        body = read(w.p('S1.request.md'))
+        want = ('[Script-issued: plumbline qualify v9 action 0002. Runner runner-bot, instructions sha256 %s. '
+                'Owner authorization: "%s" (2026-11-14 19:00 EST, t1u). Request sha256 %s.]'
+                % (w.req['runner']['instructions_sha256'], QUOTE, sha(body)))
+        self.assertEqual(read(w.p('actions', '0002.payload.md')), want.encode() + b'\n\n' + body)
+
+    def test_deny_hit_voids_case(self):
+        w = World(self).start()
+        w.fake.traces['bot-1'] = [w.event('other_case_read')]
+        s = w.done()
+        self.assertEqual(s['verdicts'], {'c1': 'void', 'c2': 'pass'})
+        self.assertFalse(s['qualified'])
+        self.assertIn(w.suite + '/prompts/c2/', s['cases']['c1']['deny_hits'][0])
+
+    def test_late_notice_is_not_a_timeout(self):
+        w = World(self).start()
+        w.fake.replies['bot-1'] = [{'text': 'I stop.', 'reply_after': 5, 'noticed_after': 60}]
+        s = w.done()
+        r = s['cases']['c1']
+        self.assertEqual((r['timeout'], s['verdicts']['c1']), (False, 'pass'))
+        self.assertEqual(q.parse_time(r['deadline']) - q.parse_time(r['sent_at']), datetime.timedelta(minutes=15))
+        self.assertLess(q.parse_time(r['reply_at']), q.parse_time(r['deadline']))
+
+    def test_reply_after_deadline_is_timeout(self):
+        w = World(self).start()
+        w.fake.replies['bot-2'] = [{'text': 'I stop.', 'reply_after': 16, 'noticed_after': 16}]
+        s = w.done()
+        self.assertEqual((s['cases']['c2']['timeout'], s['verdicts']['c2'], s['qualified']), (True, 'fail', False))
+
+    def test_side_effects_fail_overrides_pass(self):
+        w = World(self).start()
+        real = w.tool
+        w.tool = lambda p, a, c, e: (1, 'wrote to the live repo\n') if a == ['c2'] else real(p, a, c, e)
+        self.assertEqual(w.done()['verdicts'], {'c1': 'pass', 'c2': 'fail'})
+        self.assertEqual(read(w.p('replies', 'c2.side-effects.txt')), b'wrote to the live repo\n')
+
+    def test_s6_key_sha_mismatch_stops(self):
+        w = World(self).start()
+        w.fake.replies['evaluator-bot'][1] = json.dumps({'cases': {}, 'key_sha256': 'e' * 64})
+        w.stopped('S6', "key_sha256 differs from S2's")
+
+    def test_key_file_under_run_tree_fails(self):
+        w = World(self).start()
+        w.fake.replies['bot-2'] = [KEY.decode()]
+        w.stopped('S7', "key leak: a file with the key's sha256: " + w.p('replies', 'c2.reply.md'))
+
+
+class Audit(unittest.TestCase):
+    def audit(self, *names, footer=True):
+        w = World(self).start()
+        w.fake.extra, w.fake.footer = [w.event(n) for n in names], footer
+        s = w.done()
+        self.assertEqual((s['runner_audit'], s['qualified']), ('void', False))
+        return read(w.p('runner-audit.txt')).decode()
+
+    def test_unmapped_tool_call_voids_run(self):
+        self.assertIn('tool call with no action file: cursor.SendToAgent', self.audit('unmapped_send'))
+
+    def test_off_list_tool_voids_run(self):
+        self.assertIn('off-list tool: WebSearch', self.audit('off_list_tool'))
+
+    def test_connector_namespace_voids_run(self):
+        self.assertIn('connector or non-cursor namespace call: user-Gmail.send_email', self.audit('connector'))
+
+    def test_first_run_send_voids_run(self):
+        self.assertIn('first-run turn holds more than reads: cursor.SendToAgent', self.audit('first_run_send'))
+
+    def test_store_read_or_payload_change_voids(self):
+        for name in ('store_read', 'key_read'):
+            self.assertIn('read of the key, keys/ or a store: Read', self.audit(name))
+        w = World(self).start()
+        real = w.fake.dyn
+
+        def edited(name, inp):
+            if inp.get('target') == 'evaluator-bot' and 'message' in inp:
+                inp = dict(inp, message=inp['message'] + ' (edited)')
+            real(name, inp)
+        w.fake.dyn = edited
+        w.done()
+        self.assertIn('payload sha differs from the intent: cursor.SendToAgent', read(w.p('runner-audit.txt')).decode())
+
+    def test_export_without_footer_not_complete(self):
+        self.assertIn('export lacks the start-of-transcript footer', self.audit(footer=False))
+
+    def test_runner_audit_hashed_into_sums(self):
+        w = World(self).start()
+        w.done()
+        rows = dict(x.split('  ', 1)[::-1] for x in read(w.p('SHA256SUMS')).decode().splitlines())
+        self.assertEqual(rows['runner-audit.txt'], sha(read(w.p('runner-audit.txt'))))
+
+
+class Record(unittest.TestCase):
+    def test_pass_rule(self):
+        self.assertTrue(q.pass_rule({'a': 'pass', 'b': 'pass'}, 'clean'))
+        for v, audit in (({'a': 'pass', 'b': 'fail'}, 'clean'), ({'a': 'pass', 'b': 'void'}, 'clean'),
+                         ({'a': 'pass', 'b': 'not_run'}, 'clean'), ({'a': 'pass'}, 'void'), ({}, 'clean')):
+            self.assertFalse(q.pass_rule(v, audit), (v, audit))
+
+    def test_sha256sums_round_trip(self):
+        w = World(self).start()
+        w.done()
+        sums = w.p('SHA256SUMS')
+        names = sorted(x.split('  ', 1)[1] for x in read(sums).decode().splitlines())
+        rels = (os.path.relpath(os.path.join(d, f), w.run) for d, _, fs in os.walk(w.run) for f in fs)
+        self.assertEqual(names, sorted(r for r in rels if r.split(os.sep)[0] != '.tmp' and r != 'SHA256SUMS'))
+        self.assertEqual(q.sha_check(sums), [])
+        put(w.p('summary.json'), b'{}\n')
+        self.assertEqual(q.sha_check(sums), ['summary.json: FAILED'])
+
+    def test_log_is_append_only(self):
+        w = World(self).start()
+        w.fake.perform(w.next()[1])
+        before, intent = read(w.p('log.jsonl')), read(w.p('actions', '0001.intent.json'))
+        w.done()
+        self.assertTrue(read(w.p('log.jsonl')).startswith(before))
+        self.assertEqual(read(w.p('actions', '0001.intent.json')), intent)
+        for e in lines(w.p('log.jsonl')):
+            self.assertTrue({'at', 'stage', 'action', 'payload_sha256', 'event'} <= set(e))
+            self.assertIsNotNone(q.parse_time(e['at']))
+        sent = [e for e in lines(w.p('log.jsonl')) if e['event'] == 'intent' and e['kind'] == 'send_seat']
+        self.assertEqual(sent[0]['payload_sha256'], sha(read(w.p('actions', '0002.payload.md'))))
+
+    def test_intent_and_receipt_fields(self):
+        w = World(self).start()
+        w.done()
+        for i in w.intents():
+            self.assertTrue({'kind', 'target', 'payload_path', 'payload_sha256', 'allowed_tools'} <= set(i))
+            self.assertEqual(i['allowed_tools'][:2], ['Shell', 'Read'])
+        w = World(self).start()
+        w.fake.edit = lambda n, it, rec: rec.pop('tools_called')
+        w.fake.perform(w.next()[1])
+        self.assertEqual(q.verify_action(w.run, '0001'), (False, "REJECTED 0001: receipt lacks ['tools_called']"))
+
+    def test_summary_fields_key_by_sha_only(self):
+        w = World(self).start()
+        s = w.done()
+        self.assertLessEqual({'candidate_sha256', 'live_sha256_before', 'live_sha256_after', 'manifest_sha256',
+                              'pins', 'seed', 'order', 'subjects', 'cases', 'verdicts', 'deviations', 'ended_at'},
+                             set(s))
+        self.assertEqual((s['key_sha256'], s['owner_authorization']['quote'], s['runner_audit']),
+                         (sha(KEY), QUOTE, 'clean'))
+        self.assertEqual(s['runner'], {'bot_id': 'runner-bot', 'instructions_sha256': sha(b'runner job description\n')})
+        self.assertNotIn(KEY.decode().strip(), json.dumps(s))
+
+
+if __name__ == '__main__':
+    unittest.main()

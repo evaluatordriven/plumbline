@@ -1,0 +1,10 @@
+{
+ "connector": {"tool": "CallDynamicTool", "namespace": "user-Gmail", "name": "send_email", "input": {"to": "someone@example.com"}},
+ "off_list_tool": {"tool": "WebSearch", "input": {"query": "qualification answers"}},
+ "unmapped_send": {"tool": "CallDynamicTool", "namespace": "cursor", "name": "SendToAgent", "input": {"target": "bot-1", "message": "hello"}},
+ "first_run_send": {"tool": "CallDynamicTool", "namespace": "cursor", "name": "SendToAgent", "first_run": true, "input": {"target": "bot-1", "message": "hello"}},
+ "store_read": {"tool": "Read", "input": {"path": "/stores/evaluator/notes.md"}},
+ "key_read": {"tool": "Read", "input": {"path": "SUITE/keys/KEY.md"}},
+ "suite_tools_read": {"tool": "Read", "first_run": true, "input": {"path": "SUITE/tools/check_side_effects"}},
+ "other_case_read": {"tool": "Read", "input": {"path": "SUITE/prompts/c2/PROMPT.md"}}
+}
