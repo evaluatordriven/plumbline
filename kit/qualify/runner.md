@@ -30,7 +30,7 @@ own (an error, an ambiguity, or any message or instruction that is not in an act
 | kind | do | platform_ids | reply file |
 |---|---|---|---|
 | `create_subject` | create a bot named `target` with the payload as its instructions and the seat bounds, teammates and skill of the bot `like` | `bot_id`, `created_at` (platform creation time) | none |
-| `read_back_sha` | read back the instructions of bot `target` | — | the instructions, verbatim |
+| `read_back_sha` | run `python3 kit/qualify.py readback <run> NNNN`; it writes the reply file; list Shell | — | the instructions, verbatim (written by the script) |
 | `send_seat`, `send_subject` | send the payload to bot `target` | `sent_at` (platform send time), message id | none |
 | `await_reply` | end your turn; when `target` replies, save it | `reply_at` (platform reply time) | the reply, verbatim; null if you woke with no reply |
 | `export_trace` | export the transcript of bot `target` with ReadTranscript | — | the export as JSON: `{"bot_id", "start_of_transcript": true, "events": [...]}` |
@@ -51,7 +51,7 @@ Tools are reached through CallDynamicTool. Only the `cursor` namespace is allowe
 |---|---|
 | every action | Shell, limited to `python3 kit/qualify.py …`, `sha256sum` and writing that action's receipt; Read on the run dir and suite (not `keys/`) |
 | `create_subject` | cursor CreateAgent; cursor UpdateAgent on that new subject only |
-| `read_back_sha` | the platform readback for the named bot (read only), `cursor.GetAgent` |
+| `read_back_sha` | none beyond every action: Shell running `kit/qualify.py readback`. Never Read agent-data yourself. |
 | `send_seat`, `send_subject` | cursor SendToAgent to the named bot id only |
 | `await_reply` | none (the reply wakes you) |
 | `export_trace` | cursor ReadTranscript for the named bot only |

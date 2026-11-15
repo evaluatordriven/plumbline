@@ -100,7 +100,27 @@ the key or a store; the deny list and the runner audit enforce this.
     conduit's full export after the run (L229) is there for the Evaluator, who may void the run.
 16. The audit maps a call to the action whose window (intent logged to receipt `done_at`) holds it. Shell may
     only run `kit/qualify.py`, `sha256sum` or write a receipt; Read stays in the run dir and suite; the first-run
-    turn may hold only Read. The readback tool is `cursor.GetAgent` (SPEC names none).
+    turn may hold only Read. The readback is the script's own command, `python3 kit/qualify.py readback <run> NNNN`:
+    it reads `actions/NNNN.intent.json`, then the `"description"` string of
+    `<AGENTS_ROOT>/<target>/profile.json` (`AGENTS_ROOT = '/home/box/agent-data/agents'`, a module constant only
+    tests patch), writes it verbatim (UTF-8, no added newline) to the intent's `reply_to` once via `.part`, records
+    `steps/readback-NNNN.json` `{action, target, profile_path, description_sha256, read_at}` once, logs
+    `readback NNNN` and prints `READBACK <reply_to> sha256 <file sha> text_sha256 <text sha>`; the receipt's
+    `reply_sha256` is the printed sha256, `tools_called` is `["Shell"]` and `platform_ids` is `{}`. The
+    `read_back_sha` allow-list adds nothing to every action's Shell and Read; a runner Read of agent-data voids the
+    audit. It reads only the allowed target's `profile.json` (never `settings.json`, `store.db`, a key or a store).
+    Refusals write no reply file and change none: (1) no intent NNNN or its kind is not `read_back_sha`: exit 2,
+    usage (`REFUSED`), the run goes on; (2) `target` is not a canonical lowercase UUID; (3) `target` is neither
+    `live_bot_id` nor the `bot_id` of a `create_subject` action whose latest receipt passes verification (from the
+    intents and receipts, not the log); (4) the profile path falls under a `deny_paths` entry; (5) `profile.json`
+    is missing or not JSON, or `description` is missing or not a string; (6) `reply_to` (or the record) already
+    exists with other content (identical bytes reprint the line, exit 0). Cases 2-6 exit 3 through `STOP.md`.
+    Receipt verification (every `verify` and every `next` replay) requires the record, its target and
+    `sha256(reply) == description_sha256`, else a fatal runner deviation; it reads no agent-data, so a replay never
+    re-reads `profile.json`. `verify NNNN` alone also re-reads `profile.json` (same target rules); a mismatch is
+    recorded once in `steps/readback-NNNN.fresh.json` and rejects as fatal, and the next `next` stops with "fresh
+    read at verify: ... The bot's instructions changed on the platform after qualify.py readback ran; this is a
+    platform change, not a runner deviation".
 17. A replacement subject is `... subject NN-r1`, listed in `SUBJECTS-<ver>.r1.txt`.
 18. Verdicts: a deny-list hit voids, a timeout fails, a side-effect failure turns a pass into a fail, a case with
     no score is `not_run`. A `pass_rule` other than `all` stops at S0. The live bot is read back at S0 and S7.
@@ -159,3 +179,13 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - B22: tests.test_qualify.Audit.test_runner_audit_hashed_into_sums
 - B23: tests.test_qualify.Record.test_summary_fields_key_by_sha_only
 - B24: tests.test_qualify.Loop.test_next_and_verify_commands
+- R01: tests.test_qualify.Readback.test_refuses_an_action_that_is_not_read_back_sha
+- R02: tests.test_qualify.Readback.test_refuses_a_target_that_is_not_a_canonical_uuid
+- R03: tests.test_qualify.Readback.test_refuses_a_target_that_is_not_live_or_a_verified_subject
+- R04: tests.test_qualify.Readback.test_refuses_a_deny_listed_profile_path
+- R05: tests.test_qualify.Readback.test_refuses_a_missing_or_bad_profile
+- R06: tests.test_qualify.Readback.test_refuses_an_existing_reply_with_other_bytes
+- R07: tests.test_qualify.Readback.test_reply_is_written_verbatim, tests.test_qualify.Loop.test_clean_run_qualifies
+- R08: tests.test_qualify.Readback.test_verify_rejects_a_hand_edited_reply, tests.test_qualify.Readback.test_verify_rejects_a_reply_with_no_readback, tests.test_qualify.Readback.test_verify_rejects_a_changed_profile, tests.test_qualify.Readback.test_replay_does_not_re_read_profile
+- R09: tests.test_qualify.Audit.test_runner_read_of_profile_voids
+- R10: tests.test_qualify.Loop.test_readback_command_refuses

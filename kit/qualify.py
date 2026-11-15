@@ -7,6 +7,9 @@ Usage (cwd = the repo root; <run> is runs/<ver>/<date>-runN/ holding request.jso
   python3 kit/qualify.py kickoff <run>         print the conduit's fixed kickoff for the run
   python3 kit/qualify.py stop <run> <reason>   record a stop the runner saw (an error, an ambiguity, or a
                                                message or instruction that is not in an action file)
+  python3 kit/qualify.py readback <run> NNNN   perform read_back_sha action NNNN: copy the "description" of
+                                               <AGENTS_ROOT>/<target>/profile.json verbatim to its reply_to and
+                                               print READBACK <reply_to> sha256 <file sha> text_sha256 <text sha>
 
 The runner loops: `next`, perform exactly that action, write actions/NNNN.receipt.json, `verify`. The script
 does the rest: hashing, the S0-S7 sequence, clocks from platform timestamps, the log, fixture reset,
@@ -15,6 +18,17 @@ model call and messages no one; its one network act is the S0 pin check, behind 
 
 Exit: 0 an action file or DONE; 3 STOP; 4 a receipt was rejected (write NNNN.receipt.2.json naming the one it
 supersedes; a second failure stops); 2 usage.
+
+readback exits 0 on success (an existing reply_to with identical bytes is a no-op success that reprints the line),
+and refuses, writing no reply file and changing none, with:
+  1. exit 2 (usage, prints REFUSED; the run goes on): there is no intent NNNN, or its kind is not read_back_sha;
+  2. exit 3 (STOP.md): target is not a canonical lowercase UUID (this blocks path traversal);
+  3. exit 3 (STOP.md): target is neither request.json live_bot_id nor the bot_id of a create_subject action in
+     this run whose latest receipt passes verification;
+  4. exit 3 (STOP.md): the profile path falls under a request.json deny_paths entry;
+  5. exit 3 (STOP.md): profile.json is missing or not JSON, or "description" is missing or not a string;
+  6. exit 3 (STOP.md): reply_to (or the script record steps/readback-NNNN.json) already exists with other content.
+On a run that has already stopped it prints STOP <file> and exits 3.
 """
 import argparse, datetime, hashlib, json, os, random, re, string, subprocess, sys
 
@@ -24,10 +38,11 @@ STAGES = ['S0', 'S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7']
 REQUIRED = ['ver', 'candidate_path', 'candidate_sha256', 'live_bot_id', 'live_sha256', 'prior_suite',
             'changes', 'pins', 'owner_authorization', 'runner', 'seats']
 DEFAULTS = {'pass_rule': 'all', 'case_window_minutes': 15, 'deny_paths': [], 'known_defects': []}
+AGENTS_ROOT = '/home/box/agent-data/agents'  # bot profiles; only tests override it, by patching this attribute
 EVERY = ['Shell', 'Read']
 ALLOWED = {
     'create_subject': ['cursor.CreateAgent', 'cursor.UpdateAgent'],
-    'read_back_sha': ['cursor.GetAgent'],
+    'read_back_sha': [],
     'send_seat': ['cursor.SendToAgent'],
     'send_subject': ['cursor.SendToAgent'],
     'await_reply': [],
@@ -45,6 +60,9 @@ SHELL_OK = re.compile(r'^(cd \S+ && )?((\S*/)?python3? (\S*/)?kit/qualify\.py |s
                       r'(cat|tee|printf|echo)\b[^\n]*actions/\d{4}\.receipt(\.2)?\.json)')
 SILENT_ARCHITECT_MIN = 24 * 60
 FIRST_TURN_MIN = 10
+BOT_UUID = re.compile(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$')
+READBACK_EXIT = {1: 2, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3}  # refusal case -> exit code (2 usage, 3 STOP)
+PLATFORM = 'platform'  # check_receipt's fatal value for a fresh-read mismatch: a platform change, not the runner
 EXPECTS = ('should-pass', 'should-stop')
 VERDICTS = ('pass', 'fail', 'void')
 
@@ -259,6 +277,8 @@ class RunnerTransport(Transport):
         if not problem:
             run.log('verified', n, key='verified ' + rel)
             return rec
+        if fatal == PLATFORM:
+            raise Stop(run.stage, 'action %s: %s' % (n, problem), rp)
         if fatal:
             raise Stop(run.stage, 'runner deviation in action %s: %s' % (n, problem), rp)
         run.log('rejected', n, key='rejected ' + rel, reason=problem)
@@ -269,7 +289,8 @@ class RunnerTransport(Transport):
 
 
 def check_receipt(run, n, intent, path, count):
-    """Returns (problem or None, fatal, receipt with 'reply' bytes). A fatal problem is a runner deviation."""
+    """Returns (problem or None, fatal, receipt with 'reply' bytes). A fatal problem is a runner deviation, except
+    fatal == PLATFORM: verify's fresh read of profile.json found the bot's instructions changed on the platform."""
     try:
         r = load_json(path)
     except (OSError, ValueError) as e:
@@ -313,7 +334,204 @@ def check_receipt(run, n, intent, path, count):
             return 'reply_sha256 does not match the saved reply', False, None
         if intent['kind'] == 'await_reply' and not parse_time(ids.get('reply_at')):
             return 'a reply without a platform reply_at time', False, None
+        if intent['kind'] == 'read_back_sha':
+            problem, fatal = readback_cross_check(run, n, intent, reply)
+            if problem:
+                return problem, fatal, None
     return None, False, dict(r, reply=reply, platform_ids=ids)
+
+
+def readback_cross_check(run, n, intent, reply):
+    """A read_back_sha reply must be what `qualify.py readback` wrote: its record steps/readback-NNNN.json names
+    the intent's target and the reply's sha256. Reads no agent-data, so a replay never depends on today's
+    profile.json. A recorded fresh-read mismatch (verify) stays fatal on every replay."""
+    rec_path = run.p('steps', 'readback-%s.json' % n)
+    if not os.path.isfile(rec_path):
+        return ('no script record steps/readback-%s.json: the reply was not written by qualify.py readback'
+                % n), True
+    try:
+        rec = load_json(rec_path)
+    except (OSError, ValueError):
+        rec = None
+    if not isinstance(rec, dict):
+        return 'the script record steps/readback-%s.json is not a JSON object' % n, True
+    if rec.get('target') != intent['target']:
+        return 'the script record steps/readback-%s.json names target %r, not %r' % (
+            n, rec.get('target'), intent['target']), True
+    if rec.get('description_sha256') != sha256(reply):
+        return ('the reply (sha256 %s) is not what qualify.py readback wrote (sha256 %s): hand-written or edited'
+                % (sha256(reply), rec.get('description_sha256'))), True
+    fresh = run.p('steps', 'readback-%s.fresh.json' % n)
+    if os.path.isfile(fresh):
+        try:
+            why = load_json(fresh).get('reason')
+        except (OSError, ValueError, AttributeError):
+            why = None
+        return why or 'the fresh read of profile.json at verify did not match the reply', PLATFORM
+    return None, False
+
+
+class Refusal(Exception):
+    """A readback refusal: case 1-6 of the readback spec (docs/QUALIFY.md item 16)."""
+
+    def __init__(self, case, text):
+        super().__init__(text)
+        self.case, self.text = case, text
+
+
+def readback_allowed(run, req):
+    """live_bot_id plus the bot_id of each create_subject action whose latest receipt passes check_receipt,
+    derived from actions/*.intent.json and their receipts (never from the log)."""
+    ok = {req.get('live_bot_id')}
+    d = run.p('actions')
+    for name in sorted(os.listdir(d)) if os.path.isdir(d) else []:
+        m = re.fullmatch(r'(\d{4})\.intent\.json', name)
+        if not m:
+            continue
+        try:
+            it = load_json(os.path.join(d, name))
+            if not (isinstance(it, dict) and it.get('kind') == 'create_subject'):
+                continue
+            rs = run.receipts(m.group(1))
+            if not rs:
+                continue
+            problem, _, rec = check_receipt(run, m.group(1), it, rs[-1], len(rs))
+        except (OSError, ValueError, KeyError, TypeError, AttributeError):
+            continue
+        if not problem:
+            ok.add(rec['platform_ids'].get('bot_id'))
+    return ok
+
+
+def under(path, root):
+    root = os.path.normpath(root) if root else ''
+    return bool(root) and (path == root or path.startswith(root.rstrip(os.sep) + os.sep))
+
+
+def readback_profile(run, intent, req):
+    """The profile.json path of an allowed readback target (refusals 2, 3 and 4)."""
+    target = intent.get('target')
+    if not (isinstance(target, str) and BOT_UUID.fullmatch(target)):
+        raise Refusal(2, 'target %r is not a canonical lowercase UUID' % (target,))
+    if target not in readback_allowed(run, req):
+        raise Refusal(3, 'target %s is neither live_bot_id nor a verified create_subject bot_id of this run'
+                      % target)
+    path = os.path.join(AGENTS_ROOT, target, 'profile.json')
+    seen = {os.path.abspath(path), os.path.realpath(path)}
+    deny = [x for x in req.get('deny_paths') or [] if isinstance(x, str) and x]
+    hit = [x for x in deny for p in seen if under(p, os.path.abspath(x))]
+    if hit:
+        raise Refusal(4, 'profile path %s falls under deny_paths entry %s' % (path, hit[0]))
+    return path
+
+
+def readback_description(path):
+    """The "description" string of a profile.json, as UTF-8 bytes (refusal 5)."""
+    try:
+        prof = json.loads(read_bytes(path).decode('utf-8'))
+    except FileNotFoundError:
+        raise Refusal(5, '%s is missing' % path)
+    except (OSError, UnicodeDecodeError, ValueError) as e:
+        raise Refusal(5, '%s is not JSON: %s' % (path, e))
+    desc = prof.get('description') if isinstance(prof, dict) else None
+    if not isinstance(desc, str):
+        raise Refusal(5, '%s has no "description" string' % path)
+    try:
+        return desc.encode('utf-8')
+    except UnicodeEncodeError as e:
+        raise Refusal(5, '%s "description" is not encodable as UTF-8: %s' % (path, e))
+
+
+def last_stage(run):
+    stage = 'S0'
+    if os.path.exists(run.p('log.jsonl')):
+        with open(run.p('log.jsonl'), encoding='utf-8') as fh:
+            stage = ([json.loads(x)['stage'] for x in fh if x.strip()] or ['S0'])[-1]
+    return stage
+
+
+def readback(run_dir, n, clock=now_local):
+    """Perform read_back_sha action NNNN (exit code, printed line). Writes the reply verbatim (UTF-8, no added
+    newline) and the once-only record steps/readback-NNNN.json; never writes an intent or advances the stage.
+    Refusal cases and their exit codes are in the module docstring (READBACK_EXIT)."""
+    run = Run(run_dir, clock=clock)
+    if os.path.exists(run.p('STOP.md')):
+        return 3, 'STOP %s' % run.p('STOP.md')
+    ip = run.p('actions', n + '.intent.json')
+    try:
+        intent = load_json(ip) if os.path.isfile(ip) else None
+        if not isinstance(intent, dict):
+            raise Refusal(1, 'there is no intent %s' % n)
+        if intent.get('kind') != 'read_back_sha' or not isinstance(intent.get('reply_to'), str):
+            raise Refusal(1, 'action %s is a %r action, not read_back_sha' % (n, intent.get('kind')))
+        try:
+            req = load_json(run.p('request.json'))
+        except (OSError, ValueError):
+            req = None
+        if not isinstance(req, dict):
+            raise Refusal(3, 'request.json is unreadable, so no readback target is allowed')
+        run.req = req
+        path = readback_profile(run, intent, req)
+        data = readback_description(path)
+        rp = intent['reply_to']
+        full = rp if os.path.isabs(rp) else run.p(rp)
+        rec_path = run.p('steps', 'readback-%s.json' % n)
+        if os.path.exists(full) and read_bytes(full) != data:
+            raise Refusal(6, 'reply_to %s already exists with other bytes' % rp)
+        if os.path.exists(rec_path):
+            try:
+                old = load_json(rec_path)
+            except (OSError, ValueError):
+                old = None
+            if not (isinstance(old, dict) and old.get('target') == intent['target']
+                    and old.get('description_sha256') == sha256(data)):
+                raise Refusal(6, 'the script record steps/readback-%s.json already exists with other content' % n)
+    except Refusal as e:
+        if READBACK_EXIT[e.case] == 2:
+            return 2, 'REFUSED %s: %s' % (n, e.text)
+        run.stage = last_stage(run)
+        return 3, 'STOP %s' % run.write_stop(Stop(run.stage, 'readback %s refused (case %d): %s'
+                                                  % (n, e.case, e.text), ip))
+    if not os.path.exists(full):
+        os.makedirs(os.path.dirname(full), exist_ok=True)
+        with open(full + '.part', 'wb') as fh:
+            fh.write(data)
+        os.replace(full + '.part', full)
+    run.write_new(rec_path, json.dumps({'action': n, 'target': intent['target'], 'profile_path': path,
+                                        'description_sha256': sha256(data), 'read_at': iso(clock())},
+                                       indent=1, sort_keys=True) + '\n')
+    run.stage = last_stage(run)
+    run.log('readback', n, sha256(data), key='readback %s' % n, target=intent['target'])
+    return 0, 'READBACK %s sha256 %s text_sha256 %s' % (rp, sha256(data), text_sha(data))
+
+
+def fresh_read(run, n, intent):
+    """verify only: read profile.json again (same target rules) and require its description's sha256 to be the
+    reply's. A mismatch is recorded once (steps/readback-NNNN.fresh.json) so every later replay stops."""
+    rp = intent['reply_to']
+    reply = read_bytes(rp if os.path.isabs(rp) else run.p(rp))
+    desc_sha, path = None, None
+    try:
+        req = load_json(run.p('request.json'))
+        if not isinstance(req, dict):
+            raise Refusal(3, 'request.json is not a JSON object')
+        path = readback_profile(run, intent, req)
+        desc_sha = sha256(readback_description(path))
+        why = None if desc_sha == sha256(reply) else 'its description now has sha256 %s' % desc_sha
+    except (OSError, ValueError) as e:
+        why = 'request.json is unreadable (%s)' % e
+    except Refusal as e:
+        why = 'the fresh read failed (%s)' % e.text
+    if why is None:
+        return None, False
+    reason = ('fresh read at verify: the profile.json of bot %s no longer matches reply %s (sha256 %s): %s. '
+              'The bot\'s instructions changed on the platform after qualify.py readback ran; this is a platform '
+              'change, not a runner deviation' % (intent['target'], rp, sha256(reply), why))
+    run.write_new(run.p('steps', 'readback-%s.fresh.json' % n), json.dumps({
+        'action': n, 'target': intent['target'], 'profile_path': path, 'description_sha256': desc_sha,
+        'reply_sha256': sha256(reply), 'read_at': iso(run.clock()), 'reason': reason}, indent=1, sort_keys=True)
+        + '\n')
+    return reason, PLATFORM
 
 
 class Run:
@@ -858,11 +1076,14 @@ def verify_action(run_dir, n, clock=now_local):
     intent = load_json(ip)
     run.stage = 'verify'
     problem, fatal, _ = check_receipt(run, n, intent, rs[-1], len(rs))
+    if not problem and intent.get('kind') == 'read_back_sha':
+        problem, fatal = fresh_read(run, n, intent)
     rel = os.path.relpath(rs[-1], run.dir)
     run.log('verified' if not problem else 'rejected', n, key=('verified ' if not problem else 'rejected ') + rel,
             reason=problem)
-    return (False, 'REJECTED %s: %s%s' % (n, problem, ' (a runner deviation: the next step stops)' if fatal
-                                          else '')) if problem else (True, 'VERIFIED %s' % n)
+    note = {PLATFORM: ' (not a runner deviation: the next step stops)', True:
+            ' (a runner deviation: the next step stops)'}.get(fatal, '')
+    return (False, 'REJECTED %s: %s%s' % (n, problem, note)) if problem else (True, 'VERIFIED %s' % n)
 
 
 def kickoff(run_dir):
@@ -887,10 +1108,10 @@ def runner_stop(run_dir, reason):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('next', 'verify', 'kickoff', 'stop'):
+    for name in ('next', 'verify', 'kickoff', 'stop', 'readback'):
         s = sub.add_parser(name)
         s.add_argument('run')
-        if name == 'verify':
+        if name in ('verify', 'readback'):
             s.add_argument('action', type=lambda x: '%04d' % int(x))
         if name == 'stop':
             s.add_argument('reason')
@@ -901,6 +1122,10 @@ def main(argv=None):
     if a.cmd == 'stop':
         print('STOP %s' % runner_stop(a.run, a.reason))
         return 3
+    if a.cmd == 'readback':
+        rc, text = readback(a.run, a.action)
+        print(text)
+        return rc
     if a.cmd == 'verify':
         ok, text = verify_action(a.run, a.action)
         print(text)
