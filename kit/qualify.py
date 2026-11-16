@@ -19,6 +19,12 @@ Usage (cwd = the kit folder, the repo root the kickoff names; <run> is runs/<ver
                                                (a re-issued export_trace starts fresh: the earlier attempt's pages are
                                                set aside in steps/trace-NNNN.attempt-K/); a script check is re-run and
                                                stops again if it still fails
+  python3 kit/qualify.py reaudit <run> --ruling <file>
+                                               re-run the S5 runner audit of a finished run at a later kit commit
+                                               from the saved runner export, on an Owner ruling {quote, time,
+                                               message_id, channel, summary_sha256, kit_sha}; writes
+                                               runner-audit.rK.txt, summary.rK.json, rulings/reaudit-KK.json and
+                                               SHA256SUMS.rK (nothing rewritten) and logs `reaudited`
   python3 kit/qualify.py readback <run> NNNN   perform read_back_sha action NNNN: copy the "description" of
                                                <AGENTS_ROOT>/<target>/profile.json verbatim to its reply_to and
                                                print READBACK <reply_to> sha256 <file sha> text_sha256 <text sha>
@@ -1173,7 +1179,8 @@ class Run:
             if e['tool'] == 'CallDynamicTool' and ns != 'cursor':
                 reasons.append('connector or non-cursor namespace call: %s' % where)
                 continue
-            if [g for g in guard if g in flat] or KEY_NAME.search(flat):
+            hits = [g for g in guard if g in flat] + [m.group(0) for m in KEY_NAME.finditer(flat)]
+            if hits and not self.sent_payload_names(cur, tid, hits):
                 reasons.append('read of the key, keys/ or a store: %s' % where)
                 continue
             if e.get('first_run'):
@@ -1204,6 +1211,25 @@ class Run:
                                                    str(inp.get('command', ''))):
                 cur = None
         return reasons
+
+    def sent_payload_names(self, cur, tid, hits):
+        """A deny-list path or key name inside a CreateAgent or SendToAgent call is not a read when the action in
+        force carries a payload file that holds every hit: the runner is sending the kit's text (run 6: the candidate
+        instructions name /workspace/.openrouter-key, and the 11 CreateAgent calls whose elided tail showed it were
+        flagged). The text sent is checked apart (payload_ok, the S3 readback). Reads (Read, Shell, GetDynamicTools)
+        and any hit the payload does not hold still flag."""
+        if cur is None or tid not in ('cursor.CreateAgent', 'cursor.SendToAgent'):
+            return False
+        try:
+            intent = load_json(self.intent_path(cur))
+            text = read_bytes(self.local(intent['payload_path'])).decode('utf-8', 'replace') \
+                if intent.get('payload_path') else None
+        except (OSError, ValueError, KeyError, TypeError):
+            return False
+        if text is None or tid not in intent.get('allowed_tools', []):
+            return False
+        flat = json.dumps(text)
+        return all(h in text or h in flat for h in hits)
 
     def is_stop_report(self, inp):
         """A SendToUser whose text is a STOP the run recorded (STOP-NN.md): the report a stop calls for."""
@@ -1783,6 +1809,126 @@ def resume(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_is
                      'no action was stalled: the stopped check runs again')
 
 
+REAUDIT_FIELDS = ('quote', 'time', 'message_id', 'channel', 'summary_sha256', 'kit_sha')
+
+
+def runner_export(run):
+    """(action, export bytes) of the runner's own transcript export (S5's last action), from its latest verified
+    receipt; the export must be what `trace` wrote (steps/trace-NNNN.json). Raises ValueError otherwise."""
+    rid, d = run.req['runner']['bot_id'], run.p('actions')
+    for n in sorted({x[:4] for x in os.listdir(d) if re.fullmatch(r'\d{4}\.intent(\.\d+)?\.json', x)}, reverse=True):
+        intent = load_json(run.intent_path(n))
+        if intent.get('kind') == 'export_trace' and intent.get('target') == rid:
+            rs = run.receipts(n)
+            if not rs:
+                raise ValueError('the runner export %s has no receipt' % n)
+            problem, _, rec = check_receipt(run, n, intent, rs[-1], len(rs))
+            if problem:
+                raise ValueError('the runner export %s does not verify: %s' % (n, problem))
+            return n, rec['reply']
+    raise ValueError('no export_trace of the runner %s on record' % rid)
+
+
+def log_prefix_checks(run, sums):
+    """log.jsonl is appended after SHA256SUMS (a later `verify` or `next` logs): it checks when a prefix of it,
+    ending at a line, has the sha256 SHA256SUMS records."""
+    want = next((x.split()[0] for x in read_bytes(sums).decode('utf-8').splitlines() if x.endswith('  log.jsonl')),
+                None)
+    data, h = read_bytes(run.p('log.jsonl')), hashlib.sha256()
+    for line in data.splitlines(keepends=True):
+        h.update(line)
+        if h.hexdigest() == want:
+            return True
+    return False
+
+
+def reaudit(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_is_ancestor):
+    """Re-run the S5 runner audit of a finished run at a later kit commit, from the saved runner export, on an
+    Owner ruling: (exit code, printed text). The ruling file is JSON {quote, time, message_id, channel,
+    summary_sha256 (of the summary.json ruled on), kit_sha (this kit's HEAD, kit/ clean, descended from the pin in
+    force)}. Refuses (exit 2, nothing written) on a run with STOP.md, without summary.json and SHA256SUMS, with a
+    SHA256SUMS that does not check, or a ruling that fails those checks. Nothing is rewritten: it writes
+    runner-audit.rK.txt, summary.rK.json (runner_audit, qualified and deviations recomputed with the pass rule from
+    the recorded verdicts; `supersedes`), rulings/reaudit-KK.json and SHA256SUMS.rK, and logs `reaudited`."""
+    run = Run(run_dir, clock=clock)
+    sp, sm, ss = run.p('STOP.md'), run.p('summary.json'), run.p('SHA256SUMS')
+    if os.path.exists(sp):
+        return 2, 'REFUSED: %s has a STOP.md; a stopped run resumes (resume), it is not re-audited' % run.dir
+    if not (os.path.isfile(sm) and os.path.isfile(ss)):
+        return 2, 'REFUSED: %s is not finished (no summary.json and SHA256SUMS)' % run.dir
+    try:
+        ruling = load_json(ruling_path)
+    except (OSError, ValueError) as e:
+        return 2, 'REFUSED: the ruling %s is not JSON: %s' % (ruling_path, e)
+    if not isinstance(ruling, dict):
+        return 2, 'REFUSED: the ruling %s is not a JSON object' % ruling_path
+    bad = [k for k in REAUDIT_FIELDS if not (isinstance(ruling.get(k), str) and ruling[k].strip())]
+    if bad:
+        return 2, 'REFUSED: the ruling lacks %s (the Owner\'s words verbatim, time, message id and channel, the ' \
+                  'sha256 of the summary.json it rules on, and kit_sha)' % bad
+    if ruling['summary_sha256'] != file_sha(sm):
+        return 2, 'REFUSED: the ruling is on summary.json sha256 %s; this summary.json is %s' % (
+            ruling['summary_sha256'], file_sha(sm))
+    broken = [x for x in sha_check(ss) if not (x.startswith('log.jsonl:') and log_prefix_checks(run, ss))]
+    if broken:
+        return 2, 'REFUSED: SHA256SUMS does not check: %s' % '; '.join(broken)
+    ks, (at_sha, dirty) = ruling['kit_sha'], head()
+    try:
+        pin, _ = kit_pin(run)
+    except (OSError, ValueError, KeyError, TypeError) as e:
+        return 2, 'REFUSED: cannot read the run\'s kit pin: %s' % e
+    if not FULL_SHA.fullmatch(ks):
+        return 2, 'REFUSED: kit_sha must be a full 40-hex commit sha, not %r' % (ks,)
+    if at_sha != ks or dirty:
+        return 2, 'REFUSED: run reaudit from the kit checked out at kit_sha %s; this kit (%s) is at %s%s' % (
+            ks, os.path.dirname(HERE), at_sha, ' with changed kit/ files' if dirty else '')
+    if not ancestor(pin, ks):
+        return 2, 'REFUSED: kit_sha %s does not descend from the pin in force %s' % (ks, pin)
+    try:
+        run.req = dict(DEFAULTS, **load_json(run.p('request.json')))
+        m = re.match(r'manifest (\S+) sha256 ', read_bytes(run.p('S1.checks.txt')).decode('utf-8'))
+        run.suite, run.stage = os.path.dirname(m.group(1)), 'S5'
+        n, data = runner_export(run)
+        tr = json.loads(data.decode('utf-8'))
+        tr['events'] = [e for e in tr['events'] if isinstance(e, dict)]
+        summary = load_json(sm)
+        reasons = run.audit(tr)
+    except (OSError, ValueError, KeyError, TypeError, AttributeError) as e:
+        return 2, 'REFUSED: cannot re-audit from the record: %s' % e
+    result, was = 'void' if reasons else 'clean', summary.get('runner_audit')
+    hidden = tr.get('unreadable_positions')
+    k = 1 + len([x for x in os.listdir(run.dir) if re.fullmatch(r'runner-audit\.r\d+\.txt', x)])
+    old_audit = run.p('runner-audit.txt' if k == 1 else 'runner-audit.r%d.txt' % (k - 1))
+    old_sum = run.p('summary.json' if k == 1 else 'summary.r%d.json' % (k - 1))
+    ap = run.write_new('runner-audit.r%d.txt' % k, 'runner audit: %s\n%s%ssupersedes: %s (sha256 %s)\nre-audited at '
+                       'kit %s from %s (action %s), on the ruling rulings/reaudit-%02d.json\n' % (
+                           result, ''.join('- %s\n' % x for x in reasons),
+                           'not audited: %s transcript position(s) the platform counts but does not show\n' % hidden
+                           if hidden else '', os.path.basename(old_audit), file_sha(old_audit), ks,
+                           load_json(run.intent_path(n))['reply_to'], n, k))
+    verdicts = summary.get('verdicts') or {}
+    dev = [x for x in summary.get('deviations', []) if not x.startswith('runner audit void (')]
+    if result != 'clean':
+        dev.append('runner audit void (%s)' % os.path.basename(ap))
+    qualified = pass_rule(verdicts, result)
+    rp = run.write_new(run.p('rulings', 'reaudit-%02d.json' % k), json.dumps(dict(
+        ruling, ruling_path=os.path.abspath(ruling_path), ruling_file_sha256=file_sha(ruling_path), kit_from=pin,
+        reaudited_at=iso(clock())), indent=1, sort_keys=True) + '\n')
+    new = dict(load_json(old_sum), runner_audit=result, qualified=qualified, deviations=dev,
+               supersedes='%s (sha256 %s)' % (os.path.basename(old_sum), file_sha(old_sum)),
+               reaudit={'kit_sha': ks, 'kit_from': pin, 'audit_path': os.path.basename(ap), 'audit_sha256':
+                        file_sha(ap), 'ruling': os.path.relpath(rp, run.dir), 'was': was, 'at': iso(clock())})
+    sp2 = run.write_new('summary.r%d.json' % k, json.dumps(new, indent=1, sort_keys=True) + '\n')
+    run.log('reaudited', n, file_sha(ap), key='reaudited %d' % k, was=was, result=result, qualified=qualified,
+            reasons=len(reasons), kit_sha=ks, kit_from=pin, summary=os.path.basename(sp2))
+    sums = write_sums(run.dir, 'SHA256SUMS.r%d' % k)
+    bad = sha_check(sums)
+    if bad:
+        return 2, 'REFUSED: SHA256SUMS.r%d does not check: %s' % (k, '; '.join(bad))
+    return 0, 'REAUDIT %s: runner audit %s (was %s; %d reason(s)); %s qualified %s' % (
+        os.path.basename(ap), result, was, len(reasons), os.path.basename(sp2), str(qualified).lower())
+
+
 def runner_stop(run_dir, reason, clock=now_local):
     run = Run(run_dir, clock=clock)
     if os.path.exists(run.p('STOP.md')):
@@ -1800,7 +1946,8 @@ def runner_stop(run_dir, reason, clock=now_local):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest='cmd', required=True)
-    for name in ('next', 'verify', 'kickoff', 'stop', 'readback', 'resume', 'trace', 'save', 'wait', 'now'):
+    for name in ('next', 'verify', 'kickoff', 'stop', 'readback', 'resume', 'reaudit', 'trace', 'save', 'wait',
+                 'now'):
         s = sub.add_parser(name)
         if name == 'now':
             continue
@@ -1809,7 +1956,7 @@ def main(argv=None):
             s.add_argument('action', type=lambda x: '%04d' % int(x))
         if name == 'stop':
             s.add_argument('reason')
-        if name == 'resume':
+        if name in ('resume', 'reaudit'):
             s.add_argument('--ruling', required=True)
         if name == 'trace':
             s.add_argument('pages', nargs='*')
@@ -1821,8 +1968,8 @@ def main(argv=None):
     if a.cmd == 'kickoff':
         print(kickoff(a.run), end='')
         return 0
-    if a.cmd in ('resume', 'trace', 'save', 'wait'):
-        rc, text = {'resume': lambda: resume(a.run, a.ruling),
+    if a.cmd in ('resume', 'reaudit', 'trace', 'save', 'wait'):
+        rc, text = {'resume': lambda: resume(a.run, a.ruling), 'reaudit': lambda: reaudit(a.run, a.ruling),
                     'trace': lambda: trace(a.run, a.action, a.pages, a.incomplete),
                     'save': lambda: save(a.run, a.action, sys.stdin.buffer.read()),
                     'wait': lambda: wait(a.run, a.action)}[a.cmd]()

@@ -84,6 +84,19 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    A copy of a run (`cp -a`) replays and resumes with no rewriting: intents name absolute paths under the dir the
    run was started in (the parent of `steps/S0-tmp.json`'s `tmpdir`), and the kit maps those to the same place in
    the copy.
+6. Re-audit a finished run at a later kit commit (Owner ruling 2026-11-16 14:11 EST, run 6). A finished run
+   (`summary.json` and `SHA256SUMS`) is not replayed: `next` prints DONE, and S6's request already carries the old
+   audit result. `qualify.py reaudit <run> --ruling <file>` re-runs only the S5 runner audit, from the runner's
+   saved export (its latest receipt verified, the export checked against `steps/trace-NNNN.json`). The ruling file
+   is `{quote, time, message_id, channel, summary_sha256, kit_sha}`: Steve's words, the sha256 of the
+   `summary.json` he ruled on, and the kit commit, which is checked as for `resume` (HEAD exactly, `kit/` clean,
+   descended from the pin in force). It refuses, writing nothing, on a run with `STOP.md`, an unfinished run, a
+   `SHA256SUMS` that does not check (`log.jsonl` may only have grown: a prefix ending at a line must match), or a
+   ruling that fails a check. Nothing is rewritten. It writes `runner-audit.rK.txt` (`supersedes`),
+   `summary.rK.json` (`runner_audit`, `qualified` by the pass rule from the recorded verdicts, `deviations`,
+   `supersedes`, `reaudit`), `rulings/reaudit-KK.json` and `SHA256SUMS.rK`, and it logs `reaudited` (`was`, `result`,
+   `qualified`, `kit_sha`). Case verdicts are not re-asked: the Evaluator scored with the old audit result in S6's
+   request.
 
 Stages: S0 preflight, S1 Architect, S2 gate, S3 subjects, S4 first-run contamination, S5 cases and the runner
 audit, S6 scoring, S7 record. `qualified = all cases pass and void == 0 and not_run == 0 and runner_audit ==
@@ -120,7 +133,8 @@ the key or a store; the deny list and the runner audit enforce this.
 
 ## Decisions where the spec is silent
 
-1. Commands beyond `next` and `verify`: `kickoff`, `stop`, `readback`, `resume`, `trace`, `save`, `wait`, `now`.
+1. Commands beyond `next` and `verify`: `kickoff`, `stop`, `readback`, `resume`, `reaudit`, `trace`, `save`, `wait`,
+   `now`.
 2. A receipt that fails verification is `REJECTED`; the runner may correct it once as `NNNN.receipt.2.json` with
    `"supersedes"`; a second failure stops. An off-list tool in `tools_called`, `sent_unedited` not true or an
    edited payload is a runner deviation and stops at once.
@@ -152,6 +166,11 @@ the key or a store; the deny list and the runner audit enforce this.
     the suite for key file names and `deny_paths`; after S2 and at S7 the run and suite trees are scanned.
 13. The deny list: `deny_paths`, the suite's `tools/`, `keys/` and KEY files, `qualify-script/run/`, this run's
     `actions/` and every other case's prompt directory. S4 scans first-run events, S5 the whole trace.
+    The runner audit scans every tool input for `deny_paths` and key names. One case is not a read: a cursor
+    CreateAgent or SendToAgent inside an action whose payload file holds every hit is sending the kit's own text.
+    Run 6's candidate names `/workspace/.openrouter-key`, and 11 CreateAgent calls were voided for it before this
+    rule. Any hit the payload does not hold still flags, as does a call outside an action and every Read, Shell
+    or GetDynamicTools hit.
 14. An export is JSON `{bot_id, start_of_transcript, events}`, built by `qualify.py trace` from the files
     ReadTranscript writes with `write_to_file`; the runner names each new page and the script keeps the list in
     `steps/trace-NNNN.pages.jsonl` (the current attempt's pages: a re-issue sets the list aside, "Running it"
@@ -298,3 +317,4 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - K08 (subject replies in agentId; rescore from saved exports): tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_is_found, tests.test_qualify_reply_agentid.ReplyKey.test_target_id_and_agent_id_still_work, tests.test_qualify_reply_agentid.ReplyKey.test_direct_sendtoagent_with_agentid_or_agent_id, tests.test_qualify_reply_agentid.ReplyKey.test_other_target_first_run_or_namespace_is_not_a_reply, tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_on_a_real_shaped_page_short_and_elided, tests.test_qualify_reply_agentid.ReplyKey.test_payload_ok_reads_the_send_target_in_any_key, tests.test_qualify_reply_agentid.Rescore.test_stop_with_an_open_export_rescore_resume_done, tests.test_qualify_reply_agentid.Rescore.test_rescore_never_waives_a_script_check
 - K09 (a plain copy of a run rehearses a resume): tests.test_qualify_reply_agentid.CopyRehearsal.test_plain_copy_resumes_like_the_original, tests.test_qualify_reply_agentid.CopyRehearsal.test_local_maps_only_paths_under_the_origin
 - K10 (a re-issued export starts fresh, old pages set aside): tests.test_qualify_export_fresh.Run6Replay.test_the_second_stop_reproduces_at_the_old_kit, tests.test_qualify_export_fresh.Run6Replay.test_resume_at_the_fix_reissues_fresh_and_reaches_done, tests.test_qualify_export_fresh.SetAside.test_a_finished_attempt_moves_its_record_and_reply_too, tests.test_qualify_export_fresh.SetAside.test_nothing_kept_moves_nothing_and_logs_nothing, tests.test_qualify_export_fresh.SetAside.test_an_existing_set_aside_is_never_overwritten, tests.test_qualify_export_fresh.SetAside.test_only_export_trace_is_set_aside_on_reissue, tests.test_qualify_export_fresh.FirstAttempt.test_overlapping_pages_in_one_attempt_still_refuse
+- K11 (sending the payload is not a key read; reaudit): tests.test_qualify_audit_createagent.Run6Flags.test_the_flags_reproduce_without_the_fix, tests.test_qualify_audit_createagent.Run6Flags.test_with_the_fix_the_same_run_audits_clean, tests.test_qualify_audit_createagent.StillFlags.test_createagent_sending_the_payload_passes, tests.test_qualify_audit_createagent.StillFlags.test_createagent_with_a_deny_path_the_payload_lacks_flags, tests.test_qualify_audit_createagent.StillFlags.test_a_key_name_the_payload_lacks_flags, tests.test_qualify_audit_createagent.StillFlags.test_createagent_outside_an_action_flags, tests.test_qualify_audit_createagent.StillFlags.test_reads_of_the_store_or_keys_still_flag, tests.test_qualify_audit_createagent.StillFlags.test_a_send_to_agent_naming_a_path_its_payload_lacks_flags, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_at_the_fix_writes_new_files_and_rewrites_none, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refusals_change_nothing, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refuses_a_stopped_or_unfinished_run, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refuses_when_the_record_does_not_check, tests.test_qualify_audit_createagent.Reaudit.test_a_tampered_runner_export_is_refused
