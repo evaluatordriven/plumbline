@@ -113,6 +113,18 @@ READBACK_EXIT = {1: 2, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3}  # refusal case -> exit cod
 PLATFORM = 'platform'  # check_receipt's fatal value for a fresh-read mismatch: a platform change, not the runner
 EXPECTS = ('should-pass', 'should-stop')
 VERDICTS = ('pass', 'fail', 'void')
+# SendToAgent's target argument. The kit first assumed target_id; real subject calls in run 5 (2026-11-15) used
+# agentId (CoS trace evidence, n8.trace.8.json) and agent_id. Every key is accepted; the first one present is the
+# target.
+SEND_TARGET_KEYS = ('agentId', 'target_id', 'agent_id')
+
+
+def send_target(inp):
+    """(key, value) of a SendToAgent input's target argument, else (None, None)."""
+    for k in SEND_TARGET_KEYS:
+        if k in inp:
+            return k, inp[k]
+    return None, None
 
 
 def sha256(data):
@@ -335,7 +347,7 @@ class RunnerTransport(Transport):
             run.log('intent', n, intent['payload_sha256'], kind=kind, target=target)
             raise Wait('ACTION', ip)
         old = load_json(ip)
-        if dict(old, payload_sha256=None) != dict(intent, payload_sha256=None):
+        if not run.same_intent(old, intent):
             raise Stop(run.stage, 'action %s on record is not the action the procedure needs now' % n, ip)
         if old['payload_sha256'] != intent['payload_sha256']:
             raise Stop(run.stage, 'runner deviation in action %s: payload edited after its intent' % n, payload_path)
@@ -384,7 +396,7 @@ def check_receipt(run, n, intent, path, count):
     off = [t for t in tools if t not in intent['allowed_tools']]
     if off:
         return 'off-list tool(s) %s' % off, True, None
-    if intent['payload_path'] and file_sha(intent['payload_path']) != intent['payload_sha256']:
+    if intent['payload_path'] and file_sha(run.local(intent['payload_path'])) != intent['payload_sha256']:
         return 'payload changed after its intent was written', True, None
     if not parse_time(r['done_at']):
         return 'done_at is not a time with its zone', False, None
@@ -400,7 +412,7 @@ def check_receipt(run, n, intent, path, count):
     if rp:
         if intent.get('reply_to') and rp != intent['reply_to']:
             return 'reply saved at %r, not %r' % (rp, intent['reply_to']), False, None
-        full = rp if os.path.isabs(rp) else run.p(rp)
+        full = run.local(rp)
         if not os.path.isfile(full):
             return 'reply file %s is missing' % rp, False, None
         reply = read_bytes(full)
@@ -566,7 +578,7 @@ def readback(run_dir, n, clock=now_local):
         path = readback_profile(run, intent, req)
         data = readback_description(path)
         rp = intent['reply_to']
-        full = rp if os.path.isabs(rp) else run.p(rp)
+        full = run.local(rp)
         rec_path = run.p('steps', 'readback-%s.json' % n)
         if os.path.exists(full) and read_bytes(full) != data:
             raise Refusal(6, 'reply_to %s already exists with other bytes' % rp)
@@ -601,7 +613,7 @@ def fresh_read(run, n, intent):
     """verify only: read profile.json again (same target rules) and require its description's sha256 to be the
     reply's. A mismatch is recorded once (steps/readback-NNNN.fresh.json) so every later replay stops."""
     rp = intent['reply_to']
-    reply = read_bytes(rp if os.path.isabs(rp) else run.p(rp))
+    reply = read_bytes(run.local(rp))
     desc_sha, path = None, None
     try:
         req = load_json(run.p('request.json'))
@@ -634,14 +646,48 @@ class Run:
         self.clock, self.tool_fn, self.pins, self.head = clock, tool, pins, head
         self.t = RunnerTransport(self)
         self.n, self.stage, self.suite = 0, 'S0', None
-        self.keys, self.created = set(), {}
+        self.keys, self.created, self.logged = set(), {}, {}
         lp = self.p('log.jsonl')
         if os.path.exists(lp):
             with open(lp, encoding='utf-8') as fh:
-                self.keys = {json.loads(x).get('key') for x in fh if x.strip()}
+                self.logged = {d.get('key'): d for d in (json.loads(x) for x in fh if x.strip())}
+            self.keys = set(self.logged)
+        self._origin = None
 
     def p(self, *parts):
         return os.path.join(self.dir, *parts)
+
+    def origin(self):
+        """The directory this run was started in: the parent of the tmpdir S0 recorded (steps/S0-tmp.json), else
+        this directory. A copy of a run keeps its records, which name absolute paths under the origin."""
+        if self._origin is None:
+            self._origin = self.dir
+            try:
+                t = load_json(self.p('steps', 'S0-tmp.json')).get('tmpdir')
+                if isinstance(t, str) and os.path.isabs(t):
+                    self._origin = os.path.dirname(os.path.normpath(t))
+            except (OSError, ValueError, AttributeError):
+                pass
+        return self._origin
+
+    def local(self, path):
+        """A recorded path as a file of this run: a relative path is under the run dir; an absolute path under the
+        origin is mapped to the same place here (so a copy of a run replays with no rewriting); others stay."""
+        if not isinstance(path, str):
+            return path
+        if not os.path.isabs(path):
+            return self.p(path)
+        o = self.origin()
+        if o != self.dir and under(os.path.normpath(path), o):
+            return os.path.join(self.dir, os.path.relpath(os.path.normpath(path), o))
+        return path
+
+    def same_intent(self, old, new):
+        """Is the intent on record the one the procedure needs now? payload_sha256 is compared apart (an edit is
+        a separate stop); payload_path is compared as a file of this run (local), so a copy matches."""
+        a, b = dict(old, payload_sha256=None), dict(new, payload_sha256=None)
+        a['payload_path'], b['payload_path'] = self.local(a.get('payload_path')), self.local(b.get('payload_path'))
+        return a == b
 
     def intent_path(self, n):
         """The intent now in force for action n: NNNN.intent.json, or the latest NNNN.intent.K.json re-issue."""
@@ -930,8 +976,9 @@ class Run:
     def deny_patterns(self, case):
         own = os.path.dirname(os.path.join(self.suite, case['prompt_path']))
         others = {os.path.dirname(os.path.join(self.suite, c['prompt_path'])) for c in self.cases} - {own}
-        return list(self.req['deny_paths']) + [os.path.join(self.suite, 'tools') + '/', 'qualify-script/run/',
-                                               self.p('actions') + '/'] + [d + '/' for d in sorted(others)]
+        acts = sorted({self.p('actions') + '/', os.path.join(self.origin(), 'actions') + '/'})
+        return list(self.req['deny_paths']) + [os.path.join(self.suite, 'tools') + '/', 'qualify-script/run/'] \
+            + acts + [d + '/' for d in sorted(others)]
 
     def deny_hits(self, tr, case, first_run_only):
         """Scan tool-call inputs and prose against the fixed deny list (SPEC L112-118)."""
@@ -1016,8 +1063,15 @@ class Run:
                 'trace_path': trace_rel, 'polls': polls,
                 'side_effects_rc': se['rc'], 'side_effects_path': os.path.relpath(sp, self.dir),
                 'side_effects_sha256': file_sha(sp)}
-            self.log('case', key='case ' + cid, payload_sha=self.results[cid]['reply_sha256'], case=cid,
-                     timeout=timeout, void=bool(hits), side_effects_rc=se['rc'])
+            codes = dict(timeout=timeout, void=bool(hits), side_effects_rc=se['rc'])
+            self.log('case', key='case ' + cid, payload_sha=self.results[cid]['reply_sha256'], case=cid, **codes)
+            was = self.logged.get('case ' + cid)
+            if was and {k: was.get(k) for k in codes} != codes:
+                # a later kit (resume with kit_sha) scored this case differently from the saved exports: the old
+                # line stays; this line records the new codes and the kit pin that produced them
+                self.log('rescored', key='rescored %s %s' % (cid, kit_pin(self)[0]), payload_sha=self.results[cid]
+                         ['reply_sha256'], case=cid, was={k: was.get(k) for k in codes}, kit_sha=kit_pin(self)[0],
+                         trace=trace_rel, **codes)
             if self.tool('S5-%s-reset-after' % cid, 'reset_fixtures')['rc'] != 0:
                 raise Stop('S5', 'reset_fixtures failed after case %s' % cid, self.p('steps'))
         tr = self.trace(R['runner']['bot_id'], 'replies/runner-transcript.json')
@@ -1049,9 +1103,28 @@ class Run:
                 text, elided = got
                 write_once(self.p(rel), text.encode('utf-8'))
                 self.log('reply_seen', key='reply_seen %s' % cid, case=cid, file=trace_rel, elided=elided)
+                self.replay_polls(cid, bot, sent, deadline, k)
                 return read_bytes(self.p(rel)), done, tr, trace_rel, elided, k
             if nb >= deadline and done >= deadline:
                 return None, None, tr, trace_rel, False, k
+
+    def replay_polls(self, cid, bot, sent, deadline, k):
+        """A rescore: an earlier kit missed the reply and kept polling, so exports k+1.. of this case are on record
+        after the one that shows it. Each is performed again in order (verified, or re-issued under a ruling when
+        it has no receipt) so the action numbers match the record; the result stays the first export's. A live run
+        has no such intent on record and returns at once."""
+        while True:
+            k += 1
+            nxt = self.p('actions', '%04d.intent.json' % (self.n + 1))
+            try:
+                it = load_json(nxt) if os.path.isfile(nxt) else None
+            except (OSError, ValueError):
+                it = None
+            if not (isinstance(it, dict) and it.get('kind') == 'export_trace' and it.get('target') == bot
+                    and it.get('reply_to') == 'replies/%s.trace.%d.json' % (cid, k)):
+                return
+            self.trace_at(bot, it['reply_to'], min(sent + datetime.timedelta(minutes=POLL_MIN * k), deadline))
+            self.log('poll_replayed', key='poll_replayed %s %d' % (cid, k), case=cid, file=it['reply_to'])
 
     def audit(self, tr):
         """The post-run runner audit (SPEC L228-242): every reason found voids the run. Calls are mapped to actions
@@ -1081,7 +1154,7 @@ class Run:
                     reasons.append('first-run turn holds more than reads: %s' % where)
                 continue
             m = re.search(r'/actions/(\d{4})\.intent(?:\.\d+)?\.json$', str(inp.get('path', '')))
-            if tid == 'Read' and m and under(os.path.abspath(inp['path']), self.dir):
+            if tid == 'Read' and m and under(self.local(os.path.abspath(inp['path'])), self.dir):
                 cur = m.group(1)
             if tid in NEVER:
                 reasons.append('off-list tool: %s' % where)
@@ -1121,20 +1194,23 @@ class Run:
             return bool(SHELL_OK.fullmatch(first))
         if tid == 'GetDynamicTools':
             return inp.get('namespace') == 'cursor' and inp.get('toolName') in DYNAMIC_NAMES
-        p = os.path.abspath(str(inp.get('path', '')))
+        p = self.local(os.path.abspath(str(inp.get('path', ''))))
         return any(under(p, r) for r in (self.dir, self.suite) if r) or p in self.payload_paths()
 
     def payload_paths(self):
         d = self.p('actions')
-        return {load_json(os.path.join(d, x)).get('payload_path') for x in sorted(os.listdir(d))
+        return {self.local(load_json(os.path.join(d, x)).get('payload_path')) for x in sorted(os.listdir(d))
                 if re.fullmatch(r'\d{4}\.intent(\.\d+)?\.json', x)} - {None} if os.path.isdir(d) else set()
 
     def payload_ok(self, intent, name, inp):
-        """The call's target and text against the intent, in the real argument names (SendToAgent target_id and
-        message, CreateAgent name and description, ReadTranscript in). An input the transcript shows elided
+        """The call's target and text against the intent, in the real argument names (SendToAgent agentId, also
+        target_id or agent_id, and message; CreateAgent name and description; ReadTranscript in). An input the
+        transcript shows elided
         (over ~4000 characters) is checked on what is shown: the target, and for a seat message its header line,
         which carries the body's sha256; a subject's instructions are proven by the S3 readback instead."""
-        target = {'SendToAgent': 'target_id', 'CreateAgent': 'name', 'ReadTranscript': 'in'}.get(name)
+        target = {'CreateAgent': 'name', 'ReadTranscript': 'in'}.get(name)
+        if name == 'SendToAgent':
+            target = send_target(inp)[0] or SEND_TARGET_KEYS[0]
         if target and target in inp and inp[target] != intent['target']:
             return False
         if name == 'ReadTranscript' and 'in' not in inp and '_elided' not in inp:
@@ -1142,7 +1218,7 @@ class Run:
         text = inp.get({'SendToAgent': 'message', 'CreateAgent': 'description'}.get(name, ''))
         if not intent['payload_path'] or name not in ('SendToAgent', 'CreateAgent'):
             return True
-        payload = read_bytes(intent['payload_path'])
+        payload = read_bytes(self.local(intent['payload_path']))
         if '_elided' in inp:
             if target and target not in inp:
                 return False
@@ -1241,13 +1317,18 @@ def write_once(path, data):
 
 
 def subject_reply(tr, runner):
-    """A subject's reply: its first cursor SendToAgent call to the runner after its first-run turn, as
-    (text, elided). None when the export shows no such call."""
+    """A subject's reply: its first SendToAgent call to the runner after its first-run turn, as (text, elided).
+    None when the export shows no such call. Run 5's subjects (2026-11-15) sent it three ways, all accepted:
+    CallDynamicTool cursor SendToAgent {agentId}, and SendToAgent called directly with {agentId} or {agent_id};
+    target_id is kept."""
     for e in tr['events']:
-        if e.get('first_run') or e.get('tool') != 'CallDynamicTool':
+        if e.get('first_run'):
+            continue
+        dyn = e.get('tool') == 'CallDynamicTool' and e.get('namespace') == 'cursor' and e.get('name') == 'SendToAgent'
+        if not (dyn or e.get('tool') == 'SendToAgent'):
             continue
         inp = e.get('input') if isinstance(e.get('input'), dict) else {}
-        if e.get('namespace') == 'cursor' and e.get('name') == 'SendToAgent' and inp.get('target_id') == runner:
+        if send_target(inp)[1] == runner:
             if '_elided' in inp:
                 raw = inp['_elided']
                 i = raw.find('"message":"')
@@ -1337,7 +1418,7 @@ def stamp_time(text):
 def _elided_fields(s):
     """The scalar fields still readable at the head of an elided tool input."""
     out = {'_elided': s}
-    for k in ('namespace', 'toolName', 'target_id', 'name', 'in', 'agent_id', 'path', 'command'):
+    for k in ('namespace', 'toolName', 'agentId', 'target_id', 'name', 'in', 'agent_id', 'path', 'command'):
         m = re.search(r'"%s"\s*:\s*"((?:[^"\\]|\\.)*)"' % k, s)
         if not m:
             continue
@@ -1481,7 +1562,7 @@ def trace(run_dir, n, pages, incomplete=False, clock=now_local):
         if not complete and not incomplete:
             return 0, 'MORE %s before=%d' % (n, low)
         data = (json.dumps(export, indent=1, sort_keys=True) + '\n').encode('utf-8')
-        full = intent['reply_to'] if os.path.isabs(intent['reply_to']) else run.p(intent['reply_to'])
+        full = run.local(intent['reply_to'])
         if os.path.exists(full) and read_bytes(full) != data:
             raise TraceError('reply_to %s already exists with other bytes' % intent['reply_to'])
     except Refusal as e:
@@ -1511,7 +1592,7 @@ def save(run_dir, n, data):
         intent = load_intent(run, n, 'await_reply')
     except Refusal as e:
         return 2, 'REFUSED %s: %s' % (n, e.text)
-    full = intent['reply_to'] if os.path.isabs(intent['reply_to']) else run.p(intent['reply_to'])
+    full = run.local(intent['reply_to'])
     if os.path.exists(full) and read_bytes(full) != data:
         return 2, 'REFUSED %s: reply_to %s already exists with other bytes' % (n, intent['reply_to'])
     write_once(full, data)

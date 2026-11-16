@@ -141,12 +141,15 @@ class Platform:
         return 'Sent to %s. This is asynchronous; if they reply, it will arrive later as a new message.' % t.name
 
     def subject_turns(self, b):
+        # a subject's reply as run 5's subjects really sent it (CoS trace evidence, 2026-11-15): SendToAgent with
+        # "agentId"; Sim.reply_key may set another key
         turns = [list(x) for x in b.turns]
         if b.case_at is not None:
             events = [{'text': 'Working on it.'}]
             if b.reply is not None and self.clock() >= b.case_at + datetime.timedelta(minutes=b.reply_after):
                 events.append({'tool': 'CallDynamicTool', 'namespace': 'cursor', 'name': 'SendToAgent',
-                               'input': {'target_id': self.sim.runner_id, 'message': b.reply, 'priority': True}})
+                               'input': {getattr(self.sim, 'reply_key', 'agentId'): self.sim.runner_id,
+                                         'message': b.reply, 'priority': True}})
             turns.append(['agent', b.case_at, 'Qualify Runner (id: %s)' % self.sim.runner_id, events])
         return turns
 
