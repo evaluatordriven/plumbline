@@ -52,6 +52,15 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    refused or left without a receipt is re-issued as `actions/NNNN.intent.K.json` (`supersedes`, and `ruling` with
    the quote, time, message id, channel and STOP sha) and logged `reissued`; a stop from a script check runs that
    check again, so a ruling never waives a failed check. A stop with no ruling file stays a stop.
+   A re-issued `export_trace` starts fresh (Owner ruling 2026-11-16 12:29 EST, run 6 action 0101): before
+   `NNNN.intent.K+1.json` is written, what attempt K kept, the page list `steps/trace-NNNN.pages.jsonl` (and
+   `steps/trace-NNNN.json` and the `reply_to` file, if that attempt got so far), moves to
+   `steps/trace-NNNN.attempt-K/`, never deleted, and the move is logged `trace_set_aside` (`attempt`, `moved`,
+   `to`). The runner pages its transcript again from the newest page, and those pages are checked, joined and
+   counted on their own; nothing reads the set-aside folder again, so scoring, the audit and a rescore see only the
+   current attempt. Within one attempt the join check is unchanged: overlapping pages refuse. Before this fix the
+   list was kept per action across attempts, so a fresh newest page (the transcript had grown) overlapped the
+   kept pages and every call refused "do not join".
 5. Resume at a later kit commit. A fix to the kit itself lands as a new commit, but the run is pinned to the old
    one, and every `next` checks the kit checkout's HEAD (with `kit/` clean) against the pin in force: request.json's
    `pins.plumbline.sha`, or the `kit_sha` of the latest ruling that moved it. To move it, the ruling file adds
@@ -90,6 +99,8 @@ Evaluator and Chief of Staff stores, the runbooks and the provider key); optiona
 ## The record
 
 The run dir is append-only: nothing is rewritten, and a correction is a new file naming the one it supersedes.
+One move is made, never a rewrite or a delete: a re-issued `export_trace` renames its earlier attempt's files into
+`steps/trace-NNNN.attempt-K/` ("Running it" item 4), logged `trace_set_aside`.
 `log.jsonl` has one line per event (`at` with zone, `stage`, `action`, `payload_sha256`, `event`).
 `actions/NNNN.intent.json` holds `{kind, target, payload_path, payload_sha256, allowed_tools}` (plus `reply_to`,
 `not_before`); a re-issued action is `NNNN.intent.K.json` with `supersedes` and `ruling`; `rulings/ruling-NN.json`
@@ -143,7 +154,8 @@ the key or a store; the deny list and the runner audit enforce this.
     `actions/` and every other case's prompt directory. S4 scans first-run events, S5 the whole trace.
 14. An export is JSON `{bot_id, start_of_transcript, events}`, built by `qualify.py trace` from the files
     ReadTranscript writes with `write_to_file`; the runner names each new page and the script keeps the list in
-    `steps/trace-NNNN.pages.jsonl`. The real page shape (pages read 2026-11-15; a structural copy is
+    `steps/trace-NNNN.pages.jsonl` (the current attempt's pages: a re-issue sets the list aside, "Running it"
+    item 4). The real page shape (pages read 2026-11-15; a structural copy is
     `tests/fixtures/qualify/readtranscript-subject-first-run.txt`): a `<cursor_untrusted_data_1337
     source="ReadTranscript">` wrapper, no trailing newline; the header `Transcript of agent "NAME" (ID),
     positions A–B of N:` (0-based, inclusive, en dash) or `Transcript of this session, ...`; one compact JSON line
@@ -285,3 +297,4 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - K07 (resume at a later kit commit): tests.test_qualify_page_header.Run5Resume.test_stop_at_0044_ruling_at_a_new_kit_commit_resume_done, tests.test_qualify_page_header.Run5Resume.test_after_the_move_next_at_the_old_commit_stops, tests.test_qualify_page_header.Run5Resume.test_resume_at_the_pin_needs_no_kit_sha
 - K08 (subject replies in agentId; rescore from saved exports): tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_is_found, tests.test_qualify_reply_agentid.ReplyKey.test_target_id_and_agent_id_still_work, tests.test_qualify_reply_agentid.ReplyKey.test_direct_sendtoagent_with_agentid_or_agent_id, tests.test_qualify_reply_agentid.ReplyKey.test_other_target_first_run_or_namespace_is_not_a_reply, tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_on_a_real_shaped_page_short_and_elided, tests.test_qualify_reply_agentid.ReplyKey.test_payload_ok_reads_the_send_target_in_any_key, tests.test_qualify_reply_agentid.Rescore.test_stop_with_an_open_export_rescore_resume_done, tests.test_qualify_reply_agentid.Rescore.test_rescore_never_waives_a_script_check
 - K09 (a plain copy of a run rehearses a resume): tests.test_qualify_reply_agentid.CopyRehearsal.test_plain_copy_resumes_like_the_original, tests.test_qualify_reply_agentid.CopyRehearsal.test_local_maps_only_paths_under_the_origin
+- K10 (a re-issued export starts fresh, old pages set aside): tests.test_qualify_export_fresh.Run6Replay.test_the_second_stop_reproduces_at_the_old_kit, tests.test_qualify_export_fresh.Run6Replay.test_resume_at_the_fix_reissues_fresh_and_reaches_done, tests.test_qualify_export_fresh.SetAside.test_a_finished_attempt_moves_its_record_and_reply_too, tests.test_qualify_export_fresh.SetAside.test_nothing_kept_moves_nothing_and_logs_nothing, tests.test_qualify_export_fresh.SetAside.test_an_existing_set_aside_is_never_overwritten, tests.test_qualify_export_fresh.SetAside.test_only_export_trace_is_set_aside_on_reissue, tests.test_qualify_export_fresh.FirstAttempt.test_overlapping_pages_in_one_attempt_still_refuse

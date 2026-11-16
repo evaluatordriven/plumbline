@@ -15,8 +15,10 @@ Usage (cwd = the kit folder, the repo root the kickoff names; <run> is runs/<ver
                                                from the pin in force; later `next` calls check it); STOP.md becomes
                                                STOP-NN.md, the ruling is kept as rulings/ruling-NN.json, and the
                                                conduit's fixed resume message is printed. A stalled action (an intent
-                                               with no receipt) is re-issued as NNNN.intent.K.json carrying the ruling;
-                                               a script check is re-run and stops again if it still fails
+                                               with no receipt) is re-issued as NNNN.intent.K.json carrying the ruling
+                                               (a re-issued export_trace starts fresh: the earlier attempt's pages are
+                                               set aside in steps/trace-NNNN.attempt-K/); a script check is re-run and
+                                               stops again if it still fails
   python3 kit/qualify.py readback <run> NNNN   perform read_back_sha action NNNN: copy the "description" of
                                                <AGENTS_ROOT>/<target>/profile.json verbatim to its reply_to and
                                                print READBACK <reply_to> sha256 <file sha> text_sha256 <text sha>
@@ -710,6 +712,8 @@ class Run:
         if len(rulings) < k:
             return None
         r = rulings[k - 1]
+        if intent['kind'] == 'export_trace':
+            self.set_aside_trace(n, k, intent)
         path = self.p('actions', '%s.intent.%d.json' % (n, k + 1))
         self.write_new(path, json.dumps(dict(intent, supersedes=os.path.basename(latest), ruling={
             x: r.get(x) for x in ('quote', 'time', 'message_id', 'channel', 'stop_sha256', 'stop_file', 'kit_sha')
@@ -717,6 +721,29 @@ class Run:
         self.log('reissued', n, intent['payload_sha256'], key='reissued %s %d' % (n, k + 1),
                  intent=os.path.basename(path))
         return path
+
+    def set_aside_trace(self, n, k, intent):
+        """A re-issued export_trace starts fresh (Owner ruling 2026-11-16 12:29 EST, run 6 action 0101): what
+        attempt k kept (the page list steps/trace-NNNN.pages.jsonl, and the record steps/trace-NNNN.json and the
+        reply_to file if it got that far) moves, never deleted, to steps/trace-NNNN.attempt-K/, and the move is
+        logged `trace_set_aside`. Nothing reads that folder again, so the new attempt's pages are checked, joined and
+        counted on their own (the first attempt's join check is unchanged)."""
+        dest = self.p('steps', 'trace-%s.attempt-%d' % (n, k))
+        moved = []
+        for src in (self.p('steps', 'trace-%s.pages.jsonl' % n), self.p('steps', 'trace-%s.json' % n),
+                    self.local(intent['reply_to'])):
+            if not os.path.isfile(src):
+                continue
+            to = os.path.join(dest, os.path.basename(src))
+            if os.path.exists(to):
+                raise Stop(self.stage, 'cannot set aside %s for the re-issue of action %s: %s already exists' % (
+                    src, n, to), to)
+            os.makedirs(dest, exist_ok=True)
+            os.rename(src, to)
+            moved.append(os.path.relpath(src, self.dir))
+        if moved:
+            self.log('trace_set_aside', n, key='trace_set_aside %s %d' % (n, k), attempt=k, moved=moved,
+                     to=os.path.relpath(dest, self.dir))
 
     def receipts(self, n):
         names = [n + '.receipt.json', n + '.receipt.2.json']
@@ -1540,7 +1567,8 @@ def trace(run_dir, n, pages, incomplete=False, clock=now_local):
         if not given:
             raise TraceError('no page files given')
         # pages given by earlier calls for this action are kept in steps/trace-NNNN.pages.jsonl (appended), so each
-        # call names only the page just read and the Shell command stays short
+        # call names only the page just read and the Shell command stays short; a re-issue of the action sets the
+        # earlier attempt's list aside (Run.set_aside_trace), so this list holds the current attempt's pages only
         lp = run.p('steps', 'trace-%s.pages.jsonl' % n)
         known = [json.loads(x) for x in open(lp, encoding='utf-8')] if os.path.isfile(lp) else []
         parsed = [parse_page(k['path']) for k in known if os.path.isfile(k['path'])]
