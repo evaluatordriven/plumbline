@@ -43,6 +43,11 @@ def naming_sim(tc):
     return sim
 
 
+def pre_g1():
+    """The kit as run 6 ran it, before kit-small-gaps G1: a void audit went on to S6 instead of stopping at S5."""
+    return unittest.mock.patch.object(q.Run, 'audit_final', lambda self, tr, reasons, hidden: None)
+
+
 def audit_lines(sim):
     return open(os.path.join(sim.run, 'runner-audit.txt'), encoding='utf-8').read()
 
@@ -57,7 +62,7 @@ def run_for_audit(sim):
 class Run6Flags(unittest.TestCase):
     def test_the_flags_reproduce_without_the_fix(self):
         sim = naming_sim(self)
-        with unittest.mock.patch.object(q.Run, 'sent_payload_names', lambda self, cur, tid, hits: False):
+        with unittest.mock.patch.object(q.Run, 'sent_payload_names', lambda self, cur, tid, hits: False), pre_g1():
             self.assertEqual(sim.drive(), 'DONE')
         text = audit_lines(sim)
         self.assertTrue(text.startswith('runner audit: void'), text)
@@ -147,7 +152,7 @@ class StillFlags(unittest.TestCase):
 class Reaudit(unittest.TestCase):
     def finished_void(self):
         sim = naming_sim(self)
-        with unittest.mock.patch.object(q.Run, 'sent_payload_names', lambda self, cur, tid, hits: False):
+        with unittest.mock.patch.object(q.Run, 'sent_payload_names', lambda self, cur, tid, hits: False), pre_g1():
             self.assertEqual(sim.drive(), 'DONE')
         self.assertFalse(sim.j('summary.json')['qualified'])
         return sim

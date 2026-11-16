@@ -40,7 +40,8 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    `python3 kit/qualify.py verify <run> NNNN`. `now` prints box time for receipts, `save` writes a seat reply,
    `wait` sleeps toward an intent's `not_before`, and `trace` turns ReadTranscript pages into an export.
 3. At the end `next` prints `STOP <run>/STOP.md` or `DONE <run>/summary.json`, which the runner sends to Steve
-   verbatim. `qualify.py stop <run> "<reason>"` records a stop the runner saw. Exit: 0 action or DONE, 3 STOP,
+   verbatim. On a finished run `next` prints the summary in force: the highest `summary.rK.json` a `reaudit` wrote
+   (K compared as a number, so `summary.r10.json` is after `summary.r2.json`), else `summary.json`. `qualify.py stop <run> "<reason>"` records a stop the runner saw. Exit: 0 action or DONE, 3 STOP,
    4 rejected receipt, 2 usage.
 4. Resume after a stop, on Steve's ruling only. The conduit writes a ruling file `{quote, time, message_id,
    channel, stop_sha256}` (Steve's words verbatim, where and when he said them, and the sha256 of the `STOP.md`
@@ -84,6 +85,18 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    A copy of a run (`cp -a`) replays and resumes with no rewriting: intents name absolute paths under the dir the
    run was started in (the parent of `steps/S0-tmp.json`'s `tmpdir`), and the kit maps those to the same place in
    the copy.
+   The runner audit is final before S6 scores (kit-small-gaps G1, Owner word relayed 2026-11-16 16:07 EST). A void
+   audit stops the run at the end of S5, after `runner-audit.txt` is written and logged, with the failing check
+   "runner audit void; an Owner ruling decides before S6 scores", so the Evaluator is never asked to score against a
+   void audit Steve has not ruled on. The ruling on that stop resumes as above (with `kit_sha` to move to a kit
+   that fixes the audit). On the next `next` the audit runs again once per such ruling, at the kit the run is now
+   pinned to, from the same saved runner export: `runner-audit.rK.txt` (`supersedes` the previous audit file and
+   its sha; `runner-audit.txt` is never rewritten), logged `runner_audit` with key `runner_audit rK`, `kit_sha` and
+   `supersedes`. S6's request carries the latest audit file, result and sha; S7's `summary.json` records it
+   (`runner_audit`, `runner_audit_path`) and `SHA256SUMS` covers every audit file. A re-run audit that is still
+   void stops again, unless that ruling carries `"audit_void": "accept"`: Steve chooses to have the cases scored
+   with the void audit, and the run then cannot qualify under the pass rule. `resume` refuses (exit 2, nothing
+   written) an `audit_void` other than the string `"accept"`, or one on a stop that is not the audit stop.
 6. Re-audit a finished run at a later kit commit (Owner ruling 2026-11-16 14:11 EST, run 6). A finished run
    (`summary.json` and `SHA256SUMS`) is not replayed: `next` prints DONE, and S6's request already carries the old
    audit result. `qualify.py reaudit <run> --ruling <file>` re-runs only the S5 runner audit, from the runner's
@@ -96,7 +109,11 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    `summary.rK.json` (`runner_audit`, `qualified` by the pass rule from the recorded verdicts, `deviations`,
    `supersedes`, `reaudit`), `rulings/reaudit-KK.json` and `SHA256SUMS.rK`, and it logs `reaudited` (`was`, `result`,
    `qualified`, `kit_sha`). Case verdicts are not re-asked: the Evaluator scored with the old audit result in S6's
-   request.
+   request. `summary.rK.json`'s `reaudit` block records `evaluator_saw_audit` and `evaluator_saw_audit_path`, the
+   audit result and file S6's request carried, so a reader sees mechanically when the verdicts were scored
+   against an audit the re-audit superseded (runs scored before G1 stopped void audits at S5). K continues the
+   audit files' numbering (`runner-audit.rK.txt` from a resume counts), and `summary.rK.json` supersedes the
+   summary in force.
 
 Stages: S0 preflight, S1 Architect, S2 gate, S3 subjects, S4 first-run contamination, S5 cases and the runner
 audit, S6 scoring, S7 record. `qualified = all cases pass and void == 0 and not_run == 0 and runner_audit ==
@@ -197,7 +214,9 @@ the key or a store; the deny list and the runner audit enforce this.
     without the footer stops the run; a runner export without it voids the audit.
 15. The runner exports its own transcript as the last S5 action, since S6 sends the audit result (SPEC L140,
     L241) and the conduit cannot wake the runner after the kickoff (L67-69). Later acts are not in it; the
-    conduit's full export after the run (L229) is there for the Evaluator, who may void the run.
+    conduit's full export after the run (L229) is there for the Evaluator, who may void the run. The audit S6
+    sends is final: a void audit stops at S5 for a ruling, and S6 sends the latest `runner-audit(.rK).txt`
+    (see "The runner audit is final before S6 scores" above).
 16. The audit maps a call to an action by order, since the transcript has no per-call time: a Read of
     `actions/NNNN.intent(.K).json` opens the action and `qualify.py verify <run> NNNN` (or `stop`) closes it.
     Shell's first line must fully match one of the forms in `runner.md` (`qualify.py <command>`, `sha256sum`, a
@@ -318,3 +337,4 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - K09 (a plain copy of a run rehearses a resume): tests.test_qualify_reply_agentid.CopyRehearsal.test_plain_copy_resumes_like_the_original, tests.test_qualify_reply_agentid.CopyRehearsal.test_local_maps_only_paths_under_the_origin
 - K10 (a re-issued export starts fresh, old pages set aside): tests.test_qualify_export_fresh.Run6Replay.test_the_second_stop_reproduces_at_the_old_kit, tests.test_qualify_export_fresh.Run6Replay.test_resume_at_the_fix_reissues_fresh_and_reaches_done, tests.test_qualify_export_fresh.SetAside.test_a_finished_attempt_moves_its_record_and_reply_too, tests.test_qualify_export_fresh.SetAside.test_nothing_kept_moves_nothing_and_logs_nothing, tests.test_qualify_export_fresh.SetAside.test_an_existing_set_aside_is_never_overwritten, tests.test_qualify_export_fresh.SetAside.test_only_export_trace_is_set_aside_on_reissue, tests.test_qualify_export_fresh.FirstAttempt.test_overlapping_pages_in_one_attempt_still_refuse
 - K11 (sending the payload is not a key read; reaudit): tests.test_qualify_audit_createagent.Run6Flags.test_the_flags_reproduce_without_the_fix, tests.test_qualify_audit_createagent.Run6Flags.test_with_the_fix_the_same_run_audits_clean, tests.test_qualify_audit_createagent.StillFlags.test_createagent_sending_the_payload_passes, tests.test_qualify_audit_createagent.StillFlags.test_createagent_with_a_deny_path_the_payload_lacks_flags, tests.test_qualify_audit_createagent.StillFlags.test_a_key_name_the_payload_lacks_flags, tests.test_qualify_audit_createagent.StillFlags.test_createagent_outside_an_action_flags, tests.test_qualify_audit_createagent.StillFlags.test_reads_of_the_store_or_keys_still_flag, tests.test_qualify_audit_createagent.StillFlags.test_a_send_to_agent_naming_a_path_its_payload_lacks_flags, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_at_the_fix_writes_new_files_and_rewrites_none, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refusals_change_nothing, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refuses_a_stopped_or_unfinished_run, tests.test_qualify_audit_createagent.Reaudit.test_reaudit_refuses_when_the_record_does_not_check, tests.test_qualify_audit_createagent.Reaudit.test_a_tampered_runner_export_is_refused
+- K12 (the runner audit is final before S6; next names the latest summary): tests.test_qualify_small_gaps.G1.test_a_void_audit_stops_before_s6_and_no_s6_request_is_sent, tests.test_qualify_small_gaps.G1.test_a_clean_audit_goes_straight_to_s6, tests.test_qualify_small_gaps.G1.test_resume_at_a_new_kit_reaudits_and_s6_sends_the_rk_audit, tests.test_qualify_small_gaps.G1.test_still_void_after_the_ruling_stops_again, tests.test_qualify_small_gaps.G1.test_still_void_with_audit_void_accept_scores_the_void_audit, tests.test_qualify_small_gaps.G1.test_a_bad_audit_void_value_refuses_and_writes_nothing, tests.test_qualify_small_gaps.G1.test_audit_void_refuses_on_a_stop_that_is_not_the_audit_stop, tests.test_qualify_small_gaps.G1.test_runner_audit_txt_is_never_rewritten, tests.test_qualify_small_gaps.G2.test_next_on_a_finished_run_names_summary_json, tests.test_qualify_small_gaps.G2.test_next_names_the_highest_summary_rk_json_by_number, tests.test_qualify_small_gaps.G2.test_the_procedure_done_path_names_the_latest_summary, tests.test_qualify_small_gaps.Reaudit.test_reaudit_records_what_s6_carried_and_next_names_its_summary, tests.test_qualify_small_gaps.Reaudit.test_reaudit_after_an_accepted_void_supersedes_the_latest_audit

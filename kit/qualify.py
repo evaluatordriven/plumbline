@@ -2,7 +2,8 @@
 """Script-driven Orchestrator qualification: the deterministic part of SPEC v2 (docs/QUALIFY.md).
 
 Usage (cwd = the kit folder, the repo root the kickoff names; <run> is runs/<ver>/<date>-runN/ holding request.json):
-  python3 kit/qualify.py next <run>            print the next action file, or STOP <file>, or DONE <file>
+  python3 kit/qualify.py next <run>            print the next action file, or STOP <file>, or DONE <file> (a
+                                               finished run: its latest summary, summary.rK.json after a reaudit)
   python3 kit/qualify.py verify <run> NNNN     verify the runner's receipt for action NNNN
   python3 kit/qualify.py kickoff <run>         print the conduit's fixed kickoff for the run (names the kit folder
                                                and the commit it is checked out at)
@@ -18,13 +19,18 @@ Usage (cwd = the kit folder, the repo root the kickoff names; <run> is runs/<ver
                                                with no receipt) is re-issued as NNNN.intent.K.json carrying the ruling
                                                (a re-issued export_trace starts fresh: the earlier attempt's pages are
                                                set aside in steps/trace-NNNN.attempt-K/); a script check is re-run and
-                                               stops again if it still fails
+                                               stops again if it still fails. A void runner audit stops at the
+                                               end of S5, before S6 scores; on resume the audit is re-run at the
+                                               ruling's kit (runner-audit.rK.txt) and S6 sends the latest; still
+                                               void stops again unless the ruling says "audit_void": "accept"
   python3 kit/qualify.py reaudit <run> --ruling <file>
                                                re-run the S5 runner audit of a finished run at a later kit commit
                                                from the saved runner export, on an Owner ruling {quote, time,
                                                message_id, channel, summary_sha256, kit_sha}; writes
                                                runner-audit.rK.txt, summary.rK.json, rulings/reaudit-KK.json and
-                                               SHA256SUMS.rK (nothing rewritten) and logs `reaudited`
+                                               SHA256SUMS.rK (nothing rewritten) and logs `reaudited`;
+                                               summary.rK.json's reaudit block records evaluator_saw_audit, the
+                                               audit result S6's request carried
   python3 kit/qualify.py readback <run> NNNN   perform read_back_sha action NNNN: copy the "description" of
                                                <AGENTS_ROOT>/<target>/profile.json verbatim to its reply_to and
                                                print READBACK <reply_to> sha256 <file sha> text_sha256 <text sha>
@@ -1116,6 +1122,44 @@ class Run:
             'not audited: %s transcript position(s) the platform counts but does not show\n' % hidden
             if hidden else ''))
         self.log('runner_audit', payload_sha=file_sha(self.audit_path), result=self.audit_result)
+        self.audit_final(tr, reasons, hidden)
+
+    def audit_rulings(self):
+        """The rulings on runner-audit stops (STOP-NN.md's failing check is AUDIT_STOP), in order."""
+        out = []
+        for r in self.rulings():
+            sf = r.get('stop_file')
+            if isinstance(sf, str) and os.path.isfile(self.p(sf)) and stop_check(self.p(sf)) == AUDIT_STOP:
+                out.append(r)
+        return out
+
+    def audit_final(self, tr, reasons, hidden):
+        """S6 scores only a final audit. A void audit stops here (AUDIT_STOP) for an Owner ruling. Each ruling on
+        such a stop re-runs the audit once, at the kit the run is now pinned to, from the same saved runner export:
+        runner-audit.rK.txt (`supersedes`; runner-audit.txt is never rewritten), logged `runner_audit` with key
+        `runner_audit rK`. S6 and S7 use the latest audit. Still void stops again, unless the latest ruling carries
+        "audit_void": "accept": the Owner proceeds to S6 with the void audit (the run cannot qualify)."""
+        ruled = self.audit_rulings()
+        for k, r in enumerate(ruled, 1):
+            name = 'runner-audit.r%d.txt' % k
+            if not os.path.exists(self.p(name)):
+                prev = self.audit_path
+                result = 'void' if reasons else 'clean'
+                ap = self.write_new(name, 'runner audit: %s\n%s%ssupersedes: %s (sha256 %s)\nre-audited at kit %s on '
+                                    'the ruling %s (on %s)\n' % (
+                                        result, ''.join('- %s\n' % x for x in reasons),
+                                        'not audited: %s transcript position(s) the platform counts but does not '
+                                        'show\n' % hidden if hidden else '', os.path.basename(prev), file_sha(prev),
+                                        kit_pin(self)[0], 'rulings/ruling-%s.json' % r['stop_file'][5:7],
+                                        r['stop_file']))
+                self.log('runner_audit', payload_sha=file_sha(ap), key='runner_audit r%d' % k, result=result,
+                         audit=name, supersedes=os.path.basename(prev), kit_sha=kit_pin(self)[0],
+                         stop_file=r['stop_file'])
+            self.audit_path = self.p(name)
+            first = read_bytes(self.audit_path).decode('utf-8').split('\n', 1)[0]
+            self.audit_result = 'clean' if first == 'runner audit: clean' else 'void'
+        if self.audit_result != 'clean' and not (ruled and ruled[-1].get('audit_void') == 'accept'):
+            raise Stop('S5', AUDIT_STOP, self.audit_path)
 
     def poll(self, cid, bot, sent, deadline, rel):
         """S5: export the subject's transcript every POLL_MIN minutes (each export waits for its not_before) until
@@ -1319,7 +1363,7 @@ class Run:
         dev = [x for r in self.results.values() for x in r['deny_hits']] + [
             '%s timeout' % k for k, r in sorted(self.results.items()) if r['timeout']]
         if self.audit_result != 'clean':
-            dev.append('runner audit void (runner-audit.txt)')
+            dev.append('runner audit void (%s)' % os.path.basename(self.audit_path))
         summary = self.once('S7-summary', lambda: {
             'ver': R['ver'], 'batch': os.path.basename(self.dir), 'candidate_sha256': R['candidate_sha256'],
             'live_sha256_before': R['live_sha256'], 'live_sha256_after': text_sha(live),
@@ -1329,7 +1373,8 @@ class Run:
             'cases': self.results, 'verdicts': self.verdicts, 'counts': counts, 'deviations': dev,
             'owner_authorization': R['owner_authorization'],
             'runner': {'bot_id': R['runner']['bot_id'], 'instructions_sha256': R['runner']['instructions_sha256']},
-            'runner_audit': self.audit_result, 'qualified': qualified, 'tmpdir': self.tmp['tmpdir'],
+            'runner_audit': self.audit_result, 'runner_audit_path': os.path.basename(self.audit_path),
+            'qualified': qualified, 'tmpdir': self.tmp['tmpdir'],
             'tmp_entries_before': self.tmp['tmp_entries_before'], 'tmp_entries_after': tmp_entries(),
             'ended_at': iso(self.clock())})
         path = self.write_new('summary.json', json.dumps(summary, indent=1, sort_keys=True) + '\n')
@@ -1673,15 +1718,31 @@ def pass_rule(verdicts, runner_audit):
         and runner_audit == 'clean'
 
 
+def latest_summary(run):
+    """The summary in force: the highest summary.rK.json (K compared as a number, so r10 is after r2), else
+    summary.json."""
+    ks = [int(m.group(1)) for m in (re.fullmatch(r'summary\.r(\d+)\.json', x) for x in os.listdir(run.dir)) if m]
+    return run.p('summary.r%d.json' % max(ks)) if ks else run.p('summary.json')
+
+
+def stop_check(path):
+    """The failing check a STOP file records ('- Failing check: ...'), else None."""
+    for line in read_bytes(path).decode('utf-8', 'replace').splitlines():
+        if line.startswith('- Failing check: '):
+            return line[len('- Failing check: '):]
+    return None
+
+
 def next_action(run_dir, **seams):
-    """('ACTION', intent path) | ('REJECTED', text) | ('STOP', STOP.md) | ('DONE', summary.json)."""
+    """('ACTION', intent path) | ('REJECTED', text) | ('STOP', STOP.md) | ('DONE', the latest summary)."""
     run = Run(run_dir, **seams)
     if os.path.exists(run.p('STOP.md')):
         return 'STOP', run.p('STOP.md')
     if os.path.exists(run.p('SHA256SUMS')):
-        return 'DONE', run.p('summary.json')
+        return 'DONE', latest_summary(run)
     try:
-        return 'DONE', run.procedure()
+        run.procedure()
+        return 'DONE', latest_summary(run)
     except Wait as w:
         return w.word, w.text
     except Stop as s:
@@ -1731,6 +1792,8 @@ def stalled(run):
 
 
 RULING_FIELDS = ('quote', 'time', 'message_id', 'channel', 'stop_sha256')
+AUDIT_STOP = 'runner audit void; an Owner ruling decides before S6 scores'
+AUDIT_VOID = ('accept',)  # the values a ruling's "audit_void" may take
 FULL_SHA = re.compile(r'[0-9a-f]{40}')
 
 
@@ -1770,6 +1833,13 @@ def resume(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_is
     if ruling['stop_sha256'] != file_sha(sp):
         return 2, 'REFUSED: the ruling is on STOP.md sha256 %s; this STOP.md is %s' % (ruling['stop_sha256'],
                                                                                      file_sha(sp))
+    if 'audit_void' in ruling:
+        if ruling['audit_void'] not in AUDIT_VOID or not isinstance(ruling['audit_void'], str):
+            return 2, 'REFUSED: audit_void must be %s, not %r' % (' or '.join('"%s"' % x for x in AUDIT_VOID),
+                                                                 ruling['audit_void'])
+        if stop_check(sp) != AUDIT_STOP:
+            return 2, 'REFUSED: audit_void rules only on a runner-audit stop ("%s"); this STOP.md is "%s"' % (
+                AUDIT_STOP, stop_check(sp))
     try:
         pin, _ = kit_pin(run)
     except (OSError, ValueError, KeyError, TypeError) as e:
@@ -1899,7 +1969,10 @@ def reaudit(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_i
     hidden = tr.get('unreadable_positions')
     k = 1 + len([x for x in os.listdir(run.dir) if re.fullmatch(r'runner-audit\.r\d+\.txt', x)])
     old_audit = run.p('runner-audit.txt' if k == 1 else 'runner-audit.r%d.txt' % (k - 1))
-    old_sum = run.p('summary.json' if k == 1 else 'summary.r%d.json' % (k - 1))
+    old_sum = latest_summary(run)  # a resume past an audit stop writes runner-audit.rK.txt with no summary.rK.json
+    m6 = re.search(r'^Runner audit: (\S+) \((\S+), sha256 ([0-9a-f]{64})\)$',
+                   read_bytes(run.p('S6.request.md')).decode('utf-8', 'replace') if os.path.isfile(
+                       run.p('S6.request.md')) else '', re.M)
     ap = run.write_new('runner-audit.r%d.txt' % k, 'runner audit: %s\n%s%ssupersedes: %s (sha256 %s)\nre-audited at '
                        'kit %s from %s (action %s), on the ruling rulings/reaudit-%02d.json\n' % (
                            result, ''.join('- %s\n' % x for x in reasons),
@@ -1917,7 +1990,9 @@ def reaudit(run_dir, ruling_path, clock=now_local, head=git_head, ancestor=git_i
     new = dict(load_json(old_sum), runner_audit=result, qualified=qualified, deviations=dev,
                supersedes='%s (sha256 %s)' % (os.path.basename(old_sum), file_sha(old_sum)),
                reaudit={'kit_sha': ks, 'kit_from': pin, 'audit_path': os.path.basename(ap), 'audit_sha256':
-                        file_sha(ap), 'ruling': os.path.relpath(rp, run.dir), 'was': was, 'at': iso(clock())})
+                        file_sha(ap), 'ruling': os.path.relpath(rp, run.dir), 'was': was, 'at': iso(clock()),
+                        'evaluator_saw_audit': m6.group(1) if m6 else None,
+                        'evaluator_saw_audit_path': m6.group(2) if m6 else None})
     sp2 = run.write_new('summary.r%d.json' % k, json.dumps(new, indent=1, sort_keys=True) + '\n')
     run.log('reaudited', n, file_sha(ap), key='reaudited %d' % k, was=was, result=result, qualified=qualified,
             reasons=len(reasons), kit_sha=ks, kit_from=pin, summary=os.path.basename(sp2))

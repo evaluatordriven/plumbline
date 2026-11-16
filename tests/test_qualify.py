@@ -680,12 +680,17 @@ class Cases(unittest.TestCase):
 
 
 class Audit(unittest.TestCase):
+    def voided(self, w):
+        """A void runner audit stops at the end of S5 (kit-small-gaps G1): no S6 request, no summary."""
+        w.stopped('S5', '- Failing check: ' + q.AUDIT_STOP, 'runner-audit.txt')
+        self.assertFalse(os.path.exists(w.p('S6.request.md')))
+        self.assertFalse(os.path.exists(w.p('summary.json')))
+        return read(w.p('runner-audit.txt')).decode()
+
     def audit(self, *names, footer=True):
         w = World(self).start()
         w.fake.extra, w.fake.footer = [w.event(n) for n in names], footer
-        s = w.done()
-        self.assertEqual((s['runner_audit'], s['qualified']), ('void', False))
-        return read(w.p('runner-audit.txt')).decode()
+        return self.voided(w)
 
     def test_unmapped_tool_call_voids_run(self):
         self.assertIn('tool call with no action file: cursor.SendToAgent', self.audit('unmapped_send'))
@@ -710,8 +715,7 @@ class Audit(unittest.TestCase):
                 inp = dict(inp, message=inp['message'] + ' (edited)')
             real(name, inp)
         w.fake.dyn = edited
-        w.done()
-        self.assertIn('payload sha differs from the intent: cursor.SendToAgent', read(w.p('runner-audit.txt')).decode())
+        self.assertIn('payload sha differs from the intent: cursor.SendToAgent', self.voided(w))
 
     def test_export_without_footer_not_complete(self):
         self.assertIn('export lacks the start-of-transcript footer', self.audit(footer=False))
@@ -726,9 +730,7 @@ class Audit(unittest.TestCase):
     def test_runner_read_of_profile_voids(self):
         w = World(self).start()
         w.fake.extra = [{'tool': 'Read', 'input': {'path': os.path.join(w.agents, LIVE, 'profile.json')}}]
-        s = w.done()
-        self.assertEqual((s['runner_audit'], s['qualified']), ('void', False))
-        text = read(w.p('runner-audit.txt')).decode()
+        text = self.voided(w)
         self.assertTrue(text.startswith('runner audit: void\n'), text)
         self.assertIn('- off-list use of Read at ', text)
 
