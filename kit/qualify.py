@@ -114,7 +114,8 @@ PLATFORM = 'platform'  # check_receipt's fatal value for a fresh-read mismatch: 
 EXPECTS = ('should-pass', 'should-stop')
 VERDICTS = ('pass', 'fail', 'void')
 # SendToAgent's target argument. The kit first assumed target_id; real subject calls in run 5 (2026-11-15) used
-# agentId (CoS trace evidence, n8.trace.8.json). Every key is accepted; the first one present is the target.
+# agentId (CoS trace evidence, n8.trace.8.json) and agent_id. Every key is accepted; the first one present is the
+# target.
 SEND_TARGET_KEYS = ('agentId', 'target_id', 'agent_id')
 
 
@@ -1316,13 +1317,18 @@ def write_once(path, data):
 
 
 def subject_reply(tr, runner):
-    """A subject's reply: its first cursor SendToAgent call to the runner (target in agentId, target_id or
-    agent_id) after its first-run turn, as (text, elided). None when the export shows no such call."""
+    """A subject's reply: its first SendToAgent call to the runner after its first-run turn, as (text, elided).
+    None when the export shows no such call. Run 5's subjects (2026-11-15) sent it three ways, all accepted:
+    CallDynamicTool cursor SendToAgent {agentId}, and SendToAgent called directly with {agentId} or {agent_id};
+    target_id is kept."""
     for e in tr['events']:
-        if e.get('first_run') or e.get('tool') != 'CallDynamicTool':
+        if e.get('first_run'):
+            continue
+        dyn = e.get('tool') == 'CallDynamicTool' and e.get('namespace') == 'cursor' and e.get('name') == 'SendToAgent'
+        if not (dyn or e.get('tool') == 'SendToAgent'):
             continue
         inp = e.get('input') if isinstance(e.get('input'), dict) else {}
-        if e.get('namespace') == 'cursor' and e.get('name') == 'SendToAgent' and send_target(inp)[1] == runner:
+        if send_target(inp)[1] == runner:
             if '_elided' in inp:
                 raw = inp['_elided']
                 i = raw.find('"message":"')

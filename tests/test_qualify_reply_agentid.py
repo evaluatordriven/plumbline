@@ -60,6 +60,17 @@ class ReplyKey(unittest.TestCase):
         for key in ('target_id', 'agent_id', 'agentId'):
             self.assertEqual(q.subject_reply({'events': [real_reply_event(key)]}, RUNNER), ('<text>', False), key)
 
+    def test_direct_sendtoagent_with_agentid_or_agent_id(self):
+        """Run 5's subjects 07 and 08 (cases n10, n5) called SendToAgent directly, not through CallDynamicTool:
+        {agentId, message, priority} and {agent_id, message, priority}."""
+        for key in ('agentId', 'agent_id'):
+            ev = {'at': '2026-11-15T20:38:00-05:00', 'first_run': False, 'tool': 'SendToAgent',
+                  'input': {key: RUNNER, 'message': '<text>', 'priority': True}}
+            self.assertEqual(q.subject_reply({'events': [ev]}, RUNNER), ('<text>', False), key)
+            self.assertIsNone(q.subject_reply({'events': [dict(ev, first_run=True)]}, RUNNER), key)
+        user = {'at': 'x', 'first_run': False, 'tool': 'SendToUser', 'input': {'content': '<text>', 'end_turn': True}}
+        self.assertIsNone(q.subject_reply({'events': [user]}, RUNNER))  # a message to Steve is not a reply
+
     def test_other_target_first_run_or_namespace_is_not_a_reply(self):
         other = real_reply_event(target='00000000-0000-4000-8000-000000000099')
         first = dict(real_reply_event(), first_run=True)
@@ -71,13 +82,17 @@ class ReplyKey(unittest.TestCase):
         """The reply as ReadTranscript shows it, through parse_page and export_from_pages: a short message and one
         over ~4000 characters (shown elided, with agentId still readable at its head)."""
         t = datetime.datetime(2026, 11, 15, 21, 24, tzinfo=EST)
-        for msg, elided in (('Short reply.', False), ('L' * 5000, True)):
-            ev = real_reply_event(message=msg)
+        direct = {'tool': 'SendToAgent'}
+        for msg, elided, shape in (('Short reply.', False, {}), ('L' * 5000, True, {}), ('Short.', False, direct),
+                                   ('M' * 5000, True, direct)):
+            ev = dict(real_reply_event(message=msg), **shape)
+            if shape:
+                ev = {k: v for k, v in ev.items() if k not in ('namespace', 'name')}
             turns = [['first', t - datetime.timedelta(minutes=30), '', [{'tool': 'SendToUser', 'input': {
                 'type': 'text', 'content': 'Hi'}}]],
                 ['agent', t, 'Qualify Runner (id: %s)' % RUNNER, [{'text': 'Working.'},
                                                                   {k: ev[k] for k in ('tool', 'namespace', 'name',
-                                                                                       'input')}]]]
+                                                                                       'input') if k in ev}]]]
             with tempfile.TemporaryDirectory(dir=os.environ.get('TMPDIR')) as d:
                 paths = qp.pages(qp.messages(turns), d, SUBJECT, 'E-DI Orchestrator (v3.3 qual, subject 10)',
                                  limit=200)

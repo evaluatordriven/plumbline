@@ -64,7 +64,8 @@ repository. `tests/test_qualify_dryrun.py` replays S0-S7 against the platform's 
    needs now"). So a kit fix that changes what an action says, or `runner.md` (its sha is in request.json),
    cannot resume a run. It needs a new run.
    One change to the S5 actions is replayed instead of stopping: a rescore. When a later kit finds a case's reply
-   in an export an earlier kit already asked for (run 5: the subjects' SendToAgent used `agentId`), the case is
+   in an export an earlier kit already asked for (run 5: the subjects' SendToAgent used `agentId` or `agent_id`, some
+   called directly), the case is
    scored from the first export that shows it, and the later exports of that case on record are performed again
    in order (verified from their receipts, or re-issued under the ruling when one has none) so the action numbers
    still match. Each such export logs `poll_replayed`; a case whose codes change logs `rescored` with `was` (the
@@ -204,8 +205,9 @@ the key or a store; the deny list and the runner audit enforce this.
     scan, where a hit voids the case. A replacement subject waits the same way.
 
 20. S5 sends the case and then polls: an `export_trace` of the subject every 2 minutes (`not_before`) until the
-    subject's first SendToAgent to the runner after its first-run turn appears (the runner's id in `agentId`, as
-    the subjects really send it, or `target_id` or `agent_id`), or the window plus 60 s has
+    subject's first SendToAgent to the runner after its first-run turn appears (called through CallDynamicTool
+    cursor or directly, with the runner's id in `agentId`, `agent_id` or `target_id`: run 5's subjects used the
+    first three shapes), or the window plus 60 s has
     passed. The script writes that message as `replies/<case>.reply.md` (flagged `reply_elided` when the platform
     shortened it) and scans the last export. No reply, or one stamped after the deadline plus 60 s, is a
     `timeout`; the 60 s covers the minute-precision stamp.
@@ -281,5 +283,5 @@ The prompt rule (SPEC L136-137: no "do not message any person or bot", name the 
 - K05 (export from real pages): tests.test_qualify_dryrun.Commands.test_trace_refuses_pages_that_are_not_the_targets
 - K06 (the real page header): tests.test_qualify_page_header.RealPage.test_the_real_page_shape_is_accepted_and_counted_honestly, tests.test_qualify_page_header.RealPage.test_the_check_run_5_stopped_on_refuses_this_page, tests.test_qualify_page_header.RealPage.test_what_the_page_check_still_refuses, tests.test_qualify_page_header.Paging.test_pages_join_and_unreadable_positions_are_counted, tests.test_qualify_page_header.Paging.test_a_gap_or_a_page_that_is_not_the_newest_is_refused, tests.test_qualify_page_header.Paging.test_a_no_readable_messages_page_ends_the_chain, tests.test_qualify_page_header.SimShape.test_the_simulator_emits_the_real_shape
 - K07 (resume at a later kit commit): tests.test_qualify_page_header.Run5Resume.test_stop_at_0044_ruling_at_a_new_kit_commit_resume_done, tests.test_qualify_page_header.Run5Resume.test_after_the_move_next_at_the_old_commit_stops, tests.test_qualify_page_header.Run5Resume.test_resume_at_the_pin_needs_no_kit_sha
-- K08 (subject replies in agentId; rescore from saved exports): tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_is_found, tests.test_qualify_reply_agentid.ReplyKey.test_target_id_and_agent_id_still_work, tests.test_qualify_reply_agentid.ReplyKey.test_other_target_first_run_or_namespace_is_not_a_reply, tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_on_a_real_shaped_page_short_and_elided, tests.test_qualify_reply_agentid.ReplyKey.test_payload_ok_reads_the_send_target_in_any_key, tests.test_qualify_reply_agentid.Rescore.test_stop_with_an_open_export_rescore_resume_done, tests.test_qualify_reply_agentid.Rescore.test_rescore_never_waives_a_script_check
+- K08 (subject replies in agentId; rescore from saved exports): tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_is_found, tests.test_qualify_reply_agentid.ReplyKey.test_target_id_and_agent_id_still_work, tests.test_qualify_reply_agentid.ReplyKey.test_direct_sendtoagent_with_agentid_or_agent_id, tests.test_qualify_reply_agentid.ReplyKey.test_other_target_first_run_or_namespace_is_not_a_reply, tests.test_qualify_reply_agentid.ReplyKey.test_agentid_reply_on_a_real_shaped_page_short_and_elided, tests.test_qualify_reply_agentid.ReplyKey.test_payload_ok_reads_the_send_target_in_any_key, tests.test_qualify_reply_agentid.Rescore.test_stop_with_an_open_export_rescore_resume_done, tests.test_qualify_reply_agentid.Rescore.test_rescore_never_waives_a_script_check
 - K09 (a plain copy of a run rehearses a resume): tests.test_qualify_reply_agentid.CopyRehearsal.test_plain_copy_resumes_like_the_original, tests.test_qualify_reply_agentid.CopyRehearsal.test_local_maps_only_paths_under_the_origin
