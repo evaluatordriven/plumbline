@@ -13,6 +13,10 @@
 It was built under, and runs well under, [Hermes Agent](https://github.com/NousResearch/hermes-agent), but
 nothing in the emitter, the verifier or the test suites needs it.
 
+**Running E-DI jobs on Grok Bot.** [docs/SETUP-GROK-BOT.md](docs/SETUP-GROK-BOT.md) sets up one Grok Bot
+account so that separate bots hold the E-DI seats, including Orchestrator qualification with `kit/qualify.py`
+and the seat bridge.
+
 ## The one rule that shapes everything
 
 **A prompted model promises; a configured instance enforces.**
